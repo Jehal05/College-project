@@ -31,6 +31,13 @@ const ORDER = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_
 const rank = (state) => (state === 'ESCALATED' ? 0 : ORDER.indexOf(state));
 
 export const isFinal = (state) => FINAL_STATES.includes(state);
+
+// Early states: the patient app has detected something but the patient has not confirmed the SOS yet
+// (still in the cancel countdown). Hospitals may see the alert, but it is only a notice:
+// no sound, no flashing, no Acknowledge or Dispatch until the state is SOS_SENT.
+// Works the same if the backend creates the alert already at SOS_SENT (the early state is simply never seen).
+export const EARLY_STATES = ['MONITORING', 'SYMPTOMS_REPORTED', 'EMERGENCY_DETECTED'];
+export const isEarly = (state) => EARLY_STATES.includes(state);
 export const nextStates = (state) => TRANSITIONS[state] || [];
 export const canTransition = (from, to) => nextStates(from).includes(to);
 export const canCancel = (state) => CANCELLABLE_STATES.includes(state);

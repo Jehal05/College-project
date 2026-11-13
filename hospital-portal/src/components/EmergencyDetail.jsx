@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract.js';
-import { canCancel } from '../services/stateMachine.js';
+import { canCancel, isEarly } from '../services/stateMachine.js';
+import { NOT_SHARED, originText } from '../services/adapters.js';
 import { canEscalate, fallbackStatuses, nextHospital } from '../services/escalation.js';
 import { USE_MOCK, mockPatientCancel, mockEscalate } from '../services/api.js';
 import { useAuth } from './AuthProvider.jsx';
@@ -41,6 +42,9 @@ export default function EmergencyDetail({ emergency }) {
   }
   const last = e.status_events[e.status_events.length - 1];
   const cancelled = e.state === 'CANCELLED';
+  const early = isEarly(e.state);
+  const cancelledEarly = cancelled && !e.status_events.some((s) => s.state === 'SOS_SENT');
+  const fromCheckIn = originText(e);
   const hasAmbulance = Boolean(e.ambulance_id);
 
   async function cancelAsPatient() {
@@ -63,9 +67,22 @@ export default function EmergencyDetail({ emergency }) {
       </div>
 
       {cancelled && (
-        <p className="rounded-xl bg-slate-800 p-4 text-lg font-semibold text-white">
-          The patient cancelled this alert (false alarm). No ambulance may be dispatched.
+        <p data-testid="cancelled-banner" className="rounded-xl bg-slate-800 p-4 text-lg font-semibold text-white">
+          {cancelledEarly
+            ? 'The patient cancelled before the SOS was sent. Nothing is needed from the desk.'
+            : 'The patient cancelled this alert (false alarm). No ambulance may be dispatched.'}
         </p>
+      )}
+
+      {early && (
+        <p data-testid="early-banner" className="rounded-xl bg-slate-200 p-4 text-lg font-semibold text-slate-800">
+          Early notice (simulated). The patient has not confirmed the SOS yet and can still cancel.
+          Acknowledge and Dispatch unlock when the SOS is sent.
+        </p>
+      )}
+
+      {fromCheckIn && (
+        <p data-testid="checkin-banner" className="rounded-xl bg-sky-50 p-4 text-lg font-semibold text-sky-900">{fromCheckIn}</p>
       )}
 
       {e.state === 'ESCALATED' && (
@@ -78,13 +95,13 @@ export default function EmergencyDetail({ emergency }) {
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-5">
           <dl className="grid grid-cols-2 gap-4 text-lg">
-            <div><dt className="text-sm text-slate-500">Patient ID</dt><dd className="font-semibold">{e.patient_id}</dd></div>
+            <div><dt className="text-sm text-slate-500">Patient ID</dt><dd className="font-semibold">{e.patient_id ?? NOT_SHARED}</dd></div>
             <div><dt className="text-sm text-slate-500">Emergency ID</dt><dd className="font-semibold">{e.emergency_id}</dd></div>
             <div><dt className="text-sm text-slate-500">Alert time</dt><dd className="font-semibold">{formatTime(e.created_at)}</dd></div>
             <div>
               <dt className="text-sm text-slate-500">Location</dt>
               <dd className="font-semibold">
-                {e.location ? `${e.location.lat.toFixed(4)}, ${e.location.lng.toFixed(4)} (±${e.location.accuracy_m ?? '?'} m)` : 'Not shared'}
+                {e.location ? `${e.location.lat.toFixed(4)}, ${e.location.lng.toFixed(4)} (±${e.location.accuracy_m ?? e.location.accuracy ?? '?'} m)` : 'Not shared'}
               </dd>
             </div>
           </dl>
@@ -95,6 +112,7 @@ export default function EmergencyDetail({ emergency }) {
               {(e.symptoms || []).map((s) => (
                 <span key={s} className="rounded-lg bg-red-50 px-3 py-1 font-medium text-red-800">{s}</span>
               ))}
+              {!(e.symptoms || []).length && <span data-testid="no-symptoms" className="text-slate-600">{fromCheckIn ? 'None reported (safety check-in)' : NOT_SHARED}</span>}
             </div>
           </div>
 
@@ -108,7 +126,7 @@ export default function EmergencyDetail({ emergency }) {
               ].map(([label, value, unit]) => (
                 <div key={label} className="rounded-xl bg-slate-100 p-3">
                   <div className="text-sm text-slate-500">{label}</div>
-                  <div className="text-2xl font-bold">{value ?? '–'} <span className="text-base font-normal">{unit}</span></div>
+                  <div className="text-2xl font-bold">{value ?? (e.vitals ? '–' : NOT_SHARED)} {value != null && <span className="text-base font-normal">{unit}</span>}</div>
                 </div>
               ))}
             </div>

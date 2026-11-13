@@ -2,6 +2,8 @@ import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract
 import { nextHospital } from '../services/escalation.js';
 import { useRanking } from './useRanking.js';
 import EscalationCountdown from './EscalationCountdown.jsx';
+import { isEarly } from '../services/stateMachine.js';
+import { NOT_SHARED, originText } from '../services/adapters.js';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -12,15 +14,18 @@ export function formatTime(iso) {
  * symptoms, vitals, location, alert time and the current state.
  */
 export default function AlertCard({ alert, selected, onSelect }) {
-  const { emergency_id, patient_id, type, severity, symptoms = [], vitals = {}, location, created_at, state } = alert;
+  const { emergency_id, patient_id, type, severity, symptoms, location, created_at, state } = alert;
+  const vitals = alert.vitals || {};
+  const early = isEarly(state);
+  const fromCheckIn = originText(alert);
   const ranking = useRanking(type, location);
   const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
-  const unread = !alert._read && state !== 'CANCELLED' && state !== 'HANDOVER_DONE';
+  const unread = !alert._read && state !== 'CANCELLED' && state !== 'HANDOVER_DONE' && !early;
   const cancelled = state === 'CANCELLED';
   const finished = state === 'HANDOVER_DONE';
   // Flash only alerts that arrived live in the last few seconds (not on every page visit).
   const flash = alert._new && Date.now() - new Date(created_at).getTime() < 5000;
-  const border = cancelled || finished
+  const border = cancelled || finished || early
     ? 'border-slate-400'
     : severity === 'EMERGENCY' ? 'border-red-600' : severity === 'URGENT' ? 'border-orange-500' : 'border-yellow-400';
 
@@ -30,10 +35,11 @@ export default function AlertCard({ alert, selected, onSelect }) {
       data-id={emergency_id}
       data-state={state}
       data-unread={unread ? 'true' : 'false'}
+      data-early={early ? 'true' : 'false'}
       onClick={() => onSelect?.(alert)}
       className={`w-full rounded-2xl border-l-8 bg-white p-4 text-left shadow transition hover:shadow-md ${border} ${
         selected ? 'ring-4 ring-sky-400' : ''
-      } ${cancelled || finished ? 'opacity-70' : ''} ${flash ? 'ht-flash' : ''}`}
+      } ${cancelled || finished ? 'opacity-70' : ''} ${early ? 'bg-slate-50' : ''} ${flash ? 'ht-flash' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
@@ -47,20 +53,23 @@ export default function AlertCard({ alert, selected, onSelect }) {
         )}
       </div>
       <div className="mt-1 text-slate-600">
-        Patient <b>{patient_id}</b> · {emergency_id} · {formatTime(created_at)}
+        Patient <b>{patient_id ?? NOT_SHARED}</b> · {emergency_id} · {formatTime(created_at)}
       </div>
-      <div className="mt-2 text-slate-800">{symptoms.join(', ')}</div>
+      <div className="mt-2 text-slate-800" data-testid="card-symptoms">{fromCheckIn || (symptoms || []).join(', ') || NOT_SHARED}</div>
       <div className="mt-2 flex flex-wrap gap-x-4 text-slate-600">
         <span>HR {vitals.heart_rate ?? '–'}</span>
         <span>SpO₂ {vitals.spo2 ?? '–'}%</span>
         <span>BP {vitals.bp ?? '–'}</span>
         <span className="ml-auto text-sm text-slate-500">
-          {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'No location'}
+          {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : `Location ${NOT_SHARED.toLowerCase()}`}
         </span>
       </div>
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
         {STATE_LABELS[state] || state}
       </div>
+      {fromCheckIn && !early && !cancelled && (
+        <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">Safety check-in alert. Simulated.</div>
+      )}
       <div className="mt-2 empty:hidden">
         <EscalationCountdown emergency={alert} hasNext={hasNext} />
       </div>

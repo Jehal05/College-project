@@ -15,6 +15,9 @@ export const EMERGENCY_STATES = [
 export const EXTRA_STATES = ['CANCELLED', 'ESCALATED'];
 
 export const EMERGENCY_TYPES = ['HEART', 'STROKE', 'DIABETIC', 'ASTHMA'];
+// UNKNOWN = the safety check-in started the alert with no symptoms (source FALL_CHECK or INACTIVITY_CHECK).
+// Jehal's app sends it; it is not in the day-1 contract yet (see docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md).
+export const EXTRA_TYPES = ['UNKNOWN'];
 
 // Ordered from most to least serious.
 export const SEVERITY = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
@@ -41,6 +44,7 @@ export const REQUIRED_CAPABILITIES = {
   STROKE: ['stroke_unit', 'emergency'],
   DIABETIC: ['emergency'],
   ASTHMA: ['icu', 'emergency'],
+  UNKNOWN: ['emergency'], // nothing is known yet, so only an emergency department is required
 };
 
 export const CAPABILITY_LABELS = {
@@ -55,6 +59,7 @@ export const TYPE_LABELS = {
   STROKE: 'Stroke',
   DIABETIC: 'Diabetic emergency',
   ASTHMA: 'Severe asthma',
+  UNKNOWN: 'Safety check-in (no symptoms)',
 };
 
 export const SEVERITY_STYLES = {
@@ -83,6 +88,7 @@ export const SPECIALTY_FOR_TYPE = {
   STROKE: 'Neurology',
   DIABETIC: 'Emergency Medicine',
   ASTHMA: 'Pulmonology',
+  UNKNOWN: 'Emergency Medicine',
 };
 
 // ---------- Added in Phase 2 ----------
@@ -102,6 +108,7 @@ export const EVENT_FOR_STATE = {
 // What hospital staff read on screen. Honest wording: nothing says an ambulance
 // is dispatched until the operator has clicked Dispatch.
 export const STATE_LABELS = {
+  EMERGENCY_DETECTED: 'Early notice · patient has not confirmed the SOS yet',
   SOS_SENT: 'New alert · notification received, not acknowledged yet',
   ESCALATED: 'Escalated to the next hospital · not acknowledged yet',
   HOSPITAL_ACKNOWLEDGED: 'Acknowledged · no ambulance dispatched yet',

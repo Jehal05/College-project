@@ -5,10 +5,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import * as api from '../services/api.js';
 import { subscribe, onStatus, getStatus } from '../services/socket.js';
-import { emergencyReducer, sortForQueue, countUnread } from '../services/emergencyReducer.js';
+import { emergencyReducer, sortForQueue, countUnread, shouldAlertSound } from '../services/emergencyReducer.js';
 import { canTransition, whyNot } from '../services/stateMachine.js';
 import { playAlertSound } from '../services/sound.js';
 import { useAuth } from './AuthProvider.jsx';
+import { USE_MOCK } from '../services/config.js';
 
 const EmergencyContext = createContext(null);
 
@@ -19,6 +20,7 @@ export function EmergencyProvider({ children }) {
   const [error, setError] = useState('');
   const listRef = useRef(list);
   listRef.current = list;
+  const refreshRef = useRef(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -26,7 +28,7 @@ export function EmergencyProvider({ children }) {
       send({ type: 'load', list: await api.getAlerts() });
       setError('');
     } catch (err) {
-      setError(`Could not load the alert list (${err.message}). New alerts will still appear live.`);
+      setError(`Could not load the alert list: ${err.message} New alerts will still appear live.`);
     } finally {
       setLoading(false);
     }
@@ -43,9 +45,10 @@ export function EmergencyProvider({ children }) {
     if (!isLoggedIn) return undefined;
     return subscribe('*', (msg) => {
       // Sound only for new EMERGENCY-level alerts (feature #59), so it keeps its meaning.
-      const isNew = msg.event === 'emergency.created' && !listRef.current.some((e) => e.emergency_id === msg.emergency_id);
-      if (isNew && msg.payload?.severity === 'EMERGENCY') playAlertSound();
+      if (shouldAlertSound(listRef.current, msg)) playAlertSound();
       send({ type: 'event', msg });
+      // A real backend's created event may lack patient, location and hospital: fetch the full record once.
+      if (!USE_MOCK && msg.event === 'emergency.created' && msg.emergency_id) setTimeout(() => refreshRef.current?.(msg.emergency_id), 400);
     });
   }, [isLoggedIn]);
 
@@ -66,12 +69,17 @@ export function EmergencyProvider({ children }) {
       if (!canTransition(current.state, target)) throw new Error(whyNot(current.state, target));
 
       let res;
-      if (target === 'HOSPITAL_ACKNOWLEDGED') res = await api.acknowledge(id);
-      else if (target === 'AMBULANCE_DISPATCHED') {
-        if (!options.ambulanceId) throw new Error('Choose an ambulance to dispatch.');
-        res = await api.dispatch(id, options.ambulanceId);
+      let localOnly = false;
+      try {
+        if (target === 'HOSPITAL_ACKNOWLEDGED') res = await api.acknowledge(id);
+        else if (target === 'AMBULANCE_DISPATCHED') {
+          if (!options.ambulanceId) throw new Error('Choose an ambulance to dispatch.');
+          res = await api.dispatch(id, options.ambulanceId);
+        } else res = await api.updateStatus(id, target);
+      } catch (err) {
+        if (!api.isMissingEndpoint(err)) throw err;
+        localOnly = true; // the backend cannot take this step yet: apply it on this screen only and say so
       }
-      else res = await api.updateStatus(id, target);
 
       // Apply the result straight away. The WebSocket echo of the same change is ignored as a duplicate.
       send({
@@ -87,6 +95,7 @@ export function EmergencyProvider({ children }) {
           },
         },
       });
+      return { local_only: localOnly };
     },
     [session?.name],
   );
@@ -101,9 +110,16 @@ export function EmergencyProvider({ children }) {
     }
   }, []);
 
+  refreshRef.current = refresh;
+
   /** Add a timeline note with no state change (pickup, corridor request, team assignment). */
   const addNote = useCallback(async (id, kind, note, fields = {}) => {
-    const res = await api.addNote(id, { kind, note, fields });
+    let res = null;
+    try {
+      res = await api.addNote(id, { kind, note, fields });
+    } catch (err) {
+      if (!api.isMissingEndpoint(err)) throw err; // no notes endpoint yet: the note stays on this screen
+    }
     const timestamp = res?.timestamp || new Date().toISOString();
     send({
       type: 'event',
@@ -121,7 +137,12 @@ export function EmergencyProvider({ children }) {
 
   /** Tick or untick a pre-arrival checklist item. Throws if the save fails. */
   const tick = useCallback(async (id, itemId, done) => {
-    const res = await api.setChecklistItem(id, itemId, done);
+    let res = null;
+    try {
+      res = await api.setChecklistItem(id, itemId, done);
+    } catch (err) {
+      if (!api.isMissingEndpoint(err)) throw err; // no checklist endpoint yet: the tick stays on this screen
+    }
     const current = listRef.current.find((e) => e.emergency_id === id);
     const fallback = { ...current?.checklist, [itemId]: { done, by: session?.name || 'Hospital staff', at: new Date().toISOString() } };
     send({ type: 'checklist', id, checklist: res?.checklist || fallback });

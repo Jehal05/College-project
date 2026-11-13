@@ -5,7 +5,8 @@
     "HEART": ["cath_lab", "emergency"],
     "STROKE": ["stroke_unit", "emergency"],
     "DIABETIC": ["emergency"],
-    "ASTHMA": ["icu", "emergency"]
+    "ASTHMA": ["icu", "emergency"],
+    "UNKNOWN": ["emergency"]
   },
   "scoring": {
     "_note": "travel_time scores 0 at max_travel_minutes or more; availability scores full marks at these free-bed counts",

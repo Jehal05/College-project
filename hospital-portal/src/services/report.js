@@ -1,5 +1,6 @@
 // Post-event report builder (feature #31). Pure: gives back plain data that the page
 // shows, the print view prints, and reportToText() turns into a downloadable file.
+import { NOT_SHARED, originText } from './adapters.js';
 import { TYPE_LABELS, STATE_LABELS } from './contract.js';
 import { rankHospitals } from './ranking.js';
 import { stepDurations, escalationCount, STEPS } from './analytics.js';
@@ -45,13 +46,15 @@ export function buildReport(emergency, context = {}) {
 
   return {
     emergency_id: e.emergency_id,
-    patient_id: e.patient_id,
+    patient_id: e.patient_id ?? NOT_SHARED,
+    origin: originText(e),
+    cancelled_early: e.state === 'CANCELLED' && !events.some((x) => x.state === 'SOS_SENT'),
     type: e.type,
     type_label: TYPE_LABELS[e.type] || e.type,
     severity: e.severity,
     state: e.state,
     state_label: STATE_LABELS[e.state] || e.state,
-    outcome: e.state === 'CANCELLED' ? 'Cancelled by the patient (false alarm)' : e.state === 'HANDOVER_DONE' ? 'Handed over to the hospital team' : 'Still open (not finished)',
+    outcome: e.state === 'CANCELLED' ? (!events.some((x) => x.state === 'SOS_SENT') ? 'Cancelled by the patient before the SOS was sent' : 'Cancelled by the patient (false alarm)') : e.state === 'HANDOVER_DONE' ? 'Handed over to the hospital team' : 'Still open (not finished)',
     created_at: e.created_at,
     sample: Boolean(e.sample),
     symptoms: e.symptoms || [],
@@ -91,6 +94,7 @@ export function reportToText(r) {
   L.push(`Emergency ID: ${r.emergency_id}`);
   L.push(`Patient ID:   ${r.patient_id} (sample)`);
   L.push(`Type:         ${r.type_label}`);
+  if (r.origin) L.push(`Started by:   ${r.origin}`);
   L.push(`Severity:     ${r.severity}`);
   L.push(`Outcome:      ${r.outcome}`);
   L.push(`Alert time:   ${new Date(r.created_at).toLocaleString()}`);

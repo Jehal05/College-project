@@ -1,6 +1,7 @@
 // Pure functions that keep the list of emergencies up to date.
 // No React in here, so it is easy to test (see emergencyReducer.test.js).
-import { isFinal } from './stateMachine.js';
+import { isFinal, isEarly } from './stateMachine.js';
+import { withMotion } from './adapters.js';
 import { canEscalate } from './escalation.js';
 
 const SEVERITY_ORDER = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
@@ -16,7 +17,7 @@ export function normalise(e) {
     alerted_ids: e.alerted_ids || [], // hospitals that were alerted and did not answer
     escalation_level: e.escalation_level || 0,
     checklist: e.checklist || {}, // { [item_id]: { done, by, at } }
-    status_events: events ? [...events] : [{ state: 'SOS_SENT', timestamp: created_at, actor: 'Patient app' }],
+    status_events: events ? [...events] : [{ state: e.state || 'SOS_SENT', timestamp: created_at, actor: 'Patient app' }],
   };
 }
 
@@ -31,7 +32,9 @@ export function applyEvent(list, msg) {
 
   if (event === 'emergency.created') {
     if (idx >= 0) return list; // already known
-    const created = normalise({ created_at: timestamp, ...payload, emergency_id, state: state || 'SOS_SENT', _new: true });
+    const s = state || 'SOS_SENT';
+    // An early notice (patient has not confirmed yet) is not "new" in the loud sense: no flash.
+    const created = normalise({ created_at: timestamp, ...payload, emergency_id, state: s, _new: !isEarly(s) && !isFinal(s) });
     return [created, ...list];
   }
 
@@ -43,7 +46,7 @@ export function applyEvent(list, msg) {
   if (event === 'hospital.alerted') {
     const hospitalId = payload.hospital_id;
     if (!hospitalId || hospitalId === current.alerted_hospital_id) return list;
-    return replace({ ...current, alerted_hospital_id: hospitalId });
+    return replace({ ...current, alerted_hospital_id: hospitalId, ...(payload.hospital_name ? { alerted_hospital_name: payload.hospital_name } : {}) });
   }
 
   // No acknowledgement in time: the alert moved to the next hospital. Can happen more than once.
@@ -90,7 +93,9 @@ export function applyEvent(list, msg) {
   if (event === 'ambulance.location') {
     if (isFinal(current.state)) return list;
     const { actor: _actor, ...position } = payload;
-    const moved = { ...current, ambulance: { ...current.ambulance, ...position, updated_at: timestamp || new Date().toISOString() } };
+    // The backend may send only lat, lng and ETA. Heading and progress are worked out here.
+    const motion = withMotion(current.ambulance, position);
+    const moved = { ...current, ambulance: { ...current.ambulance, ...motion, updated_at: timestamp || new Date().toISOString() } };
     if (payload.ambulance_id && !current.ambulance_id) moved.ambulance_id = payload.ambulance_id;
     if (state === 'EN_ROUTE' && current.state === 'AMBULANCE_DISPATCHED') {
       moved.state = 'EN_ROUTE';
@@ -106,6 +111,9 @@ export function applyEvent(list, msg) {
   const updated = {
     ...current,
     ...(payload.ambulance_id ? { ambulance_id: payload.ambulance_id } : {}),
+    // The patient confirmed the SOS: from now on it is a real alert for the desk (flash, sound, unread).
+    ...(isEarly(current.state) && state === 'SOS_SENT' ? { _new: true, _read: false } : {}),
+    ...(state === 'CANCELLED' ? { _new: false } : {}),
     state,
     status_events: [
       ...current.status_events,
@@ -119,7 +127,9 @@ export function applyEvent(list, msg) {
 export function mergeDetails(list, detail) {
   return list.map((e) => {
     if (e.emergency_id !== detail?.emergency_id) return e;
-    const merged = normalise({ ...e, ...detail, status_events: detail.status_events || detail.timeline || e.status_events });
+    // Fields the detail does not have (null/undefined) never wipe what we already know.
+    const known = Object.fromEntries(Object.entries(detail).filter(([, v]) => v !== null && v !== undefined));
+    const merged = normalise({ ...e, ...known, ambulance: e.ambulance || known.ambulance ? { ...e.ambulance, ...known.ambulance } : undefined, status_events: detail.status_events || detail.timeline || e.status_events });
     return { ...merged, _new: e._new, _read: e._read };
   });
 }
@@ -136,17 +146,34 @@ export function sortForQueue(list) {
     const i = SEVERITY_ORDER.indexOf(e.severity);
     return i < 0 ? SEVERITY_ORDER.length : i;
   };
+  // Order: open alerts, then early notices (not confirmed yet), then closed ones.
+  const group = (e) => (isFinal(e.state) ? 2 : isEarly(e.state) ? 1 : 0);
   return [...list].sort((a, b) => {
-    const closedA = isFinal(a.state) ? 1 : 0;
-    const closedB = isFinal(b.state) ? 1 : 0;
+    const closedA = group(a);
+    const closedB = group(b);
     if (closedA !== closedB) return closedA - closedB;
-    if (closedA) return time(b) - time(a);
+    if (closedA === 2) return time(b) - time(a);
     return severity(a) - severity(b) || time(a) - time(b) || String(a.emergency_id).localeCompare(String(b.emergency_id));
   });
 }
 
 /** Open alerts nobody has opened yet. */
-export const countUnread = (list) => list.filter((e) => !e._read && !isFinal(e.state)).length;
+export const countUnread = (list) => list.filter((e) => !e._read && !isFinal(e.state) && !isEarly(e.state)).length;
+
+/**
+ * Should this event play the alert sound? Only when an EMERGENCY-level alert becomes a real SOS:
+ * created already at SOS_SENT, or an early notice that now reaches SOS_SENT. Never for early notices or cancelled ones.
+ */
+export function shouldAlertSound(list, msg) {
+  if (!msg?.emergency_id) return false;
+  const known = list.find((e) => e.emergency_id === msg.emergency_id);
+  if (msg.event === 'emergency.created') {
+    if (known) return false;
+    const s = msg.state || 'SOS_SENT';
+    return msg.payload?.severity === 'EMERGENCY' && !isEarly(s) && !isFinal(s);
+  }
+  return Boolean(known) && msg.state === 'SOS_SENT' && isEarly(known.state) && known.severity === 'EMERGENCY';
+}
 
 export function emergencyReducer(list, action) {
   switch (action.type) {
