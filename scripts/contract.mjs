@@ -28,8 +28,12 @@ function expectShape(obj, shape, where = 'body') {
   }
 }
 const expectError = (r, ...codes) => { expectStatus(r, ...codes); if (!r.json || typeof r.json.error !== 'string') fail('error answers must be JSON like { "error": "text" }'); };
-async function test(name, fn) {
-  try { await fn(); results.push([name, true]); console.log('PASS ' + name); } catch (e) { results.push([name, false]); console.log('FAIL ' + name + '\n       ' + e.message); }
+// optional: true marks a Phase 6 extra (reminders, safety check-in setting). A backend may skip these in its first pass:
+// a failure prints OPTIONAL FAIL and does not make the run fail. Everything else is a core check.
+const optionalResults = [];
+async function test(name, fn, { optional = false } = {}) {
+  try { await fn(); (optional ? optionalResults : results).push([name, true]); console.log('PASS ' + (optional ? '(optional) ' : '') + name); }
+  catch (e) { (optional ? optionalResults : results).push([name, false]); console.log((optional ? 'OPTIONAL FAIL ' : 'FAIL ') + name + '\n       ' + e.message); }
 }
 const P = () => '/patients/' + pid;
 
@@ -130,7 +134,7 @@ await test('preferences: GET/PUT safety check-in (small JSON, validated)', async
   const g = await call('GET', P() + '/preferences'); expectStatus(g, 200); expectShape(g.json, { safety_checkin: 'object' }); expectShape(g.json.safety_checkin, { enabled: 'boolean', minutes: 'number' }, 'safety_checkin');
   expectError(await call('PUT', P() + '/preferences', { body: { safety_checkin: { enabled: 'yes', minutes: 7 } } }), 400);
   expectStatus(await call('PUT', P() + '/preferences', { body: g.json }), 200);
-});
+}, { optional: true });
 await test('reminders: create, list, update, taken, log, delete, limits (Phase 6)', async () => {
   const list = await call('GET', P() + '/reminders'); expectStatus(list, 200); if (!Array.isArray(list.json)) fail('reminders should be an array');
   if (list.json.length >= 8) fail('test patient already has 8 reminders');
@@ -145,7 +149,7 @@ await test('reminders: create, list, update, taken, log, delete, limits (Phase 6
   const log = await call('GET', P() + '/reminders/log'); expectStatus(log, 200); if (!Array.isArray(log.json)) fail('log should be an array');
   if (log.json.length) expectShape(log.json[0], { reminder_id: 'string', scheduled_for: 'iso' }, 'log[0]');
   expectStatus(await call('DELETE', P() + '/reminders/' + made.json.id), 200, 204); expectError(await call('DELETE', P() + '/reminders/' + made.json.id), 404);
-});
+}, { optional: true });
 await test('demo: vitals profile, overrides, speed and state (Phase 6)', async () => {
   expectError(await call('POST', '/demo/vitals', { body: { profile: 'not-a-profile' } }), 400);
   expectError(await call('POST', '/demo/vitals', { body: { overrides: { spo2: 500 } } }), 400);
@@ -291,5 +295,6 @@ await test('Phase 9: WebSocket needs a login: no token or a wrong token is close
 });
 
 const passed = results.filter((r) => r[1]).length;
-console.log('\nContract: ' + passed + '/' + results.length + ' passed against ' + BASE);
+const optPassed = optionalResults.filter((r) => r[1]).length;
+console.log('\nContract: ' + passed + '/' + results.length + ' core checks passed against ' + BASE + (optionalResults.length ? ' (optional Phase 6 extras: ' + optPassed + '/' + optionalResults.length + ')' : ''));
 process.exit(passed === results.length ? 0 : 1);

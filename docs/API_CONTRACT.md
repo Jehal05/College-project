@@ -157,7 +157,7 @@ The mock server (`mock-server/compat.js`) now speaks Daksh's names **next to** o
 **Order at SOS (nothing is broadcast before it; cancelling inside the countdown sends the hospital nothing):**
 `emergency.created` (state `SOS_SENT`) -> `emergency.sos_sent` -> `hospital.alerted`. Set `ALERT_AT=detected` to get the old thin `created` at `EMERGENCY_DETECTED` as well.
 
-**`emergency.created` payload.** Always: `type`, `severity`, `symptoms` (readable English labels, e.g. "Chest pain"; a safety check-in alert says "No symptoms reported (safety check-in)"), `symptom_ids` (app IDs), `source`, `patient_id`, `patient_summary { name, age, blood_group }`, `patient { id, name, age, sex }`, `created_at`, `reasons`, `consents`, `hospital { id, name, distance_km, rank }`, `simulated: true`. Only with consent: `vitals { heart_rate, spo2, bp, bp_sys, bp_dia, glucose, resp_rate }` (vitals), `location { lat, lng, accuracy }` (location and a known position), `patient.blood_group/allergies/conditions/medications` (history). A field that is not shared is **left out, never null**.
+**`emergency.created` payload.** Always: `type`, `severity`, `symptoms` (readable English labels, e.g. "Chest pain"; a safety check-in alert says "No symptoms reported (safety check-in)"), `symptom_ids` (app IDs), `source`, `patient_id`, `patient_summary { name, age, blood_group }`, `patient { id, name, age, sex, blood_group }`, `created_at`, `reasons`, `consents`, `hospital { id, name, distance_km, rank }`, `simulated: true`. Only with consent: `vitals { heart_rate, spo2, bp, bp_sys, bp_dia, glucose, resp_rate }` (vitals), `location { lat, lng, accuracy }` (location and a known position), `patient.allergies/conditions/medications` (history). A field that is not shared is **left out, never null**.
 
 **`hospital.alerted` payload:** `hospital_id`, `rank` (1 = best match) and the old `hospital { id, name, distance_km }`.
 
@@ -200,3 +200,7 @@ and then `hospital.alerted` for the new hospital (`payload: { hospital_id, rank,
 **Mock-only:** `POST /demo/no-ack { enabled, escalate_after_seconds? }` makes the fake hospital stay silent so the alert escalates (`NO_ACK_DEMO=1` does the same from the start). Not needed on a real backend; the contract test skips that check when it gets 404, 405 or 501.
 
 **Not built (waiting for Daksh's decision):** `POST /emergencies/{id}/notes`, `POST /emergencies/{id}/chat`, checklist ticks, hospital add, edit and verify.
+
+**Always shown, whatever the consents (Phase 9 follow-up):** name, age, sex and blood group (`patient`, `patient_summary` and the passport page agree). Allergies, conditions, medications and contacts need the `history` consent. Doctor review of this minimum is still pending.
+
+**Core vs optional contract checks:** `npm run contract` counts the Phase 6 extras (safety check-in setting, medication reminders) separately as optional. A backend can skip them in its first pass: they print `OPTIONAL FAIL` and do not fail the run.

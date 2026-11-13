@@ -21,7 +21,7 @@ check('C4 emergency.created arrives after the SOS', Boolean(created));
 check('C5 created comes before sos_sent and carries state SOS_SENT', mine.findIndex((x) => x.type === 'emergency.created') < mine.findIndex((x) => x.type === 'emergency.sos_sent') && created.state === 'SOS_SENT');
 const p = created.payload;
 check('C6 payload has patient, location, vitals and the alerted hospital', p.patient.name === 'Rahul Mehta' && p.location.lat === 23.0225 && p.vitals.heart_rate > 0 && p.hospital.id.startsWith('HSP-AMD-') && p.hospital.rank === 1, p);
-check('C7 history consent off: no allergies, conditions, medications or blood group', !['allergies', 'conditions', 'medications', 'blood_group'].some((k) => k in p.patient));
+check('C7 history consent off: no allergies, conditions or medications; name, age, sex and blood group stay (always shown)', !['allergies', 'conditions', 'medications'].some((k) => k in p.patient) && ['name', 'age', 'sex', 'blood_group'].every((k) => k in p.patient));
 const alerted = mine.find((x) => x.type === 'hospital.alerted');
 check('C8 hospital.alerted has hospital_id and rank', alerted && alerted.payload.hospital_id === p.hospital.id && alerted.payload.rank === 1, alerted);
 const list1 = await api('GET', '/emergencies?status=active', tok);

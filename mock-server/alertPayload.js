@@ -1,8 +1,8 @@
 const { symptomLabels } = require('./adapters');
 // Builds the payload of the emergency.created event. Pure function (no I/O) so it can be unit tested.
 // Rule: a field the patient did not agree to share is LEFT OUT (never null, never empty). See docs/API_CONTRACT.md.
-const ALWAYS = ['id', 'name', 'age', 'sex'];
-const HISTORY = ['blood_group', 'allergies', 'conditions', 'medications'];
+const ALWAYS = ['id', 'name', 'age', 'sex', 'blood_group']; // who this is: always shown (same as patient_summary and the passport page)
+const HISTORY = ['allergies', 'conditions', 'medications']; // need the history consent
 
 function buildCreatedPayload({ emergency, patient, hospital, rank, vitals }) {
   const consents = { ...(patient && patient.consents), ...(emergency.consents || {}) };
