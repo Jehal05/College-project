@@ -25,7 +25,8 @@ describe('emergency.created payload', () => {
   it('leaves out (never null) what the patient did not share', () => {
     const p = buildCreatedPayload(base({ location: false, history: false, vitals: false, reports: true }, loc));
     for (const k of ['location', 'vitals']) expect(k in p).toBe(false);
-    for (const k of ['blood_group', 'allergies', 'conditions', 'medications']) expect(k in p.patient).toBe(false);
+    for (const k of ['allergies', 'conditions', 'medications']) expect(k in p.patient).toBe(false);
+    for (const k of ['name', 'age', 'sex', 'blood_group']) expect(k in p.patient).toBe(true); // always shown
     expect(p.patient.name).toBe('Rahul Mehta');
     expect(JSON.stringify(p)).not.toContain('null');
   });
