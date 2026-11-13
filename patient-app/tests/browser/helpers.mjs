@@ -30,7 +30,7 @@ export async function freshState() {
   const tok = await token();
   await api('POST', '/demo/fail', tok, { mode: 'off' });
   await api('POST', '/demo/reset', tok);
-  await api('PATCH', '/patients/HT-1001', tok, { language: 'en' });
+  await api('PATCH', '/patients/pat_001', tok, { language: 'en' });
   return tok;
 }
 

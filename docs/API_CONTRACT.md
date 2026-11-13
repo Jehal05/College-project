@@ -125,3 +125,29 @@ Names: the app uses `CHEST_PAIN`, the rules use `chest_pain`, `bp` is `bp_sys` +
 `POST /demo/scenario { type }`, `POST /demo/reset`, `POST /demo/passport/expire`, `POST /demo/fail { mode: off|server|expired|slow }` (makes the mock answer 500, 401 or slowly so error handling can be tested).
 
 Phase 6 demo helpers: `POST /demo/vitals { profile?, overrides? }` (profiles `normal`, `heart_attack`, `stroke`, `low_glucose`, `asthma`; an unknown profile or an out-of-range value gives `400` and changes nothing; `{ "heart_rate": null }` inside `overrides` clears one pinned value; `{}` clears all), `POST /demo/speed { multiplier }` (only 1, 2, 5, 10, 20; applies to timers started afterwards), `GET /demo/state` (`{ speed, allowed_speeds, vitals: { profile, overrides, profiles } }`). `POST /demo/reset` returns everything to normal, including reminders, past emergencies and preferences.
+
+
+## Differences from Daksh's contract (`backend/CONTRACT.md` v0.6 on the `Daksh` branch)
+
+The mock server (`mock-server/compat.js`) now speaks Daksh's names **next to** ours; old names keep working. The app translates in one file: `patient-app/src/utils/adapters.js`. `npm run contract` has a block that checks these names, so it can be run against his backend too.
+
+| Topic | Daksh v0.6 | This mock / app today |
+|---|---|---|
+| Login | `{ username, password }` -> `{ token, role, user_id, patient_id }`; demo `patient1` / `demo-password` | Accepts `username` (the app sends it) and the old `email`; answers with `user_id` too. Both `patient1` and `patient@demo.test` work |
+| IDs | `pat_001`, `em_001`, `hosp_001`, `amb_001` | Same style now (`pat_001`, `em_001`, `hosp_001`, `amb_001`) |
+| Errors | `{ "detail": text }` | `{ "error", "detail" }` (both, same text) |
+| Event envelope | `event` | `event` and `type` (both) |
+| WebSocket | `/ws/emergencies/{id}?token=`, `/ws/hospitals/{id}?token=` | `/ws` plus both of his paths (the mock sends every event on all of them and does not check the token) |
+| Emergency history | `timeline [ { state, timestamp, actor, seconds_since_start } ]` | `timeline` and `status_events` (both) |
+| `POST /emergencies` | `consent` (singular), lowercase symptoms, `type` optional (engine decides), answer has `reasons` (list of strings), `rule_ids`, `action` | All accepted. Our `consents`, UPPER_SNAKE symptoms and `source` still work. The `reasons` OBJECT is at `GET /emergencies/:id/reasons` and in the `emergency.created` payload |
+| Consents | `GET`/`PUT` answer `{ patient_id, consents, simulated }`, `PUT` takes only the changed flags and adds `changed`; `GET /consents/history` | All of that, plus our `changes` list |
+| Passport | `GET /passport/{patient_id}?token=` (401 expired or tampered, 403 other patient) | Also works (random token from our `POST /patients/:id/passport`); our `GET /passport/:token` (410 when gone) still serves the responder page |
+| Demo | `POST /demo/scenario { scenario }`, `/demo/reset` -> `{ status: "reset" }` | Both spellings accepted |
+
+**Not aligned yet (decisions needed):**
+- `POST /reports` (his) vs `POST /patients/:id/reports` (ours); no file-upload shape in his contract.
+- Hospitals: his `capabilities` is an object (`emergency`, `cath_lab`, ...) with an `availability` object; ours is a list. The patient app does not use it.
+- Our Phase 6 endpoints are not in his contract: baseline, contacts, reminders, preferences, alert summary and past emergencies, `/demo/speed`, `GET /emergencies/:id/reasons`, `UNKNOWN` type and `source`. They need to be added to the real backend or dropped.
+- Validation status: his `422` for a non-boolean consent, ours `400`.
+- His open decision: the backend moves `EMERGENCY_DETECTED` to `SOS_SENT` when the cancel countdown ends. The app currently sends `POST /emergencies/:id/sos` itself.
+- His `/insights` (wellbeing notes) has no screen in the patient app.

@@ -42,17 +42,17 @@ const sentAuth = []; r.on('request', (q) => { if (q.url().includes('/passport/')
 await r.reload(); await r.waitForSelector("[data-testid='passport-content']"); check('P12 the responder call sends no login token', sentAuth.length > 0 && sentAuth.every((h) => !h));
 
 // Consent applies live
-await api('PUT', '/patients/HT-1001/consents', tok, { location: true, history: false, vitals: true, reports: true });
+await api('PUT', '/patients/pat_001/consents', tok, { location: true, history: false, vitals: true, reports: true });
 await r.reload(); await r.waitForSelector("[data-testid='passport-content']");
 const limited = await r.innerText("[data-testid='passport-content']");
 check('P13 history consent off removes allergies, conditions, medicines and contacts', limited.includes('Rahul Mehta') && !limited.includes('Penicillin') && !limited.includes('Metformin') && !limited.includes('Asha Demo') && limited.includes('The patient has not shared this section.'));
 const raw = await (await fetch(API + '/passport/' + token)).json();
 check('P14 the server response itself omits the data', !('allergies' in raw) && !('contacts' in raw) && raw.shared.history === false);
-await api('PUT', '/patients/HT-1001/consents', tok, { location: true, history: true, vitals: true, reports: true });
+await api('PUT', '/patients/pat_001/consents', tok, { location: true, history: true, vitals: true, reports: true });
 
 // Log: matches real opens, no IP/device
 await p.goto(BASE + '/passport'); await p.waitForSelector('text=/Opened \\d+ times?/'); await sleep(300);
-const log = await api('GET', '/patients/HT-1001/passport/log', tok);
+const log = await api('GET', '/patients/pat_001/passport/log', tok);
 const shownCount = parseInt(((await p.innerText('body')).match(/Opened (\d+) time/) || [])[1], 10);
 check('P15 "Opened N times" equals the server log', shownCount === log.length && log.length >= 4, [shownCount, log.length]);
 check('P16 the log holds only times (no IP or device data)', log.every((e) => Object.keys(e).join() === 'opened_at'));
@@ -83,7 +83,7 @@ const gone = await fetch(API + '/passport/' + token); check('P17 revoked link an
 await r.reload(); await r.waitForSelector('text=This passport is no longer available.');
 check('P18 responder sees the plain message and still has the call link', (await r.locator("a[href='tel:112']").count()) === 1 && !FORBIDDEN.test(await r.innerText('main')));
 await p.getByLabel('1 hour').check(); await p.getByRole('button', { name: 'Create passport' }).click(); await p.waitForSelector('text=Valid for 1 hour');
-const t2 = (await api('GET', '/patients/HT-1001/passport', tok)).token; await api('POST', '/demo/passport/expire', tok);
+const t2 = (await api('GET', '/patients/pat_001/passport', tok)).token; await api('POST', '/demo/passport/expire', tok);
 check('P19 expired link answers 410', (await fetch(API + '/passport/' + t2)).status === 410);
 check('P20 unknown token answers 410', (await fetch(API + '/passport/not-a-real-token-123456')).status === 410);
 await p.getByRole('button', { name: /Revoke now/ }).click().catch(() => {});

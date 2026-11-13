@@ -161,6 +161,21 @@ await test('demo: vitals profile, overrides, speed and state (Phase 6)', async (
   const reset = await call('POST', '/demo/reset'); expectStatus(reset, 200, 204);
   if ((await call('GET', '/demo/state')).json.vitals.profile !== 'normal') fail('/demo/reset should return the profile to normal');
 });
+await test("Daksh's names (backend/CONTRACT.md v0.6): detail, username login, timeline, consent history and changed, passport ?token", async () => {
+  const bad = await call('POST', '/auth/login', { auth: false, body: { username: 'nobody', password: 'x' } }); expectError(bad, 401); if (typeof bad.json.detail !== 'string') fail('errors should also carry "detail"');
+  const g = await call('GET', P() + '/consents'); expectShape(g.json, { patient_id: 'string', consents: 'object', simulated: 'boolean' });
+  const first = Object.keys(g.json.consents)[0]; const put = await call('PUT', P() + '/consents', { body: { [first]: !g.json.consents[first] } }); expectStatus(put, 200);
+  if (!Array.isArray(put.json.changed) || put.json.changed.join() !== first) fail('PUT should answer with changed: ["' + first + '"] and accept a single flag');
+  await call('PUT', P() + '/consents', { body: { [first]: g.json.consents[first] } });
+  const h = await call('GET', P() + '/consents/history'); expectStatus(h, 200); if (!Array.isArray(h.json.history) || !h.json.history.length) fail('history should list the changes');
+  expectShape(h.json.history[0], { field: 'string', granted: 'boolean', timestamp: 'iso', actor_role: 'string' }, 'history[0]');
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, consent: { location: true, history: true, vitals: true, reports: true }, symptoms: ['chest_pain', 'breathlessness'] } }); expectStatus(made, 201);
+  if (made.json.type !== 'HEART') fail('type is optional: the rules engine should decide HEART from chest_pain'); if (!Array.isArray(made.json.reasons) || made.json.reasons.some((x) => typeof x !== 'string')) fail('POST /emergencies "reasons" should be a list of strings');
+  const got = await call('GET', '/emergencies/' + made.json.id); if (!Array.isArray(got.json.timeline) || !('seconds_since_start' in got.json.timeline[0])) fail('GET /emergencies/:id should have timeline with seconds_since_start');
+  const pass = await call('POST', P() + '/passport', { body: { hours: 1 } }); const viaToken = await call('GET', '/passport/' + pid + '?token=' + pass.json.token, { auth: false }); expectStatus(viaToken, 200);
+  expectError(await call('GET', '/passport/pat_other?token=' + pass.json.token, { auth: false }), 403); expectError(await call('GET', '/passport/' + pid + '?token=garbage', { auth: false }), 401);
+  await call('DELETE', P() + '/passport'); await call('POST', '/emergencies/' + made.json.id + '/cancel');
+});
 await test('WebSocket /ws: vitals.update and emergency events use { type, emergency_id, state, timestamp, payload }', async () => {
   if (typeof WebSocket === 'undefined') fail('needs Node 22+ (global WebSocket)');
   const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
@@ -168,6 +183,7 @@ await test('WebSocket /ws: vitals.update and emergency events use { type, emerge
   const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'STROKE', symptoms: ['FACE_DROOP'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
   await new Promise((r) => setTimeout(r, 3500)); await call('POST', '/emergencies/' + made.json.id + '/cancel'); ws.close();
   const types = new Set(events.map((e) => e.type));
+  if (!events.every((e) => e.event === e.type)) fail('every event should carry "event" (Daksh) equal to "type" (ours)');
   for (const needed of ['vitals.update', 'emergency.created', 'emergency.sos_sent']) if (!types.has(needed)) fail('no "' + needed + '" event received (got: ' + [...types].join(', ') + ')');
   for (const e of events) { expectShape(e, { type: 'string', state: 'string', timestamp: 'iso', payload: 'object' }, e.type); if (!('emergency_id' in e)) fail(e.type + ' lacks emergency_id (use null for none)'); }
 });

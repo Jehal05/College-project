@@ -16,3 +16,8 @@ export function readingFromPayload(payload) {
     ? { bp_sys: payload.bp_sys, bp_dia: payload.bp_dia } : bpParts(payload.bp);
   return { ...out, ...bp };
 }
+
+// Daksh's backend names the event type `event` (we use `type`) and the emergency history `timeline` (we use `status_events`).
+export const normalizeEvent = (e) => (e && e.type === undefined && e.event !== undefined ? { ...e, type: e.event } : e);
+export const normalizeEmergency = (e) => (e && !e.status_events && Array.isArray(e.timeline)
+  ? { ...e, status_events: e.timeline.map(({ state, timestamp }) => ({ state, timestamp })) } : e);

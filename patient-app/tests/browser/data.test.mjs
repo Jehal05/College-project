@@ -22,15 +22,15 @@ check('2 intro says changes apply to the next emergency', (await p.innerText('bo
 await toggle('Reports'); check('3 saved, Off and logged', (await sw('Reports')) === 'false' && (await p.innerText('body')).includes('Reports: Off'));
 await p.reload(); await p.waitForSelector("h1:has-text('Consent')"); check('3 survives reload', (await sw('Reports')) === 'false');
 await toggle('Reports');
-await p.route('**/patients/HT-1001/consents', (r) => (r.request().method() === 'PUT' ? r.fulfill({ status: 500, body: '{}' }) : r.continue()));
+await p.route('**/patients/pat_001/consents', (r) => (r.request().method() === 'PUT' ? r.fulfill({ status: 500, body: '{}' }) : r.continue()));
 await p.getByRole('switch', { name: 'Live vitals' }).click(); await p.waitForSelector('text=The switch was put back');
 check('3 rollback and Retry shown', (await sw('Live vitals')) === 'true' && (await p.getByRole('button', { name: 'Retry' }).count()) === 1);
-await p.unroute('**/patients/HT-1001/consents'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Saved');
+await p.unroute('**/patients/pat_001/consents'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Saved');
 check('3 Retry works', (await sw('Live vitals')) === 'false'); await toggle('Live vitals');
 
 await toggle('Location');
 await p.goto(BASE + '/symptoms'); await p.click('text=Heart or chest'); await p.getByLabel('Chest pain or pressure').check(); await p.click('text=Get help now');
-await p.waitForURL('**/emergency/E-*'); const eid = p.url().split('/').pop(); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
+await p.waitForURL('**/emergency/em_*'); const eid = p.url().split('/').pop(); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
 check('4 location-off message shown', (await p.locator('text=Location sharing is off in your consent settings').count()) === 1);
 check('4 server stored no location', (await api('GET', '/emergencies/' + eid, tok)).location === null);
 await p.waitForSelector('text=Your contacts were notified (simulated)', { timeout: 5000 });
@@ -92,11 +92,11 @@ await p.unroute('**/baseline'); await p.route('**/baseline', (r) => r.fulfill({ 
 await p.waitForSelector('text=Could not load your usual ranges.'); check('7 error state with Retry', (await p.getByRole('button', { name: 'Retry' }).count()) === 1);
 await p.unroute('**/baseline'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Usual:');
 
-for (const c of await api('GET', '/patients/HT-1001/contacts', tok)) await api('DELETE', '/patients/HT-1001/contacts/' + c.id, tok);
-await p.goto(BASE + '/demo'); await p.click('text=Run Heart scenario'); await p.waitForURL('**/emergency/E-*'); await p.waitForSelector('text=You have no emergency contacts.');
+for (const c of await api('GET', '/patients/pat_001/contacts', tok)) await api('DELETE', '/patients/pat_001/contacts/' + c.id, tok);
+await p.goto(BASE + '/demo'); await p.click('text=Run Heart scenario'); await p.waitForURL('**/emergency/em_*'); await p.waitForSelector('text=You have no emergency contacts.');
 check('9 no-contacts message with link', (await p.locator("a:has-text('Add some in Profile.')").getAttribute('href')) === '/contacts');
 await p.goto(BASE + '/demo'); await p.click('text=Reset demo'); await p.waitForSelector('text=Demo reset');
-const consents = await api('GET', '/patients/HT-1001/consents', tok);
-check('10 reset restores contacts, consents, reports, log', (await api('GET', '/patients/HT-1001/contacts', tok)).length === 2 && Object.values(consents.consents).every(Boolean)
-  && (await api('GET', '/patients/HT-1001/reports', tok)).length === 0 && consents.changes.length === 0);
+const consents = await api('GET', '/patients/pat_001/consents', tok);
+check('10 reset restores contacts, consents, reports, log', (await api('GET', '/patients/pat_001/contacts', tok)).length === 2 && Object.values(consents.consents).every(Boolean)
+  && (await api('GET', '/patients/pat_001/reports', tok)).length === 0 && consents.changes.length === 0);
 await browser.close(); finish('data');

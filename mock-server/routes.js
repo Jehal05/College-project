@@ -121,7 +121,7 @@ const DEFAULT_SYMPTOMS = {
 router.post('/demo/scenario', requireAuth, (req, res) => {
   const type = req.body && req.body.type;
   if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be HEART, STROKE, DIABETIC or ASTHMA' });
-  const patient = store.patients['HT-1001'];
+  const patient = store.patients['pat_001'];
   const e = simulator.createEmergency({ patient_id: patient.id, type, symptoms: DEFAULT_SYMPTOMS[type], consents: patient.consents });
   simulator.sendSos(e, { ...DEMO_LOCATION, source: 'demo' });
   res.status(201).json({ id: e.id, state: e.state });

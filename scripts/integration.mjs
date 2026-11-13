@@ -18,18 +18,18 @@ const STATES = ['MONITORING', 'SYMPTOMS_REPORTED', 'EMERGENCY_DETECTED', 'SOS_SE
 const problems = []; const problem = (m) => { problems.push(m); console.log('FAIL ' + m); }; const ok = (m) => console.log('PASS ' + m);
 const api = async (method, p, token, body) => (await fetch(BASE + p, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) })).json().catch(() => ({}));
 
-const login = await api('POST', '/auth/login', null, { email: 'patient@demo.test', password: 'demo1234' });
+const login = await api('POST', '/auth/login', null, { username: 'patient1', password: 'demo-password' });
 if (!login.token) { console.log('FAIL login'); process.exit(1); }
 const tok = login.token; await api('POST', '/demo/reset', tok);
 const events = []; const t0 = Date.now(); const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws');
 ws.onmessage = (m) => { const e = JSON.parse(m.data); if (e.type !== 'vitals.update') events.push({ ...e, at: Date.now() - t0 }); };
 await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('cannot open the WebSocket')); });
 
-const made = await api('POST', '/emergencies', tok, { patient_id: 'HT-1001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'], source: 'MANUAL' });
+const made = await api('POST', '/emergencies', tok, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'], source: 'MANUAL' });
 await api('POST', '/emergencies/' + made.id + '/sos', tok, { location: { lat: 21.17, lng: 72.83, accuracy: 20, source: 'gps' } });
-const passport = await api('POST', '/patients/HT-1001/passport', tok, { hours: 1 }); await api('GET', '/passport/' + passport.token);
+const passport = await api('POST', '/patients/pat_001/passport', tok, { hours: 1 }); await api('GET', '/passport/' + passport.token);
 for (let i = 0; i < 400 && !events.some((e) => e.type === 'emergency.handover_done'); i++) await new Promise((r) => setTimeout(r, 250));
-ws.close(); await api('DELETE', '/patients/HT-1001/passport', tok);
+ws.close(); await api('DELETE', '/patients/pat_001/passport', tok);
 
 const mine = events.filter((e) => e.emergency_id === made.id || e.type === 'passport.opened');
 const SHAPE = ['type', 'emergency_id', 'state', 'timestamp', 'payload'];

@@ -14,13 +14,13 @@ await p.goto(BASE + '/login'); await p.getByLabel('Language').selectOption('gu')
 check('L1 login switches to Gujarati and sets <html lang>', (await p.innerText('h2')) === 'સાઇન ઇન કરો' && (await lang()) === 'gu');
 await p.fill('input[type=email]', 'patient@demo.test'); await p.fill('input[type=password]', 'demo1234'); await p.click('button[type=submit]');
 await p.waitForURL(BASE + '/'); await sleep(1000);
-check('L2 language picked on Login is saved on the record', (await api('GET', '/patients/HT-1001', tok)).language === 'gu');
+check('L2 language picked on Login is saved on the record', (await api('GET', '/patients/pat_001', tok)).language === 'gu');
 
 for (const code of ['hi', 'gu']) {
   await p.goto(BASE + '/profile'); await p.locator('select:has(option[value=hi])').selectOption(code); await sleep(1000);
-  check(`L3 [${code}] saved to the record`, (await api('GET', '/patients/HT-1001', tok)).language === code);
-  await api('POST', '/demo/reset', tok); await api('PATCH', '/patients/HT-1001', tok, { language: code });
-  const ex = await api('POST', '/emergencies', tok, { patient_id: 'HT-1001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
+  check(`L3 [${code}] saved to the record`, (await api('GET', '/patients/pat_001', tok)).language === code);
+  await api('POST', '/demo/reset', tok); await api('PATCH', '/patients/pat_001', tok, { language: code });
+  const ex = await api('POST', '/emergencies', tok, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
   const run = await api('POST', '/demo/scenario', tok, { type: 'ASTHMA' }); await sleep(300);
   const screens = [['/', 'home'], ['/profile', 'profile'], ['/consent', 'consent'], ['/contacts', 'contacts'], ['/reports', 'reports'], ['/symptoms', 'symptoms'],
     ['/passport', 'passport'], ['/emergency/' + ex.id, 'emergency countdown'], ['/emergency/' + run.id, 'emergency response'], ['/cancelled', 'cancelled'], ['/demo', 'demo'], ['/nope', 'not found']];
@@ -32,7 +32,7 @@ for (const code of ['hi', 'gu']) {
   }
   await p.goto(BASE + '/'); await p.reload(); await sleep(600); check(`L5 [${code}] persists after reload`, (await lang()) === code);
 }
-await api('PATCH', '/patients/HT-1001', tok, { language: 'hi' }); await p.goto(BASE + '/'); await sleep(1500);
+await api('PATCH', '/patients/pat_001', tok, { language: 'hi' }); await p.goto(BASE + '/'); await sleep(1500);
 await p.evaluate("localStorage.removeItem('ht.lang')"); await p.getByRole('button', { name: 'साइन आउट' }).click(); await p.waitForURL('**/login');
 await p.reload(); await sleep(400);
 check('L6 with no device choice the login screen is English', (await p.innerText('h2')) === 'Sign in');
@@ -42,7 +42,7 @@ check('L7 sign-in applies the language saved on the record', (await lang()) === 
 await p.goto(BASE + '/contacts'); await p.waitForSelector('text=Asha Demo'); check('L8 contact relations translated', (await p.innerText('body')).includes('माँ'));
 
 // ---------------- voice ----------------
-await api('PATCH', '/patients/HT-1001', tok, { language: 'en' });
+await api('PATCH', '/patients/pat_001', tok, { language: 'en' });
 const INIT = `window.__heard = 'chest pain'; window.__speechError = null;
 class FakeRecognition { start(){ setTimeout(()=>{
   if (window.__speechError) { this.onerror && this.onerror({error: window.__speechError}); this.onend && this.onend(); }
@@ -76,7 +76,7 @@ check('V10 typing still works after voice errors', await v.getByRole('button', {
 const cases = [['hi', 'मुझे सीने में दर्द है और सांस फूल रही है', ['सीने में दर्द या दबाव', 'सांस फूलना']], ['hi', 'चेहरा टेढ़ा हो गया है और बोलने में लड़खड़ाहट', ['चेहरा टेढ़ा होना', 'बोलने में लड़खड़ाहट']],
   ['gu', 'મને છાતીમાં દુખાવો છે અને પરસેવો થાય છે', ['છાતીમાં દુખાવો અથવા દબાણ', 'પરસેવો થવો']], ['gu', 'મારા હોઠ ભૂરા છે અને સિસોટી જેવો અવાજ આવે છે', ['હોઠ ભૂરા થવા', 'સિસોટી જેવો અવાજ સાથે શ્વાસ']]];
 for (const [code, spoken, ids] of cases) {
-  await api('PATCH', '/patients/HT-1001', tok, { language: code }); await v.goto(BASE + '/symptoms'); await sleep(900);
+  await api('PATCH', '/patients/pat_001', tok, { language: code }); await v.goto(BASE + '/symptoms'); await sleep(900);
   await speak(spoken); const t = await v.innerText('section[aria-label]'); check(`V11 [${code}] "${spoken.slice(0, 12)}..." suggests the right symptoms`, ids.every((i) => t.includes(i)));
 }
 const uctx = await phone(browser); await uctx.addInitScript('delete window.SpeechRecognition; delete window.webkitSpeechRecognition;');

@@ -14,7 +14,7 @@ function setServer(server) { wss = server; }
 // Send one event to every connected client. Shape: { type, emergency_id, state, timestamp, payload }
 function broadcast(event) {
   if (!wss) return;
-  const message = JSON.stringify(event);
+  const message = JSON.stringify({ event: event.type, ...event }); // `event` is Daksh's name for `type`; both are sent
   wss.clients.forEach((client) => { if (client.readyState === 1) client.send(message); });
 }
 
@@ -93,7 +93,7 @@ function sendSos(emergency, location) {
   later(emergency, 4000, () => emit(emergency, 'hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED',
     { hospital_id: h.id, acknowledged_by: 'Demo ER desk' }));
   later(emergency, 8000, () => emit(emergency, 'ambulance.dispatched', 'AMBULANCE_DISPATCHED',
-    { ambulance_id: 'AMB-01', eta_seconds: 60 }, { ambulance: { id: 'AMB-01' }, eta_seconds: 60 }));
+    { ambulance_id: 'amb_001', eta_seconds: 60 }, { ambulance: { id: 'amb_001' }, eta_seconds: 60 }));
 
   // Ambulance moves in a straight line from the hospital to the patient from 10 s to 40 s.
   for (let at = 10000; at <= 40000; at += 2000) {
@@ -102,9 +102,9 @@ function sendSos(emergency, location) {
     const lat = h.lat + (where.lat - h.lat) * progress;
     const lng = h.lng + (where.lng - h.lng) * progress;
     later(emergency, at, () => emit(emergency, 'ambulance.location', 'EN_ROUTE',
-      { ambulance_id: 'AMB-01', lat, lng, eta_seconds: eta }, { eta_seconds: eta }));
+      { ambulance_id: 'amb_001', lat, lng, eta_seconds: eta }, { eta_seconds: eta }));
   }
-  later(emergency, 40000, () => emit(emergency, 'emergency.arrived', 'ARRIVED', { ambulance_id: 'AMB-01' }));
+  later(emergency, 40000, () => emit(emergency, 'emergency.arrived', 'ARRIVED', { ambulance_id: 'amb_001' }));
   later(emergency, 50000, () => emit(emergency, 'emergency.handover_done', 'HANDOVER_DONE', {}));
   return emergency;
 }

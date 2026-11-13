@@ -3,6 +3,7 @@
 import { getToken } from './auth';
 import { readCopy, saveCopy } from '../utils/offlineCache';
 import { isSimulatedOffline } from '../utils/simulatedOffline';
+import { normalizeEmergency } from '../utils/adapters';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -64,7 +65,7 @@ async function request(path, { method = 'GET', body } = {}) {
   }
 }
 
-export const login = (email, password) => request('/auth/login', { method: 'POST', body: { email, password } });
+export const login = (email, password) => request('/auth/login', { method: 'POST', body: { username: email, password } }); // Daksh's backend logs in with `username`
 export const getPatient = (id) => request('/patients/' + id);
 export const updatePatient = (id, fields) => request('/patients/' + id, { method: 'PATCH', body: fields });
 export const getVitals = (id) => request('/patients/' + id + '/vitals');
@@ -73,7 +74,7 @@ export const getVitals = (id) => request('/patients/' + id + '/vitals');
 export const createEmergency = (body) => request('/emergencies', { method: 'POST', body });
 export const sendSos = (id, location) => request('/emergencies/' + id + '/sos', { method: 'POST', body: { location } });
 export const cancelEmergency = (id) => request('/emergencies/' + id + '/cancel', { method: 'POST' });
-export const getEmergency = (id) => request('/emergencies/' + id);
+export const getEmergency = (id) => request('/emergencies/' + id).then(normalizeEmergency);
 
 // ---- Demo helpers ----
 export const runDemoScenario = (type) => request('/demo/scenario', { method: 'POST', body: { type } });

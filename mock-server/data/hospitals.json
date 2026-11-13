@@ -1,9 +1,9 @@
 [
-  { "id": "h1", "name": "Demo Heart Care Hospital", "lat": 21.1702, "lng": 72.8311,
+  { "id": "hosp_001", "name": "Demo Heart Care Hospital", "lat": 21.1702, "lng": 72.8311,
     "capabilities": ["CARDIAC_CATH_LAB", "ICU", "EMERGENCY"], "available": true, "verified": true },
-  { "id": "h2", "name": "Demo City Stroke and Neuro Centre", "lat": 21.1959, "lng": 72.8302,
+  { "id": "hosp_002", "name": "Demo City Stroke and Neuro Centre", "lat": 21.1959, "lng": 72.8302,
     "capabilities": ["STROKE_UNIT", "CT_SCAN", "ICU", "EMERGENCY"], "available": true, "verified": true },
-  { "id": "h3", "name": "Demo General Hospital", "lat": 21.1850, "lng": 72.8120,
+  { "id": "hosp_003", "name": "Demo General Hospital", "lat": 21.1850, "lng": 72.8120,
     "capabilities": ["EMERGENCY", "ICU"], "available": true, "verified": true },
   { "id": "h4", "name": "Demo Chest and Respiratory Institute", "lat": 21.1500, "lng": 72.8500,
     "capabilities": ["PULMONOLOGY", "ICU", "EMERGENCY"], "available": false, "verified": true },

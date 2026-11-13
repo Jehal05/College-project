@@ -1,5 +1,5 @@
 [
-  { "email": "patient@demo.test", "password": "demo1234", "role": "PATIENT", "patient_id": "HT-1001" },
+  { "email": "patient@demo.test", "password": "demo1234", "role": "PATIENT", "patient_id": "pat_001" },
   { "email": "staff@demo.test", "password": "demo1234", "role": "HOSPITAL_STAFF", "patient_id": null },
   { "email": "admin@demo.test", "password": "demo1234", "role": "ADMIN", "patient_id": null }
 ]

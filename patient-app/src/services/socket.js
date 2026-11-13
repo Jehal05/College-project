@@ -1,5 +1,6 @@
 // Live events from the server. Reconnects automatically if the connection drops.
 import { API_URL } from './api';
+import { normalizeEvent } from '../utils/adapters';
 
 // By default the WebSocket address is built from VITE_API_URL (http -> ws), so ONE variable switches both.
 export const WS_URL = import.meta.env.VITE_WS_URL || API_URL.replace(/^http/, 'ws') + '/ws';
@@ -15,7 +16,7 @@ export function connectEvents(onEvent, onStatus) {
     socket.onopen = () => onStatus(true);
     socket.onmessage = (msg) => {
       try {
-        onEvent(JSON.parse(msg.data)); // Shape: { type, emergency_id, state, timestamp, payload }
+        onEvent(normalizeEvent(JSON.parse(msg.data))); // Shape: { type, emergency_id, state, timestamp, payload } (Daksh's backend names the type `event`)
       } catch {
         /* ignore malformed messages */
       }

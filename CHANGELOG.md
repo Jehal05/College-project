@@ -2,6 +2,11 @@
 
 All changes are to a SIMULATED prototype. It is not a medical device and never diagnoses.
 
+## Contract alignment with Daksh v0.6 (mock server and app, no merge)
+- Mock server speaks his names next to ours (`mock-server/compat.js`): `username` login with `user_id`, `detail` on errors, `event` on every WebSocket message, `timeline`, `consent`/lowercase symptoms/optional type on `POST /emergencies`, partial consent updates with `changed`, `GET /consents/history`, `GET /passport/{id}?token=`, `{ scenario }` and `{ status: "reset" }`. IDs are now `pat_001`, `em_001`, `hosp_001`, `amb_001`.
+- App: sends `username`, reads `event` or `type`, `timeline` or `status_events` (`utils/adapters.js`).
+- `npm run contract` now has 21 checks, including one for his names. The list of what is still different is at the end of `docs/API_CONTRACT.md`.
+
 ## Phase 6: smarter, safer, demo-ready
 - **Why this alert** card on the emergency screen (collapsed): what you told us, what your readings showed (only with vitals consent), neutral checklist line. Built on a JS port of Daksh's rules v0.1 (`mock-server/rules.js`, `data/rules.json`, all pending doctor review). A rule's own sentence is shown only when it is marked reviewed (none are). `GET /emergencies/:id/reasons`; `reasons` and `source` in the `emergency.created` payload.
 - **Vitals trend** on Home: hand-drawn SVG sparkline per vital (last 60 readings, in memory only), usual-range band, "Within your usual range" / "Changed from your usual", text alternatives, "Simulated wearable data"; "Live vitals sharing is off" when consent is off (nothing is buffered). Mock vitals profiles (`normal`, `heart_attack`, `stroke`, `low_glucose`, `asthma`) and pinned values via `POST /demo/vitals`; optional `bp_sys`, `bp_dia`, `resp_rate` in `vitals.update`.
