@@ -1,5 +1,6 @@
 // Post-event report builder (feature #31). Pure: gives back plain data that the page
 // shows, the print view prints, and reportToText() turns into a downloadable file.
+import { staffNotes } from './notes.js';
 import { NOT_SHARED, originText } from './adapters.js';
 import { TYPE_LABELS, STATE_LABELS } from './contract.js';
 import { rankHospitals } from './ranking.js';
@@ -81,6 +82,9 @@ export function buildReport(emergency, context = {}) {
     ],
     checklist: { done: items.filter((i) => i.done).length, total: items.length, items },
     notes: events.filter((x) => x.state === 'NOTE').map((x) => ({ text: x.note, actor: x.actor || null, timestamp: x.timestamp })),
+    // Handover and desk notes written by staff (C1). "Shift handover" is for the next shift.
+    handover: staffNotes(events).filter((n) => n.kind === 'handover'),
+    desk_notes: staffNotes(events).filter((n) => n.kind === 'desk'),
   };
 }
 
@@ -113,6 +117,15 @@ export function reportToText(r) {
   L.push('');
   L.push(`CHECKLIST: ${r.checklist.done} of ${r.checklist.total} done (sample checklist, pending medical review)`);
   for (const i of r.checklist.items) L.push(`  [${i.done ? 'x' : ' '}] ${i.text}${i.done && i.by ? ` (${i.by})` : ''}`);
+  L.push('');
+  L.push('SHIFT HANDOVER');
+  if (r.handover.length) for (const n of r.handover) L.push(`  ${new Date(n.timestamp).toLocaleTimeString()}  ${n.text}${n.actor ? ` (${n.actor})` : ''}${n.localOnly ? ' [saved on this screen only]' : ''}`);
+  else L.push('  No handover note.');
+  if (r.desk_notes.length) {
+    L.push('');
+    L.push('DESK NOTES');
+    for (const n of r.desk_notes) L.push(`  ${new Date(n.timestamp).toLocaleTimeString()}  ${n.text}${n.actor ? ` (${n.actor})` : ''}${n.localOnly ? ' [saved on this screen only]' : ''}`);
+  }
   if (r.notes.length) {
     L.push('');
     L.push('NOTES');

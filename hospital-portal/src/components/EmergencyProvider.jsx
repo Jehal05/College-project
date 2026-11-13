@@ -127,10 +127,12 @@ export function EmergencyProvider({ children }) {
   /** Add a timeline note with no state change (pickup, corridor request, team assignment). */
   const addNote = useCallback(async (id, kind, note, fields = {}) => {
     let res = null;
+    let localOnly = false;
     try {
       res = await api.addNote(id, { kind, note, fields });
     } catch (err) {
       if (!api.isMissingEndpoint(err)) throw err; // no notes endpoint yet: the note stays on this screen
+      localOnly = true;
     }
     const timestamp = res?.timestamp || new Date().toISOString();
     send({
@@ -139,9 +141,10 @@ export function EmergencyProvider({ children }) {
         event: 'emergency.note',
         emergency_id: id,
         timestamp,
-        payload: { note_id: res?.note_id || `${timestamp}|${note}`, kind, note, fields: res?.fields || fields, actor: res?.actor || session?.name || 'Hospital staff' },
+        payload: { note_id: res?.note_id || `${timestamp}|${note}`, kind, note, fields: res?.fields || fields, actor: res?.actor || session?.name || 'Hospital staff', ...(localOnly ? { local_only: true } : {}) },
       },
     });
+    return { localOnly };
   }, [session?.name]);
 
   /** Mark an alert as opened (clears its unread dot). */

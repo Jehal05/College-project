@@ -123,6 +123,19 @@ export default function Report() {
           <p className="text-sm text-slate-500">Sample checklist. Pending medical review.</p>
         </section>
 
+        <section data-testid="report-handover">
+          <h2 className="mb-1 text-xl font-bold">Shift handover</h2>
+          {r.handover.length === 0 ? <p className="text-lg text-slate-600">No handover note.</p> : (
+            <ul className="text-lg">{r.handover.map((n, i) => <li key={i}>{when(n.timestamp)} · {n.text}{n.actor ? ` (${n.actor})` : ''}{n.localOnly ? ' [saved on this screen only]' : ''}</li>)}</ul>
+          )}
+          {r.desk_notes.length > 0 && (
+            <>
+              <h3 className="mb-1 mt-3 text-lg font-bold">Desk notes</h3>
+              <ul data-testid="report-desk-notes" className="text-lg">{r.desk_notes.map((n, i) => <li key={i}>{when(n.timestamp)} · {n.text}{n.actor ? ` (${n.actor})` : ''}{n.localOnly ? ' [saved on this screen only]' : ''}</li>)}</ul>
+            </>
+          )}
+        </section>
+
         <section>
           <h2 className="mb-1 text-xl font-bold">Notes</h2>
           {r.notes.length === 0 ? <p className="text-lg text-slate-600">No notes.</p> : (

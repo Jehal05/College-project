@@ -84,7 +84,7 @@
     {
       "method": "POST",
       "path": "/emergencies/{id}/notes",
-      "used_for": "Timeline notes: assignment, corridor, pickup, responder alert",
+      "used_for": "Timeline notes: assignment, corridor, pickup, responder alert, shift handover (kind handover) and desk notes (kind desk, 500 characters)",
       "status": "proposed",
       "fallback": "Notes stay on this screen only."
     },

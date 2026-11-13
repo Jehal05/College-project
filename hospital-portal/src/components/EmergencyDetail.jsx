@@ -17,6 +17,7 @@ import PatientFacts from './detail/PatientFacts.jsx';
 import SymptomList from './detail/SymptomList.jsx';
 import VitalsGrid from './detail/VitalsGrid.jsx';
 import ActionsPanel from './detail/ActionsPanel.jsx';
+import NotesPanel from './NotesPanel.jsx';
 
 /** Right-hand panel of the dashboard: patient summary, map, actions and timeline. The parts live in ./detail/. */
 export default function EmergencyDetail({ emergency }) {
@@ -58,6 +59,11 @@ export default function EmergencyDetail({ emergency }) {
           <div>
             <h3 className="mb-2 font-semibold">Response timeline</h3>
             <Timeline events={e.status_events} createdAt={e.created_at} />
+          </div>
+
+          <div>
+            <h3 className="mb-2 font-semibold">Handover and desk notes</h3>
+            <NotesPanel emergency={e} />
           </div>
         </div>
       </div>

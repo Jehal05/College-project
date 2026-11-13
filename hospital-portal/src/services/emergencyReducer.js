@@ -102,7 +102,7 @@ export function applyEvent(list, msg) {
       ...(payload.fields || {}),
       status_events: [
         ...current.status_events,
-        { state: 'NOTE', kind: payload.kind || null, note: payload.note, note_id: noteId, timestamp: timestamp || new Date().toISOString(), actor: payload.actor || null },
+        { state: 'NOTE', kind: payload.kind || null, note: payload.note, note_id: noteId, timestamp: timestamp || new Date().toISOString(), actor: payload.actor || null, ...(payload.local_only ? { local_only: true } : {}) },
       ],
     });
   }

@@ -4,6 +4,7 @@
 //   createdAt – ISO time of the alert (falls back to the first event)
 // An event may also carry an optional `note` (used for "Now alerting <hospital>").
 import { useEffect, useState } from 'react';
+import { NOTE_KIND_LABELS } from '../services/notes.js';
 
 const STAGES = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE', 'ARRIVED', 'HANDOVER_DONE'];
 const FINAL = ['HANDOVER_DONE', 'CANCELLED'];
@@ -76,7 +77,11 @@ export default function Timeline({ events = [], createdAt }) {
                 {(i < sorted.length - 1 || pending.length > 0) && <span className="w-0.5 flex-1 bg-slate-300" />}
               </div>
               <div>
-                <div className={`text-lg font-bold ${text}`}>{isNote(e) ? e.note : LABELS[e.state] || e.state}</div>
+                <div className={`text-lg font-bold ${text}`}>
+                  {isNote(e) && NOTE_KIND_LABELS[e.kind] && <span data-testid="timeline-note-kind" className="mr-2 rounded bg-sky-100 px-1.5 py-0.5 text-sm font-semibold text-sky-900">{NOTE_KIND_LABELS[e.kind]}</span>}
+                  {isNote(e) ? e.note : LABELS[e.state] || e.state}
+                </div>
+                {isNote(e) && e.local_only && <div className="text-sm font-semibold text-amber-800">Saved on this screen only</div>}
                 <div className="text-slate-600">
                   {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} since alert
                   {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} after previous step`}
