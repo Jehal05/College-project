@@ -201,6 +201,15 @@ UI only. No behaviour, API, route or safety wording changed (strings listed in `
 - `scripts/screenshots.mjs` takes a screenshot of every screen (`OUT=/tmp/after LANGS=en,hi FONT_SCALE=130% node scripts/screenshots.mjs`).
 - Not done: dark mode (skipped on purpose, see `docs/ACCESSIBILITY.md`).
 
+## Phase 9: what Puneet needs from the mock
+Mock server and one patient-app message (details in `docs/API_CONTRACT.md`, "Phase 9"):
+- Staff passport by patient id (`GET /passport/{patient_id}` with a staff token, honours the history consent, logged).
+- `hospital.escalated` then `hospital.alerted` when nobody acknowledges in `ESCALATION_SECONDS`.
+- `PATCH /hospitals/{id}/availability` (both key name sets), `GET /audit` (admin), WebSocket login (`?token=`, closed with 1008 otherwise).
+- Patient app: a refused cancel after dispatch says "The ambulance is already sent. Please call the number shown."
+- Joint rehearsal now has 26 checks against the current portal (`origin/Puneet`). Reply for Puneet: `docs/REPLY_TO_PUNEET.md`.
+- Not built, waiting for Daksh: notes, chat, checklist, hospital add/edit/verify endpoints.
+
 ## Phase 5: health passport, integration and release
 
 - **Health passport:** Home or Profile > "Health passport (QR)". Choose 1 hour, 24 hours (default) or 7 days and press Create. The QR holds **only a link** `<app>/p/<random token>`, never personal or health data. People scanning it see a public, read-only page (no login, 3 languages, starts with Call 112 / 108) with the name, age and blood group, and, only if the **Medical history** consent is on, allergies, conditions, medicines and emergency contacts. It says "Prepared by the patient. Not verified by a doctor." The patient can download the QR as PNG, print it, revoke it, and sees "Opened N times" (times only, no IP or device data). Expired or revoked links answer 410 and show a plain message.

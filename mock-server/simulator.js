@@ -6,6 +6,7 @@ const { buildCreatedPayload } = require('./alertPayload');
 const { getSpeed } = require('./demoState');
 const { evaluate } = require('./rules');
 const { sharedVitals, VITAL_KEYS } = require('./vitals');
+const escalation = require('./escalation');
 
 let wss = null; // set by server.js
 const timers = new Map(); // emergency id -> list of timeouts
@@ -16,7 +17,7 @@ function setServer(server) { wss = server; }
 function broadcast(event) {
   if (!wss) return;
   const message = JSON.stringify({ event: event.type, ...event }); // `event` is Daksh's name for `type`; both are sent
-  wss.clients.forEach((client) => { if (client.readyState === 1) client.send(message); });
+  wss.clients.forEach((client) => { if (client.readyState === 1 && client.authed) client.send(message); });
 }
 
 // Update the emergency, add a status event if the state changed, then broadcast.
@@ -107,11 +108,12 @@ function sendSos(emergency, location) {
   if (!h) return emergency;
 
   later(emergency, 1000, () => emit(emergency, 'hospital.alerted', 'SOS_SENT', { hospital_id: h.id, rank: top.rank, hospital }));
-  if (hospitalMode() === 'manual') return emergency; // the portal acknowledges, dispatches and moves the ambulance
+  escalation.start(emergency, ranked, { emit, later }); // nobody acknowledges in time: next hospital (escalation.js)
+  if (hospitalMode() === 'manual' || escalation.noAck()) return emergency; // the portal acknowledges, dispatches and moves the ambulance
 
   const amb = store.ambulances.find((a) => a.base_hospital_id === h.id) || store.ambulances[0];
   later(emergency, 4000, () => emit(emergency, 'hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED',
-    { hospital_id: h.id, acknowledged_by: 'ER desk (simulated)' }));
+    { hospital_id: (emergency.hospital || h).id, acknowledged_by: 'ER desk (simulated)' }));
   later(emergency, 8000, () => emit(emergency, 'ambulance.dispatched', 'AMBULANCE_DISPATCHED',
     { ambulance_id: amb.id, eta_seconds: 60 }, { ambulance: { id: amb.id, call_sign: amb.call_sign }, eta_seconds: 60 }));
 

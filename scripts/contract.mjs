@@ -178,8 +178,8 @@ await test("Daksh's names (backend/CONTRACT.md v0.6): detail, username login, ti
 });
 await test('WebSocket /ws: vitals.update and emergency events use { type, emergency_id, state, timestamp, payload }', async () => {
   if (typeof WebSocket === 'undefined') fail('needs Node 22+ (global WebSocket)');
-  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
-  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('could not open ' + BASE.replace(/^http/, 'ws') + '/ws')); setTimeout(() => reject(new Error('timeout opening WebSocket')), 5000); });
+  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + token); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('could not open ' + BASE.replace(/^http/, 'ws') + '/ws?token=' + token)); setTimeout(() => reject(new Error('timeout opening WebSocket')), 5000); });
   const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'STROKE', symptoms: ['FACE_DROOP'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
   await new Promise((r) => setTimeout(r, 3500)); await call('POST', '/emergencies/' + made.json.id + '/cancel'); ws.close();
   const types = new Set(events.map((e) => e.type));
@@ -190,7 +190,7 @@ await test('WebSocket /ws: vitals.update and emergency events use { type, emerge
 
 await test('Phase 7: created event at SOS (patient, location, vitals gated by consent), hospital.alerted hospital_id + rank, lists, ambulances', async () => {
   if (typeof WebSocket === 'undefined') fail('needs Node 22+ (global WebSocket)');
-  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + token); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('could not open WebSocket')); setTimeout(() => reject(new Error('timeout')), 5000); });
   const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'], consents: { location: false, history: true, vitals: true, reports: true } } }); expectStatus(made, 201);
   await new Promise((r) => setTimeout(r, 600));
@@ -223,6 +223,71 @@ await test('hospital steps: 403 for a patient token, 409 for an invalid move (st
 await test('portal logins: staff@demo / demo123 gives role "staff" and a hospital_id', async () => {
   const r = await call('POST', '/auth/login', { auth: false, body: { email: 'staff@demo', password: 'demo123' } }); expectStatus(r, 200);
   expectShape(r.json, { token: 'string', role: 'string', hospital_id: 'string' }); if (r.json.role !== 'staff') fail('portal dialect role should be "staff"');
+});
+
+// ---------------- Phase 9: staff passport, availability, escalation, WebSocket login, audit ----------------
+const loginAs = async (email) => { const r = await call('POST', '/auth/login', { auth: false, body: { email, password: PASSWORD } }); expectStatus(r, 200); return r.json; };
+const asUser = async (who, fn) => { const keep = token; token = who.token; try { return await fn(); } finally { token = keep; } };
+await test('Phase 9: staff passport GET /passport/{patient_id} honours the history consent (401 no login, 403 other patient, 404 unknown patient) and QR token still works', async () => {
+  const staff = await loginAs('staff@demo.test'); const before = (await call('GET', P() + '/consents')).json.consents;
+  try {
+    await call('PUT', P() + '/consents', { body: { ...before, history: true } });
+    const on = await asUser(staff, () => call('GET', '/passport/' + pid)); expectStatus(on, 200);
+    expectShape(on.json, { name: 'string', age: 'number', shared: 'object' }, 'passport'); if (!Array.isArray(on.json.allergies) || !Array.isArray(on.json.medications)) fail('history on: allergies and medications should be lists');
+    await call('PUT', P() + '/consents', { body: { ...before, history: false } });
+    const off = await asUser(staff, () => call('GET', '/passport/' + pid)); expectStatus(off, 200);
+    for (const k of ['allergies', 'conditions', 'medications', 'contacts']) if (k in off.json) fail('history off: "' + k + '" must be left out');
+    if (off.json.shared.history !== false) fail('history off: shared.history should be false');
+  } finally { await call('PUT', P() + '/consents', { body: before }); }
+  expectError(await call('GET', '/passport/' + pid, { auth: false }), 401);
+  expectError(await call('GET', '/passport/PT-9999-0000'), 403);
+  expectError(await asUser(staff, () => call('GET', '/passport/PT-9999-0000')), 404);
+  const pass = await call('POST', P() + '/passport', { body: { hours: 1 } }); expectStatus(await call('GET', '/passport/' + pass.json.token, { auth: false }), 200); await call('DELETE', P() + '/passport');
+});
+await test('Phase 9: GET /audit is admin only and lists staff passport views without tokens', async () => {
+  const staff = await loginAs('staff@demo.test'); const admin = await loginAs('admin@demo.test');
+  await asUser(staff, () => call('GET', '/passport/' + pid));
+  expectError(await call('GET', '/audit'), 403); expectError(await asUser(staff, () => call('GET', '/audit')), 403);
+  const r = await asUser(admin, () => call('GET', '/audit?page=1&page_size=50')); expectStatus(r, 200); if (!Array.isArray(r.json.rows)) fail('audit should answer { rows: [...] }');
+  const row = r.json.rows.find((x) => x.action === 'passport.staff_view'); if (!row) fail('no passport.staff_view row');
+  expectShape(row, { at: 'iso', user: 'string', role: 'string', action: 'string', outcome: 'string', fields: 'array' }, 'audit row');
+  if (/token|password/i.test(JSON.stringify(r.json))) fail('the audit log must never show tokens or passwords');
+});
+await test('Phase 9: PATCH /hospitals/{id}/availability (staff own hospital, both key names, 400 / 403 / 404)', async () => {
+  const staff = await loginAs('staff@demo.test'); const admin = await loginAs('admin@demo.test'); if (!staff.hospital_id) fail('staff login should carry hospital_id');
+  const list = (await call('GET', '/hospitals')).json; const mine = list.find((h) => h.id === staff.hospital_id); const other = list.find((h) => h.id !== staff.hospital_id);
+  const patch = (who, id, body) => asUser(who, () => call('PATCH', '/hospitals/' + id + '/availability', { body }));
+  const original = { beds_free: mine.availability.beds_free, icu_free: mine.availability.icu_free };
+  try {
+    const ok = await patch(staff, mine.id, { beds_free: 7 }); expectStatus(ok, 200); if (ok.json.id !== mine.id || ok.json.availability.beds_free !== 7) fail('answer should be the updated hospital');
+    if ((await call('GET', '/hospitals')).json.find((h) => h.id === mine.id).availability.beds_free !== 7) fail('GET /hospitals should show the change');
+    const alias = await patch(staff, mine.id, { icu_beds: 1 }); expectStatus(alias, 200); if (alias.json.availability.icu_free !== 1 || alias.json.availability.icu_beds !== 1) fail('icu_beds and icu_free should both show 1');
+    expectError(await patch(staff, mine.id, { wifi: true }), 400); expectError(await patch(staff, mine.id, { beds_free: -3 }), 400); expectError(await patch(staff, mine.id, { cath_lab_ready: 'yes' }), 400);
+    expectError(await patch(staff, other.id, { beds_free: 1 }), 403); expectError(await patch({ token }, mine.id, { beds_free: 1 }), 403);
+    expectError(await patch(admin, 'HSP-NOPE-999', { beds_free: 1 }), 404); expectStatus(await patch(admin, other.id, { beds_free: other.availability.beds_free }), 200);
+  } finally { await patch(staff, mine.id, original); }
+});
+await test('Phase 9: no acknowledgement in time -> hospital.escalated { escalation_level, from_hospital_id, to_hospital_id, to_hospital_name } then hospital.alerted (mock only; skipped on a backend without /demo/no-ack)', async () => {
+  const arm = await call('POST', '/demo/no-ack', { body: { enabled: true, escalate_after_seconds: 2 } });
+  if ([404, 405, 501].includes(arm.status)) { console.log('       (skipped: this backend has no /demo/no-ack)'); return; } expectStatus(arm, 200);
+  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + token); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+  await new Promise((resolve, reject) => { ws.onopen = resolve; setTimeout(() => reject(new Error('timeout opening WebSocket')), 5000); });
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
+  try {
+    let esc = null; for (let i = 0; i < 60 && !esc; i++) { await new Promise((r) => setTimeout(r, 250)); esc = events.find((e) => e.emergency_id === made.json.id && e.type === 'hospital.escalated'); }
+    if (!esc) fail('no hospital.escalated within 15 s'); expectShape(esc.payload, { escalation_level: 'number', from_hospital_id: 'string', to_hospital_id: 'string', to_hospital_name: 'string' }, 'escalated.payload');
+    if (esc.payload.from_hospital_id === esc.payload.to_hospital_id) fail('the alert must move to a different hospital');
+    await new Promise((r) => setTimeout(r, 500));
+    const alerted = events.filter((e) => e.emergency_id === made.json.id && e.type === 'hospital.alerted'); if (!alerted.some((e) => e.payload.hospital_id === esc.payload.to_hospital_id)) fail('no hospital.alerted for the new hospital');
+  } finally { await call('POST', '/emergencies/' + made.json.id + '/cancel'); await call('POST', '/demo/no-ack', { body: { enabled: false } }); ws.close(); }
+});
+await test('Phase 9: WebSocket needs a login: no token or a wrong token is closed with 1008, a first {"type":"auth"} message works', async () => {
+  const url = BASE.replace(/^http/, 'ws') + '/ws';
+  const closeCode = (u) => new Promise((resolve) => { const w = new WebSocket(u); w.onclose = (e) => resolve(e.code); setTimeout(() => resolve('still open'), 9000); });
+  if ((await closeCode(url + '?token=wrong-token')) !== 1008) fail('a wrong token should close with 1008');
+  if ((await closeCode(url)) !== 1008) fail('no token should close with 1008');
+  const got = await new Promise((resolve) => { const w = new WebSocket(url); w.onopen = () => w.send(JSON.stringify({ type: 'auth', token })); w.onmessage = () => { w.close(); resolve(true); }; w.onclose = () => resolve(false); setTimeout(() => resolve(false), 5000); });
+  if (!got) fail('a first auth message with a good token should start the event stream');
 });
 
 const passed = results.filter((r) => r[1]).length;

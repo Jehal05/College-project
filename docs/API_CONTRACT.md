@@ -179,3 +179,24 @@ An invalid move answers `409 { error, detail: "Invalid transition", from, to }`.
 **Portal logins:** `staff@demo` / `admin@demo` with password `demo123` (answer has lowercase role `staff` / `admin` and `hospital_id`), next to the existing logins.
 
 **Not in the mock (the portal keeps these local):** notes, chat, checklist ticks, hospital onboarding and edits, availability updates, responders, AED. Ids and the realistic-name choice: see the IDs row above.
+
+## Phase 9: what Puneet asked for (mock only, Daksh must agree for the real backend)
+**Staff passport.** `GET /passport/{patient_id}` with a `HOSPITAL_STAFF` or `ADMIN` bearer token returns the same fields as the QR page, only for the groups the patient's consents allow (`history` off: no `allergies`, `conditions`, `medications`, `contacts`; `reports` on: `reports: [{ name, content_type }]`). Answer shape: `{ name, age, blood_group, patient_id, shared: { history, reports }, ...groups }`. No login: 401. Patient token for another patient: 403. Unknown patient id with a staff token: 404 "No passport found for this patient". A random QR token in the same place still works as before (public). Every staff read is written to the audit log (`passport.staff_view`).
+
+**`passport_available`** (boolean) in the `emergency.created` payload: `true` when the history consent is on. No token, no data.
+
+**`hospital.escalated`.** If an alert is still `SOS_SENT` (nobody acknowledged) after `ESCALATION_SECONDS` (default 30, divided by `DEMO_SPEED`), the mock broadcasts
+`{ event: "hospital.escalated", emergency_id, state: "SOS_SENT", payload: { escalation_level, from_hospital_id, to_hospital_id, to_hospital_name } }`
+and then `hospital.alerted` for the new hospital (`payload: { hospital_id, rank, hospital, escalation_level }`). `escalation_level` is 1 for the first move, 2 for the second. It goes through the ranked list and stops at the end, on acknowledge, dispatch or cancel. `GET /emergencies/{id}` then shows the new hospital.
+
+**`PATCH /hospitals/{id}/availability`** (staff of that hospital, or admin; patient 403; staff of another hospital 403; unknown hospital 404). Body: any of `beds_free`, `icu_free` (whole numbers, 0 or more), `cath_lab_ready`, `stroke_unit_ready` (true or false), or Daksh's names `icu_beds`, `cath_lab_open`, `stroke_unit_open` (same meaning). Unknown field, wrong type or negative number: 400 with a plain `error`. Answer: the updated hospital exactly as `GET /hospitals` returns it. `GET /hospitals` now shows both name sets in `availability`. Broadcasts `hospital.availability_updated { hospital_id, availability }`. `POST /demo/reset` restores the seed numbers.
+
+**WebSocket login.** `/ws`, `/ws/emergencies/:id` and `/ws/hospitals/:id` need `?token=<login token>`. A wrong token is accepted and closed at once with code **1008** (a browser can read the code). No token in the address: send `{ "type": "auth", "token": "..." }` within 5 seconds (answer `auth.ok`), otherwise the socket is closed with 1008. An unauthorised socket receives no events. Mock tokens never expire, so "expired" means "unknown". `WS_AUTH=off` switches the check off (old scripts).
+
+**`GET /audit?page=1&page_size=50`** (admin only; others 403). `{ page, page_size, total, rows: [{ at, user, role, action, patient_id, outcome, reason, fields }] }`, newest first. Actions: `passport.view`, `passport.staff_view`, `hospital.availability_update`, `consent.change`. Never contains tokens, passwords or IP addresses.
+
+**Login answer** now carries `hospital_id` for staff (`staff@demo.test` and `staff@demo`: `HSP-AMD-002`).
+
+**Mock-only:** `POST /demo/no-ack { enabled, escalate_after_seconds? }` makes the fake hospital stay silent so the alert escalates (`NO_ACK_DEMO=1` does the same from the start). Not needed on a real backend; the contract test skips that check when it gets 404, 405 or 501.
+
+**Not built (waiting for Daksh's decision):** `POST /emergencies/{id}/notes`, `POST /emergencies/{id}/chat`, checklist ticks, hospital add, edit and verify.

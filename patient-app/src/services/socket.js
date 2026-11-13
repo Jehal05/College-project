@@ -1,6 +1,7 @@
 // Live events from the server. Reconnects automatically if the connection drops.
 import { API_URL } from './api';
 import { normalizeEvent } from '../utils/adapters';
+import { getToken } from './auth';
 
 // By default the WebSocket address is built from VITE_API_URL (http -> ws), so ONE variable switches both.
 export const WS_URL = import.meta.env.VITE_WS_URL || API_URL.replace(/^http/, 'ws') + '/ws';
@@ -12,7 +13,8 @@ export function connectEvents(onEvent, onStatus) {
   let stopped = false;
 
   function open() {
-    socket = new WebSocket(WS_URL);
+    const token = getToken(); // the server closes sockets that have no valid login token (code 1008)
+    socket = new WebSocket(token ? WS_URL + (WS_URL.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) : WS_URL);
     socket.onopen = () => onStatus(true);
     socket.onmessage = (msg) => {
       try {

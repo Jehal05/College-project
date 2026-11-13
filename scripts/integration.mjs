@@ -21,7 +21,7 @@ const api = async (method, p, token, body) => (await fetch(BASE + p, { method, h
 const login = await api('POST', '/auth/login', null, { username: 'patient1', password: 'demo-password' });
 if (!login.token) { console.log('FAIL login'); process.exit(1); }
 const tok = login.token; await api('POST', '/demo/reset', tok);
-const events = []; const t0 = Date.now(); const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws');
+const events = []; const t0 = Date.now(); const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + tok);
 ws.onmessage = (m) => { const e = JSON.parse(m.data); if (e.type !== 'vitals.update') events.push({ ...e, at: Date.now() - t0 }); };
 await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('cannot open the WebSocket')); });
 
@@ -62,5 +62,26 @@ console.log('  To acknowledge or dispatch for real, the backend must emit hospit
 console.log('\nFor Shagun (family, responder, admin): use these:');
 ['contacts.notified', 'emergency.handover_done', 'passport.opened'].forEach((t) => console.log(sample(t)));
 console.log('  Responder passport page: GET /passport/<token> (no login). The QR holds only <app>/p/<token>.');
+// Phase 9 events: escalation (nobody acknowledges), availability change, and the passport_available flag. No phone numbers or tokens in any of them.
+{
+  const more = []; const w2 = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + tok); w2.onmessage = (m) => { const e = JSON.parse(m.data); if (e.type !== 'vitals.update') more.push(e); };
+  await new Promise((resolve, reject) => { w2.onopen = resolve; w2.onerror = () => reject(new Error('cannot open the WebSocket')); });
+  const armed = await api('POST', '/demo/no-ack', tok, { enabled: true, escalate_after_seconds: 2 });
+  const em = await api('POST', '/emergencies', tok, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN'] });
+  await api('POST', '/emergencies/' + em.id + '/sos', tok, { location: { lat: 23.0225, lng: 72.5714, accuracy: 20, source: 'gps' } });
+  const staff = await api('POST', '/auth/login', null, { email: 'staff@demo.test', password: 'demo1234' });
+  await api('PATCH', '/hospitals/' + staff.hospital_id + '/availability', staff.token, { beds_free: 11 });
+  for (let i = 0; i < 80 && !more.some((e) => e.type === 'hospital.escalated'); i++) await new Promise((r) => setTimeout(r, 250));
+  await api('POST', '/emergencies/' + em.id + '/cancel', tok); await api('POST', '/demo/no-ack', tok, { enabled: false }); w2.close();
+  const esc = more.find((e) => e.type === 'hospital.escalated'); const next = more.find((e) => e.type === 'hospital.alerted' && e.payload.escalation_level);
+  armed.no_ack !== true ? ok('(no-ack helper not available here; escalation not checked)') : esc && ['escalation_level', 'from_hospital_id', 'to_hospital_id', 'to_hospital_name'].every((k) => k in esc.payload) && esc.state === 'SOS_SENT' && next ? ok('hospital.escalated has escalation_level, from_hospital_id, to_hospital_id, to_hospital_name and is followed by hospital.alerted') : problem('hospital.escalated missing or wrong shape');
+  const av = more.find((e) => e.type === 'hospital.availability_updated'); av && av.payload.hospital_id === staff.hospital_id && av.payload.availability.beds_free === 11 ? ok('hospital.availability_updated has hospital_id and availability') : problem('hospital.availability_updated missing');
+  const c2 = more.find((e) => e.type === 'emergency.created' && e.emergency_id === em.id); c2 && typeof c2.payload.passport_available === 'boolean' ? ok('emergency.created carries passport_available (true or false)') : problem('emergency.created lacks passport_available');
+  const leak = JSON.stringify(more.filter((e) => e.emergency_id === em.id || /^hospital\./.test(e.type)).map((e) => ({ ...e, payload: { ...e.payload, hospital: undefined, patient: undefined, reasons: undefined } })));
+  /\+?\d{9,}/.test(leak.replace(/\d{4}-\d{2}-\d{2}T[\d:.]+Z/g, '').replace(/EM-\d{8}-\d{4}/g, '')) || /token/i.test(leak) ? problem('Phase 9 events contain a phone number or token') : ok('Phase 9 events carry no phone numbers or tokens');
+  const show = (e) => (e ? '  ' + JSON.stringify({ type: e.type, emergency_id: e.emergency_id, state: e.state, payload: e.payload }) : '  (not received)');
+  console.log('\nFor Puneet, new in Phase 9:'); console.log(show(esc)); console.log(show(next)); console.log(show(av));
+}
+
 console.log('\nIntegration: ' + (problems.length ? problems.length + ' problem(s)' : 'all checks passed'));
 process.exit(problems.length ? 1 : 0);

@@ -107,6 +107,7 @@
   "emergency.sending": "अलर्ट भेजा जा रहा है...",
   "emergency.sendError": "अलर्ट नहीं भेजा जा सका। कॉल बटन का उपयोग करें, फिर दोबारा कोशिश करें।",
   "emergency.cancelError": "रद्द नहीं हो सका। कृपया दोबारा कोशिश करें।",
+  "emergency.cancelRefused": "एम्बुलेंस पहले ही भेजी जा चुकी है। कृपया दिखाया गया नंबर कॉल करें।",
   "emergency.retry": "दोबारा कोशिश करें",
   "emergency.loading": "आपातकाल लोड हो रहा है...",
   "emergency.loadError": "यह आपातकाल लोड नहीं हो सका।",

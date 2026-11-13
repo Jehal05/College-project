@@ -1,6 +1,7 @@
 // Scenarios a-g of the joint rehearsal (see scripts/joint-rehearsal.mjs). Selectors used are named in each check.
 import { sleep } from './joint-util.mjs';
 import { makeKit } from './joint-util.mjs';
+import { runPhase9 } from './joint-scenarios2.mjs';
 
 export async function runScenarios(env) {
   const k = await makeKit(env); const { check, desk, phone, api, tok, card, patientStart, cancelInPatient } = k;
@@ -73,8 +74,9 @@ export async function runScenarios(env) {
   await h.page.getByRole('button', { name: /yes|cancel|confirm/i }).last().click().catch(() => {}); await quiet(2500);
   const stateH = await card(h.id).getAttribute('data-state'); const pTxt = (await h.page.innerText('main')).replace(/\n+/g, ' | ');
   check('h1 cancel after dispatch is refused: portal card is NOT cancelled (data-state=' + stateH + ')', stateH !== 'CANCELLED');
-  console.log('NOTE h2 patient screen after the refused cancel: ' + JSON.stringify(pTxt.slice(0, 260)));
-  k.note('h2 patient screen: ' + pTxt.slice(0, 260));
+  check('h2 patient screen after the refused cancel says the ambulance is already sent (not "try again")', /The ambulance is already sent\. Please call the number shown\./.test(pTxt) && !/Could not cancel/.test(pTxt), pTxt.slice(0, 200));
+
+  await runPhase9(k, env);
 
   // g) console errors in both apps
   const bad = k.logs.filter((l) => !/401|404|409|Failed to load resource/.test(l));

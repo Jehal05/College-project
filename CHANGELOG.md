@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 9: what Puneet needs (mock server)
+- `GET /passport/{patient_id}` for staff and admin (consent honoured, every read logged); `passport_available` flag in `emergency.created`.
+- `hospital.escalated` + `hospital.alerted` after `ESCALATION_SECONDS` without acknowledgement (works in auto and manual mode, stops on acknowledge, dispatch or cancel). Mock helper `POST /demo/no-ack`, env `NO_ACK_DEMO`.
+- `PATCH /hospitals/{id}/availability` (staff own hospital or admin; Daksh's key names accepted and shown too), event `hospital.availability_updated`; `POST /demo/reset` restores seed numbers.
+- WebSocket needs the login token (`?token=` or a first `{type:"auth"}` message); otherwise closed with 1008. The patient app, scripts and tests send the token. `WS_AUTH=off` for old scripts.
+- `GET /audit` (admin only). Staff login answer has `hospital_id`.
+- Patient app: new string `emergency.cancelRefused` (en/hi/gu) shown when the server refuses a cancel (409). English: "The ambulance is already sent. Please call the number shown." Network failures still say "Could not cancel. Please try again."
+- Tests: contract 29 checks (was 24), browser 13 files / 345 checks, joint rehearsal 26 checks (was 18), integration prints the new event shapes.
+
 ## Phase 8: a real-looking health product (UI only)
 - New design system (teal brand, tokens, system fonts, inline icons, shared Button/Card/Chip/Notice/Skeleton/EmptyState). Shell with header and status chip, restyled Home, Symptoms, Emergency, Profile, Contacts, Consent, Reports, Reminders, Summary, Passport, responder page and Login.
 - Emergency red is limited to the emergency flow; Login's Call 112 / 108 link is now dark outline instead of red (still a plain `tel:112` link, 56 px).

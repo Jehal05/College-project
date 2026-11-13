@@ -107,6 +107,7 @@
   "emergency.sending": "Sending alert...",
   "emergency.sendError": "Could not send the alert. Use the call button, then try again.",
   "emergency.cancelError": "Could not cancel. Please try again.",
+  "emergency.cancelRefused": "The ambulance is already sent. Please call the number shown.",
   "emergency.retry": "Try again",
   "emergency.loading": "Loading emergency...",
   "emergency.loadError": "Could not load this emergency.",

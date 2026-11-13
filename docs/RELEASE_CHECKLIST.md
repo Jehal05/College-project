@@ -60,6 +60,9 @@ Honest status of a SIMULATED prototype. A tick means it was run, with the result
 - [ ] Phase 8: look through the new screens on a real phone (small screen, bright sunlight, large system font) and in Hindi and Gujarati.
 - [ ] Phase 8: native speakers re-read the new status labels (Online / Offline / Demo).
 
+- [ ] Phase 9: native speakers check the new cancel message (Hindi and Gujarati) and the Phase 8 status labels.
+- [ ] Phase 9: Daksh builds staff passport, escalation, availability PATCH, WebSocket login and audit on the real backend (spec: `docs/API_CONTRACT.md`, Phase 9).
+
 ## Clean-clone run
 
 A fresh `git clone --branch Jehal`, `npm ci`, then `npm test`: 28 unit tests and 7 of 7 browser files (199 checks) passed in 4 min 24 s; `npm run contract` 16 of 16 and `npm run integration` passed against a mock server started from that clone. This run found one real bug (a late answer could write a saved copy after sign out), now fixed and covered by the offline test.

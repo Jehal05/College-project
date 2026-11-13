@@ -19,6 +19,8 @@ const consentChanges = { 'PT-2026-0417': [] };
 const counters = { contact: 2, report: 0, reminder: 2 }; // C-1 and C-2 are in the seed
 const passports = {}; // patient id -> passport (Phase 5)
 const passportTokens = new Map(); // token -> passport
+const accessLog = []; // Phase 9: who looked at or changed what (passport views, availability, consents). Never holds tokens.
+const seedAvailability = hospitals.map((h) => ({ ...h.availability }));
 
 // Phase 6: medication reminders (fake), their 7-day log and the patient's small preferences. In memory only.
 const seedReminders = () => [
@@ -53,7 +55,9 @@ function resetStore() {
   preferences['PT-2026-0417'] = seedPreferences();
   for (const k of Object.keys(passports)) delete passports[k];
   passportTokens.clear();
+  accessLog.length = 0;
+  hospitals.forEach((h, i) => { h.availability = { ...seedAvailability[i] }; });
 }
 
 module.exports = { users, hospitals, ambulances, emergencyTypes, patients, tokens, emergencies, nextEmergencyId, resetStore,
-  baseline, reports, consentChanges, counters, passports, passportTokens, reminders, reminderLog, preferences };
+  baseline, reports, consentChanges, counters, passports, passportTokens, accessLog, reminders, reminderLog, preferences };

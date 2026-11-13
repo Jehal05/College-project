@@ -75,9 +75,10 @@ export default function Emergency() {
       stopAlarm();
       clearActive();
       navigate('/cancelled', { replace: true, state: { id } });
-    } catch {
+    } catch (err) {
       cancelled.current = false;
-      setProblem(t('emergency.cancelError'));
+      // 409: the server refuses a cancel once the ambulance is sent. Say so plainly instead of "try again".
+      setProblem(err && err.status === 409 ? t('emergency.cancelRefused') : t('emergency.cancelError'));
     }
   }
 

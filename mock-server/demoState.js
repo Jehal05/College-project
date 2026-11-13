@@ -2,6 +2,7 @@
 const express = require('express');
 const { requireAuth } = require('./helpers');
 const vitals = require('./vitals');
+const escalation = require('./escalation');
 
 const ALLOWED = [1, 2, 5, 10, 20];
 const START = Number(process.env.DEMO_SPEED) || 1; // /demo/reset goes back to this
@@ -15,9 +16,14 @@ router.post('/demo/speed', requireAuth, (req, res) => {
   speed = m;
   res.json({ speed });
 });
+// Test helper: the fake hospital stays silent so the alert escalates. { enabled: true, escalate_after_seconds: 5 } (nominal seconds, divided by speed).
+router.post('/demo/no-ack', requireAuth, (req, res) => {
+  escalation.configure(req.body || {});
+  res.json({ no_ack: escalation.noAck() });
+});
 router.post('/demo/vitals', requireAuth, (req, res) => {
   const { status, body } = vitals.applyChange(req.body);
   res.status(status).json(body);
 });
 
-module.exports = { router, getSpeed: () => speed, reset: () => { speed = START; vitals.reset(); } };
+module.exports = { router, getSpeed: () => speed, reset: () => { speed = START; vitals.reset(); escalation.reset(); } };

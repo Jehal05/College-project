@@ -10,6 +10,7 @@ function buildCreatedPayload({ emergency, patient, hospital, rank, vitals }) {
     type: emergency.type, severity: emergency.severity, symptoms: symptomLabels(emergency.symptoms), symptom_ids: emergency.symptoms || [], source: emergency.source,
     patient_id: emergency.patient_id, created_at: emergency.status_events[0].timestamp, simulated: true,
     reasons: emergency.reasons, consents,
+    passport_available: Boolean(consents.history), // can staff open the health passport? (GET /passport/{patient_id}, honours the history consent)
   };
   if (patient) {
     const p = {};

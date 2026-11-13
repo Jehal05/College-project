@@ -10,6 +10,7 @@ const vitals = require('./vitals');
 const simulator = require('./simulator');
 const failMode = require('./failMode');
 const compat = require('./compat');
+const wsAuth = require('./wsAuth');
 
 const PORT = process.env.PORT || 4000;
 // Extra ports are allowed so Puneet's hospital portal can call this server too.
@@ -33,6 +34,7 @@ server.on('upgrade', (req, socket, head) => {
   if (!/^\/ws(\/(emergencies|hospitals)\/[^/?]+)?(\?|$)/.test(req.url)) return socket.destroy();
   wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
 });
+wsAuth.attach(wss); // wrong or missing token: closed with 1008 (wsAuth.js)
 simulator.setServer(wss); // the simulator uses it to broadcast emergency events
 
 // Every second, send a vitals.update event to every connected client.

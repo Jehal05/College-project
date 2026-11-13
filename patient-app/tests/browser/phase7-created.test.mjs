@@ -2,7 +2,7 @@
 import { API, api, check, finish, freshState, sleep } from './helpers.mjs';
 
 const tok = await freshState();
-const events = []; const ws = new WebSocket(API.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+const events = []; const ws = new WebSocket(API.replace(/^http/, 'ws') + '/ws?token=' + tok); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
 await new Promise((r) => { ws.onopen = r; });
 
 const e = await api('POST', '/emergencies', tok, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN', 'SWEATING'], consents: { location: true, history: false, vitals: true, reports: true } });

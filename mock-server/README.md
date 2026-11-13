@@ -35,7 +35,11 @@ Every route except `/health` and `/auth/login` needs the header `Authorization: 
 | GET /patients/:id/reports/:reportId/file | The stored bytes with the stored content type (needs the Authorization header) |
 | DELETE /patients/:id/reports/:reportId | 204 |
 | GET /patients/:id/baseline | `{ heart_rate, spo2, bp_systolic, bp_diastolic, glucose: { min, max }, updated_at }` |
-| WebSocket /ws | `vitals.update` every second (payload now also has `bp` and `glucose`), plus the emergency events below |
+| GET /passport/:patient_id | Staff or admin token: the passport by patient id (honours the history consent, logged). A QR token still works without login |
+| PATCH /hospitals/:id/availability | Staff of that hospital or admin. Both name sets accepted (`icu_free`/`icu_beds`, ...). Broadcasts `hospital.availability_updated` |
+| GET /audit?page=&page_size= | Admin only. Passport views, availability changes, consent changes. No tokens |
+| POST /demo/no-ack | Test helper: the fake hospital stays silent so the alert escalates |
+| WebSocket /ws | Needs `?token=<login token>` (wrong token: closed with 1008).  `vitals.update` every second (payload now also has `bp` and `glucose`), plus the emergency events below |
 
 Settings: `PORT` (default 4000) and `CORS_ORIGINS` (comma-separated; default allows localhost ports 5173, 5174 and 3000).
 
@@ -124,3 +128,18 @@ Settings (environment variables of the mock): `HOSPITAL_MODE=auto|manual` (defau
 - Ranking (`helpers.js` `rankHospitals`): needed unit present **and ready** first, then nearest. Unverified hospitals are skipped.
 - Seed data is fictional but realistic-looking: patient `PT-2026-0417` Rahul Mehta, contacts Sunita Mehta and Karan Mehta (`+91 00000 00001`/`00002`), medicines Metformin 500 mg and Amlodipine 5 mg. No real people, hospitals or phone numbers.
 - Full description of the calls and events: `docs/API_CONTRACT.md` section "Phase 7". Rehearsal with the real portal: `docs/JOINT_REHEARSAL.md`.
+
+## Phase 9 settings
+| Variable | Default | Meaning |
+|---|---|---|
+| `ESCALATION_SECONDS` | 30 | No acknowledgement within this time (divided by `DEMO_SPEED`): `hospital.escalated`, then the next hospital |
+| `NO_ACK_DEMO` | off | `1`: the fake hospital never acknowledges (auto mode), so alerts escalate |
+| `WS_AUTH` | on | `off` lets old scripts open the WebSocket without a token |
+| `HOSPITAL_MODE` | auto | `manual`: the portal acknowledges, dispatches and moves the ambulance |
+
+## Real mode with the hospital portal
+Mock (from the repo root):
+```
+HOSPITAL_MODE=manual DEMO_SPEED=5 CORS_ORIGINS=http://localhost:5173,http://localhost:5174 npm run mock
+```
+Portal (`hospital-portal/.env`): `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:4000`, `VITE_WS_URL=ws://localhost:4000/ws`. Log in as `staff@demo` / `demo123`. If the queue looks empty click "All hospitals". Set `VITE_PORTAL_SIMULATES_AMBULANCE=false` so the mock moves the ambulance.

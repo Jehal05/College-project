@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const store = require('./store');
 const simulator = require('./simulator');
 const { requireAuth, distanceKm, DEMO_LOCATION } = require('./helpers');
+const { hospitalView } = require('./hospitalAdmin');
 const vitals = require('./vitals');
 const demoState = require('./demoState');
 
@@ -21,7 +22,7 @@ router.post('/auth/login', (req, res) => {
   if (!user) return res.status(401).json({ error: 'Invalid email or password' });
   const token = crypto.randomBytes(16).toString('hex');
   store.tokens.set(token, user);
-  res.json({ token, role: user.role, patient_id: user.patient_id });
+  res.json({ token, role: user.role, patient_id: user.patient_id, ...(user.hospital_id ? { hospital_id: user.hospital_id } : {}) });
 });
 
 router.get('/patients/:id', requireAuth, (req, res) => {
@@ -53,6 +54,7 @@ router.use(require('./summaries')); // past alerts and post-incident summary (Ph
 router.use(demoState.router); // demo speed, vitals profiles (Phase 6)
 router.use(require('./demoScenario'));
 router.use(require('./hospitalMode').router); // portal-driven hospital steps, ambulances (Phase 7)
+router.use(require('./hospitalAdmin')); // availability, staff passport audit, GET /audit (Phase 9)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.
@@ -129,7 +131,7 @@ router.get('/hospitals', requireAuth, (req, res) => {
   const lat = parseFloat(req.query.lat) || DEMO_LOCATION.lat;
   const lng = parseFloat(req.query.lng) || DEMO_LOCATION.lng;
   const list = store.hospitals
-    .map((h) => ({ ...h, distance_km: Number(distanceKm(lat, lng, h.lat, h.lng).toFixed(2)) }))
+    .map((h) => hospitalView(h, lat, lng))
     .sort((a, b) => a.distance_km - b.distance_km);
   res.json(list);
 });
