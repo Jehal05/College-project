@@ -175,3 +175,12 @@ test('emergency.note adds a timeline note and stores its fields, without changin
   assert.equal(applyEvent(list, note('n1', 'Assigned to Dr. X (Cardiology)')), list, 'duplicate is ignored');
   assert.equal(applyEvent(list, note('n2', 'Corridor request logged (simulated)')).at(0).status_events.length, 3);
 });
+
+test('after an escalation the "now at" name follows the new hospital, not the one it left', () => {
+  const start = [{ ...base()[0], alerted_hospital_id: 'H2', alerted_hospital_name: 'Old Hospital' }];
+  let list = applyEvent(start, esc(1, 'H4', 'H2'));
+  assert.equal(list[0].alerted_hospital_name, 'Hospital H4');
+  // the follow-up hospital.alerted for the same hospital changes nothing
+  const again = applyEvent(list, { event: 'hospital.alerted', emergency_id: list[0].emergency_id, state: 'ESCALATED', timestamp: new Date().toISOString(), payload: { hospital_id: 'H4', hospital_name: 'Hospital H4' } });
+  assert.equal(again, list);
+});

@@ -58,7 +58,11 @@ export function applyEvent(list, msg) {
   // Which hospital has the alert now (no state change).
   if (event === 'hospital.alerted') {
     const hospitalId = payload.hospital_id;
-    if (!hospitalId || hospitalId === current.alerted_hospital_id) return list;
+    if (!hospitalId) return list;
+    if (hospitalId === current.alerted_hospital_id) {
+      // Same hospital: only fill in a name we did not have yet.
+      return payload.hospital_name && !current.alerted_hospital_name ? replace({ ...current, alerted_hospital_name: payload.hospital_name }) : list;
+    }
     return replace({ ...current, alerted_hospital_id: hospitalId, ...(payload.hospital_name ? { alerted_hospital_name: payload.hospital_name } : {}) });
   }
 
@@ -79,6 +83,8 @@ export function applyEvent(list, msg) {
       flash_from: receivedMs(msg),
       alerted_ids: from && !current.alerted_ids.includes(from) ? [...current.alerted_ids, from] : current.alerted_ids,
       alerted_hospital_id: payload.to_hospital_id || current.alerted_hospital_id,
+      // The old name belonged to the hospital it left: use the new one, or none (the label then looks it up by id).
+      ...(payload.to_hospital_id ? { alerted_hospital_name: payload.to_hospital_name || null } : {}),
       escalated_to_name: payload.to_hospital_name || null,
       status_events: [
         ...current.status_events,
