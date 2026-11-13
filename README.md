@@ -108,7 +108,7 @@ instruction lines are shown; condition-specific lines stay hidden until a doctor
 5. **Countdown:** the number counts 10 to 0 with a beep and vibration each second (on a phone; needs a tap first).
 6. **Cancel:** "I'm OK, cancel" shows "Alert cancelled" and Home has no active-emergency banner.
 7. **Send now / location:** "Send now" skips the wait. Deny location, or turn on "Use demo location": label says "Using demo location".
-   Switch off `location` consent via `PATCH /patients/pat_001` and the screen says location sharing is off.
+   Switch off `location` consent via `PATCH /patients/PT-2026-0417` and the screen says location sharing is off.
 8. **Live progress:** with `DEMO_SPEED=1` the status moves to Handover done after about 50 seconds; the timeline fills in.
 9. **Reload:** refresh mid-emergency; the same state returns, and Home shows "Return to it" until it ends.
 10. **/demo:** run Heart, Stroke, Diabetic and Asthma scenarios, then Reset.

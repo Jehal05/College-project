@@ -3,7 +3,7 @@
 All changes are to a SIMULATED prototype. It is not a medical device and never diagnoses.
 
 ## Contract alignment with Daksh v0.6 (mock server and app, no merge)
-- Mock server speaks his names next to ours (`mock-server/compat.js`): `username` login with `user_id`, `detail` on errors, `event` on every WebSocket message, `timeline`, `consent`/lowercase symptoms/optional type on `POST /emergencies`, partial consent updates with `changed`, `GET /consents/history`, `GET /passport/{id}?token=`, `{ scenario }` and `{ status: "reset" }`. IDs are now `pat_001`, `em_001`, `hosp_001`, `amb_001`.
+- Mock server speaks his names next to ours (`mock-server/compat.js`): `username` login with `user_id`, `detail` on errors, `event` on every WebSocket message, `timeline`, `consent`/lowercase symptoms/optional type on `POST /emergencies`, partial consent updates with `changed`, `GET /consents/history`, `GET /passport/{id}?token=`, `{ scenario }` and `{ status: "reset" }`. IDs are now `PT-2026-0417`, `em_001`, `hosp_001`, `amb_001`.
 - App: sends `username`, reads `event` or `type`, `timeline` or `status_events` (`utils/adapters.js`).
 - `npm run contract` now has 21 checks, including one for his names. The list of what is still different is at the end of `docs/API_CONTRACT.md`.
 

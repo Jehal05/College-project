@@ -27,25 +27,26 @@ function distanceKm(lat1, lng1, lat2, lng2) {
 }
 
 // Demo location used when the patient app sends no location (same as the app's demo location).
-const DEMO_LOCATION = { lat: 21.1702, lng: 72.8311, accuracy: 50 };
+const DEMO_LOCATION = { lat: 23.0225, lng: 72.5714, accuracy: 50 }; // Ahmedabad (same as the portal's demo location)
 
-// What each emergency type needs from a hospital.
-const REQUIRED_CAPABILITY = {
-  HEART: 'CARDIAC_CATH_LAB', STROKE: 'STROKE_UNIT', ASTHMA: 'PULMONOLOGY', DIABETIC: 'EMERGENCY',
+// What each emergency type needs from a hospital: [capability key, availability key that must also be true].
+const REQUIRED = {
+  HEART: ['cath_lab', 'cath_lab_ready'], STROKE: ['stroke_unit', 'stroke_unit_ready'], ASTHMA: ['icu', null], DIABETIC: ['emergency', null],
 };
 
-// PLACEHOLDER for Puneet's real hospital ranking (feature 15).
-// Picks the nearest verified, available hospital with the needed capability;
-// falls back to the nearest verified, available hospital with EMERGENCY.
-function chooseHospital(type, location) {
+// Ranks the verified hospitals: suitable ones first (capability present and ready), then by distance.
+// Stand-in for Puneet's ranking; rank 1 is the one alerted. Returns [{ ...hospital, distance_km, rank, suitable }].
+function rankHospitals(type, location, list = hospitals) {
   const where = location || DEMO_LOCATION;
-  const withDistance = hospitals
-    .filter((h) => h.verified && h.available)
-    .map((h) => ({ ...h, distance_km: Number(distanceKm(where.lat, where.lng, h.lat, h.lng).toFixed(2)) }))
-    .sort((a, b) => a.distance_km - b.distance_km);
-  const needed = REQUIRED_CAPABILITY[type];
-  return withDistance.find((h) => h.capabilities.includes(needed)) ||
-    withDistance.find((h) => h.capabilities.includes('EMERGENCY')) || null;
+  const [cap, ready] = REQUIRED[type] || ['emergency', null];
+  const scored = list.filter((h) => h.verified).map((h) => ({
+    ...h, distance_km: Number(distanceKm(where.lat, where.lng, h.lat, h.lng).toFixed(2)),
+    suitable: Boolean(h.capabilities[cap] && (!ready || h.availability[ready]) && h.capabilities.emergency),
+  }));
+  scored.sort((a, b) => (Number(b.suitable) - Number(a.suitable)) || (a.distance_km - b.distance_km));
+  return scored.map((h, i) => ({ ...h, rank: i + 1 }));
 }
 
-module.exports = { delay, requireAuth, distanceKm, chooseHospital, DEMO_LOCATION };
+function chooseHospital(type, location) { return rankHospitals(type, location)[0] || null; }
+
+module.exports = { delay, requireAuth, distanceKm, chooseHospital, rankHospitals, DEMO_LOCATION };

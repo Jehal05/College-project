@@ -79,7 +79,7 @@ Also: `simulator.js` holds the broadcast helper and the timers.
 
 ## Phase 3 notes
 
-- Seed contacts (fake): `C-1 Asha Demo, Mother, +91 00000 00001, primary` and `C-2 Ravi Demo, Friend, +91 00000 00002`. The patient field is named `contacts`.
+- Seed contacts (fake): `C-1 Sunita Mehta, Mother, +91 00000 00001, primary` and `C-2 Karan Mehta, Friend, +91 00000 00002`. The patient field is named `contacts`.
   Relations: Mother, Father, Spouse, Sibling, Child, Friend, Other. Phone: after removing spaces and dashes, an optional `+` then 8 to 15 digits.
 - `GET /patients/:id/consents` is an addition beyond the original list so the screen can show the change log after a reload.
 - Reports live in memory only (max 10, names cleaned to letters, digits, space, dot, dash, underscore). `POST /demo/reset` clears reports,

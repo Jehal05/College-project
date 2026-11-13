@@ -1,12 +1,120 @@
-[
-  { "id": "hosp_001", "name": "Demo Heart Care Hospital", "lat": 21.1702, "lng": 72.8311,
-    "capabilities": ["CARDIAC_CATH_LAB", "ICU", "EMERGENCY"], "available": true, "verified": true },
-  { "id": "hosp_002", "name": "Demo City Stroke and Neuro Centre", "lat": 21.1959, "lng": 72.8302,
-    "capabilities": ["STROKE_UNIT", "CT_SCAN", "ICU", "EMERGENCY"], "available": true, "verified": true },
-  { "id": "hosp_003", "name": "Demo General Hospital", "lat": 21.1850, "lng": 72.8120,
-    "capabilities": ["EMERGENCY", "ICU"], "available": true, "verified": true },
-  { "id": "hosp_004", "name": "Demo Chest and Respiratory Institute", "lat": 21.1500, "lng": 72.8500,
-    "capabilities": ["PULMONOLOGY", "ICU", "EMERGENCY"], "available": false, "verified": true },
-  { "id": "hosp_005", "name": "Demo Community Health Centre", "lat": 21.2100, "lng": 72.8650,
-    "capabilities": ["EMERGENCY"], "available": true, "verified": false }
-]
+{
+ "_comment": "Copied on 2026-11-13 from origin/Puneet hospital-portal/src/data/hospitals.json (coordinates, capability keys, availability keys). Names, ids (HSP-AMD-nnn) and phones are fictional but realistic-looking; portal_id keeps the portal's H1-H5. Not real hospitals.",
+ "hospitals": [
+  {
+   "id": "HSP-AMD-001",
+   "portal_id": "H1",
+   "name": "Sabarmati Civil Care Hospital",
+   "address": "Ashram Road, Ahmedabad",
+   "lat": 23.03,
+   "lng": 72.565,
+   "phone": "+91 00000 10001",
+   "verified": true,
+   "simulated": true,
+   "capabilities": {
+    "cath_lab": false,
+    "stroke_unit": false,
+    "icu": true,
+    "emergency": true
+   },
+   "availability": {
+    "beds_free": 12,
+    "icu_free": 2,
+    "cath_lab_ready": false,
+    "stroke_unit_ready": false
+   }
+  },
+  {
+   "id": "HSP-AMD-002",
+   "portal_id": "H2",
+   "name": "Navrangpura Heart & Stroke Institute",
+   "address": "Navrangpura, Ahmedabad",
+   "lat": 23.037,
+   "lng": 72.55,
+   "phone": "+91 00000 10002",
+   "verified": true,
+   "simulated": true,
+   "capabilities": {
+    "cath_lab": true,
+    "stroke_unit": true,
+    "icu": true,
+    "emergency": true
+   },
+   "availability": {
+    "beds_free": 6,
+    "icu_free": 1,
+    "cath_lab_ready": true,
+    "stroke_unit_ready": true
+   }
+  },
+  {
+   "id": "HSP-AMD-003",
+   "portal_id": "H3",
+   "name": "Maninagar General Hospital",
+   "address": "Maninagar, Ahmedabad",
+   "lat": 22.997,
+   "lng": 72.603,
+   "phone": "+91 00000 10003",
+   "verified": true,
+   "simulated": true,
+   "capabilities": {
+    "cath_lab": true,
+    "stroke_unit": false,
+    "icu": true,
+    "emergency": true
+   },
+   "availability": {
+    "beds_free": 20,
+    "icu_free": 4,
+    "cath_lab_ready": true,
+    "stroke_unit_ready": false
+   }
+  },
+  {
+   "id": "HSP-AMD-004",
+   "portal_id": "H4",
+   "name": "Vastrapur Neuro & Trauma Centre",
+   "address": "Vastrapur, Ahmedabad",
+   "lat": 23.038,
+   "lng": 72.528,
+   "phone": "+91 00000 10004",
+   "verified": true,
+   "simulated": true,
+   "capabilities": {
+    "cath_lab": false,
+    "stroke_unit": true,
+    "icu": true,
+    "emergency": true
+   },
+   "availability": {
+    "beds_free": 8,
+    "icu_free": 0,
+    "cath_lab_ready": false,
+    "stroke_unit_ready": true
+   }
+  },
+  {
+   "id": "HSP-AMD-005",
+   "portal_id": "H5",
+   "name": "Naroda Community Hospital",
+   "address": "Naroda, Ahmedabad",
+   "lat": 23.07,
+   "lng": 72.655,
+   "phone": "+91 00000 10005",
+   "verified": true,
+   "simulated": true,
+   "capabilities": {
+    "cath_lab": false,
+    "stroke_unit": false,
+    "icu": false,
+    "emergency": true
+   },
+   "availability": {
+    "beds_free": 15,
+    "icu_free": 0,
+    "cath_lab_ready": false,
+    "stroke_unit_ready": false
+   }
+  }
+ ]
+}

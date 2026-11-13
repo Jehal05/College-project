@@ -22,11 +22,11 @@ const call = (path, token, body) => fetch(API + path, {
 
 // Each screen: a name, the address, and whether to sign in first.
 async function screens(token) {
-  const countdown = await call('/emergencies', token, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
+  const countdown = await call('/emergencies', token, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
   const running = await call('/demo/scenario', token, { type: 'STROKE' });
-  const passport = await call('/patients/pat_001/passport', token, { hours: 24 });
-  const done = await call('/emergencies', token, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN'] });
-  await call('/emergencies/' + done.id + '/sos', token, { location: { lat: 21.17, lng: 72.83 } });
+  const passport = await call('/patients/PT-2026-0417/passport', token, { hours: 24 });
+  const done = await call('/emergencies', token, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN'] });
+  await call('/emergencies/' + done.id + '/sos', token, { location: { lat: 23.0225, lng: 72.5714 } });
   const text = (page, label) => page.evaluate((l) => { const e = [...document.querySelectorAll('button,summary,a')].find((x) => x.textContent.includes(l)); if (e) e.click(); }, label);
   const inApp = (page, path) => page.evaluate((x) => { history.pushState({}, '', x); dispatchEvent(new PopStateEvent('popstate')); }, path);
   const pause = (ms) => new Promise((r) => setTimeout(r, ms));

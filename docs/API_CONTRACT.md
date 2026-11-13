@@ -134,7 +134,7 @@ The mock server (`mock-server/compat.js`) now speaks Daksh's names **next to** o
 | Topic | Daksh v0.6 | This mock / app today |
 |---|---|---|
 | Login | `{ username, password }` -> `{ token, role, user_id, patient_id }`; demo `patient1` / `demo-password` | Accepts `username` (the app sends it) and the old `email`; answers with `user_id` too. Both `patient1` and `patient@demo.test` work |
-| IDs | `pat_001`, `em_001`, `hosp_001`, `amb_001` | Same style now (`pat_001`, `em_001`, `hosp_001`, `amb_001`) |
+| IDs | `PT-2026-0417`, `em_001`, `hosp_001`, `amb_001` | Same style now (`PT-2026-0417`, `em_001`, `hosp_001`, `amb_001`) |
 | Errors | `{ "detail": text }` | `{ "error", "detail" }` (both, same text) |
 | Event envelope | `event` | `event` and `type` (both) |
 | WebSocket | `/ws/emergencies/{id}?token=`, `/ws/hospitals/{id}?token=` | `/ws` plus both of his paths (the mock sends every event on all of them and does not check the token) |

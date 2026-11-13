@@ -80,7 +80,7 @@ await test('reports: upload (201), list, file, wrong type (415), delete (204)', 
 });
 await test('GET /hospitals', async () => {
   const r = await call('GET', '/hospitals'); expectStatus(r, 200); if (!r.json.length) fail('no hospitals');
-  expectShape(r.json[0], { id: 'string', name: 'string', lat: 'number', lng: 'number', capabilities: 'array', available: 'boolean', verified: 'boolean', distance_km: 'number' });
+  expectShape(r.json[0], { id: 'string', name: 'string', lat: 'number', lng: 'number', capabilities: 'object', availability: 'object', verified: 'boolean', distance_km: 'number' });
 });
 let emergencyId = null;
 await test('emergencies: create (201), invalid (400), get, sos, cancel, unknown (404)', async () => {
@@ -88,7 +88,7 @@ await test('emergencies: create (201), invalid (400), get, sos, cancel, unknown 
   expectShape(made.json, { id: 'string', state: 'string', severity: 'string' }); if (made.json.state !== 'EMERGENCY_DETECTED') fail('new emergency should start as EMERGENCY_DETECTED'); emergencyId = made.json.id;
   expectError(await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['NOT_A_SYMPTOM'] } }), 400);
   const got = await call('GET', '/emergencies/' + emergencyId); expectStatus(got, 200); expectShape(got.json, { id: 'string', patient_id: 'string', type: 'string', symptoms: 'array', state: 'string', status_events: 'array' });
-  const sos = await call('POST', '/emergencies/' + emergencyId + '/sos', { body: { location: { lat: 21.17, lng: 72.83, accuracy: 20, source: 'gps' } } }); expectStatus(sos, 200); expectShape(sos.json, { id: 'string', state: 'string' });
+  const sos = await call('POST', '/emergencies/' + emergencyId + '/sos', { body: { location: { lat: 23.0225, lng: 72.5714, accuracy: 20, source: 'gps' } } }); expectStatus(sos, 200); expectShape(sos.json, { id: 'string', state: 'string' });
   const again = await call('POST', '/emergencies/' + emergencyId + '/sos', { body: {} }); expectStatus(again, 200); // sending twice is harmless
   const cancel = await call('POST', '/emergencies/' + emergencyId + '/cancel'); expectStatus(cancel, 200); if (cancel.json.state !== 'CANCELLED') fail('state should be CANCELLED');
   expectError(await call('GET', '/emergencies/E-DOES-NOT-EXIST'), 404);
@@ -173,7 +173,7 @@ await test("Daksh's names (backend/CONTRACT.md v0.6): detail, username login, ti
   if (made.json.type !== 'HEART') fail('type is optional: the rules engine should decide HEART from chest_pain'); if (!Array.isArray(made.json.reasons) || made.json.reasons.some((x) => typeof x !== 'string')) fail('POST /emergencies "reasons" should be a list of strings');
   const got = await call('GET', '/emergencies/' + made.json.id); if (!Array.isArray(got.json.timeline) || !('seconds_since_start' in got.json.timeline[0])) fail('GET /emergencies/:id should have timeline with seconds_since_start');
   const pass = await call('POST', P() + '/passport', { body: { hours: 1 } }); const viaToken = await call('GET', '/passport/' + pid + '?token=' + pass.json.token, { auth: false }); expectStatus(viaToken, 200);
-  expectError(await call('GET', '/passport/pat_other?token=' + pass.json.token, { auth: false }), 403); expectError(await call('GET', '/passport/' + pid + '?token=garbage', { auth: false }), 401);
+  expectError(await call('GET', '/passport/PT-9999-0000?token=' + pass.json.token, { auth: false }), 403); expectError(await call('GET', '/passport/' + pid + '?token=garbage', { auth: false }), 401);
   await call('DELETE', P() + '/passport'); await call('POST', '/emergencies/' + made.json.id + '/cancel');
 });
 await test('WebSocket /ws: vitals.update and emergency events use { type, emergency_id, state, timestamp, payload }', async () => {
@@ -186,6 +186,43 @@ await test('WebSocket /ws: vitals.update and emergency events use { type, emerge
   if (!events.every((e) => e.event === e.type)) fail('every event should carry "event" (Daksh) equal to "type" (ours)');
   for (const needed of ['vitals.update', 'emergency.created', 'emergency.sos_sent']) if (!types.has(needed)) fail('no "' + needed + '" event received (got: ' + [...types].join(', ') + ')');
   for (const e of events) { expectShape(e, { type: 'string', state: 'string', timestamp: 'iso', payload: 'object' }, e.type); if (!('emergency_id' in e)) fail(e.type + ' lacks emergency_id (use null for none)'); }
+});
+
+await test('Phase 7: created event at SOS (patient, location, vitals gated by consent), hospital.alerted hospital_id + rank, lists, ambulances', async () => {
+  if (typeof WebSocket === 'undefined') fail('needs Node 22+ (global WebSocket)');
+  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('could not open WebSocket')); setTimeout(() => reject(new Error('timeout')), 5000); });
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'], consents: { location: false, history: true, vitals: true, reports: true } } }); expectStatus(made, 201);
+  await new Promise((r) => setTimeout(r, 600));
+  if (events.some((e) => e.emergency_id === made.json.id && e.type === 'emergency.created')) fail('emergency.created must not be sent before the SOS');
+  await call('POST', '/emergencies/' + made.json.id + '/sos', { body: { location: { lat: 23.0225, lng: 72.5714, accuracy: 20, source: 'gps' } } });
+  await new Promise((r) => setTimeout(r, 2500)); await call('POST', '/emergencies/' + made.json.id + '/cancel'); ws.close();
+  const mine = events.filter((e) => e.emergency_id === made.json.id);
+  const created = mine.find((e) => e.type === 'emergency.created'); if (!created) fail('no emergency.created after the SOS');
+  expectShape(created.payload, { type: 'string', severity: 'string', symptoms: 'array', source: 'string', patient_id: 'string', created_at: 'iso', patient: 'object', hospital: 'object', vitals: 'object' }, 'created.payload');
+  if ('location' in created.payload) fail('location must be left out (not null) when the patient did not consent');
+  if (created.payload.patient.allergies === undefined) fail('history consent given: patient.allergies should be there');
+  const alerted = mine.find((e) => e.type === 'hospital.alerted'); if (!alerted) fail('no hospital.alerted');
+  expectShape(alerted.payload, { hospital_id: 'string', rank: 'number' }, 'alerted.payload');
+  const active = await call('GET', '/emergencies?status=active'); expectStatus(active, 200); if (!Array.isArray(active.json)) fail('GET /emergencies?status=active should be an array');
+  const amb = await call('GET', '/ambulances'); expectStatus(amb, 200); expectShape(amb.json[0], { id: 'string', call_sign: 'string', lat: 'number', lng: 'number', status: 'string' }, 'ambulances[0]');
+});
+await test('hospital steps: 403 for a patient token, 409 for an invalid move, staff can acknowledge (ack, dispatch, status)', async () => {
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); expectStatus(made, 201);
+  await call('POST', '/emergencies/' + made.json.id + '/sos', { body: { location: { lat: 23.0225, lng: 72.5714 } } });
+  for (const [path, body] of [['/ack', {}], ['/dispatch', { ambulance_id: 'AMB-AMD-02' }], ['/status', { state: 'ARRIVED' }]]) expectStatus(await call('POST', '/emergencies/' + made.json.id + path, { body }), 403);
+  const patientToken = token;
+  const login = await call('POST', '/auth/login', { auth: false, body: { email: 'staff@demo.test', password: PASSWORD } }); expectStatus(login, 200); token = login.json.token;
+  try {
+    const bad = await call('POST', '/emergencies/' + made.json.id + '/status', { body: { state: 'HANDOVER_DONE' } }); expectStatus(bad, 409);
+    if (bad.json.detail !== 'Invalid transition' || bad.json.from !== 'SOS_SENT' || bad.json.to !== 'HANDOVER_DONE') fail('409 body should be { detail: "Invalid transition", from, to }, got ' + bad.text);
+    expectStatus(await call('POST', '/emergencies/' + made.json.id + '/dispatch', { body: { ambulance_id: 'nope' } }), 400);
+    expectStatus(await call('POST', '/emergencies/' + made.json.id + '/ack', { body: {} }), 200);
+  } finally { token = patientToken; await call('POST', '/emergencies/' + made.json.id + '/cancel'); }
+});
+await test('portal logins: staff@demo / demo123 gives role "staff" and a hospital_id', async () => {
+  const r = await call('POST', '/auth/login', { auth: false, body: { email: 'staff@demo', password: 'demo123' } }); expectStatus(r, 200);
+  expectShape(r.json, { token: 'string', role: 'string', hospital_id: 'string' }); if (r.json.role !== 'staff') fail('portal dialect role should be "staff"');
 });
 
 const passed = results.filter((r) => r[1]).length;

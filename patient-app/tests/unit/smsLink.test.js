@@ -14,7 +14,7 @@ describe('SMS fallback links', () => {
   });
   it('adds a map link only when a location is given', () => {
     expect(buildMessage(TEXT, null)).toBe(TEXT);
-    expect(buildMessage(TEXT, { lat: 21.1702, lng: 72.8311 })).toBe(TEXT + ' https://maps.google.com/?q=21.17020,72.83110');
+    expect(buildMessage(TEXT, { lat: 23.0225, lng: 72.5714 })).toBe(TEXT + ' https://maps.google.com/?q=23.02250,72.57140');
     expect(mapLink({ lat: 1, lng: 2 })).toBe('https://maps.google.com/?q=1.00000,2.00000');
   });
   it('the text holds no health words', () => { expect(buildMessage(TEXT, { lat: 1, lng: 2 })).not.toMatch(/symptom|chest|heart rate|spo2|glucose|allerg|condition|medic|diagnos/i); });

@@ -68,7 +68,7 @@ router.get('/passport/:token', (req, res) => {
 
 // Demo helper: make the current passport expire now (used by tests and the demo).
 router.post('/demo/passport/expire', requireAuth, (req, res) => {
-  const p = current('pat_001');
+  const p = current('PT-2026-0417');
   if (p) p.expires_at = new Date(Date.now() - 1000).toISOString();
   res.json({ ok: true });
 });

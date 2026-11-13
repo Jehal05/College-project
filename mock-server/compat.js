@@ -10,6 +10,8 @@ const { evaluate } = require('./rules');
 const ENGINE_TO_APP = {};
 Object.entries(SYMPTOM_TO_ENGINE).forEach(([appId, engine]) => { if (engine && !ENGINE_TO_APP[engine]) ENGINE_TO_APP[engine] = appId; });
 const USERNAMES = { patient1: 'patient@demo.test', staff1: 'staff@demo.test', admin1: 'admin@demo.test' };
+const PORTAL_LOGINS = { 'staff@demo': { email: 'staff@demo.test', role: 'staff', hospital_id: 'HSP-AMD-002' },
+  'admin@demo': { email: 'admin@demo.test', role: 'admin', hospital_id: 'HSP-AMD-002' } };
 const CONSENT_KEYS = ['location', 'history', 'vitals', 'reports'];
 
 // Wraps res.json so a later step can add fields to the answer.
@@ -29,6 +31,11 @@ function middleware(req, res, next) {
     const b = req.body;
     if (b.username && !b.email) b.email = USERNAMES[b.username] || b.username;
     if (b.password === 'demo-password') b.password = 'demo1234';
+    // The hospital portal's own demo logins (staff@demo / admin@demo, password demo123) get lowercase roles and a hospital_id.
+    if (PORTAL_LOGINS[b.email] && b.password === 'demo123') {
+      const portal = PORTAL_LOGINS[b.email]; b.email = portal.email; b.password = 'demo1234';
+      decorate(res, (body) => (body.token ? { ...body, role: portal.role, hospital_id: portal.hospital_id } : body));
+    }
     decorate(res, (body) => (body.token ? { ...body, user_id: 'usr_' + (store.users.findIndex((u) => u.patient_id === body.patient_id && u.role === body.role) + 1 || 1).toString().padStart(3, '0') } : body));
   }
 

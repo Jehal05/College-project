@@ -23,15 +23,15 @@ check('T5 no trend/reminder/summary/emergency data in browser storage', keys.eve
 await api('POST', '/demo/reset', tok);
 
 // ---- Consent off -> no trend
-await api('PUT', '/patients/pat_001/consents', tok, { location: true, history: true, vitals: false, reports: true });
+await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: true, history: true, vitals: false, reports: true });
 await p.reload(); await p.waitForSelector('text=Live vitals sharing is off', { timeout: 8000 });
 check('T6 vitals consent off: sharing-off text with consent link', (await p.getByRole('link', { name: 'Change in Consent settings' }).count()) >= 1);
-await api('PUT', '/patients/pat_001/consents', tok, { location: true, history: true, vitals: true, reports: true });
+await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: true, history: true, vitals: true, reports: true });
 
 // ---- Why this alert + summary
-const e = await api('POST', '/emergencies', tok, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN'], location: { lat: 21.17, lng: 72.83 }, consents: { location: true, history: true, vitals: true, reports: true } });
+const e = await api('POST', '/emergencies', tok, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN'], location: { lat: 23.0225, lng: 72.5714 }, consents: { location: true, history: true, vitals: true, reports: true } });
 const id = e.emergency_id || e.id; check('W0 emergency created', Boolean(id), e);
-await api('POST', '/emergencies/' + id + '/sos', tok, { location: { lat: 21.17, lng: 72.83 } });
+await api('POST', '/emergencies/' + id + '/sos', tok, { location: { lat: 23.0225, lng: 72.5714 } });
 const rs = await api('GET', '/emergencies/' + id + '/reasons', tok);
 check('W1 reasons endpoint shape', rs.simulated === true && rs.reviewed === false && Array.isArray(rs.matched_rules) && rs.matched_rules.length > 0 && rs.matched_rules.every((r) => r.reviewed === false), rs);
 await p.goto(BASE + '/emergency/' + id); await p.waitForSelector('text=Why this alert');
@@ -51,9 +51,9 @@ await p.unroute('**/emergencies/*/reasons');
 
 // Summary after the run ends (DEMO_SPEED 10)
 await sleep(100);
-let sum; for (let i = 0; i < 40; i++) { sum = await api('GET', '/patients/pat_001/emergencies/' + id + '/summary', tok); if (sum.final_state === 'HANDOVER_DONE') break; await sleep(1000); }
+let sum; for (let i = 0; i < 40; i++) { sum = await api('GET', '/patients/PT-2026-0417/emergencies/' + id + '/summary', tok); if (sum.final_state === 'HANDOVER_DONE') break; await sleep(1000); }
 check('S1 summary endpoint shape', sum && sum.simulated === true && Array.isArray(sum.timeline) && sum.durations && 'to_acknowledged' in sum.durations && sum.source === 'MANUAL', sum);
-const list = await api('GET', '/patients/pat_001/emergencies', tok); check('S2 emergency list includes it', Array.isArray(list) && list.some((x) => x.id === id));
+const list = await api('GET', '/patients/PT-2026-0417/emergencies', tok); check('S2 emergency list includes it', Array.isArray(list) && list.some((x) => x.id === id));
 await p.goto(BASE + '/summary/' + id); await p.waitForSelector('text=Alert record'); await p.waitForSelector('text=/Hospital acknowledged after/');
 const st = await p.innerText('main');
 check('S3 summary shows record line, durations, footer', st.includes('This is a record of what the app did. It does not describe your health.') && /Hospital acknowledged after/.test(st) && st.includes('Prepared by the app. Not verified by a doctor.'), st.slice(0, 200));

@@ -51,6 +51,7 @@ router.use(require('./reminders')); // medication reminders (Phase 6)
 router.use(require('./preferences')); // safety check-in setting (Phase 6)
 router.use(require('./summaries')); // past alerts and post-incident summary (Phase 6)
 router.use(demoState.router); // demo speed, vitals profiles (Phase 6)
+router.use(require('./hospitalMode').router); // portal-driven hospital steps, ambulances (Phase 7)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.
@@ -71,6 +72,16 @@ router.post('/emergencies', requireAuth, (req, res) => {
   if (problem) return res.status(400).json({ error: problem });
   const e = simulator.createEmergency(req.body);
   res.status(201).json({ id: e.id, state: e.state, severity: e.severity, source: e.source });
+});
+
+// The portal's lists: ?status=active (not finished or cancelled) or ?status=finished.
+router.get('/emergencies', requireAuth, (req, res) => {
+  const done = (e) => ['HANDOVER_DONE', 'CANCELLED'].includes(e.state);
+  const want = req.query.status;
+  const all = [...store.emergencies.values()].filter((e) => e.state !== 'EMERGENCY_DETECTED' || process.env.ALERT_AT === 'detected');
+  const list = want === 'active' ? all.filter((e) => !done(e)) : want === 'finished' ? all.filter(done) : all;
+  res.json(list.map((e) => ({ ...e, emergency_id: e.id, created_at: e.status_events[0].timestamp, simulated: true,
+    ...(e.consents && e.consents.location && e.location ? {} : { location: undefined }) })));
 });
 
 const findEmergency = (req, res) => {
@@ -95,6 +106,10 @@ router.post('/emergencies/:id/cancel', requireAuth, (req, res) => {
   const e = findEmergency(req, res);
   if (!e) return;
   if (e.state === 'HANDOVER_DONE') return res.status(409).json({ error: 'Emergency already finished' });
+  // Manual hospital mode follows Daksh's table: CANCELLED only before AMBULANCE_DISPATCHED.
+  if (process.env.HOSPITAL_MODE === 'manual' && ['AMBULANCE_DISPATCHED', 'EN_ROUTE', 'ARRIVED'].includes(e.state)) {
+    return res.status(409).json({ error: 'Invalid transition', detail: 'Invalid transition', from: e.state, to: 'CANCELLED' });
+  }
   if (e.state !== 'CANCELLED') simulator.cancelEmergency(e);
   res.json({ id: e.id, state: e.state });
 });
@@ -121,7 +136,7 @@ const DEFAULT_SYMPTOMS = {
 router.post('/demo/scenario', requireAuth, (req, res) => {
   const type = req.body && req.body.type;
   if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be HEART, STROKE, DIABETIC or ASTHMA' });
-  const patient = store.patients['pat_001'];
+  const patient = store.patients['PT-2026-0417'];
   const e = simulator.createEmergency({ patient_id: patient.id, type, symptoms: DEFAULT_SYMPTOMS[type], consents: patient.consents });
   simulator.sendSos(e, { ...DEMO_LOCATION, source: 'demo' });
   res.status(201).json({ id: e.id, state: e.state });
@@ -135,10 +150,10 @@ router.post('/demo/reset', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// Hospitals sorted by distance from lat/lng (defaults to a demo point in Surat).
+// Hospitals sorted by distance from lat/lng (defaults to the Ahmedabad demo point).
 router.get('/hospitals', requireAuth, (req, res) => {
-  const lat = parseFloat(req.query.lat) || 21.1702;
-  const lng = parseFloat(req.query.lng) || 72.8311;
+  const lat = parseFloat(req.query.lat) || DEMO_LOCATION.lat;
+  const lng = parseFloat(req.query.lng) || DEMO_LOCATION.lng;
   const list = store.hospitals
     .map((h) => ({ ...h, distance_km: Number(distanceKm(lat, lng, h.lat, h.lng).toFixed(2)) }))
     .sort((a, b) => a.distance_km - b.distance_km);

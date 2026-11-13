@@ -25,11 +25,11 @@ const events = []; const t0 = Date.now(); const ws = new WebSocket(BASE.replace(
 ws.onmessage = (m) => { const e = JSON.parse(m.data); if (e.type !== 'vitals.update') events.push({ ...e, at: Date.now() - t0 }); };
 await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('cannot open the WebSocket')); });
 
-const made = await api('POST', '/emergencies', tok, { patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'], source: 'MANUAL' });
-await api('POST', '/emergencies/' + made.id + '/sos', tok, { location: { lat: 21.17, lng: 72.83, accuracy: 20, source: 'gps' } });
-const passport = await api('POST', '/patients/pat_001/passport', tok, { hours: 1 }); await api('GET', '/passport/' + passport.token);
+const made = await api('POST', '/emergencies', tok, { patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'], source: 'MANUAL' });
+await api('POST', '/emergencies/' + made.id + '/sos', tok, { location: { lat: 23.0225, lng: 72.5714, accuracy: 20, source: 'gps' } });
+const passport = await api('POST', '/patients/PT-2026-0417/passport', tok, { hours: 1 }); await api('GET', '/passport/' + passport.token);
 for (let i = 0; i < 400 && !events.some((e) => e.type === 'emergency.handover_done'); i++) await new Promise((r) => setTimeout(r, 250));
-ws.close(); await api('DELETE', '/patients/pat_001/passport', tok);
+ws.close(); await api('DELETE', '/patients/PT-2026-0417/passport', tok);
 
 const mine = events.filter((e) => e.emergency_id === made.id || e.type === 'passport.opened');
 const SHAPE = ['type', 'emergency_id', 'state', 'timestamp', 'payload'];
@@ -41,10 +41,14 @@ backwards ? problem('states went backwards') : ok('states only move forward');
 const REQUIRED = ['emergency.created', 'emergency.sos_sent', 'hospital.alerted', 'hospital.acknowledged', 'ambulance.dispatched', 'ambulance.location', 'emergency.arrived', 'emergency.handover_done', 'contacts.notified', 'passport.opened'];
 const types = new Set(mine.map((e) => e.type)); const missing = REQUIRED.filter((t) => !types.has(t)); missing.length ? problem('missing events: ' + missing.join(', ')) : ok('all ' + REQUIRED.length + ' event types arrived');
 const notified = mine.find((e) => e.type === 'contacts.notified');
-notified && JSON.stringify(notified).match(/\+?\d{8,}/) ? problem('contacts.notified contains a phone number') : ok('contacts.notified has names only (no phone numbers)');
+notified && JSON.stringify(notified.payload).match(/\+?\d{8,}/) ? problem('contacts.notified contains a phone number') : ok('contacts.notified has names only (no phone numbers)');
 const loc = mine.find((e) => e.type === 'ambulance.location'); loc && typeof loc.payload.lat === 'number' && typeof loc.payload.eta_seconds === 'number' ? ok('ambulance.location carries lat, lng and eta_seconds') : problem('ambulance.location lacks lat/lng/eta_seconds');
 const created = mine.find((e) => e.type === 'emergency.created');
 created && created.payload.source === 'MANUAL' ? ok('emergency.created carries source') : problem('emergency.created lacks payload.source');
+const cp = (created && created.payload) || {};
+['patient_id', 'type', 'severity', 'symptoms', 'symptom_ids', 'reasons', 'patient_summary', 'created_at'].every((k) => k in cp) ? ok('emergency.created has patient_id, readable symptoms, symptom_ids, reasons, patient_summary') : problem('emergency.created lacks one of the Phase 7 fields');
+created && created.state === 'SOS_SENT' && mine.findIndex((e) => e.type === 'emergency.created') < mine.findIndex((e) => e.type === 'emergency.sos_sent') ? ok('emergency.created arrives at SOS (state SOS_SENT) before sos_sent') : problem('emergency.created should come at SOS, before sos_sent');
+const alerted = mine.find((e) => e.type === 'hospital.alerted'); alerted && alerted.payload.hospital_id && alerted.payload.rank === 1 ? ok('hospital.alerted has hospital_id and rank') : problem('hospital.alerted lacks hospital_id or rank');
 created && created.payload.reasons && Array.isArray(created.payload.reasons.matched_rules) && created.payload.reasons.reviewed === false ? ok('emergency.created carries reasons (matched_rules, reviewed:false)') : problem('emergency.created lacks payload.reasons');
 const reasonText = created ? JSON.stringify(created.payload.reasons) : '';
 /diagnos|probab|score/i.test(reasonText) ? problem('reasons contain a diagnosis, score or probability word') : ok('reasons contain no diagnosis, score or probability');

@@ -7,7 +7,7 @@ const p = await newPage(ctx); await login(p);
 
 // Off by default
 await p.goto(BASE + '/profile'); await p.waitForSelector('text=Safety check-in');
-const prefs0 = await api('GET', '/patients/pat_001/preferences', tok);
+const prefs0 = await api('GET', '/patients/PT-2026-0417/preferences', tok);
 check('C1 safety check-in is OFF by default', prefs0.safety_checkin && prefs0.safety_checkin.enabled === false, prefs0);
 check('C2 Profile says what the app cannot do (honest limits)', /cannot|can not|only/i.test(await p.innerText('main')));
 
@@ -18,23 +18,23 @@ check('C3 check-in is full screen with I\'m OK and tel:112', (await p.getByRole(
 const box = await p.getByRole('button', { name: "I'm OK" }).boundingBox(); check('C4 I\'m OK is huge (>= 44 px high)', box.height >= 44, box);
 check('C5 countdown text starts at 30 or below', /Alert starts in (30|29|28) seconds/.test(await p.innerText('body')));
 await p.getByRole('button', { name: "I'm OK" }).click(); await p.waitForSelector('text=Are you OK?', { state: 'detached' });
-check('C6 I\'m OK closes it and starts no emergency', (await api('GET', '/patients/pat_001/emergencies', tok)).length === 0);
+check('C6 I\'m OK closes it and starts no emergency', (await api('GET', '/patients/PT-2026-0417/emergencies', tok)).length === 0);
 
 // Simulated fall -> no answer
 await p.getByRole('button', { name: 'Simulated fall' }).click(); await p.waitForSelector('text=Are you OK?');
 await p.waitForURL(/\/emergency\//, { timeout: 45000 });
-const list = await api('GET', '/patients/pat_001/emergencies', tok);
+const list = await api('GET', '/patients/PT-2026-0417/emergencies', tok);
 check('C7 no answer starts an emergency with source FALL_CHECK', list.length === 1 && list[0].source === 'FALL_CHECK', list);
 await p.waitForSelector('text=Why this alert');
 check('C8 Emergency screen says it started from the check-in (simulated)', /safety check-in/i.test(await p.innerText('main')));
 await p.getByRole('button', { name: 'False alarm? Cancel' }).click();
 await p.getByRole('button', { name: /yes|cancel|confirm/i }).last().click().catch(() => {});
 await p.waitForURL(/cancelled/, { timeout: 10000 }).catch(() => {});
-check('C9 Cancel still works on a check-in alert', (await api('GET', '/patients/pat_001/emergencies', tok))[0].final_state === 'CANCELLED' || /cancelled/.test(p.url()), p.url());
+check('C9 Cancel still works on a check-in alert', (await api('GET', '/patients/PT-2026-0417/emergencies', tok))[0].final_state === 'CANCELLED' || /cancelled/.test(p.url()), p.url());
 check('C10 cancelled screen links to the record', (await p.locator('a[href^="/summary/"]').count()) >= 1);
 
 // Validation of source
-const badSrc = await fetch((process.env.TEST_API_URL || 'http://localhost:4000') + '/emergencies', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ patient_id: 'pat_001', type: 'HEART', symptoms: ['CHEST_PAIN'], source: 'BOGUS' }) });
+const badSrc = await fetch((process.env.TEST_API_URL || 'http://localhost:4000') + '/emergencies', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ patient_id: 'PT-2026-0417', type: 'HEART', symptoms: ['CHEST_PAIN'], source: 'BOGUS' }) });
 check('C11 invalid source -> 400', badSrc.status === 400);
 
 // Simulated offline -> SMS card
@@ -64,14 +64,14 @@ await q.click('text=Stroke signs'); await q.getByLabel('Face drooping').check();
 const ih = await q.locator('a[href^="sms:"]').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
 check('M9 iPhone form uses &body=', ih.length === 2 && ih.every((h) => /^sms:\+\d+&body=/.test(h)), ih);
 // No location consent -> no map link; back online -> sent
-await api('PUT', '/patients/pat_001/consents', tok, { location: false, history: true, vitals: true, reports: true });
+await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: false, history: true, vitals: true, reports: true });
 // Switch off the simulated offline and let the pending alert send
 await q.evaluate(() => { history.pushState({}, '', '/demo'); dispatchEvent(new PopStateEvent('popstate')); });
 await q.getByRole('switch', { name: /No data connection/ }).click();
 await q.evaluate(() => { history.pushState({}, '', '/'); dispatchEvent(new PopStateEvent('popstate')); });
 await sleep(6000);
-check('M10 after the connection returns the alert reaches the server', (await api('GET', '/patients/pat_001/emergencies', tok)).length >= 1);
-await api('PUT', '/patients/pat_001/consents', tok, { location: true, history: true, vitals: true, reports: true });
+check('M10 after the connection returns the alert reaches the server', (await api('GET', '/patients/PT-2026-0417/emergencies', tok)).length >= 1);
+await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: true, history: true, vitals: true, reports: true });
 // Storage dump after check-in, SMS fallback and demo use: nothing from the new features may sit in browser storage
 for (const page of [p, q]) {
   const dump = await page.evaluate(() => JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage), indexedDB.databases ? 'idb' : '']));

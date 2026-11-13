@@ -13,7 +13,7 @@ const helpBtn = () => p.getByRole('button', { name: 'Get help now' });
 const pickHeart = async () => { await p.click('text=Heart or chest'); await p.getByLabel('Chest pain or pressure').check(); await p.getByLabel('Shortness of breath').check(); };
 async function startHeart() {
   await p.click('text=Emergency help'); await p.waitForSelector('text=What is happening?'); await pickHeart();
-  const t0 = Date.now(); await p.click('text=Get help now'); await p.waitForURL('**/emergency/em_*'); return (Date.now() - t0) / 1000;
+  const t0 = Date.now(); await p.click('text=Get help now'); await p.waitForURL('**/emergency/EM-*'); return (Date.now() - t0) / 1000;
 }
 
 check('2.1 Home has a red Emergency help link to /symptoms', (await p.locator("a:has-text('Emergency help')").getAttribute('href')) === '/symptoms');
@@ -25,7 +25,7 @@ await p.getByLabel('Chest pain or pressure').check(); check('2.5 enabled after o
 await p.click('text=Stroke signs'); check('2.6 switching category clears ticks', await helpBtn().isDisabled());
 check('2.7 no overflow, all controls named', (await noOverflow(p)) && (await unnamedControls(p)).length === 0);
 
-await pickHeart(); let t0 = Date.now(); await p.click('text=Get help now'); await p.waitForURL('**/emergency/em_*');
+await pickHeart(); let t0 = Date.now(); await p.click('text=Get help now'); await p.waitForURL('**/emergency/EM-*');
 const dt = (Date.now() - t0) / 1000; await p.waitForSelector("text=I'm OK, cancel");
 check('3.1 emergency screen opens in under a second', dt < 1, dt);
 check('3.2 banner visible and bottom nav hidden', (await p.innerText('body')).includes(BANNER) && (await p.locator("nav[aria-label='Main navigation']").count()) === 0);
@@ -41,7 +41,7 @@ check('3.7 no active-emergency banner after cancel', (await p.locator('text=You 
 
 await startHeart(); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
 await p.waitForSelector('text=/Using demo location|Using your location/'); check('4.1 location label shown', true);
-await p.waitForSelector('text=/Hospital: Demo Heart Care Hospital/', { timeout: 5000 });
+await p.waitForSelector('text=/Hospital: Navrangpura Heart & Stroke Institute/', { timeout: 5000 });
 await p.waitForSelector('text=Ambulance ETA', { timeout: 8000 });
 check('4.2 false-alarm button visible mid-response', await p.getByRole('button', { name: 'False alarm? Cancel' }).isVisible());
 await p.reload(); await p.waitForSelector('text=Alert sent'); check('4.3 reload mid-response restores state', (await p.locator('text=/Hospital: /').count()) > 0);
@@ -55,27 +55,27 @@ check('4.6 banner cleared after handover', (await p.locator('text=You have an ac
 await startHeart(); await p.waitForSelector('text=Alert sent', { timeout: 14000 }); check('5 natural countdown sends the SOS', true);
 await p.waitForSelector('text=The simulated emergency has ended.', { timeout: 12000 });
 
-await api('PATCH', '/patients/pat_001', tok, { consents: { location: false, history: true, vitals: true, reports: true } });
+await api('PATCH', '/patients/PT-2026-0417', tok, { consents: { location: false, history: true, vitals: true, reports: true } });
 await p.goto(BASE + '/symptoms'); await p.click('text=Stroke signs'); await p.getByLabel('Face drooping').check(); await p.click('text=Get help now');
-await p.waitForURL('**/emergency/em_*'); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
+await p.waitForURL('**/emergency/EM-*'); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
 check('6 consent off: location sharing is off', (await p.locator('text=Location sharing is off in your consent settings').count()) === 1);
-await api('PATCH', '/patients/pat_001', tok, { consents: { location: true, history: true, vitals: true, reports: true } });
+await api('PATCH', '/patients/PT-2026-0417', tok, { consents: { location: true, history: true, vitals: true, reports: true } });
 
-const ctx2 = await phone(browser, { geolocation: { latitude: 21.2, longitude: 72.85 }, permissions: ['geolocation'] }); await ctx2.addInitScript(INIT);
+const ctx2 = await phone(browser, { geolocation: { latitude: 23.03, longitude: 72.57 }, permissions: ['geolocation'] }); await ctx2.addInitScript(INIT);
 const q = await newPage(ctx2); await login(q);
 await q.click('text=Emergency help'); await q.click('text=Heart or chest'); await q.getByLabel('Chest pain or pressure').check(); await q.click('text=Get help now');
-await q.waitForURL('**/emergency/em_*'); await q.click('text=Send now'); await q.waitForSelector('text=Alert sent');
+await q.waitForURL('**/emergency/EM-*'); await q.click('text=Send now'); await q.waitForSelector('text=Alert sent');
 await q.waitForSelector('text=Using your location'); check('7.1 real location used when allowed', true);
 await q.goto(BASE + '/symptoms'); await q.getByLabel('Use demo location').check(); await q.click('text=Heart or chest'); await q.getByLabel('Chest pain or pressure').check();
-await q.click('text=Get help now'); await q.waitForURL('**/emergency/em_*'); await q.click('text=Send now'); await q.waitForSelector('text=Alert sent');
+await q.click('text=Get help now'); await q.waitForURL('**/emergency/EM-*'); await q.click('text=Send now'); await q.waitForSelector('text=Alert sent');
 await q.waitForSelector('text=Using demo location'); check('7.2 demo location can be forced', true);
 
-await p.goto(BASE + '/demo'); await p.click('text=Run Stroke scenario'); await p.waitForURL('**/emergency/em_*');
-await p.waitForSelector('text=/Hospital: Demo City Stroke/', { timeout: 6000 }); check('8.1 stroke scenario picks the stroke centre', true);
+await p.goto(BASE + '/demo'); await p.click('text=Run Stroke scenario'); await p.waitForURL('**/emergency/EM-*');
+await p.waitForSelector('text=/Hospital: Navrangpura Heart & Stroke Institute/', { timeout: 6000 }); check('8.1 stroke scenario picks a hospital with a ready stroke unit', true);
 await p.goto(BASE + '/demo'); await p.click('text=Reset demo'); await p.waitForSelector('text=Demo reset');
-await p.goto(BASE + '/emergency/em_001'); await p.waitForSelector('text=Could not load this emergency.');
+await p.goto(BASE + '/emergency/EM-20200101-0001'); await p.waitForSelector('text=Could not load this emergency.');
 check('8.2 unknown emergency shows an error and still has the call link', (await p.locator("a:has-text('Call 112 / 108')").count()) === 1);
-await p.goto(BASE + '/demo'); await p.click('text=Run Asthma scenario'); await p.waitForURL('**/emergency/em_*');
-await p.waitForSelector('text=/Hospital: Demo Heart Care Hospital/', { timeout: 6000 }); check('8.3 asthma falls back to the nearest emergency hospital', true);
+await p.goto(BASE + '/demo'); await p.click('text=Run Asthma scenario'); await p.waitForURL('**/emergency/EM-*');
+await p.waitForSelector('text=/Hospital: Sabarmati Civil Care Hospital/', { timeout: 6000 }); check('8.3 asthma picks the nearest hospital with an ICU', true);
 check('9 condition-specific text stays hidden until reviewed', (await p.locator('text=Guidance for this condition will appear here after medical review.').count()) === 1);
 await browser.close(); finish('emergency');

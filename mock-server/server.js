@@ -43,7 +43,7 @@ setInterval(() => {
     emergency_id: null,
     state: 'MONITORING',
     timestamp: v.timestamp,
-    payload: { patient_id: 'pat_001', heart_rate: v.heart_rate, spo2: v.spo2, bp: v.bp, bp_sys: v.bp_sys, bp_dia: v.bp_dia, glucose: v.glucose, resp_rate: v.resp_rate },
+    payload: { patient_id: 'PT-2026-0417', heart_rate: v.heart_rate, spo2: v.spo2, bp: v.bp, bp_sys: v.bp_sys, bp_dia: v.bp_dia, glucose: v.glucose, resp_rate: v.resp_rate },
   };
   simulator.broadcast(event);
 }, 1000);

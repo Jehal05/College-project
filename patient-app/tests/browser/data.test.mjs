@@ -22,19 +22,19 @@ check('2 intro says changes apply to the next emergency', (await p.innerText('bo
 await toggle('Reports'); check('3 saved, Off and logged', (await sw('Reports')) === 'false' && (await p.innerText('body')).includes('Reports: Off'));
 await p.reload(); await p.waitForSelector("h1:has-text('Consent')"); check('3 survives reload', (await sw('Reports')) === 'false');
 await toggle('Reports');
-await p.route('**/patients/pat_001/consents', (r) => (r.request().method() === 'PUT' ? r.fulfill({ status: 500, body: '{}' }) : r.continue()));
+await p.route('**/patients/PT-2026-0417/consents', (r) => (r.request().method() === 'PUT' ? r.fulfill({ status: 500, body: '{}' }) : r.continue()));
 await p.getByRole('switch', { name: 'Live vitals' }).click(); await p.waitForSelector('text=The switch was put back');
 check('3 rollback and Retry shown', (await sw('Live vitals')) === 'true' && (await p.getByRole('button', { name: 'Retry' }).count()) === 1);
-await p.unroute('**/patients/pat_001/consents'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Saved');
+await p.unroute('**/patients/PT-2026-0417/consents'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Saved');
 check('3 Retry works', (await sw('Live vitals')) === 'false'); await toggle('Live vitals');
 
 await toggle('Location');
 await p.goto(BASE + '/symptoms'); await p.click('text=Heart or chest'); await p.getByLabel('Chest pain or pressure').check(); await p.click('text=Get help now');
-await p.waitForURL('**/emergency/em_*'); const eid = p.url().split('/').pop(); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
+await p.waitForURL('**/emergency/EM-*'); const eid = p.url().split('/').pop(); await p.click('text=Send now'); await p.waitForSelector('text=Alert sent');
 check('4 location-off message shown', (await p.locator('text=Location sharing is off in your consent settings').count()) === 1);
 check('4 server stored no location', (await api('GET', '/emergencies/' + eid, tok)).location === null);
 await p.waitForSelector('text=Your contacts were notified (simulated)', { timeout: 5000 });
-const body = await p.innerText('body'); check('9 contacts notified card lists names', body.includes('Asha Demo') && body.includes('Ravi Demo'));
+const body = await p.innerText('body'); check('9 contacts notified card lists names', body.includes('Sunita Mehta') && body.includes('Karan Mehta'));
 const clock = p.locator("section[aria-label='Time since alert']");
 check('8 clock visible as mm:ss', /\d\d:\d\d/.test(await clock.innerText()));
 await p.waitForSelector('text=The simulated emergency has ended.', { timeout: 12000 });
@@ -44,24 +44,24 @@ await p.reload(); await p.waitForSelector("section[aria-label='Time since alert'
 check('8 clock after reload equals frozen value', (await clock.innerText()).split('\n')[1] === t1.split('\n')[1]);
 await p.goto(BASE + '/consent'); await toggle('Location');
 
-await p.goto(BASE + '/contacts'); await p.waitForSelector('text=Asha Demo');
+await p.goto(BASE + '/contacts'); await p.waitForSelector('text=Sunita Mehta');
 const li = (n) => p.locator('li', { hasText: n });
 await p.click("button:has-text('Add contact')"); await p.getByLabel('Name').fill('Meera Demo'); await p.getByLabel('Phone').fill('12ab'); await p.click("button:has-text('Save')");
 check('5 relation and phone errors', (await p.locator('text=Choose a relation from the list').count()) === 1 && (await p.locator('text=/valid phone number/').count()) === 1);
 await p.getByLabel('Relation').selectOption('Sibling'); await p.getByLabel('Phone').fill('+91 00000 00003'); await p.getByLabel('Make this my primary contact').check(); await p.click("button:has-text('Save')");
 await p.waitForSelector('text=Meera Demo');
-check('5 added and primary', (await li('Meera Demo').innerText()).includes('Primary') && !(await li('Asha Demo').innerText()).includes('Primary'));
-await p.getByRole('button', { name: 'Edit Ravi Demo' }).click(); await p.getByLabel('Name').fill('Ravi Edited'); await p.click("button:has-text('Save')"); await p.waitForSelector('text=Ravi Edited');
-await p.getByRole('button', { name: 'Make primary: Asha Demo' }).click(); await sleep(800);
-check('5 make primary moves the marker', (await li('Asha Demo').innerText()).includes('Primary') && !(await li('Meera Demo').innerText()).includes('Primary'));
+check('5 added and primary', (await li('Meera Demo').innerText()).includes('Primary') && !(await li('Sunita Mehta').innerText()).includes('Primary'));
+await p.getByRole('button', { name: 'Edit Karan Mehta' }).click(); await p.getByLabel('Name').fill('Ravi Edited'); await p.click("button:has-text('Save')"); await p.waitForSelector('text=Ravi Edited');
+await p.getByRole('button', { name: 'Make primary: Sunita Mehta' }).click(); await sleep(800);
+check('5 make primary moves the marker', (await li('Sunita Mehta').innerText()).includes('Primary') && !(await li('Meera Demo').innerText()).includes('Primary'));
 for (const n of ['Four', 'Five']) {
   await p.click("button:has-text('Add contact')"); await p.getByLabel('Name').fill(n + ' Demo'); await p.getByLabel('Relation').selectOption('Friend');
   await p.getByLabel('Phone').fill('+91 00000 0010' + n.length); await p.click("button:has-text('Save')"); await p.waitForSelector('text=' + n + ' Demo');
 }
 check('5 sixth blocked with a message', (await p.locator("button:has-text('Add contact')").isDisabled()) && (await p.locator('text=at most 5 contacts').count()) >= 1);
-await p.getByRole('button', { name: 'Delete Asha Demo' }).click(); await p.waitForSelector('[role=alertdialog]');
+await p.getByRole('button', { name: 'Delete Sunita Mehta' }).click(); await p.waitForSelector('[role=alertdialog]');
 check('5 confirm focus starts on the safe button', (await p.evaluate('document.activeElement.innerText')) === 'Cancel');
-await p.click("button:has-text('Yes, delete')"); await p.waitForSelector('text=Asha Demo', { state: 'detached' });
+await p.click("button:has-text('Yes, delete')"); await p.waitForSelector('text=Sunita Mehta', { state: 'detached' });
 let primaries = 0; for (const n of ['Meera Demo', 'Ravi Edited', 'Four Demo', 'Five Demo']) primaries += (await li(n).innerText()).includes('Primary') ? 1 : 0;
 check('5 delete reassigns primary', primaries === 1); check('5 layout ok', await clean());
 
@@ -92,11 +92,11 @@ await p.unroute('**/baseline'); await p.route('**/baseline', (r) => r.fulfill({ 
 await p.waitForSelector('text=Could not load your usual ranges.'); check('7 error state with Retry', (await p.getByRole('button', { name: 'Retry' }).count()) === 1);
 await p.unroute('**/baseline'); await p.getByRole('button', { name: 'Retry' }).click(); await p.waitForSelector('text=Usual:');
 
-for (const c of await api('GET', '/patients/pat_001/contacts', tok)) await api('DELETE', '/patients/pat_001/contacts/' + c.id, tok);
-await p.goto(BASE + '/demo'); await p.click('text=Run Heart scenario'); await p.waitForURL('**/emergency/em_*'); await p.waitForSelector('text=You have no emergency contacts.');
+for (const c of await api('GET', '/patients/PT-2026-0417/contacts', tok)) await api('DELETE', '/patients/PT-2026-0417/contacts/' + c.id, tok);
+await p.goto(BASE + '/demo'); await p.click('text=Run Heart scenario'); await p.waitForURL('**/emergency/EM-*'); await p.waitForSelector('text=You have no emergency contacts.');
 check('9 no-contacts message with link', (await p.locator("a:has-text('Add some in Profile.')").getAttribute('href')) === '/contacts');
 await p.goto(BASE + '/demo'); await p.click('text=Reset demo'); await p.waitForSelector('text=Demo reset');
-const consents = await api('GET', '/patients/pat_001/consents', tok);
-check('10 reset restores contacts, consents, reports, log', (await api('GET', '/patients/pat_001/contacts', tok)).length === 2 && Object.values(consents.consents).every(Boolean)
-  && (await api('GET', '/patients/pat_001/reports', tok)).length === 0 && consents.changes.length === 0);
+const consents = await api('GET', '/patients/PT-2026-0417/consents', tok);
+check('10 reset restores contacts, consents, reports, log', (await api('GET', '/patients/PT-2026-0417/contacts', tok)).length === 2 && Object.values(consents.consents).every(Boolean)
+  && (await api('GET', '/patients/PT-2026-0417/reports', tok)).length === 0 && consents.changes.length === 0);
 await browser.close(); finish('data');

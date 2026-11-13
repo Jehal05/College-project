@@ -8,7 +8,7 @@ const summary = (extra = {}) => ({
   timeline: [{ state: 'EMERGENCY_DETECTED', timestamp: '2026-11-13T10:00:00.000Z' }, { state: 'SOS_SENT', timestamp: '2026-11-13T10:00:10.000Z' }],
   durations: { to_acknowledged: 72, to_dispatched: 90, to_arrived: null, to_handover: null },
   shared: { location: true, history: false, vitals: true, reports: false }, symptoms: ['CHEST_PAIN'],
-  vitals_at_alert: { heart_rate: 150, bp_sys: 159, bp_dia: 101 }, contacts_notified: [{ name: 'Asha Demo' }], hospital: { name: 'Demo Hospital' }, ambulance_id: 'AMB-01',
+  vitals_at_alert: { heart_rate: 150, bp_sys: 159, bp_dia: 101 }, contacts_notified: [{ name: 'Sunita Mehta' }], hospital: { name: 'Demo Hospital' }, ambulance_id: 'AMB-01',
   ...extra,
 });
 
