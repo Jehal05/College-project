@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.6 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.6.1 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -115,6 +115,7 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | Method and path | Purpose | Roles allowed | Main user |
 |---|---|---|---|
 | POST /auth/login | Log in, get token and role | public | all |
+| GET /health | Liveness check. Returns `{"status": "ok", "simulated": true}`. No patient data | public | all |
 | GET /patients/{id} | Read patient profile | PATIENT (own), HOSPITAL_STAFF (with consent), ADMIN | Jehal |
 | PATCH /patients/{id} | Update patient profile | PATIENT (own), ADMIN | Jehal |
 | GET /patients/{id}/consents | Current consent choices | PATIENT (own), ADMIN (read-only) | Jehal, Shagun |
@@ -482,3 +483,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.4 | Added consent API, default-deny and omit-not-null rules, field-to-consent map, encrypted fields (feature 51) |
 | 13 Nov 2026 | 0.5 | Added GET /audit, audit rules, passport access rules and error codes (features 11, 50) |
 | 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
+| 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
