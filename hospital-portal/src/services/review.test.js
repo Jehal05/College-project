@@ -51,6 +51,7 @@ test('the current data is all draft (no review has happened)', () => {
 
 test('docs/DOCTOR_REVIEW_SHEET.md is up to date with the data (run npm run review-sheet)', () => {
   const expected = buildReviewSheet({ checklists, alerts: load('mock-alerts.json'), history: load('sample-history.json') });
-  const actual = readFileSync(new URL('../../docs/DOCTOR_REVIEW_SHEET.md', import.meta.url), 'utf8');
-  assert.equal(actual, expected);
+  // Git on Windows may check the file out with CRLF line endings; the content is what matters.
+  const actual = readFileSync(new URL('../../docs/DOCTOR_REVIEW_SHEET.md', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+  assert.equal(actual, expected.replace(/\r\n/g, '\n'));
 });
