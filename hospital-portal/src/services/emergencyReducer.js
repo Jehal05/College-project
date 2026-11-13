@@ -8,6 +8,17 @@ import { inScope } from './queueScope.js';
 const receivedMs = (msg) => (Number.isFinite(msg?.received_at) ? msg.received_at : new Date(msg?.timestamp || Date.now()).getTime());
 import { canEscalate } from './escalation.js';
 
+// More than this many seconds apart = a different alert that happens to reuse the id (clocks and event delays stay well below it).
+export const SAME_ALERT_SECONDS = 5;
+
+/** Is `incomingAt` (ISO time of an emergency.created) clearly a different alert from the one we hold? Missing or bad times never count. */
+export function isNewCaseWithOldId(existing, incomingAt) {
+  const a = new Date(existing?.created_at).getTime();
+  const b = new Date(incomingAt).getTime();
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+  return Math.abs(a - b) > SAME_ALERT_SECONDS * 1000;
+}
+
 const SEVERITY_ORDER = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
 
 /** Make sure every emergency has a status_events list (the timeline data). */
@@ -35,7 +46,12 @@ export function applyEvent(list, msg) {
   const idx = list.findIndex((e) => e.emergency_id === emergency_id);
 
   if (event === 'emergency.created') {
-    if (idx >= 0) return list; // already known
+    if (idx >= 0) {
+      // Same id again. Normally a repeat of the same alert: ignore it. But if the backend was reset it counts ids from the start,
+      // so a different alert time means a NEW case with an old id: replace the old card.
+      if (!isNewCaseWithOldId(list[idx], payload.created_at || timestamp)) return list;
+      list = list.filter((_, i) => i !== idx);
+    }
     const s = state || 'SOS_SENT';
     // An early notice (patient has not confirmed yet) is not "new" in the loud sense: no flash.
     const real = !isEarly(s) && !isFinal(s);

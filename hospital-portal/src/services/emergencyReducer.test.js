@@ -184,3 +184,40 @@ test('after an escalation the "now at" name follows the new hospital, not the on
   const again = applyEvent(list, { event: 'hospital.alerted', emergency_id: list[0].emergency_id, state: 'ESCALATED', timestamp: new Date().toISOString(), payload: { hospital_id: 'H4', hospital_name: 'Hospital H4' } });
   assert.equal(again, list);
 });
+
+// A reset backend counts ids from the start again, so an old id can come back as a different alert.
+const created = (at, extra = {}) => ({ event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', timestamp: at, payload: { type: 'HEART', ...extra } });
+
+test('same id and same alert time is still a duplicate', () => {
+  const list = applyEvent([], created('2026-11-13T08:00:00Z'));
+  assert.equal(applyEvent(list, created('2026-11-13T08:00:00Z')), list);
+  assert.equal(applyEvent(list, created('2026-11-13T08:00:02Z')), list, 'a couple of seconds apart is the same alert');
+});
+
+test('same id with a different alert time replaces the old card (backend was reset)', () => {
+  let list = applyEvent([], created('2026-11-13T08:00:00Z', { severity: 'URGENT' }));
+  list = applyEvent(list, { event: 'hospital.acknowledged', emergency_id: 'E1', state: 'HOSPITAL_ACKNOWLEDGED', timestamp: '2026-11-13T08:00:20Z', payload: {} });
+  assert.equal(list[0].state, 'HOSPITAL_ACKNOWLEDGED');
+  const next = applyEvent(list, created('2026-11-13T08:30:00Z', { severity: 'EMERGENCY' }));
+  assert.equal(next.length, 1, 'no second card with the same id');
+  assert.equal(next[0].state, 'SOS_SENT');
+  assert.equal(next[0].severity, 'EMERGENCY');
+  assert.equal(next[0].created_at, '2026-11-13T08:30:00Z');
+  assert.equal(next[0]._new, true);
+  assert.equal(next[0].status_events.length, 1, 'fresh timeline');
+});
+
+test('replacing keeps the other cards and puts the new one on top', () => {
+  let list = applyEvent([], { ...created('2026-11-13T08:00:00Z'), emergency_id: 'E2' });
+  list = applyEvent(list, created('2026-11-13T08:01:00Z'));
+  list = applyEvent(list, created('2026-11-13T09:00:00Z'));
+  assert.deepEqual(list.map((e) => e.emergency_id), ['E1', 'E2']);
+  assert.equal(list[0].created_at, '2026-11-13T09:00:00Z');
+});
+
+test('a missing or bad time never replaces a card', () => {
+  const list = applyEvent([], created('2026-11-13T08:00:00Z'));
+  assert.equal(applyEvent(list, { event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', payload: {} }), list, 'no time at all');
+  const noTime = applyEvent(list, { event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', timestamp: 'not a time', payload: {} });
+  assert.equal(noTime, list);
+});
