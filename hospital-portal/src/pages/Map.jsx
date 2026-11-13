@@ -7,6 +7,7 @@ import { EMERGENCY_TYPES, TYPE_LABELS, hasCapabilities } from '../services/contr
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
+import { patientIcon } from '../components/mapIcons.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
 function hospitalIcon(h, selected) {
@@ -29,14 +30,6 @@ function hospitalIcon(h, selected) {
       </div>`,
   });
 }
-
-const patientIcon = L.divIcon({
-  className: 'ht-marker',
-  iconSize: [26, 26],
-  iconAnchor: [13, 13],
-  html: `<div style="width:26px;height:26px;border-radius:50%;background:#dc2626;border:4px solid #fff;
-    box-shadow:0 0 0 4px rgba(220,38,38,.35)"></div>`,
-});
 
 export default function MapPage() {
   const [loaded, setLoaded] = useState([]);

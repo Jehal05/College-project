@@ -2,23 +2,19 @@
 // Mock responses use the same shape as the team contract, so switching to
 // Daksh's real backend later only means setting VITE_USE_MOCK=false.
 import hospitalsSeed from '../data/hospitals.json';
-import mockAlerts from '../data/mock-alerts.json';
+import * as mock from './mockBackend.js';
+import { USE_MOCK, API_BASE_URL } from './config.js';
+import { getToken, getSession } from './session.js';
 import { withDistance, DEMO_LOCATION } from './geo.js';
 import { hasCapabilities } from './contract.js';
 
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+export { USE_MOCK, API_BASE_URL };
 
-const STORAGE_KEY = 'ht_hospital_session';
 const mockDelay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 
 function authHeader() {
-  try {
-    const token = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')?.token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  } catch {
-    return {};
-  }
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 /** Low-level request to the real backend. */
@@ -69,31 +65,44 @@ export async function updateAvailability(id, availability) {
 }
 
 // ---------- Emergencies ----------
+// In mock mode these go to services/mockBackend.js, which also sends the matching
+// WebSocket event. In real mode they call Daksh's backend, which does the same.
 
-/** Mock alert list for the dashboard shell (live WebSocket arrives in Phase 2). */
+const actor = () => getSession()?.name || 'Hospital staff';
+
+/** Active emergencies for the alert queue. */
 export async function getAlerts() {
-  if (USE_MOCK) {
-    await mockDelay();
-    return mockAlerts;
-  }
+  if (USE_MOCK) return mock.listAlerts();
   return request('GET', '/emergencies?status=active');
 }
 
-export const getEmergency = (id) => request('GET', `/emergencies/${id}`);
+/** GET /emergencies/{id}: details and timeline (status_events). */
+export async function getEmergency(id) {
+  if (USE_MOCK) return mock.getEmergency(id);
+  return request('GET', `/emergencies/${id}`);
+}
 
-// Action endpoints. Buttons are wired up in feature #10 (Phase 2).
+/** POST /emergencies/{id}/ack */
 export async function acknowledge(id) {
-  if (USE_MOCK) return { id, state: 'HOSPITAL_ACKNOWLEDGED' };
+  if (USE_MOCK) return mock.transition(id, 'HOSPITAL_ACKNOWLEDGED', actor());
   return request('POST', `/emergencies/${id}/ack`);
 }
+
+/** POST /emergencies/{id}/dispatch */
 export async function dispatch(id, ambulanceId) {
-  if (USE_MOCK) return { id, state: 'AMBULANCE_DISPATCHED', ambulance_id: ambulanceId };
+  if (USE_MOCK) return mock.transition(id, 'AMBULANCE_DISPATCHED', actor());
   return request('POST', `/emergencies/${id}/dispatch`, { ambulance_id: ambulanceId });
 }
+
+/** POST /emergencies/{id}/status  (EN_ROUTE, ARRIVED, HANDOVER_DONE) */
 export async function updateStatus(id, state) {
-  if (USE_MOCK) return { id, state };
+  if (USE_MOCK) return mock.transition(id, state, actor());
   return request('POST', `/emergencies/${id}/status`, { state });
 }
+
+// Mock-only helpers for testing without the patient app.
+export const mockPatientCancel = (id) => mock.patientCancel(id);
+export const mockCreateEmergency = (type) => mock.createEmergency(type);
 
 // ---------- Ambulances ----------
 

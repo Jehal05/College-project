@@ -1,10 +1,18 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import * as auth from '../services/auth.js';
+import { connect, disconnect } from '../services/socket.js';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(() => auth.getSession());
+
+  // Open the live connection while logged in; close it on logout.
+  useEffect(() => {
+    if (!session?.token) return undefined;
+    connect(session.token);
+    return () => disconnect();
+  }, [session?.token]);
 
   const value = {
     session,

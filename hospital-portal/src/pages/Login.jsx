@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
-import { USE_MOCK } from '../services/api.js';
+import { USE_MOCK } from '../services/config.js';
 
 export default function Login() {
   const { login, isLoggedIn } = useAuth();

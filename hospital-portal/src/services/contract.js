@@ -68,3 +68,30 @@ export function hasCapabilities(hospital, type) {
   const needed = REQUIRED_CAPABILITIES[type] || [];
   return needed.every((cap) => hospital.capabilities?.[cap]);
 }
+
+// ---------- Added in Phase 2 ----------
+
+// Which WebSocket event announces each state change.
+// EN_ROUTE has no event of its own in the contract, so it rides on ambulance.location.
+export const EVENT_FOR_STATE = {
+  HOSPITAL_ACKNOWLEDGED: 'hospital.acknowledged',
+  AMBULANCE_DISPATCHED: 'ambulance.dispatched',
+  EN_ROUTE: 'ambulance.location',
+  ARRIVED: 'emergency.arrived',
+  HANDOVER_DONE: 'emergency.handover_done',
+  CANCELLED: 'emergency.cancelled',
+  ESCALATED: 'hospital.escalated',
+};
+
+// What hospital staff read on screen. Honest wording: nothing says an ambulance
+// is dispatched until the operator has clicked Dispatch.
+export const STATE_LABELS = {
+  SOS_SENT: 'New alert · notification received, not acknowledged yet',
+  ESCALATED: 'Escalated from another hospital',
+  HOSPITAL_ACKNOWLEDGED: 'Acknowledged · no ambulance dispatched yet',
+  AMBULANCE_DISPATCHED: 'Ambulance dispatched (simulated)',
+  EN_ROUTE: 'Ambulance en route (simulated)',
+  ARRIVED: 'Arrived at hospital',
+  HANDOVER_DONE: 'Handed over',
+  CANCELLED: 'Cancelled by patient',
+};

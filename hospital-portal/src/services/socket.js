@@ -1,47 +1,77 @@
-// WebSocket client (stub for Phase 1; used live from Phase 2).
-// Every event follows the contract: { event, emergency_id, state, timestamp, payload }.
-import { USE_MOCK } from './api.js';
+// WebSocket client. Every event follows the contract:
+// { event, emergency_id, state, timestamp, payload }
+// In mock mode no connection is opened; services/mockBackend.js calls emitMock() instead.
+import { USE_MOCK, WS_URL } from './config.js';
 import { WS_EVENTS } from './contract.js';
-
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
 
 let ws = null;
 let reconnectTimer = null;
+let wanted = false; // true between connect() and disconnect()
 const handlers = new Map(); // event name -> Set of callbacks
 
-function dispatchEvent(message) {
-  const { event } = message;
-  handlers.get(event)?.forEach((cb) => cb(message));
+// ---- connection status: 'mock' | 'connecting' | 'live' | 'reconnecting'
+let status = USE_MOCK ? 'mock' : 'connecting';
+const statusListeners = new Set();
+function setStatus(next) {
+  if (status === next) return;
+  status = next;
+  statusListeners.forEach((cb) => cb(status));
+}
+export const getStatus = () => status;
+export function onStatus(callback) {
+  statusListeners.add(callback);
+  return () => statusListeners.delete(callback);
+}
+
+function deliver(message) {
+  handlers.get(message.event)?.forEach((cb) => cb(message));
   handlers.get('*')?.forEach((cb) => cb(message));
 }
 
-/** Open the connection. In mock mode nothing is opened; use emitMock() to fake events. */
+/** Open the connection (call after login). Reconnects by itself every 2 seconds if it drops. */
 export function connect(token) {
-  if (USE_MOCK || ws) return;
+  if (USE_MOCK) return setStatus('mock');
+  wanted = true;
+  if (ws) return;
   const url = token ? `${WS_URL}?token=${encodeURIComponent(token)}` : WS_URL;
-  ws = new WebSocket(url);
-
-  ws.onmessage = (e) => {
+  let socket;
+  try {
+    socket = new WebSocket(url);
+  } catch (err) {
+    console.warn('WebSocket could not start', err);
+    return scheduleReconnect(token);
+  }
+  ws = socket;
+  socket.onopen = () => setStatus('live');
+  socket.onmessage = (e) => {
     try {
-      dispatchEvent(JSON.parse(e.data));
+      deliver(JSON.parse(e.data));
     } catch (err) {
       console.warn('Bad WebSocket message', err);
     }
   };
-  ws.onclose = () => {
-    ws = null;
-    clearTimeout(reconnectTimer);
-    reconnectTimer = setTimeout(() => connect(token), 2000); // auto-reconnect
+  socket.onclose = () => {
+    if (ws === socket) ws = null;
+    if (wanted) scheduleReconnect(token);
   };
 }
 
+function scheduleReconnect(token) {
+  setStatus('reconnecting');
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(() => wanted && connect(token), 2000);
+}
+
+/** Close the connection (call on logout). */
 export function disconnect() {
+  wanted = false;
   clearTimeout(reconnectTimer);
   if (ws) {
-    ws.onclose = null;
-    ws.close();
+    const socket = ws;
     ws = null;
+    socket.close();
   }
+  setStatus(USE_MOCK ? 'mock' : 'connecting');
 }
 
 /**
@@ -61,7 +91,7 @@ export function unsubscribe(event, callback) {
   handlers.get(event)?.delete(callback);
 }
 
-/** Fake an incoming event for local testing (mock mode). */
-export function emitMock(event, { emergency_id, state, payload = {} }) {
-  dispatchEvent({ event, emergency_id, state, timestamp: new Date().toISOString(), payload });
+/** Fake an incoming event (mock mode and local testing). */
+export function emitMock(event, { emergency_id, state, timestamp, payload = {} }) {
+  deliver({ event, emergency_id, state, timestamp: timestamp || new Date().toISOString(), payload });
 }

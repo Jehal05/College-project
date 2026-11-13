@@ -1,8 +1,8 @@
 // Mock login until Daksh's POST /auth/login is ready.
 // In real mode the same function calls the backend and stores its token and role.
-import { request, USE_MOCK } from './api.js';
-
-const STORAGE_KEY = 'ht_hospital_session';
+import { request } from './api.js';
+import { USE_MOCK } from './config.js';
+import { getSession, saveSession, clearSession, getToken } from './session.js';
 
 // Demo accounts (mock mode only).
 const MOCK_USERS = {
@@ -24,23 +24,12 @@ export async function login(email, password) {
   } else {
     session = await request('POST', '/auth/login', { email, password }); // { token, role, ... }
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  saveSession(session);
   return session;
 }
 
 export function logout() {
-  localStorage.removeItem(STORAGE_KEY);
+  clearSession();
 }
 
-export function getSession() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function getToken() {
-  return getSession()?.token || null;
-}
+export { getSession, getToken };
