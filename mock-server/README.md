@@ -85,3 +85,18 @@ Also: `simulator.js` holds the broadcast helper and the timers.
 - Reports live in memory only (max 10, names cleaned to letters, digits, space, dot, dash, underscore). `POST /demo/reset` clears reports,
   restores the two contacts, and clears the consent change log.
 - Files: `patientData.js` holds the consents, contacts, reports and baseline routes.
+
+## Phase 5 notes (health passport and test helpers)
+
+| Method and path | Notes |
+| --- | --- |
+| POST /patients/:id/passport | Body `{ hours: 1 \| 24 \| 168 }` (default 24) -> 201 `{ token, expires_at }`. Replaces the earlier passport. 400 for other hours |
+| GET /patients/:id/passport | The current `{ token, expires_at }`, or 404 |
+| DELETE /patients/:id/passport | Revoke -> `{ ok: true }` |
+| GET /patients/:id/passport/log | `[ { opened_at } ]` (times only) |
+| GET /passport/:token | NO login. `{ name, age, blood_group, expires_at, shared: { history }, allergies, conditions, medications, contacts }`; the last four only when the `history` consent is on. 410 when expired, revoked or unknown. Each open is logged and broadcast as `passport.opened` |
+| POST /demo/passport/expire | Makes the current passport expire now (for tests) |
+| POST /demo/fail | Body `{ mode: "off" \| "server" \| "expired" \| "slow" }`: every request (except health, login and `/demo/*`) answers 500, answers 401, or waits 12 s. `POST /demo/reset` switches it off. For testing the app's error handling |
+
+New event: `passport.opened` (`emergency_id: null`, payload `{ patient_id }`, no IP or device data). Passports live in memory only and are forgotten by `POST /demo/reset`.
+Files: `passport.js` (passport routes) and `failMode.js` (the failure switch). The full contract for the real backend is `docs/API_CONTRACT.md`; check any server with `npm run contract -- <url>`.

@@ -7,6 +7,7 @@ const { WebSocketServer } = require('ws');
 const routes = require('./routes');
 const { delay, normalVitals } = require('./helpers');
 const simulator = require('./simulator');
+const failMode = require('./failMode');
 
 const PORT = process.env.PORT || 4000;
 // Extra ports are allowed so Puneet's hospital portal can call this server too.
@@ -17,6 +18,8 @@ const app = express();
 app.use(cors({ origin: ORIGINS }));
 app.use(express.json());
 app.use(delay);
+app.use('/', failMode.router);
+app.use(failMode.middleware);
 app.use('/', routes);
 
 const server = http.createServer(app);

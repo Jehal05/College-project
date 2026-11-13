@@ -44,6 +44,7 @@ router.get('/patients/:id/vitals', requireAuth, (req, res) => {
 
 // Consents, contacts, reports and baseline (Phase 3) live in their own file.
 router.use(require('./patientData'));
+router.use(require('./passport')); // QR health passport (Phase 5)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.
@@ -112,6 +113,7 @@ router.post('/demo/scenario', requireAuth, (req, res) => {
 router.post('/demo/reset', requireAuth, (req, res) => {
   simulator.stopAll();
   store.resetStore();
+  require('./failMode').reset();
   res.json({ ok: true });
 });
 

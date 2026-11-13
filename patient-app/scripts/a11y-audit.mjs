@@ -23,11 +23,13 @@ const call = (path, token, body) => fetch(API + path, {
 async function screens(token) {
   const countdown = await call('/emergencies', token, { patient_id: 'HT-1001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
   const running = await call('/demo/scenario', token, { type: 'STROKE' });
+  const passport = await call('/patients/HT-1001/passport', token, { hours: 24 });
   return [
     { name: 'login', path: '/login', signedIn: false },
     { name: 'home', path: '/' }, { name: 'profile', path: '/profile' }, { name: 'consent', path: '/consent' },
     { name: 'contacts', path: '/contacts' }, { name: 'reports', path: '/reports' },
     { name: 'symptoms', path: '/symptoms', click: '[role=radio]' }, { name: 'demo', path: '/demo' },
+    { name: 'passport', path: '/passport' }, { name: 'responder page', path: '/p/' + passport.token, signedIn: false },
     { name: 'emergency (countdown)', path: '/emergency/' + countdown.id },
     { name: 'emergency (response)', path: '/emergency/' + running.id }, { name: 'cancelled', path: '/cancelled' },
   ];

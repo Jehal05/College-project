@@ -19,7 +19,7 @@ const toForm = (p) => ({
 
 export default function Profile() {
   const { t } = useTranslation();
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
   const online = useOnline();
   const [form, setForm] = useState(null);
   const [errors, setErrors] = useState({});
@@ -31,8 +31,8 @@ export default function Profile() {
     setStatus('loading');
     getPatient(session.patient_id)
       .then((p) => { setForm(toForm(p)); setStatus('ready'); })
-      .catch((err) => { if (err.status === 401) signOut(); else setStatus('loadError'); });
-  }, [session.patient_id, signOut]);
+      .catch(() => setStatus('loadError')); // a 401 signs out by itself (auth.js)
+  }, [session.patient_id]);
 
   useEffect(load, [load]);
 
@@ -68,7 +68,7 @@ export default function Profile() {
       <LanguageSelect />
       <OfflineNote />
       <nav aria-label={t('profile.links')} className="mb-5 grid gap-2">
-        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports']].map(([to, key]) => (
+        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports'], ['/passport', 'profile.passport']].map(([to, key]) => (
           <Link key={to} to={to} className="flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
             {t(key)}<span aria-hidden="true">›</span>
           </Link>

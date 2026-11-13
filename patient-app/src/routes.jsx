@@ -7,6 +7,8 @@ import Profile from './screens/Profile';
 import Consent from './screens/Consent';
 import Contacts from './screens/Contacts';
 import Reports from './screens/Reports';
+import Passport from './screens/Passport';
+import PassportView from './screens/PassportView';
 import Symptoms from './screens/Symptoms';
 import Emergency from './screens/Emergency';
 import Cancelled from './screens/Cancelled';
@@ -27,6 +29,8 @@ export default function AppRoutes() {
       <Route path="/consent" element={<Protected><Consent /></Protected>} />
       <Route path="/contacts" element={<Protected><Contacts /></Protected>} />
       <Route path="/reports" element={<Protected><Reports /></Protected>} />
+      <Route path="/passport" element={<Protected><Passport /></Protected>} />
+      <Route path="/p/:token" element={<PassportView />} />
       <Route path="/symptoms" element={<Protected><Symptoms /></Protected>} />
       <Route path="/emergency/:id" element={<Protected><Emergency /></Protected>} />
       <Route path="/cancelled" element={<Protected><Cancelled /></Protected>} />

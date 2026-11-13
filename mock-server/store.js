@@ -16,6 +16,8 @@ let emergencyCounter = 0;
 const reports = { 'HT-1001': [] };
 const consentChanges = { 'HT-1001': [] };
 const counters = { contact: 2, report: 0 }; // C-1 and C-2 are in the seed
+const passports = {}; // patient id -> passport (Phase 5)
+const passportTokens = new Map(); // token -> passport
 
 function nextEmergencyId() {
   emergencyCounter += 1;
@@ -32,7 +34,9 @@ function resetStore() {
   consentChanges['HT-1001'] = [];
   counters.contact = 2;
   counters.report = 0;
+  for (const k of Object.keys(passports)) delete passports[k];
+  passportTokens.clear();
 }
 
 module.exports = { users, hospitals, emergencyTypes, patients, tokens, emergencies, nextEmergencyId, resetStore,
-  baseline, reports, consentChanges, counters };
+  baseline, reports, consentChanges, counters, passports, passportTokens };

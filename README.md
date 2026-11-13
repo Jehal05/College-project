@@ -1,4 +1,4 @@
-# HealthTwin AI - Patient App (Phase 4)
+# HealthTwin AI - Patient App (Phase 5)
 
 Simulated emergency-response prototype for a college project. **Not a medical device. It never diagnoses.**
 Every screen shows: "Simulated event. Not a medical diagnosis."
@@ -9,6 +9,7 @@ hospital/ambulance response arriving live over the WebSocket.
 Phase 3 adds personal data and context: a consent screen, an emergency contacts manager, report upload, a digital twin bar on Home,
 a "Time since alert" clock and a "contacts notified" card on the emergency screen.
 Phase 4 adds Hindi and Gujarati, voice input that only suggests symptoms, offline mode, an accessibility audit and final polish.
+Phase 5 adds the QR health passport, an in-app notification bell, the API contract and test scripts for the real backend, and release work (tests, CI, deploy notes).
 
 ## Setup
 
@@ -27,24 +28,30 @@ Open http://localhost:5173 and sign in with `patient@demo.test` / `demo1234`.
 ```
 patient-app/        React 18 + Vite + Tailwind + i18next + PWA
   src/screens/      Login, Home, Profile, NotFound, Symptoms, Emergency, Cancelled, DemoTools,
-                    Consent, Contacts, Reports
+                    Consent, Contacts, Reports, Passport, PassportView (public /p/:token)
   src/components/   SimulatedBanner, StatusBar, Timeline, Countdown, ConsentToggles, Switch, ConfirmDialog, ContactForm,
                     ReportUpload, ReportList, DigitalTwinBar, GoldenHourClock, ContactsNotified, CallButton, EmergencyHeader,
                     InstructionsCard, SymptomGroup, ResponseCard, DemoLocationToggle,
                     VitalsCard, BottomNav, FormField, ContactsEditor, ErrorMessage,
-                    LanguageSelect, VoiceSymptoms, OfflineBanner, OfflineNote, PendingEmergency, SkipLink, ErrorBoundary
+                    LanguageSelect, VoiceSymptoms, OfflineBanner, OfflineNote, PendingEmergency, SkipLink, ErrorBoundary,
+                    PassportQr, PassportSection, NotificationBell
   src/services/     api.js (HTTP), socket.js (WebSocket), auth.js (token in memory + sessionStorage), speech.js (Web Speech API)
   src/hooks/        useAuth.js, useVitals.js, useEmergency.js, useCountdown.js,
                     useConsents.js, useContacts.js, useReports.js, useBaseline.js,
-                    useOnline.js, usePendingEmergency.js, useLanguageSync.js, useRouteFocus.js
+                    useOnline.js, usePendingEmergency.js, useLanguageSync.js, useRouteFocus.js,
+                    usePassport.js, useNotifications.js
   src/config/       symptoms.js, instructions.json (doctor-reviewed text only), demo.js
   src/i18n/         en.json, hi.json, gu.json (hi and gu NOT yet reviewed by native speakers)
   src/utils/        validate.js, alarm.js (beep + vibrate), activeEmergency.js (sessionStorage),
                     time.js (clock format, language-aware dates), twin.js (usual-range rule),
-                    offlineCache.js (read-only saved copies), symptomMatcher.js (voice words to symptom IDs)
+                    offlineCache.js (read-only saved copies), symptomMatcher.js (voice words to symptom IDs),
+                    passportTime.js, notifications.js, browserAlerts.js
+  tests/            unit/ (vitest) and browser/ (Playwright) tests, run-browser.mjs
   scripts/          a11y-audit.mjs (axe-core on every screen in 3 languages)
-docs/               DEMO_SCRIPT.md, ACCESSIBILITY.md, TRANSLATION_REVIEW.md
+docs/               DEMO_SCRIPT, ACCESSIBILITY, TRANSLATION_REVIEW, API_CONTRACT, CLINICAL_REVIEW, DEPLOY, RELEASE_CHECKLIST
 mock-server/        Express + ws, fake data in memory (see mock-server/README.md)
+scripts/            contract.mjs (API contract test), integration.mjs (event check)
+.github/workflows/  ci.yml
 ```
 
 ## Switching from the mock API to the real backend
@@ -151,12 +158,33 @@ score or the words normal/abnormal/risk/danger; the clock only measures time ("T
 8. **Crash screen (dev only):** open `/demo?crash=1` with `npm run dev`; the crash screen shows the call button and the simulated banner.
 9. **Walkthrough:** follow `docs/DEMO_SCRIPT.md` once from start to end.
 
+## Phase 5: health passport, integration and release
+
+- **Health passport:** Home or Profile > "Health passport (QR)". Choose 1 hour, 24 hours (default) or 7 days and press Create. The QR holds **only a link** `<app>/p/<random token>`, never personal or health data. People scanning it see a public, read-only page (no login, 3 languages, starts with Call 112 / 108) with the name, age and blood group, and, only if the **Medical history** consent is on, allergies, conditions, medicines and emergency contacts. It says "Prepared by the patient. Not verified by a doctor." The patient can download the QR as PNG, print it, revoke it, and sees "Opened N times" (times only, no IP or device data). Expired or revoked links answer 410 and show a plain message.
+- **Notification bell** on Home: hospital acknowledged, ambulance dispatched, contacts notified (simulated), passport opened. Kept in memory for the session, no medical detail. Optional **browser alerts** (off by default, opt-in switch in the bell panel) pop up only when the tab is hidden.
+- **Real backend:** `docs/API_CONTRACT.md` is the spec. `npm run contract -- <base-url>` runs 16 checks against any server (mock or real) and prints PASS/FAIL per endpoint; `npm run integration` plays one emergency and prints the live events other apps can copy. Set `VITE_API_URL` (and `VITE_APP_URL` for the QR link). A 401 signs the person out with a message (never on the emergency screens), a 5xx shows a retry, non-emergency calls give up after 10 s.
+- **Tests:** `npm test` runs 28 unit tests and 7 browser test files. The browser tests build the app and start their own mock server and preview server on ports 4100, 5273 and 5274, so they do not disturb your running servers. Needs Chrome (`CHROME_PATH`, default `/usr/bin/google-chrome`). Run one file with `npm run test:browser -w patient-app -- passport`. `npm run audit` runs axe-core on every screen in three languages.
+- **Release:** GitHub Actions workflow (`.github/workflows/ci.yml`), a Content-Security-Policy added to the production build, Netlify files and `docs/DEPLOY.md`, scores and open items in `docs/RELEASE_CHECKLIST.md`, and the doctor sign-off process in `docs/CLINICAL_REVIEW.md`.
+
+### Manual test checklist (Phase 5)
+
+1. **Create:** Home > Health passport (QR) > Create passport. A QR and "Valid for 24 hours" appear. Reload the page: the same QR is still there.
+2. **Scan:** scan it with a phone camera (same network, use your computer's address in `VITE_APP_URL`) or press "Preview the responder page". No login is asked. The first thing on the page is the Call 112 / 108 button.
+3. **Consent:** turn Medical history off, reload the responder page: only name, age and blood group remain. Turn it on again.
+4. **Opened:** the passport screen says "Opened N times" with the times. Home's bell lists "Passport opened".
+5. **Revoke and expiry:** Revoke now (confirm). Reload the responder page: "This passport is no longer available." Create a 1 hour passport and run `POST /demo/passport/expire`: same result.
+6. **Languages:** switch the responder page to Hindi and Gujarati with the language selector at its top.
+7. **Errors:** `POST /demo/fail {"mode":"server"}` then open Profile: friendly message with Try again; `"expired"`: signed out with "Your session ended"; `"off"` restores. The call button stays available.
+8. **Bell and alerts:** run a `/demo` scenario: three notifications appear. In the bell panel switch Browser alerts on, switch to another tab, run another scenario: a pop-up appears.
+9. **Print:** the Print button prints only the QR code.
+
 ## Known limits (what is still simulated or unfinished)
 
-- No real backend: the mock server keeps everything in memory and the hospital, ambulance and contacts are simulated.
-- QR health passport is not built.
-- No real SMS, push or call notifications to contacts or hospitals.
-- Condition-specific guidance is hidden until a doctor reviews it (`reviewed: true`); only 3 general lines are shown.
-- Hindi and Gujarati text and the voice keyword list have not been checked by native speakers (`docs/TRANSLATION_REVIEW.md`).
-- Not tested with a real screen reader or on real phones; voice depends on the browser (best in Chrome).
-- Offline mode keeps read-only copies only; changes made offline are not queued.
+- **No real backend.** The mock server keeps everything in memory. The real backend (Daksh) must implement `docs/API_CONTRACT.md` and pass `npm run contract`; until then login, data, hospitals and the passport are simulated. The mock has no real security (fake tokens, open passport links).
+- **Passport:** anyone holding the link can read it until it expires or is revoked (that is how a QR works); the data is what the patient typed and is not verified by a doctor. The link is a secret token, so print it only where you are happy for it to be seen. There is no rate limiting or audit trail beyond the open times.
+- **No real notifications:** contacts, hospitals and ambulances are never really messaged. Browser alerts are local pop-ups only (no push when the app is closed).
+- **Doctor review:** condition-specific guidance is hidden until a doctor signs it off (`docs/CLINICAL_REVIEW.md`); only 3 general lines are shown. Nobody has reviewed it yet.
+- **Translations:** Hindi and Gujarati text and the voice keyword list have not been checked by native speakers (`docs/TRANSLATION_REVIEW.md`).
+- **Real-world testing:** not tested with a real screen reader, on real phones, with real GPS or with a real microphone in Hindi or Gujarati (the tests fake the speech engine). Voice depends on the browser (best in Chrome).
+- **Offline:** read-only saved copies only; changes made offline are not queued. The QR image can be shown from memory offline but the link needs internet.
+- **Not a medical device.** Never use it for a real emergency: call 112 / 108.

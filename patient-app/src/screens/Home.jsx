@@ -11,6 +11,7 @@ import VitalsCard from '../components/VitalsCard';
 import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
 import { usePending } from '../hooks/usePendingEmergency';
+import NotificationBell from '../components/NotificationBell';
 
 export default function Home() {
   const { t } = useTranslation();
@@ -24,8 +25,8 @@ export default function Home() {
   useEffect(() => {
     getPatient(session.patient_id)
       .then((p) => setName(p.name))
-      .catch((err) => { if (err.status === 401) signOut(); }); // Token no longer valid.
-  }, [session.patient_id, signOut]);
+      .catch(() => {}); // a 401 signs out by itself (auth.js)
+  }, [session.patient_id]);
 
   // If an emergency was running, check it is not finished before showing the banner.
   useEffect(() => {
@@ -41,7 +42,10 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+        <NotificationBell />
+      </div>
       {pending && (
         <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
           <p className="mb-2 font-bold text-red-900">{t('pending.homeBanner')}</p>
@@ -58,6 +62,9 @@ export default function Home() {
       )}
       <Link to="/symptoms" className="mb-5 flex min-h-[80px] w-full items-center justify-center rounded-xl bg-red-700 text-2xl font-extrabold text-white shadow">
         {t('home.emergency')}
+      </Link>
+      <Link to="/passport" className="mb-5 flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
+        {t('home.passport')}<span aria-hidden="true">›</span>
       </Link>
       <VitalsCard vitals={vitals} connected={connected} />
       <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline} />

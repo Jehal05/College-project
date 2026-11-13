@@ -7,7 +7,7 @@ import { updatePatient } from '../services/api';
 import { markPickedBeforeLogin } from '../hooks/useLanguageSync';
 import useAuth from '../hooks/useAuth';
 
-export default function LanguageSelect() {
+export default function LanguageSelect({ saveToRecord = true }) {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const id = useId();
@@ -17,6 +17,7 @@ export default function LanguageSelect() {
     const code = event.target.value;
     setDeviceOnly(false);
     await setLanguage(code);
+    if (!saveToRecord) return; // e.g. a responder reading a passport: only this device changes
     if (!session) { markPickedBeforeLogin(); return; } // saved after sign in
     updatePatient(session.patient_id, { language: code }).catch(() => setDeviceOnly(true));
   }

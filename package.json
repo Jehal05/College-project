@@ -3,12 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "HealthTwin AI - Patient App (Phase 1) and shared mock API. Simulated prototype, not a medical device.",
-  "workspaces": ["patient-app", "mock-server"],
+  "workspaces": [
+    "patient-app",
+    "mock-server"
+  ],
   "scripts": {
     "dev": "npm run dev -w patient-app",
     "mock": "npm start -w mock-server",
     "dev:all": "concurrently -n app,mock -c blue,green \"npm run dev -w patient-app\" \"npm start -w mock-server\"",
-    "build": "npm run build -w patient-app"
+    "build": "npm run build -w patient-app",
+    "contract": "node scripts/contract.mjs",
+    "integration": "node scripts/integration.mjs",
+    "test": "npm test -w patient-app",
+    "audit": "npm run audit -w patient-app"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

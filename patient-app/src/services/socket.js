@@ -31,6 +31,9 @@ export function connectEvents(onEvent, onStatus) {
   return () => {
     stopped = true;
     clearTimeout(timer);
-    if (socket) socket.close();
+    if (!socket) return;
+    // Closing a socket that is still connecting makes the browser log a warning: wait until it is open, then close it.
+    if (socket.readyState === WebSocket.CONNECTING) socket.onopen = () => socket.close();
+    else socket.close();
   };
 }

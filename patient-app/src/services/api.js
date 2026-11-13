@@ -5,23 +5,38 @@ import { readCopy, saveCopy } from '../utils/offlineCache';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-// One fetch helper for everything: adds the token and turns failures into errors with .status or .code === 'NETWORK'.
-async function send(path, { method = 'GET', headers = {}, body } = {}) {
-  const token = getToken();
+// Calls that start or follow an emergency never get a time limit or an automatic sign-out:
+// the offline "Not sent yet" logic (usePendingEmergency.js) owns them.
+const EMERGENCY_PATH = /^\/emergencies/;
+const TIMEOUT_MS = 10000; // everything else gives up after 10 seconds
+
+// One fetch helper for everything: adds the token and turns failures into errors with
+// .status (HTTP code) or .code === 'NETWORK' | 'TIMEOUT'. 5xx answers also get .server = true.
+async function send(path, { method = 'GET', headers = {}, body, publicCall = false } = {}) {
+  const token = publicCall ? null : getToken();
   const allHeaders = token ? { ...headers, Authorization: 'Bearer ' + token } : headers;
+  const emergency = EMERGENCY_PATH.test(path);
+  const controller = new AbortController();
+  const timer = emergency ? null : setTimeout(() => controller.abort(), TIMEOUT_MS);
   let response;
   try {
-    response = await fetch(API_URL + path, { method, headers: allHeaders, body });
-  } catch {
-    const err = new Error('network');
-    err.code = 'NETWORK';
-    window.dispatchEvent(new Event('ht:network-fail')); // lets the offline banner know right away
-    throw err; // Server not reachable.
+    response = await fetch(API_URL + path, { method, headers: allHeaders, body, signal: controller.signal });
+  } catch (cause) {
+    const timedOut = cause?.name === 'AbortError';
+    const err = new Error(timedOut ? 'timeout' : 'network');
+    err.code = timedOut ? 'TIMEOUT' : 'NETWORK';
+    if (!timedOut) window.dispatchEvent(new Event('ht:network-fail')); // lets the offline banner know right away
+    throw err; // Server not reachable, or too slow.
+  } finally {
+    clearTimeout(timer);
   }
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
     const err = new Error(data.error || 'Request failed');
     err.status = response.status;
+    err.server = response.status >= 500;
+    // The login is no longer valid: sign out with a message (auth.js listens). Never for emergency calls or the login itself.
+    if (response.status === 401 && token && !emergency) window.dispatchEvent(new Event('ht:unauthorized'));
     throw err;
   }
   return response;
@@ -78,3 +93,11 @@ export const uploadReport = (id, file) => send(patientPath(id, '/reports?name=' 
 // The file needs the login token, so fetch it as a Blob and return a temporary address the browser can open.
 export const getReportFileUrl = (id, reportId) => send(patientPath(id, '/reports/' + reportId + '/file'))
   .then((r) => r.blob()).then((blob) => URL.createObjectURL(blob));
+
+// ---- Health passport (Phase 5) ----
+export const createPassport = (id, hours) => request(patientPath(id, '/passport'), { method: 'POST', body: { hours } });
+export const getPassport = (id) => request(patientPath(id, '/passport'));
+export const revokePassport = (id) => request(patientPath(id, '/passport'), { method: 'DELETE' });
+export const getPassportLog = (id) => request(patientPath(id, '/passport/log'));
+// The responder page: no login, no token sent, never saved offline. 410 means expired or revoked.
+export const getPublicPassport = (token) => send('/passport/' + encodeURIComponent(token), { publicCall: true }).then((r) => r.json());

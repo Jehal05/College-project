@@ -11,14 +11,16 @@ import useAuth from './hooks/useAuth';
 import useLanguageSync from './hooks/useLanguageSync';
 import useRouteFocus from './hooks/useRouteFocus';
 import { useAutoSend } from './hooks/usePendingEmergency';
+import { useNotificationFeed } from './hooks/useNotifications';
 
 export default function App() {
   const { isLoggedIn } = useAuth();
   const { pathname } = useLocation();
   useLanguageSync(); // use the language saved on the patient record
   useAutoSend(); // send an unsent emergency when the connection returns
+  useNotificationFeed(); // turn live events into bell notifications
   useRouteFocus(pathname); // move focus to the heading after a page change
-  const showNav = isLoggedIn && !pathname.startsWith('/emergency');
+  const showNav = isLoggedIn && !pathname.startsWith('/emergency') && !pathname.startsWith('/p/');
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-white shadow-lg">
       <SkipLink />

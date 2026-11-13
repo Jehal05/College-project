@@ -1,4 +1,5 @@
 import { clearCopies } from '../utils/offlineCache';
+import { clearNotifications } from '../utils/notifications';
 
 // Login session. The token lives in memory and is copied to sessionStorage
 // so a page reload keeps you signed in (closing the tab signs you out).
@@ -33,6 +34,7 @@ export function setSession(newSession) {
 export function clearSession() {
   session = null;
   clearCopies(); // saved copies and unsent emergencies must not outlive the login
+  clearNotifications();
   try {
     sessionStorage.removeItem(KEY);
   } catch {
@@ -40,6 +42,18 @@ export function clearSession() {
   }
   notify();
 }
+
+// When the server says the login is no longer valid we sign out and leave a note for the Login screen.
+let notice = null;
+export function expireSession() {
+  if (!session) return;
+  // Never pull the person away from the emergency screens: the call button and the emergency flow stay usable.
+  if (/^\/(symptoms|emergency)/.test(window.location.pathname)) return;
+  notice = 'expired';
+  clearSession();
+}
+export const takeNotice = () => { const n = notice; notice = null; return n; };
+if (typeof window !== 'undefined') window.addEventListener('ht:unauthorized', expireSession);
 
 export const getSession = () => session;
 export const getToken = () => (session ? session.token : null);

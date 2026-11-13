@@ -1,13 +1,15 @@
 # Translation review (Hindi and Gujarati)
 
-**Status: NOT reviewed by a native speaker.** The Hindi and Gujarati text was written by an AI assistant using the glossary in the Phase 4 prompt. It must be read by a fluent speaker of each language, and by a doctor for anything medical, before real users see it.
+**Status: NOT reviewed by a native speaker.** The Hindi and Gujarati text was written by an AI assistant using the glossary below. It must be read by a fluent speaker of each language, and by a doctor for anything medical, before real users see it.
+
+Phase 5 added the passport, responder page and notification strings (`passport.*`, `view.*`, `notif.*`, `home.passport`, `profile.passport`, `login.expired`). The responder page (`view.*`) is read by strangers in an emergency, so check it first.
 
 ## How to review
 
-1. Read the **High priority** table first: these strings are shown during an emergency, or explain consent, offline and voice behaviour.
+1. Read the **High priority** table first: these strings are shown during an emergency, on the responder page, or explain consent, offline and voice behaviour.
 2. Check meaning, tone (calm, short, polite), and that the same word is used for the same idea everywhere (see glossary below).
-3. Check that nothing sounds like a diagnosis or a promise. "Not sent yet" must never read as "sent".
-4. Edit `patient-app/src/i18n/hi.json` or `gu.json` only. Keep the `{{placeholders}}` exactly as they are.
+3. Check that nothing sounds like a diagnosis or a promise. "Not sent yet" must never read as "sent", and the passport page must say the data was prepared by the patient and is not verified by a doctor.
+4. Edit `patient-app/src/i18n/hi.json` or `gu.json` only. Keep the `{{placeholders}}` exactly as they are. Keys ending in `_one` / `_other` are singular and plural forms.
 5. Run `npm run audit` afterwards: long words must not overflow at 360 px.
 
 ## Glossary used
@@ -21,8 +23,9 @@
 | Cancel | रद्द करें | રદ કરો |
 | Consent | सहमति | સંમતિ |
 | Emergency contacts | आपातकालीन संपर्क | કટોકટીના સંપર્કો |
+| Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ |
 
-## High priority (131 strings)
+## High priority (191 strings)
 
 | Key | English | Hindi | Gujarati | Reviewed |
 |---|---|---|---|---|
@@ -157,8 +160,68 @@
 | `error.title` | Something went wrong | कुछ गलत हो गया | કંઈક ખોટું થયું | [ ] |
 | `error.text` | The app had a problem. If this is an emergency, call now. | ऐप में समस्या आई। यदि यह आपातकाल है, तो अभी कॉल करें। | એપમાં સમસ્યા આવી. જો આ કટોકટી હોય, તો હમણાં કૉલ કરો. | [ ] |
 | `error.reload` | Reload the app | ऐप फिर से खोलें | એપ ફરી ખોલો | [ ] |
+| `login.expired` | Your session ended. Please sign in again. | आपका सत्र समाप्त हो गया। कृपया दोबारा साइन इन करें। | તમારું સત્ર પૂરું થયું. કૃપા કરીને ફરી સાઇન ઇન કરો. | [ ] |
+| `passport.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ | [ ] |
+| `passport.intro` | Show this QR code to a responder or doctor. It opens a page with the details you chose to share. The code itself holds no health data. | यह QR कोड किसी सहायक या डॉक्टर को दिखाएँ। इससे एक पेज खुलता है जिसमें वही जानकारी होती है जो आपने साझा करने के लिए चुनी है। कोड में स्वयं कोई स्वास्थ्य जानकारी नहीं होती। | આ QR કોડ કોઈ સહાયક અથવા ડૉક્ટરને બતાવો. તેનાથી એક પેજ ખુલે છે જેમાં તમે શેર કરવા માટે પસંદ કરેલી માહિતી હોય છે. કોડમાં પોતે કોઈ આરોગ્ય માહિતી નથી. | [ ] |
+| `passport.validity` | How long should it work? | यह कितने समय तक चले? | તે કેટલો સમય ચાલે? | [ ] |
+| `passport.hours1` | 1 hour | 1 घंटा | 1 કલાક | [ ] |
+| `passport.hours24` | 24 hours | 24 घंटे | 24 કલાક | [ ] |
+| `passport.days7` | 7 days | 7 दिन | 7 દિવસ | [ ] |
+| `passport.create` | Create passport | पासपोर्ट बनाएँ | પાસપોર્ટ બનાવો | [ ] |
+| `passport.qrLabel` | QR code for your health passport | आपके स्वास्थ्य पासपोर्ट का QR कोड | તમારા આરોગ્ય પાસપોર્ટનો QR કોડ | [ ] |
+| `passport.left.days_one` | Valid for {{count}} day | {{count}} दिन के लिए मान्य | {{count}} દિવસ માટે માન્ય | [ ] |
+| `passport.left.days_other` | Valid for {{count}} days | {{count}} दिन के लिए मान्य | {{count}} દિવસ માટે માન્ય | [ ] |
+| `passport.left.hours_one` | Valid for {{count}} hour | {{count}} घंटे के लिए मान्य | {{count}} કલાક માટે માન્ય | [ ] |
+| `passport.left.hours_other` | Valid for {{count}} hours | {{count}} घंटे के लिए मान्य | {{count}} કલાક માટે માન્ય | [ ] |
+| `passport.left.minutes_one` | Valid for {{count}} minute | {{count}} मिनट के लिए मान्य | {{count}} મિનિટ માટે માન્ય | [ ] |
+| `passport.left.minutes_other` | Valid for {{count}} minutes | {{count}} मिनट के लिए मान्य | {{count}} મિનિટ માટે માન્ય | [ ] |
+| `passport.left.soon` | Valid for less than 1 minute | 1 मिनट से कम के लिए मान्य | 1 મિનિટથી ઓછા સમય માટે માન્ય | [ ] |
+| `passport.download` | Download QR (PNG) | QR डाउनलोड करें (PNG) | QR ડાઉનલોડ કરો (PNG) | [ ] |
+| `passport.print` | Print | प्रिंट करें | પ્રિન્ટ કરો | [ ] |
+| `passport.revoke` | Revoke now | अभी रद्द करें | હમણાં રદ કરો | [ ] |
+| `passport.revokeConfirm` | Stop this passport working? Anyone with the link will lose access. | इस पासपोर्ट को बंद करें? लिंक वाले किसी भी व्यक्ति की पहुँच खत्म हो जाएगी। | આ પાસપોર્ટ બંધ કરવો છે? લિંક ધરાવનાર કોઈની પણ ઍક્સેસ જતી રહેશે. | [ ] |
+| `passport.revokeYes` | Yes, revoke it | हाँ, रद्द करें | હા, રદ કરો | [ ] |
+| `passport.opens_one` | Opened {{count}} time | {{count}} बार खोला गया | {{count}} વાર ખોલવામાં આવ્યો | [ ] |
+| `passport.opens_other` | Opened {{count}} times | {{count}} बार खोला गया | {{count}} વાર ખોલવામાં આવ્યો | [ ] |
+| `passport.opensNone` | Not opened yet | अभी तक नहीं खोला गया | હજી સુધી ખોલવામાં આવ્યો નથી | [ ] |
+| `passport.openPage` | Preview the responder page | सहायक का पेज देखें | સહાયકનું પેજ જુઓ | [ ] |
+| `passport.sharedNote` | Only what your consent settings allow is shown. | केवल वही दिखता है जो आपकी सहमति सेटिंग अनुमति देती है। | ફક્ત તે જ દેખાય છે જે તમારી સંમતિ સેટિંગ મંજૂરી આપે છે. | [ ] |
+| `passport.consentLink` | Check consent settings | सहमति सेटिंग देखें | સંમતિ સેટિંગ તપાસો | [ ] |
+| `passport.offlineNote` | You are offline. The QR is shown from memory, but the link needs internet to open. | आप ऑफ़लाइन हैं। QR याददाश्त से दिख रहा है, लेकिन लिंक खुलने के लिए इंटरनेट चाहिए। | તમે ઑફલાઇન છો. QR મેમરીમાંથી બતાવાયો છે, પરંતુ લિંક ખોલવા માટે ઇન્ટરનેટ જોઈએ. | [ ] |
+| `passport.loadError` | Could not load your passport. | आपका पासपोर्ट लोड नहीं हो सका। | તમારો પાસપોર્ટ લોડ થઈ શક્યો નથી. | [ ] |
+| `passport.createError` | Could not create the passport. Please try again. | पासपोर्ट नहीं बन सका। कृपया दोबारा कोशिश करें। | પાસપોર્ટ બની શક્યો નથી. કૃપા કરીને ફરી પ્રયાસ કરો. | [ ] |
+| `passport.revokeError` | Could not revoke the passport. Please try again. | पासपोर्ट रद्द नहीं हो सका। कृपया दोबारा कोशिश करें। | પાસપોર્ટ રદ થઈ શક્યો નથી. કૃપા કરીને ફરી પ્રયાસ કરો. | [ ] |
+| `view.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ | [ ] |
+| `view.preparedBy` | Prepared by the patient. Not verified by a doctor. | मरीज़ द्वारा तैयार किया गया। डॉक्टर द्वारा सत्यापित नहीं। | દર્દી દ્વારા તૈયાર કરેલું. ડૉક્ટર દ્વારા ચકાસાયેલું નથી. | [ ] |
+| `view.patient` | Patient | मरीज़ | દર્દી | [ ] |
+| `view.age` | Age: {{age}} years | आयु: {{age}} वर्ष | ઉંમર: {{age}} વર્ષ | [ ] |
+| `view.bloodGroup` | Blood group | रक्त समूह | રક્ત જૂથ | [ ] |
+| `view.allergies` | Allergies | एलर्जी | એલર્જી | [ ] |
+| `view.conditions` | Conditions the patient entered | मरीज़ द्वारा बताई गई स्थितियाँ | દર્દીએ જણાવેલી સ્થિતિઓ | [ ] |
+| `view.medicines` | Medicines | दवाइयाँ | દવાઓ | [ ] |
+| `view.contacts` | Emergency contacts | आपातकालीन संपर्क | કટોકટીના સંપર્કો | [ ] |
+| `view.none` | None listed | कुछ दर्ज नहीं | કંઈ નોંધાયેલ નથી | [ ] |
+| `view.notShared` | The patient has not shared this section. | मरीज़ ने यह भाग साझा नहीं किया है। | દર્દીએ આ વિભાગ શેર કર્યો નથી. | [ ] |
+| `view.loading` | Loading passport... | पासपोर्ट लोड हो रहा है... | પાસપોર્ટ લોડ થઈ રહ્યો છે... | [ ] |
+| `view.error` | Could not load the passport. Check the internet connection. | पासपोर्ट लोड नहीं हो सका। इंटरनेट कनेक्शन जाँचें। | પાસપોર્ટ લોડ થઈ શક્યો નથી. ઇન્ટરનેટ કનેક્શન તપાસો. | [ ] |
+| `view.gone` | This passport is no longer available. | यह पासपोर्ट अब उपलब्ध नहीं है। | આ પાસપોર્ટ હવે ઉપલબ્ધ નથી. | [ ] |
+| `view.goneHelp` | Ask the patient for a new QR code, or call 112 / 108. | मरीज़ से नया QR कोड माँगें, या 112 / 108 पर कॉल करें। | દર્દી પાસેથી નવો QR કોડ માગો, અથવા 112 / 108 પર કૉલ કરો. | [ ] |
+| `view.expires` | Link valid until {{time}} | लिंक {{time}} तक मान्य है | લિંક {{time}} સુધી માન્ય છે | [ ] |
+| `notif.bell` | Notifications, {{count}} new | सूचनाएँ, {{count}} नई | સૂચનાઓ, {{count}} નવી | [ ] |
+| `notif.title` | Notifications | सूचनाएँ | સૂચનાઓ | [ ] |
+| `notif.empty` | No notifications yet | अभी कोई सूचना नहीं | હજી કોઈ સૂચના નથી | [ ] |
+| `notif.hospital` | Hospital acknowledged | अस्पताल ने पुष्टि की | હોસ્પિટલે પુષ્ટિ કરી | [ ] |
+| `notif.ambulance` | Ambulance dispatched | एम्बुलेंस रवाना की गई | એમ્બ્યુલન્સ રવાના કરી | [ ] |
+| `notif.contacts` | Your contacts were notified (simulated) | आपके संपर्कों को सूचित किया गया (सिमुलेटेड) | તમારા સંપર્કોને જાણ કરવામાં આવી (સિમ્યુલેટેડ) | [ ] |
+| `notif.passport` | Passport opened | पासपोर्ट खोला गया | પાસપોર્ટ ખોલવામાં આવ્યો | [ ] |
+| `notif.clear` | Clear | साफ़ करें | સાફ કરો | [ ] |
+| `notif.browser.title` | HealthTwin (simulated) | HealthTwin (सिमुलेटेड) | HealthTwin (સિમ્યુલેટેડ) | [ ] |
+| `notif.browser.label` | Browser alerts | ब्राउज़र अलर्ट | બ્રાઉઝર એલર્ટ | [ ] |
+| `notif.browser.help` | Show a pop-up when the app is in the background and the hospital or ambulance status changes. Off by default. | ऐप बैकग्राउंड में हो और अस्पताल या एम्बुलेंस की स्थिति बदले तो पॉप-अप दिखाएँ। डिफ़ॉल्ट रूप से बंद। | એપ બેકગ્રાઉન્ડમાં હોય અને હોસ્પિટલ કે એમ્બ્યુલન્સની સ્થિતિ બદલાય ત્યારે પૉપ-અપ બતાવો. મૂળભૂત રીતે બંધ. | [ ] |
+| `notif.browser.denied` | Your browser blocked alerts. You can allow them in the browser settings. | आपके ब्राउज़र ने अलर्ट रोक दिए हैं। आप इन्हें ब्राउज़र सेटिंग में अनुमति दे सकते हैं। | તમારા બ્રાઉઝરે એલર્ટ અવરોધ્યા છે. તમે બ્રાઉઝર સેટિંગમાં તેમને મંજૂરી આપી શકો છો. | [ ] |
+| `notif.browser.unsupported` | This browser does not support alerts. | यह ब्राउज़र अलर्ट का समर्थन नहीं करता। | આ બ્રાઉઝર એલર્ટને સપોર્ટ કરતું નથી. | [ ] |
 
-## Everything else (144 strings)
+## Everything else (146 strings)
 
 | Key | English | Hindi | Gujarati | Reviewed |
 |---|---|---|---|---|
@@ -306,9 +369,12 @@
 | `relation.Child` | Child | बच्चा | સંતાન | [ ] |
 | `relation.Friend` | Friend | दोस्त | મિત્ર | [ ] |
 | `relation.Other` | Other | अन्य | અન્ય | [ ] |
+| `home.passport` | Health passport (QR) | स्वास्थ्य पासपोर्ट (QR) | આરોગ્ય પાસપોર્ટ (QR) | [ ] |
+| `profile.passport` | Health passport (QR) | स्वास्थ्य पासपोर्ट (QR) | આરોગ્ય પાસપોર્ટ (QR) | [ ] |
 
 ## Not translated on purpose
 
-- `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true`. Translate it only after that review.
+- `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.
 - Hospital and person names in the mock data are demo data.
 - Voice recognition accuracy for Hindi and Gujarati depends on the browser; the keyword dictionary in `src/config/voiceKeywords.js` also needs a native-speaker check.
+- "QR" stays in Latin letters on purpose (it is the common term).
