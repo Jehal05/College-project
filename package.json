@@ -1,0 +1,16 @@
+{
+  "name": "college-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HealthTwin AI - Patient App (Phase 1) and shared mock API. Simulated prototype, not a medical device.",
+  "workspaces": ["patient-app", "mock-server"],
+  "scripts": {
+    "dev": "npm run dev -w patient-app",
+    "mock": "npm start -w mock-server",
+    "dev:all": "concurrently -n app,mock -c blue,green \"npm run dev -w patient-app\" \"npm start -w mock-server\"",
+    "build": "npm run build -w patient-app"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

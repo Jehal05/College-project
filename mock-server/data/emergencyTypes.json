@@ -1,0 +1,6 @@
+{
+  "HEART":    ["Chest pain or pressure", "Shortness of breath", "Sweating", "Nausea", "Pain in left arm or jaw", "Fainting"],
+  "STROKE":   ["Face drooping", "Arm or leg weakness", "Slurred speech", "Sudden confusion", "Sudden severe headache"],
+  "DIABETIC": ["Confusion", "Shaking", "Sweating", "Fainting", "Very low glucose reading"],
+  "ASTHMA":   ["Wheezing", "Cannot speak full sentences", "Severe shortness of breath", "Blue lips"]
+}
