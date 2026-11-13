@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import checklists from '../data/checklists.json';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { formatTime } from './AlertCard.jsx';
+import { reviewBadge, reviewSummary } from '../services/review.js';
 
 export default function Checklist({ emergency }) {
   const { tick } = useEmergencies();
@@ -36,8 +37,12 @@ export default function Checklist({ emergency }) {
         <span data-testid="checklist-progress" className="text-lg font-bold">
           {done} of {items.length} done
         </span>
-        <span className="rounded-full border border-amber-500 bg-amber-100 px-2.5 py-0.5 text-sm font-semibold text-amber-800">
-          Sample checklist. Pending medical review.
+        <span
+          data-testid="review-badge"
+          data-review={reviewSummary(items).state}
+          className={`rounded-full border px-2.5 py-0.5 text-sm font-semibold ${reviewSummary(items).state === 'reviewed' ? 'border-emerald-600 bg-emerald-100 text-emerald-900' : 'border-amber-500 bg-amber-100 text-amber-800'}`}
+        >
+          {reviewBadge(items)}
         </span>
       </div>
       <div className="mb-3 h-2.5 overflow-hidden rounded-full bg-slate-200">

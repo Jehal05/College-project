@@ -3,115 +3,194 @@
   "HEART": [
     {
       "id": "heart-1",
-      "text": "Inform the on-call cardiology team"
+      "text": "Inform the on-call cardiology team",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "heart-2",
-      "text": "Confirm the cath lab is free and staffed"
+      "text": "Confirm the cath lab is free and staffed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "heart-3",
-      "text": "ECG machine ready at the arrival bay"
+      "text": "ECG machine ready at the arrival bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "heart-4",
-      "text": "Defibrillator and monitor ready at the bay"
+      "text": "Defibrillator and monitor ready at the bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "heart-5",
-      "text": "Read allergies and current medicines from the health passport"
+      "text": "Read allergies and current medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "heart-6",
-      "text": "Reserve a monitored bed"
+      "text": "Reserve a monitored bed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     }
   ],
   "STROKE": [
     {
       "id": "stroke-1",
-      "text": "Inform the stroke team"
+      "text": "Inform the stroke team",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "stroke-2",
-      "text": "Reserve the CT scanner"
+      "text": "Reserve the CT scanner",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "stroke-3",
-      "text": "Note the symptom start time from the alert"
+      "text": "Note the symptom start time from the alert",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "stroke-4",
-      "text": "Stroke bay and monitor ready"
+      "text": "Stroke bay and monitor ready",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "stroke-5",
-      "text": "Read blood-thinning medicines from the health passport"
+      "text": "Read blood-thinning medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "stroke-6",
-      "text": "Blood glucose meter ready at the bay"
+      "text": "Blood glucose meter ready at the bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     }
   ],
   "DIABETIC": [
     {
       "id": "diabetic-1",
-      "text": "Inform the duty physician"
+      "text": "Inform the duty physician",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "diabetic-2",
-      "text": "Blood glucose meter ready at the bay"
+      "text": "Blood glucose meter ready at the bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "diabetic-3",
-      "text": "IV access kit ready"
+      "text": "IV access kit ready",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "diabetic-4",
-      "text": "Read diabetes medicines from the health passport"
+      "text": "Read diabetes medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "diabetic-5",
-      "text": "Reserve an observation bed"
+      "text": "Reserve an observation bed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     }
   ],
   "ASTHMA": [
     {
       "id": "asthma-1",
-      "text": "Inform the duty physician"
+      "text": "Inform the duty physician",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "asthma-2",
-      "text": "Oxygen and nebuliser ready at the bay"
+      "text": "Oxygen and nebuliser ready at the bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "asthma-3",
-      "text": "Pulse oximeter ready"
+      "text": "Pulse oximeter ready",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "asthma-4",
-      "text": "Read allergies and inhaler medicines from the health passport"
+      "text": "Read allergies and inhaler medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "asthma-5",
-      "text": "Confirm an ICU bed is available if needed"
+      "text": "Confirm an ICU bed is available if needed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     }
   ],
   "UNKNOWN": [
     {
       "id": "unknown-1",
-      "text": "Inform the duty physician: cause not known yet"
+      "text": "Inform the duty physician: cause not known yet",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "unknown-2",
-      "text": "Try to reach the patient or their contacts for symptoms"
+      "text": "Try to reach the patient or their contacts for symptoms",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "unknown-3",
-      "text": "Emergency bay and basic monitoring ready"
+      "text": "Emergency bay and basic monitoring ready",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     },
     {
       "id": "unknown-4",
-      "text": "Read allergies and medicines from the health passport"
+      "text": "Read allergies and medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
     }
-  ]
+  ],
+  "_review": "Each item carries status ('draft' or 'reviewed'), reviewed_by and reviewed_on. A real doctor or medical teacher fills these in after reading docs/DOCTOR_REVIEW_SHEET.md. They stay null until then: nobody is named as a reviewer by default."
 }

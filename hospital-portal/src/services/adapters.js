@@ -6,7 +6,7 @@
 export const NOT_SHARED = 'Not shared';
 
 // ---------- Symptoms: IDs -> readable words ----------
-const SYMPTOM_WORDS = {
+export const SYMPTOM_WORDS = {
   CHEST_PAIN: 'Chest pain',
   SHORT_BREATH: 'Shortness of breath',
   SWEATING: 'Sweating',

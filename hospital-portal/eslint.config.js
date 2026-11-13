@@ -33,7 +33,7 @@ export default [
   },
   {
     // Tests run in Node (node:test) and the e2e/config files run in Node too
-    files: ['src/**/*.test.js', 'e2e/**/*.js', '*.config.js'],
+    files: ['src/**/*.test.js', 'e2e/**/*.js', 'scripts/**/*.{js,mjs}', '*.config.js'],
     // e2e callbacks given to page.evaluate() run in the browser, so they may use browser globals too
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
