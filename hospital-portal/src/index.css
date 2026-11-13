@@ -23,3 +23,14 @@ body { @apply bg-slate-100 text-slate-900 antialiased; }
   body { background: #fff; font-size: 12pt; }
   .report { box-shadow: none !important; padding: 0 !important; }
 }
+
+/* Keyboard focus: a clear outline on every interactive element (accessibility). */
+:where(a, button, select, input, textarea, [tabindex]):focus-visible { outline: 3px solid #0284c7; outline-offset: 2px; }
+
+/* Reduced motion: no flashing, no gliding, no smooth scrolling. The colour border, the unread dot and the NEW badge still mark a new alert. */
+@media (prefers-reduced-motion: reduce) {
+  .ht-flash { animation: none !important; }
+  .ht-smooth { transition: none !important; }
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
