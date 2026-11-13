@@ -55,3 +55,7 @@ Honest status of a SIMULATED prototype. A tick means it was run, with the result
 - [ ] Puneet and Shagun run `npm run integration` and copy the event shapes it prints.
 - [ ] Set `VITE_API_URL` and `VITE_APP_URL` on the host and deploy (`docs/DEPLOY.md`). Not deployed yet.
 - [ ] Replace the simulated notifications with a real service (SMS or push) if the project needs it.
+
+## Clean-clone run
+
+A fresh `git clone --branch Jehal`, `npm ci`, then `npm test`: 28 unit tests and 7 of 7 browser files (199 checks) passed in 4 min 24 s; `npm run contract` 16 of 16 and `npm run integration` passed against a mock server started from that clone. This run found one real bug (a late answer could write a saved copy after sign out), now fixed and covered by the offline test.
