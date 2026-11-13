@@ -108,6 +108,59 @@ await test('passport: create, public read, consent filter, log, revoke (410), un
   expectStatus(await call('DELETE', P() + '/passport'), 200, 204);
   expectError(await call('GET', '/passport/' + made.json.token, { auth: false }), 410); expectError(await call('GET', '/passport/not-a-real-token-1234567', { auth: false }), 410);
 });
+await test('emergencies: source, reasons (never a diagnosis) and summary (Phase 6)', async () => {
+  expectError(await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'], source: 'BOGUS' } }), 400);
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'UNKNOWN', symptoms: [], source: 'FALL_CHECK' } }); expectStatus(made, 201);
+  const heart = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'], source: 'MANUAL' } }); expectStatus(heart, 201);
+  const rs = await call('GET', '/emergencies/' + heart.json.id + '/reasons'); expectStatus(rs, 200);
+  expectShape(rs.json, { severity: 'string', matched_rules: 'array', inputs: 'object', reviewed: 'boolean', simulated: 'boolean' });
+  if (rs.json.reviewed !== false) fail('reasons.reviewed must be false until a doctor reviews the rules'); if (!rs.json.matched_rules.length) fail('chest pain should match at least one rule');
+  expectShape(rs.json.matched_rules[0], { id: 'string', type: 'string', severity: 'string', reason: 'string', reviewed: 'boolean' }, 'matched_rules[0]');
+  expectShape(rs.json.inputs, { symptoms: 'array', vitals: 'object' }, 'inputs');
+  expectError(await call('GET', '/emergencies/E-DOES-NOT-EXIST/reasons'), 404);
+  const sum = await call('GET', P() + '/emergencies/' + made.json.id + '/summary'); expectStatus(sum, 200);
+  expectShape(sum.json, { id: 'string', started_at: 'iso', source: 'string', final_state: 'string', simulated: 'boolean', timeline: 'array', durations: 'object', shared: 'object', symptoms: 'array', contacts_notified: 'array' });
+  if (sum.json.source !== 'FALL_CHECK') fail('source was not stored');
+  for (const k of ['to_acknowledged', 'to_dispatched', 'to_arrived', 'to_handover']) if (!(k in sum.json.durations)) fail('durations.' + k + ' missing (use null)');
+  const list = await call('GET', P() + '/emergencies'); expectStatus(list, 200); if (!Array.isArray(list.json) || !list.json.some((e) => e.id === made.json.id)) fail('emergency list should include the new one');
+  expectError(await call('GET', P() + '/emergencies/E-DOES-NOT-EXIST/summary'), 404);
+  await call('POST', '/emergencies/' + made.json.id + '/cancel'); await call('POST', '/emergencies/' + heart.json.id + '/cancel');
+});
+await test('preferences: GET/PUT safety check-in (small JSON, validated)', async () => {
+  const g = await call('GET', P() + '/preferences'); expectStatus(g, 200); expectShape(g.json, { safety_checkin: 'object' }); expectShape(g.json.safety_checkin, { enabled: 'boolean', minutes: 'number' }, 'safety_checkin');
+  expectError(await call('PUT', P() + '/preferences', { body: { safety_checkin: { enabled: 'yes', minutes: 7 } } }), 400);
+  expectStatus(await call('PUT', P() + '/preferences', { body: g.json }), 200);
+});
+await test('reminders: create, list, update, taken, log, delete, limits (Phase 6)', async () => {
+  const list = await call('GET', P() + '/reminders'); expectStatus(list, 200); if (!Array.isArray(list.json)) fail('reminders should be an array');
+  if (list.json.length >= 8) fail('test patient already has 8 reminders');
+  const r = { name: 'Contract medicine', dose_note: 'as written by your doctor', times: ['09:30'], days: [1, 2, 3] };
+  const made = await call('POST', P() + '/reminders', { body: r }); expectStatus(made, 201); expectShape(made.json, { id: 'string', name: 'string', dose_note: 'string', times: 'array', days: 'array', paused: 'boolean' });
+  expectError(await call('POST', P() + '/reminders', { body: { ...r, name: '' } }), 400); expectError(await call('POST', P() + '/reminders', { body: { ...r, name: 'x'.repeat(61) } }), 400);
+  expectError(await call('POST', P() + '/reminders', { body: { ...r, times: ['25:99'] } }), 400);
+  const up = await call('PUT', P() + '/reminders/' + made.json.id, { body: { ...r, paused: true } }); expectStatus(up, 200); if (up.json.paused !== true) fail('pause not saved');
+  const slot = new Date().toISOString();
+  expectStatus(await call('POST', P() + '/reminders/' + made.json.id + '/taken', { body: { scheduled_for: slot, at: slot } }), 200);
+  expectError(await call('POST', P() + '/reminders/' + made.json.id + '/taken', { body: { at: slot } }), 400);
+  const log = await call('GET', P() + '/reminders/log'); expectStatus(log, 200); if (!Array.isArray(log.json)) fail('log should be an array');
+  if (log.json.length) expectShape(log.json[0], { reminder_id: 'string', scheduled_for: 'iso' }, 'log[0]');
+  expectStatus(await call('DELETE', P() + '/reminders/' + made.json.id), 200, 204); expectError(await call('DELETE', P() + '/reminders/' + made.json.id), 404);
+});
+await test('demo: vitals profile, overrides, speed and state (Phase 6)', async () => {
+  expectError(await call('POST', '/demo/vitals', { body: { profile: 'not-a-profile' } }), 400);
+  expectError(await call('POST', '/demo/vitals', { body: { overrides: { spo2: 500 } } }), 400);
+  const set = await call('POST', '/demo/vitals', { body: { profile: 'stroke', overrides: { heart_rate: 140 } } }); expectStatus(set, 200);
+  const st = await call('GET', '/demo/state'); expectStatus(st, 200); expectShape(st.json, { speed: 'number', allowed_speeds: 'array', vitals: 'object' });
+  if (st.json.vitals.profile !== 'stroke' || st.json.vitals.overrides.heart_rate !== 140) fail('profile and override should show in /demo/state');
+  expectStatus(await call('POST', '/demo/vitals', { body: { overrides: { heart_rate: null } } }), 200);
+  expectStatus(await call('POST', '/demo/vitals', { body: { overrides: {} } }), 200);
+  expectError(await call('POST', '/demo/speed', { body: { multiplier: 3 } }), 400);
+  const before = (await call('GET', '/demo/state')).json.speed; expectStatus(await call('POST', '/demo/speed', { body: { multiplier: 20 } }), 200);
+  if ((await call('GET', '/demo/state')).json.speed !== 20) fail('speed should be echoed in /demo/state');
+  await call('POST', '/demo/speed', { body: { multiplier: before } });
+  const reset = await call('POST', '/demo/reset'); expectStatus(reset, 200, 204);
+  if ((await call('GET', '/demo/state')).json.vitals.profile !== 'normal') fail('/demo/reset should return the profile to normal');
+});
 await test('WebSocket /ws: vitals.update and emergency events use { type, emergency_id, state, timestamp, payload }', async () => {
   if (typeof WebSocket === 'undefined') fail('needs Node 22+ (global WebSocket)');
   const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws'); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };

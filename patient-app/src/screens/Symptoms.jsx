@@ -7,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 import { getPatient } from '../services/api';
 import { CATEGORIES } from '../config/symptoms';
 import { unlock } from '../utils/alarm';
-import { setPending, startEmergency, usePending } from '../hooks/usePendingEmergency';
+import { beginEmergency, usePending } from '../hooks/usePendingEmergency';
 import useOnline from '../hooks/useOnline';
 import CallButton from '../components/CallButton';
 import SymptomGroup from '../components/SymptomGroup';
@@ -46,14 +46,13 @@ export default function Symptoms() {
     unlock(); // allows the countdown beep later (browsers need a tap first)
     setBusy(true);
     setError('');
-    if (!online) { setPending(type, selected); setBusy(false); return; } // honest: nothing was sent
     try {
-      const saved = consents.current ? await consents.current : null;
-      const e = await startEmergency(session.patient_id, type, selected, saved);
-      navigate('/emergency/' + e.id);
-    } catch (err) {
-      if (err.code === 'NETWORK') setPending(type, selected);
-      else setError(t('symptoms.error'));
+      const saved = online && consents.current ? await consents.current : null;
+      const result = await beginEmergency(session.patient_id, type, selected, { online, savedConsents: saved });
+      if (result.emergency) navigate('/emergency/' + result.emergency.id);
+      else setBusy(false); // kept as "not sent yet": the pending screen takes over
+    } catch {
+      setError(t('symptoms.error'));
       setBusy(false);
     }
   }

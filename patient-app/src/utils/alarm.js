@@ -1,6 +1,9 @@
 // Beep and vibrate helpers for the countdown. Browsers only allow sound after a tap,
 // so call unlock() inside a click handler (the "Get help now" button does this).
 let audio = null;
+let muted = false; // the person's choice on the safety check-in screen; applies to sound and vibration
+export const isMuted = () => muted;
+export const setMuted = (value) => { muted = value; };
 
 function context() {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -20,6 +23,7 @@ export function unlock() {
 
 // One short 880 Hz tone.
 export function beep() {
+  if (muted) return;
   try {
     const ctx = context();
     if (!ctx) return;
@@ -38,6 +42,7 @@ export function beep() {
 }
 
 export function vibrate(ms = 200) {
+  if (muted) return;
   try {
     if (navigator.vibrate) navigator.vibrate(ms);
   } catch {

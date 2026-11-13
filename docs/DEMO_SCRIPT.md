@@ -38,3 +38,23 @@ Everything is simulated. Say so at the start: the yellow banner on every screen 
 ## What to say is NOT real
 
 Simulated hospital and ambulance; the passport page shows data the patient typed (not doctor-verified); mock server with fake data in memory; no real SMS or push to contacts; no doctor-reviewed condition guidance (only 3 general lines); Hindi and Gujarati not yet checked by native speakers.
+
+## Phase 6: 6-minute rehearsal with the demo panel
+
+Build with `VITE_DEMO_TOOLS=true` (always on in `npm run dev`); a normal build has no `/demo` screen at all. Start the mock with `DEMO_SPEED=5` or pick a speed on the panel. The panel's own **Rehearsal script** checklist lists these steps with tick boxes (kept in memory only).
+
+| Time | Do | Expect |
+|---|---|---|
+| 0:00 | `/demo` > **Reset demo**, sign in | Status line "Speed N× · Vitals: Resting" |
+| 0:20 | Home: point at the four sparklines | Light band = your usual range, "Within your usual range", "Simulated wearable data" |
+| 0:45 | `/demo` > vitals profile **Heart emergency** > back to Home | Within about 3 seconds the line moves and the label says "Changed from your usual" |
+| 1:15 | Run the **Stroke** scenario | Countdown, alert sent, timeline fills (speed picker: use 10× or 20× first) |
+| 2:00 | Open **Why this alert** | Symptoms you told us, readings, "This combination is on our alert checklist.", draft note. No rule sentence, no score |
+| 2:30 | After handover, open the **alert record** | Timeline, durations in plain words, shared items, contacts notified (simulated), Copy / Download / Print |
+| 3:15 | `/demo` > **Simulated fall** | Full-screen "Are you OK?" with a 30 second countdown, Call 112 / 108. Press **I'm OK** once, then run it again and let it time out: an alert starts, source "Safety check-in (simulated fall)", Cancel works |
+| 4:30 | `/demo` > switch **No data connection (simulated)** on, start an emergency | "Not sent yet", Call 112 / 108 first, "No internet. Tell your contacts by SMS" with the exact text. Say: the phone opens its messages app and you must press send; the app cannot know if it was sent |
+| 5:15 | Switch it off | The alert sends by itself |
+| 5:30 | **Reminders** | Two fake reminders, "only work while this app is open", "Ask your doctor or pharmacist what to do." |
+| 5:50 | Close | What is real and what is not (README "Known limits") |
+
+If something goes wrong: **Reset demo** (also clears the in-memory trend, notifications and pending items), and switch **Server errors (simulated)** off.

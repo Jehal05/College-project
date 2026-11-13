@@ -30,6 +30,14 @@ export default defineConfig(({ mode }) => ({
         // The app files are cached so a visited page opens offline. API calls are never cached here
         // (health data stays out of browser caches; see utils/offlineCache.js for the in-tab saved copies).
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
+        // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
+        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Summary,DemoTools}-*.js'],
+        runtimeCaching: [{
+          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Summary|DemoTools)-[^/]+\.js$/.test(url.pathname),
+          handler: 'CacheFirst',
+          options: { cacheName: 'ht-server-screens', expiration: { maxEntries: 12 } },
+        }],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
       },

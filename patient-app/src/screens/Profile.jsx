@@ -10,6 +10,8 @@ import ErrorMessage from '../components/ErrorMessage';
 import LanguageSelect from '../components/LanguageSelect';
 import OfflineNote from '../components/OfflineNote';
 import useOnline from '../hooks/useOnline';
+import CheckInSetting from '../components/CheckInSetting';
+import PastAlerts from '../components/PastAlerts';
 
 // Turn the patient from the API into plain strings the form can edit.
 const toForm = (p) => ({
@@ -68,12 +70,14 @@ export default function Profile() {
       <LanguageSelect />
       <OfflineNote />
       <nav aria-label={t('profile.links')} className="mb-5 grid gap-2">
-        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports'], ['/passport', 'profile.passport']].map(([to, key]) => (
+        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports'], ['/reminders', 'profile.reminders'], ['/passport', 'profile.passport']].map(([to, key]) => (
           <Link key={to} to={to} className="flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
             {t(key)}<span aria-hidden="true">›</span>
           </Link>
         ))}
       </nav>
+      <CheckInSetting />
+      <PastAlerts />
       <fieldset disabled={!online} className="contents">
       <FormField label={t('profile.name')} value={form.name} onChange={set('name')} error={e('name')} autoComplete="name" />
       <FormField label={t('profile.age')} value={form.age} onChange={set('age')} error={e('age')} type="number" inputMode="numeric" min="0" max="120" />

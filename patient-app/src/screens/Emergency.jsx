@@ -1,7 +1,7 @@
 // Feature 5: the red emergency screen. Shows the countdown first, then the live hospital response.
 // Always shows the Call 112 / 108 button, even while loading or when something fails.
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useEmergency from '../hooks/useEmergency';
 import { cancelEmergency, sendSos } from '../services/api';
@@ -16,6 +16,7 @@ import ResponseCard from '../components/ResponseCard';
 import GoldenHourClock from '../components/GoldenHourClock';
 import ContactsNotified from '../components/ContactsNotified';
 import InstructionsCard from '../components/InstructionsCard';
+import WhyThisAlert from '../components/WhyThisAlert';
 import ErrorMessage from '../components/ErrorMessage';
 
 const CAN_CANCEL_AFTER_SOS = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE'];
@@ -31,6 +32,7 @@ export default function Emergency() {
   const { id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const backOnline = useLocation().state?.backOnline; // we got here by sending an alert that was waiting for the connection
   const { emergency, events, connected, error, reload } = useEmergency(id);
   const [sending, setSending] = useState(false);
   const [problem, setProblem] = useState('');
@@ -42,7 +44,7 @@ export default function Emergency() {
   // Remember the running emergency; leave if it was cancelled.
   useEffect(() => {
     if (!state) return;
-    if (state === 'CANCELLED') { clearActive(); stopAlarm(); navigate('/cancelled', { replace: true }); }
+    if (state === 'CANCELLED') { clearActive(); stopAlarm(); navigate('/cancelled', { replace: true, state: { id } }); }
     else if (state === 'HANDOVER_DONE') clearActive();
     else setActive(id);
   }, [state, id, navigate]);
@@ -72,7 +74,7 @@ export default function Emergency() {
       await cancelEmergency(id);
       stopAlarm();
       clearActive();
-      navigate('/cancelled', { replace: true });
+      navigate('/cancelled', { replace: true, state: { id } });
     } catch {
       cancelled.current = false;
       setProblem(t('emergency.cancelError'));
@@ -99,6 +101,11 @@ export default function Emergency() {
       <EmergencyHeader type={emergency.type} connected={connected} />
       <CallButton onRed />
       <p className="sr-only" role="status" aria-live="polite">{t('state.' + state)}</p>
+      {backOnline && (
+        <p role="status" className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">
+          {state === 'EMERGENCY_DETECTED' ? t('emergency.backOnlineSending') : t('emergency.backOnlineSent')}
+        </p>
+      )}
 
       {counting && (
         <>
@@ -118,11 +125,16 @@ export default function Emergency() {
           <ContactsNotified emergency={emergency} />
         </>
       )}
+      {emergency.source && emergency.source !== 'MANUAL' && (
+        <p role="status" className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">{t('emergency.fromCheckIn')}</p>
+      )}
+      <WhyThisAlert emergencyId={id} source={emergency.source} />
       <InstructionsCard type={emergency.type} />
 
       {state === 'HANDOVER_DONE' && (
         <section role="status" className="mt-4 rounded-xl bg-white p-4 text-slate-900">
           <p className="mb-3 font-semibold">{t('emergency.done')}</p>
+          <Link to={'/summary/' + id} className="mb-2 flex min-h-[48px] items-center justify-center rounded-lg border-2 border-blue-700 px-4 font-bold text-blue-800">{t('emergency.viewSummary')}</Link>
           <Link to="/" className="inline-flex min-h-[48px] items-center rounded-lg bg-blue-700 px-4 font-bold text-white">{t('emergency.back')}</Link>
         </section>
       )}

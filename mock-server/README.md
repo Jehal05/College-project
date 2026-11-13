@@ -100,3 +100,17 @@ Also: `simulator.js` holds the broadcast helper and the timers.
 
 New event: `passport.opened` (`emergency_id: null`, payload `{ patient_id }`, no IP or device data). Passports live in memory only and are forgotten by `POST /demo/reset`.
 Files: `passport.js` (passport routes) and `failMode.js` (the failure switch). The full contract for the real backend is `docs/API_CONTRACT.md`; check any server with `npm run contract -- <url>`.
+
+## Phase 6 notes
+
+| Method and path | Notes |
+| --- | --- |
+| GET /emergencies/:id/reasons | Rules-engine result from `rules.js` + `data/rules.json` (Daksh's v0.1, all pending doctor review): `{ severity, matched_rules[], inputs{symptoms,vitals}, reviewed:false, simulated:true }` |
+| POST /emergencies | New optional `source` (MANUAL, FALL_CHECK, INACTIVITY_CHECK); `type: "UNKNOWN"` with no symptoms only with a check-in source. `emergency.created` payload adds `source` and `reasons` |
+| GET /patients/:id/emergencies, GET /patients/:id/emergencies/:eid/summary | Past alerts and the record (`summaries.js`) |
+| GET/PUT /patients/:id/preferences | `safety_checkin` (`preferences.js`) |
+| GET/POST /patients/:id/reminders, PUT/DELETE .../:rid, POST .../:rid/shown, POST .../:rid/taken, GET .../reminders/log | `reminders.js`; max 8 (409), seeded with two fake reminders |
+| POST /demo/vitals | `{ profile?, overrides? }`; profiles normal, heart_attack, stroke, low_glucose, asthma; 400 changes nothing; `null` clears one override, `{}` clears all |
+| POST /demo/speed, GET /demo/state | Speed 1, 2, 5, 10 or 20 (timers started afterwards); state echoes speed and vitals profile |
+
+`vitals.update` payloads add optional `bp_sys`, `bp_dia`, `resp_rate`. Name translations app <-> rules are only in `adapters.js`. `POST /demo/reset` resets all of the above.

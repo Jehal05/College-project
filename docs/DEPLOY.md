@@ -25,3 +25,8 @@ The build adds a Content-Security-Policy that allows only the site itself plus t
 ## Limits
 
 The mock server keeps everything in memory and is not for real users. The real backend (Daksh) must implement `docs/API_CONTRACT.md`.
+
+
+## Demo panel
+
+The `/demo` panel is left out of a normal build. For a rehearsal deployment set `VITE_DEMO_TOOLS=true` at build time; do not set it for anything real people use.

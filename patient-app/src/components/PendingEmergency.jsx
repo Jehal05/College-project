@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useOnline from '../hooks/useOnline';
 import { clearPending, isStale, sendPending } from '../hooks/usePendingEmergency';
 import CallButton from './CallButton';
+import SmsFallback from './SmsFallback';
 
 export default function PendingEmergency({ patientId, pending }) {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function PendingEmergency({ patientId, pending }) {
 
   async function retry() {
     setBusy(true); setFailed(false);
-    try { const e = await sendPending(patientId); navigate('/emergency/' + e.id); } catch { setFailed(true); setBusy(false); }
+    try { const e = await sendPending(patientId); navigate('/emergency/' + e.id, { state: { backOnline: true } }); } catch { setFailed(true); setBusy(false); }
   }
   const button = 'mt-3 min-h-[56px] w-full rounded-xl text-lg font-bold disabled:opacity-60 ';
   return (
@@ -26,6 +27,7 @@ export default function PendingEmergency({ patientId, pending }) {
       <h1 className="mt-4 text-3xl font-extrabold">{t('pending.title')}</h1>
       <p className="mt-2 text-lg font-semibold">{t('pending.text')}</p>
       <p role="status" className="mt-2">{failed ? t('pending.failed') : online ? t('pending.online') : t('pending.waiting')}</p>
+      {(!online || failed) && <SmsFallback />}
       {stale && <p className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">{t('pending.stale')}</p>}
       <button type="button" onClick={retry} disabled={busy} className={button + 'bg-white text-red-800'}>
         {busy ? t('emergency.sending') : stale ? t('pending.sendAnyway') : t('emergency.retry')}

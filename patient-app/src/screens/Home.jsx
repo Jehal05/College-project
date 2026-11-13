@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import useVitals from '../hooks/useVitals';
-import { getEmergency, getPatient } from '../services/api';
+import { getConsents, getContacts, getEmergency, getPatient } from '../services/api';
 import { clearActive, getActive } from '../utils/activeEmergency';
 import useBaseline from '../hooks/useBaseline';
+import useConsents from '../hooks/useConsents';
+import useVitalsHistory from '../hooks/useVitalsHistory';
 import VitalsCard from '../components/VitalsCard';
 import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
@@ -18,6 +20,9 @@ export default function Home() {
   const { session, signOut } = useAuth();
   const { vitals, connected } = useVitals();
   const { baseline, status: baselineStatus, reload: reloadBaseline } = useBaseline(session.patient_id);
+  const { consents } = useConsents(session.patient_id);
+  const sharing = !!consents && consents.vitals === true; // live vitals sharing on: the trend keeps the last minute in memory
+  const history = useVitalsHistory(vitals, sharing);
   const [name, setName] = useState('');
   const pending = usePending(); // an emergency that could not be sent yet (offline)
   const [activeId, setActiveId] = useState(null); // only set after we confirmed it is still running
@@ -26,6 +31,9 @@ export default function Home() {
     getPatient(session.patient_id)
       .then((p) => setName(p.name))
       .catch(() => {}); // a 401 signs out by itself (auth.js)
+    // Warm the offline copies the SMS fallback needs (contacts and the location consent), so they exist if the connection drops.
+    getContacts(session.patient_id).catch(() => {});
+    getConsents(session.patient_id).catch(() => {});
   }, [session.patient_id]);
 
   // If an emergency was running, check it is not finished before showing the banner.
@@ -66,8 +74,12 @@ export default function Home() {
       <Link to="/passport" className="mb-5 flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
         {t('home.passport')}<span aria-hidden="true">›</span>
       </Link>
+      <Link to="/reminders" className="mb-5 flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
+        {t('home.reminders')}<span aria-hidden="true">›</span>
+      </Link>
       <VitalsCard vitals={vitals} connected={connected} />
-      <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline} />
+      <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline}
+        history={history} sharing={sharing} sharingOff={!!consents && consents.vitals === false} />
       <h2 className="mb-2 mt-5 text-lg font-bold">{t('home.state')}</h2>
       <StatusBar state={vitals?.state || 'MONITORING'} />
       <button type="button" onClick={signOut} className="mt-8 min-h-[44px] rounded-lg bg-slate-200 px-4 font-semibold">

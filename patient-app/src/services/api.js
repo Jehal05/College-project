@@ -2,6 +2,7 @@
 // Switch from mock to real backend by changing VITE_API_URL in .env.
 import { getToken } from './auth';
 import { readCopy, saveCopy } from '../utils/offlineCache';
+import { isSimulatedOffline } from '../utils/simulatedOffline';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -13,6 +14,10 @@ const TIMEOUT_MS = 10000; // everything else gives up after 10 seconds
 // One fetch helper for everything: adds the token and turns failures into errors with
 // .status (HTTP code) or .code === 'NETWORK' | 'TIMEOUT'. 5xx answers also get .server = true.
 async function send(path, { method = 'GET', headers = {}, body, publicCall = false } = {}) {
+  if (isSimulatedOffline() && !path.startsWith('/demo')) { // demo panel switch: behave offline without touching the real network
+    window.dispatchEvent(new Event('ht:network-fail'));
+    throw Object.assign(new Error('network'), { code: 'NETWORK' });
+  }
   const token = publicCall ? null : getToken();
   const allHeaders = token ? { ...headers, Authorization: 'Bearer ' + token } : headers;
   const emergency = EMERGENCY_PATH.test(path);
@@ -101,3 +106,23 @@ export const revokePassport = (id) => request(patientPath(id, '/passport'), { me
 export const getPassportLog = (id) => request(patientPath(id, '/passport/log'));
 // The responder page: no login, no token sent, never saved offline. 410 means expired or revoked.
 export const getPublicPassport = (token) => send('/passport/' + encodeURIComponent(token), { publicCall: true }).then((r) => r.json());
+
+// ---- Phase 6: reasons, summaries, reminders, preferences, demo state ----
+export const getReasons = (emergencyId) => request('/emergencies/' + emergencyId + '/reasons');
+export const getEmergencies = (id) => request(patientPath(id, '/emergencies'));
+export const getSummary = (id, emergencyId) => request(patientPath(id, '/emergencies/' + emergencyId + '/summary'));
+export const getReminders = (id) => request(patientPath(id, '/reminders'));
+export const addReminder = (id, reminder) => request(patientPath(id, '/reminders'), { method: 'POST', body: reminder });
+export const updateReminder = (id, rid, reminder) => request(patientPath(id, '/reminders/' + rid), { method: 'PUT', body: reminder });
+export const deleteReminder = (id, rid) => request(patientPath(id, '/reminders/' + rid), { method: 'DELETE' });
+export const markReminderShown = (id, rid, scheduledFor) =>
+  request(patientPath(id, '/reminders/' + rid + '/shown'), { method: 'POST', body: { scheduled_for: scheduledFor } });
+export const markReminderTaken = (id, rid, scheduledFor, at) =>
+  request(patientPath(id, '/reminders/' + rid + '/taken'), { method: 'POST', body: { scheduled_for: scheduledFor, at } });
+export const getReminderLog = (id) => request(patientPath(id, '/reminders/log'));
+export const getPreferences = (id) => request(patientPath(id, '/preferences'));
+export const savePreferences = (id, preferences) => request(patientPath(id, '/preferences'), { method: 'PUT', body: preferences });
+export const getDemoState = () => request('/demo/state');
+export const setDemoSpeed = (multiplier) => request('/demo/speed', { method: 'POST', body: { multiplier } });
+export const setDemoVitals = (change) => request('/demo/vitals', { method: 'POST', body: change });
+export const setDemoFail = (mode) => request('/demo/fail', { method: 'POST', body: { mode } });

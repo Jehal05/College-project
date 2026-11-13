@@ -3,7 +3,9 @@ const express = require('express');
 const crypto = require('crypto');
 const store = require('./store');
 const simulator = require('./simulator');
-const { requireAuth, distanceKm, normalVitals, DEMO_LOCATION } = require('./helpers');
+const { requireAuth, distanceKm, DEMO_LOCATION } = require('./helpers');
+const vitals = require('./vitals');
+const demoState = require('./demoState');
 
 const router = express.Router();
 // Contacts and consents have their own endpoints now (patientData.js), so the profile PATCH ignores contacts.
@@ -39,16 +41,25 @@ router.patch('/patients/:id', requireAuth, (req, res) => {
 
 router.get('/patients/:id/vitals', requireAuth, (req, res) => {
   if (!store.patients[req.params.id]) return res.status(404).json({ error: 'Patient not found' });
-  res.json(normalVitals());
+  res.json(vitals.currentVitals());
 });
 
 // Consents, contacts, reports and baseline (Phase 3) live in their own file.
 router.use(require('./patientData'));
 router.use(require('./passport')); // QR health passport (Phase 5)
+router.use(require('./reminders')); // medication reminders (Phase 6)
+router.use(require('./preferences')); // safety check-in setting (Phase 6)
+router.use(require('./summaries')); // past alerts and post-incident summary (Phase 6)
+router.use(demoState.router); // demo speed, vitals profiles (Phase 6)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.
-function checkEmergencyBody({ patient_id, type, symptoms }) {
+const SOURCES = ['MANUAL', 'FALL_CHECK', 'INACTIVITY_CHECK'];
+function checkEmergencyBody({ patient_id, type, symptoms, source }) {
+  if (source !== undefined && !SOURCES.includes(source)) return 'source must be one of ' + SOURCES.join(', ');
+  // The safety check-in starts an alert without symptoms and without a type (type UNKNOWN).
+  const fromCheckIn = source === 'FALL_CHECK' || source === 'INACTIVITY_CHECK';
+  if (fromCheckIn && type === 'UNKNOWN' && Array.isArray(symptoms) && symptoms.length === 0 && patient_id) return null;
   if (!patient_id || !store.emergencyTypes[type]) return 'patient_id and a valid type are required';
   if (!Array.isArray(symptoms) || symptoms.length === 0) return 'symptoms must be a non-empty list of symptom IDs';
   const unknown = symptoms.find((id) => !store.emergencyTypes[type].includes(id));
@@ -59,7 +70,7 @@ router.post('/emergencies', requireAuth, (req, res) => {
   const problem = checkEmergencyBody(req.body || {});
   if (problem) return res.status(400).json({ error: problem });
   const e = simulator.createEmergency(req.body);
-  res.status(201).json({ id: e.id, state: e.state, severity: e.severity });
+  res.status(201).json({ id: e.id, state: e.state, severity: e.severity, source: e.source });
 });
 
 const findEmergency = (req, res) => {
@@ -93,6 +104,12 @@ router.get('/emergencies/:id', requireAuth, (req, res) => {
   if (e) res.json(e);
 });
 
+// Why the alert fired: what the person reported, what the readings showed, which checklist rules matched.
+router.get('/emergencies/:id/reasons', requireAuth, (req, res) => {
+  const e = findEmergency(req, res);
+  if (e) res.json(e.reasons);
+});
+
 // ---- Demo helpers for the demo control panel ----
 const DEFAULT_SYMPTOMS = {
   HEART: ['CHEST_PAIN', 'SHORT_BREATH', 'SWEATING'],
@@ -113,6 +130,7 @@ router.post('/demo/scenario', requireAuth, (req, res) => {
 router.post('/demo/reset', requireAuth, (req, res) => {
   simulator.stopAll();
   store.resetStore();
+  demoState.reset();
   require('./failMode').reset();
   res.json({ ok: true });
 });

@@ -26,10 +26,6 @@ function distanceKm(lat1, lng1, lat2, lng2) {
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function randomInt(min, max) {
-  return Math.floor(min + Math.random() * (max - min + 1));
-}
-
 // Demo location used when the patient app sends no location (same as the app's demo location).
 const DEMO_LOCATION = { lat: 21.1702, lng: 72.8311, accuracy: 50 };
 
@@ -52,16 +48,4 @@ function chooseHospital(type, location) {
     withDistance.find((h) => h.capabilities.includes('EMERGENCY')) || null;
 }
 
-// Normal resting vitals for a healthy-looking simulated patient.
-function normalVitals() {
-  return {
-    heart_rate: randomInt(70, 76),
-    spo2: randomInt(97, 99),
-    bp: '120/80',
-    glucose: 105,
-    resp_rate: 16,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-module.exports = { delay, requireAuth, distanceKm, normalVitals, chooseHospital, DEMO_LOCATION };
+module.exports = { delay, requireAuth, distanceKm, chooseHospital, DEMO_LOCATION };

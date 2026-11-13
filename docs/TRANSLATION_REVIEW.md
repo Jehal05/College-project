@@ -372,6 +372,194 @@ Phase 5 added the passport, responder page and notification strings (`passport.*
 | `home.passport` | Health passport (QR) | स्वास्थ्य पासपोर्ट (QR) | આરોગ્ય પાસપોર્ટ (QR) | [ ] |
 | `profile.passport` | Health passport (QR) | स्वास्थ्य पासपोर्ट (QR) | આરોગ્ય પાસપોર્ટ (QR) | [ ] |
 
+## Phase 6 additions: high priority (124 strings)
+
+Medical-sounding or safety-relevant wording (the "Why this alert" card, safety check-in, SMS fallback, reminders, record/summary and trend labels). Please have a native speaker who knows health wording check these first. Several are deliberately neutral ("checklist", "usual range", "record"): keep them neutral, do not make them sound like a diagnosis, a score or advice.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `why.title` | Why this alert | यह अलर्ट क्यों | આ એલર્ટ કેમ | [ ] |
+| `why.loading` | Loading... | लोड हो रहा है... | લોડ થઈ રહ્યું છે... | [ ] |
+| `why.unavailable` | Reasons are not available right now | कारण अभी उपलब्ध नहीं हैं | કારણો હમણાં ઉપલબ્ધ નથી | [ ] |
+| `why.told` | What you told us | आपने हमें क्या बताया | તમે અમને શું જણાવ્યું | [ ] |
+| `why.noneReported` | You did not report any symptoms. | आपने कोई लक्षण नहीं बताया। | તમે કોઈ લક્ષણ જણાવ્યું નથી. | [ ] |
+| `why.noneCheckIn` | You did not report symptoms. This alert started from the safety check-in. | आपने कोई लक्षण नहीं बताया। यह अलर्ट सुरक्षा जाँच से शुरू हुआ। | તમે કોઈ લક્ષણ જણાવ્યું નથી. આ એલર્ટ સલામતી તપાસથી શરૂ થયું. | [ ] |
+| `why.readings` | What your readings showed | आपकी रीडिंग में क्या दिखा | તમારા રીડિંગમાં શું દેખાયું | [ ] |
+| `why.noReadings` | No readings were shared. Live vitals sharing is off, or no reading was available. | कोई रीडिंग साझा नहीं की गई। लाइव वाइटल्स साझा करना बंद है, या कोई रीडिंग उपलब्ध नहीं थी। | કોઈ રીડિંગ શેર થયું નથી. લાઇવ વાઇટલ્સ શેર કરવું બંધ છે, અથવા કોઈ રીડિંગ ઉપલબ્ધ નહોતું. | [ ] |
+| `why.readingsAt` | Reading taken at {{time}} | रीडिंग का समय: {{time}} | રીડિંગનો સમય: {{time}} | [ ] |
+| `why.checklist` | Which checklist matched | कौन सी जाँच-सूची मेल खाई | કઈ ચેકલિસ્ટ મેળ ખાધી | [ ] |
+| `why.neutral` | This combination is on our alert checklist. | यह संयोजन हमारी अलर्ट जाँच-सूची में है। | આ સંયોજન અમારી એલર્ટ ચેકલિસ્ટમાં છે. | [ ] |
+| `why.noMatch` | Nothing matched our checklist. This does not say anything about your health. | कुछ भी हमारी जाँच-सूची से मेल नहीं खाया। इससे आपके स्वास्थ्य के बारे में कुछ नहीं कहा जा सकता। | કંઈ પણ અમારી ચેકલિસ્ટ સાથે મેળ ખાધું નથી. તેનાથી તમારા સ્વાસ્થ્ય વિશે કંઈ કહી શકાય નહીં. | [ ] |
+| `why.draft` | This checklist is a draft waiting for a doctor to review. It does not say what is wrong with you. If you feel unwell, call 112 / 108. | यह जाँच-सूची एक मसौदा है जिसे डॉक्टर की समीक्षा का इंतज़ार है। यह नहीं बताती कि आपको क्या समस्या है। अस्वस्थ लगे तो 112 / 108 पर कॉल करें। | આ ચેકલિસ્ટ એક ડ્રાફ્ટ છે જે ડૉક્ટરની સમીક્ષાની રાહ જુએ છે. તે એ નથી કહેતી કે તમને શું તકલીફ છે. અસ્વસ્થ લાગે તો 112 / 108 પર કૉલ કરો. | [ ] |
+| `twin.resp_rate` | Breathing rate | साँस की दर | શ્વાસનો દર | [ ] |
+| `twin.alt` | {{name}} over the last minute: between {{min}} and {{max}}, usual range {{usual}}. | {{name}}, पिछले एक मिनट में: {{min}} से {{max}} के बीच, सामान्य सीमा {{usual}}। | {{name}}, છેલ્લી એક મિનિટમાં: {{min}} થી {{max}} વચ્ચે, સામાન્ય સીમા {{usual}}. | [ ] |
+| `twin.altBp` | Blood pressure over the last minute: top number between {{smin}} and {{smax}}, bottom number between {{dmin}} and {{dmax}}, usual range {{usual}}. | रक्तचाप, पिछले एक मिनट में: ऊपर की संख्या {{smin}} से {{smax}} के बीच, नीचे की संख्या {{dmin}} से {{dmax}} के बीच, सामान्य सीमा {{usual}}। | બ્લડ પ્રેશર, છેલ્લી એક મિનિટમાં: ઉપરનો આંકડો {{smin}} થી {{smax}} વચ્ચે, નીચેનો આંકડો {{dmin}} થી {{dmax}} વચ્ચે, સામાન્ય સીમા {{usual}}. | [ ] |
+| `twin.collecting` | Collecting readings... | रीडिंग जमा हो रही हैं... | રીડિંગ એકઠા થઈ રહ્યા છે... | [ ] |
+| `twin.sharingOff` | Live vitals sharing is off | लाइव वाइटल्स साझा करना बंद है | લાઇવ વાઇટલ્સ શેર કરવું બંધ છે | [ ] |
+| `twin.sharingOffLink` | Change in Consent settings | सहमति सेटिंग में बदलें | સંમતિ સેટિંગમાં બદલો | [ ] |
+| `twin.simulated` | Simulated wearable data | सिमुलेटेड वियरेबल डेटा | સિમ્યુલેટેડ વેરેબલ ડેટા | [ ] |
+| `checkin.title` | Are you OK? | क्या आप ठीक हैं? | શું તમે ઠીક છો? | [ ] |
+| `checkin.countdown` | Alert starts in {{count}} seconds if you do not answer | अगर आप जवाब नहीं देते तो {{count}} सेकंड में अलर्ट शुरू होगा | જો તમે જવાબ ન આપો તો {{count}} સેકન્ડમાં એલર્ટ શરૂ થશે | [ ] |
+| `checkin.announce` | {{count}} seconds left to answer | जवाब देने के लिए {{count}} सेकंड बचे हैं | જવાબ આપવા માટે {{count}} સેકન્ડ બાકી છે | [ ] |
+| `checkin.imOk` | I'm OK | मैं ठीक हूँ | હું ઠીક છું | [ ] |
+| `checkin.starting` | Starting the alert... | अलर्ट शुरू हो रहा है... | એલર્ટ શરૂ થઈ રહ્યું છે... | [ ] |
+| `checkin.simulatedFall` | Simulated fall | सिमुलेटेड गिरना | સિમ્યુલેટેડ પડી જવું | [ ] |
+| `checkin.inactivity` | Safety check-in | सुरक्षा जाँच | સલામતી તપાસ | [ ] |
+| `checkin.soundOn` | Sound and vibration: on (tap to mute) | आवाज़ और कंपन: चालू (बंद करने के लिए टैप करें) | અવાજ અને વાઇબ્રેશન: ચાલુ (બંધ કરવા ટૅપ કરો) | [ ] |
+| `checkin.soundOff` | Sound and vibration: off (tap to turn on) | आवाज़ और कंपन: बंद (चालू करने के लिए टैप करें) | અવાજ અને વાઇબ્રેશન: બંધ (ચાલુ કરવા ટૅપ કરો) | [ ] |
+| `checkin.note` | Simulated safety check-in. If you do not answer, the app starts an alert like the emergency button does. Call 112 / 108 any time. | सिमुलेटेड सुरक्षा जाँच। अगर आप जवाब नहीं देते, तो ऐप आपातकालीन बटन की तरह अलर्ट शुरू करता है। कभी भी 112 / 108 पर कॉल करें। | સિમ્યુલેટેડ સલામતી તપાસ. જો તમે જવાબ ન આપો, તો એપ કટોકટી બટનની જેમ એલર્ટ શરૂ કરે છે. ગમે ત્યારે 112 / 108 પર કૉલ કરો. | [ ] |
+| `checkinSetting.title` | Safety check-in | सुरक्षा जाँच | સલામતી તપાસ | [ ] |
+| `checkinSetting.help` | If you turn this on and do not touch your phone for a while, the app asks "Are you OK?". If you do not answer in 30 seconds, it starts an alert. | इसे चालू करने पर, अगर आप कुछ देर फ़ोन नहीं छूते, तो ऐप पूछता है "क्या आप ठीक हैं?"। 30 सेकंड में जवाब न देने पर वह अलर्ट शुरू करता है। | આને ચાલુ કરશો અને થોડા સમય સુધી ફોનને અડશો નહીં, તો એપ પૂછશે "શું તમે ઠીક છો?". 30 સેકન્ડમાં જવાબ ન આપો તો તે એલર્ટ શરૂ કરે છે. | [ ] |
+| `checkinSetting.after` | Ask me after | इतनी देर बाद पूछें | આટલા સમય પછી પૂછો | [ ] |
+| `checkinSetting.minutes` | {{count}} minutes | {{count}} मिनट | {{count}} મિનિટ | [ ] |
+| `checkinSetting.limits` | This works only while the app is open on your screen. It cannot detect a fall by itself and cannot run when the app is closed. | यह तभी काम करता है जब ऐप आपकी स्क्रीन पर खुला हो। यह खुद गिरना नहीं पहचान सकता और ऐप बंद होने पर नहीं चल सकता। | આ ત્યારે જ કામ કરે છે જ્યારે એપ તમારી સ્ક્રીન પર ખુલ્લી હોય. તે જાતે પડી જવું ઓળખી શકતું નથી અને એપ બંધ હોય ત્યારે ચાલી શકતું નથી. | [ ] |
+| `checkinSetting.failed` | Could not save. The setting was put back. | सहेजा नहीं जा सका। सेटिंग पहले जैसी कर दी गई। | સાચવી શકાયું નથી. સેટિંગ પહેલાં જેવું કરી દેવાયું. | [ ] |
+| `sms.title` | No internet. Tell your contacts by SMS | इंटरनेट नहीं है। अपने संपर्कों को SMS से बताएँ | ઇન્ટરનેટ નથી. તમારા સંપર્કોને SMS થી જણાવો | [ ] |
+| `sms.help` | Your phone will open its messages app with the text ready. You must press send yourself. | आपका फ़ोन संदेश ऐप खोलेगा और पाठ तैयार रहेगा। भेजें आपको खुद दबाना होगा। | તમારો ફોન મેસેજ એપ ખોલશે અને લખાણ તૈયાર હશે. મોકલો તમારે જાતે દબાવવું પડશે. | [ ] |
+| `sms.textLabel` | The text that will be used: | इस्तेमाल होने वाला पाठ: | વપરાનાર લખાણ: | [ ] |
+| `sms.body` | I need help. This is a simulated alert from the HealthTwin demo. | मुझे मदद चाहिए। यह HealthTwin डेमो का सिमुलेटेड अलर्ट है। | મને મદદ જોઈએ છે. આ HealthTwin ડેમોનું સિમ્યુલેટેડ એલર્ટ છે. | [ ] |
+| `sms.button` | SMS {{name}} | {{name}} को SMS करें | {{name}} ને SMS કરો | [ ] |
+| `sms.loading` | Loading your contacts... | आपके संपर्क लोड हो रहे हैं... | તમારા સંપર્કો લોડ થઈ રહ્યા છે... | [ ] |
+| `sms.cannotKnow` | The app cannot tell whether an SMS was sent. Call 112 / 108 if you need help now. | ऐप यह नहीं जान सकता कि SMS भेजा गया या नहीं। अभी मदद चाहिए तो 112 / 108 पर कॉल करें। | એપ જાણી શકતી નથી કે SMS મોકલાયો કે નહીં. હમણાં મદદ જોઈએ તો 112 / 108 પર કૉલ કરો. | [ ] |
+| `reminders.title` | Medicine reminders | दवा के रिमाइंडर | દવાના રિમાઇન્ડર | [ ] |
+| `reminders.openOnly` | Reminders only work while this app is open. Do not rely on them for medicines you cannot miss. | रिमाइंडर तभी काम करते हैं जब यह ऐप खुला हो। जो दवाएँ छूट नहीं सकतीं, उनके लिए इन पर निर्भर न रहें। | રિમાઇન્ડર ત્યારે જ કામ કરે છે જ્યારે આ એપ ખુલ્લી હોય. જે દવાઓ ચૂકી શકાય નહીં તેના માટે તેના પર આધાર રાખશો નહીં. | [ ] |
+| `reminders.missed` | Missed a dose? Ask your doctor or pharmacist what to do. | कोई खुराक छूट गई? अपने डॉक्टर या फ़ार्मासिस्ट से पूछें कि क्या करना है। | કોઈ ડોઝ ચૂકી ગયા? શું કરવું તે તમારા ડૉક્ટર અથવા ફાર્માસિસ્ટને પૂછો. | [ ] |
+| `reminders.loading` | Loading your reminders... | आपके रिमाइंडर लोड हो रहे हैं... | તમારા રિમાઇન્ડર લોડ થઈ રહ્યા છે... | [ ] |
+| `reminders.loadError` | Could not load your reminders. | आपके रिमाइंडर लोड नहीं हो सके। | તમારા રિમાઇન્ડર લોડ થઈ શક્યા નથી. | [ ] |
+| `reminders.add` | Add a reminder | रिमाइंडर जोड़ें | રિમાઇન્ડર ઉમેરો | [ ] |
+| `reminders.addTitle` | New reminder | नया रिमाइंडर | નવું રિમાઇન્ડર | [ ] |
+| `reminders.editTitle` | Edit reminder | रिमाइंडर बदलें | રિમાઇન્ડર બદલો | [ ] |
+| `reminders.name` | Medicine name | दवा का नाम | દવાનું નામ | [ ] |
+| `reminders.doseNote` | Dose note (as written by your doctor) | खुराक का नोट (जैसा आपके डॉक्टर ने लिखा है) | ડોઝની નોંધ (તમારા ડૉક્ટરે લખ્યા મુજબ) | [ ] |
+| `reminders.times` | Times | समय | સમય | [ ] |
+| `reminders.timeN` | Time {{n}} | समय {{n}} | સમય {{n}} | [ ] |
+| `reminders.addTime` | Add a time | समय जोड़ें | સમય ઉમેરો | [ ] |
+| `reminders.removeTime` | Remove | हटाएँ | દૂર કરો | [ ] |
+| `reminders.days` | Days | दिन | દિવસો | [ ] |
+| `reminders.saveError` | Could not save. Please try again. | सहेजा नहीं जा सका। कृपया दोबारा कोशिश करें। | સાચવી શકાયું નથી. કૃપા કરીને ફરી પ્રયાસ કરો. | [ ] |
+| `reminders.empty` | You have no reminders yet. | आपके पास अभी कोई रिमाइंडर नहीं है। | તમારી પાસે હજી કોઈ રિમાઇન્ડર નથી. | [ ] |
+| `reminders.maxReached` | You can have at most {{count}} reminders. | आपके अधिकतम {{count}} रिमाइंडर हो सकते हैं। | તમારા વધુમાં વધુ {{count}} રિમાઇન્ડર હોઈ શકે. | [ ] |
+| `reminders.paused` | Paused | रुका हुआ | થોભાવેલું | [ ] |
+| `reminders.pause` | Pause | रोकें | થોભાવો | [ ] |
+| `reminders.resume` | Resume | फिर शुरू करें | ફરી શરૂ કરો | [ ] |
+| `reminders.everyDay` | Every day | हर दिन | દરરોજ | [ ] |
+| `reminders.next` | Next: {{time}} | अगला: {{time}} | આગળનું: {{time}} | [ ] |
+| `reminders.deleteConfirm` | Delete the reminder for {{name}}? | {{name}} का रिमाइंडर हटाएँ? | {{name}} નું રિમાઇન્ડર કાઢી નાખવું છે? | [ ] |
+| `reminders.logTitle` | Last 7 days | पिछले 7 दिन | છેલ્લા 7 દિવસ | [ ] |
+| `reminders.logEmpty` | Nothing recorded yet. | अभी कुछ दर्ज नहीं हुआ। | હજી કંઈ નોંધાયું નથી. | [ ] |
+| `reminders.takenAt` | Marked taken at {{time}} | {{time}} पर लिया हुआ चिह्नित | {{time}} એ લીધેલું ચિહ્નિત | [ ] |
+| `reminders.notMarked` | Not marked as taken | लिया हुआ चिह्नित नहीं | લીધેલું ચિહ્નિત નથી | [ ] |
+| `reminders.bannerLabel` | Medicine reminder | दवा का रिमाइंडर | દવાનું રિમાઇન્ડર | [ ] |
+| `reminders.timeFor` | Time for: {{name}} | समय हो गया: {{name}} | સમય થયો: {{name}} | [ ] |
+| `reminders.dueAt` | Due at {{time}} | नियत समय {{time}} | નિયત સમય {{time}} | [ ] |
+| `reminders.more` | {{count}} more due | {{count}} और बाकी | {{count}} વધુ બાકી | [ ] |
+| `reminders.taken` | Taken | ले ली | લીધી | [ ] |
+| `reminders.snooze` | Remind me in 10 minutes | 10 मिनट बाद याद दिलाएँ | 10 મિનિટ પછી યાદ અપાવો | [ ] |
+| `reminders.notifyTitle` | Reminder from HealthTwin | HealthTwin की ओर से रिमाइंडर | HealthTwin તરફથી રિમાઇન્ડર | [ ] |
+| `reminders.notifyBody` | Open the app to see it. | देखने के लिए ऐप खोलें। | જોવા માટે એપ ખોલો. | [ ] |
+| `reminders.err.name` | Enter the medicine name. | दवा का नाम लिखें। | દવાનું નામ લખો. | [ ] |
+| `reminders.err.nameLong` | Use 60 characters or fewer. | 60 अक्षर या उससे कम रखें। | 60 અક્ષર કે તેથી ઓછા રાખો. | [ ] |
+| `reminders.err.noteLong` | Use 60 characters or fewer. | 60 अक्षर या उससे कम रखें। | 60 અક્ષર કે તેથી ઓછા રાખો. | [ ] |
+| `reminders.err.times` | Add at least one valid time. | कम से कम एक सही समय जोड़ें। | ઓછામાં ઓછો એક સાચો સમય ઉમેરો. | [ ] |
+| `reminders.err.timesRepeat` | Each time must be different. | हर समय अलग होना चाहिए। | દરેક સમય અલગ હોવો જોઈએ. | [ ] |
+| `reminders.err.days` | Choose at least one day. | कम से कम एक दिन चुनें। | ઓછામાં ઓછો એક દિવસ પસંદ કરો. | [ ] |
+| `summary.title` | Alert record | अलर्ट का रिकॉर्ड | એલર્ટનો રેકોર્ડ | [ ] |
+| `summary.record` | This is a record of what the app did. It does not describe your health. | यह इसका रिकॉर्ड है कि ऐप ने क्या किया। यह आपके स्वास्थ्य के बारे में कुछ नहीं बताता। | આ એપે શું કર્યું તેનો રેકોર્ડ છે. તે તમારા સ્વાસ્થ્ય વિશે કંઈ જણાવતો નથી. | [ ] |
+| `summary.loading` | Loading the record... | रिकॉर्ड लोड हो रहा है... | રેકોર્ડ લોડ થઈ રહ્યો છે... | [ ] |
+| `summary.notFound` | This record was not found. | यह रिकॉर्ड नहीं मिला। | આ રેકોર્ડ મળ્યો નથી. | [ ] |
+| `summary.error` | Could not load this record. | यह रिकॉर्ड लोड नहीं हो सका। | આ રેકોર્ડ લોડ થઈ શક્યો નથી. | [ ] |
+| `summary.docTitle` | HealthTwin AI: record of an alert (simulated) | HealthTwin AI: अलर्ट का रिकॉर्ड (सिमुलेटेड) | HealthTwin AI: એલર્ટનો રેકોર્ડ (સિમ્યુલેટેડ) | [ ] |
+| `summary.started` | Started: {{time}} | शुरू हुआ: {{time}} | શરૂ થયું: {{time}} | [ ] |
+| `summary.startedBy` | Started by: {{who}} | किसने शुरू किया: {{who}} | કોણે શરૂ કર્યું: {{who}} | [ ] |
+| `summary.by.MANUAL` | You (emergency button) | आपने (आपातकालीन बटन) | તમે (કટોકટી બટન) | [ ] |
+| `summary.by.FALL_CHECK` | Safety check-in (simulated fall) | सुरक्षा जाँच (सिमुलेटेड गिरना) | સલામતી તપાસ (સિમ્યુલેટેડ પડી જવું) | [ ] |
+| `summary.by.INACTIVITY_CHECK` | Safety check-in (no activity) | सुरक्षा जाँच (कोई गतिविधि नहीं) | સલામતી તપાસ (કોઈ પ્રવૃત્તિ નહીં) | [ ] |
+| `summary.timeline` | Timeline | समयरेखा | સમયરેખા | [ ] |
+| `summary.after.ack` | Hospital acknowledged after {{time}} | अस्पताल ने {{time}} बाद पुष्टि की | હોસ્પિટલે {{time}} પછી સ્વીકાર્યું | [ ] |
+| `summary.after.dispatch` | Ambulance dispatched after {{time}} | एम्बुलेंस {{time}} बाद रवाना की गई | એમ્બ્યુલન્સ {{time}} પછી રવાના કરાઈ | [ ] |
+| `summary.after.arrive` | Ambulance arrived after {{time}} | एम्बुलेंस {{time}} बाद पहुँची | એમ્બ્યુલન્સ {{time}} પછી પહોંચી | [ ] |
+| `summary.after.handover` | Handover done after {{time}} | हस्तांतरण {{time}} बाद पूरा हुआ | સોંપણી {{time}} પછી પૂર્ણ થઈ | [ ] |
+| `summary.minSec` | {{m}} min {{s}} s | {{m}} मिनट {{s}} सेकंड | {{m}} મિનિટ {{s}} સેકન્ડ | [ ] |
+| `summary.sec` | {{s}} s | {{s}} सेकंड | {{s}} સેકન્ડ | [ ] |
+| `summary.sharedTitle` | Shared with the hospital | अस्पताल के साथ साझा किया गया | હોસ્પિટલ સાથે શેર કર્યું | [ ] |
+| `summary.nothingShared` | Nothing was shared. | कुछ भी साझा नहीं किया गया। | કંઈ શેર કરાયું નથી. | [ ] |
+| `summary.hospital` | Hospital | अस्पताल | હોસ્પિટલ | [ ] |
+| `summary.contactsTitle` | Contacts notified (simulated) | सूचित संपर्क (सिमुलेटेड) | જાણ કરાયેલા સંપર્કો (સિમ્યુલેટેડ) | [ ] |
+| `summary.symptomsTitle` | Symptoms you reported | आपके बताए लक्षण | તમે જણાવેલા લક્ષણો | [ ] |
+| `summary.readingsTitle` | Readings at the time of the alert | अलर्ट के समय की रीडिंग | એલર્ટ સમયના રીડિંગ | [ ] |
+| `summary.none` | None | कोई नहीं | કોઈ નહીં | [ ] |
+| `summary.notesTitle` | Questions for my doctor | मेरे डॉक्टर के लिए प्रश्न | મારા ડૉક્ટર માટે પ્રશ્નો | [ ] |
+| `summary.notesPlaceholder` | Type your own notes here. They stay on this screen and are added to the text you share. | अपने नोट यहाँ लिखें। वे इसी स्क्रीन पर रहते हैं और आप जो पाठ साझा करते हैं उसमें जुड़ जाते हैं। | તમારી પોતાની નોંધ અહીં લખો. તે આ સ્ક્રીન પર જ રહે છે અને તમે શેર કરો છો તે લખાણમાં ઉમેરાય છે. | [ ] |
+| `summary.footer` | Prepared by the app. Not verified by a doctor. | ऐप द्वारा तैयार किया गया। डॉक्टर द्वारा सत्यापित नहीं। | એપ દ્વારા તૈયાર કરાયું. ડૉક્ટર દ્વારા ચકાસાયેલું નથી. | [ ] |
+| `summary.share` | Share | साझा करें | શેર કરો | [ ] |
+| `summary.copy` | Copy text | पाठ कॉपी करें | લખાણ કૉપિ કરો | [ ] |
+| `summary.download` | Download as text file | टेक्स्ट फ़ाइल डाउनलोड करें | ટેક્સ્ટ ફાઇલ ડાઉનલોડ કરો | [ ] |
+| `summary.print` | Print / Save as PDF | प्रिंट करें / PDF में सहेजें | પ્રિન્ટ કરો / PDF માં સાચવો | [ ] |
+| `summary.copied` | Copied. | कॉपी हो गया। | કૉપિ થઈ ગયું. | [ ] |
+| `summary.copyFailed` | Could not copy. Use Download instead. | कॉपी नहीं हो सका। इसके बजाय डाउनलोड करें। | કૉપિ થઈ શક્યું નથી. તેના બદલે ડાઉનલોડ કરો. | [ ] |
+| `summary.downloaded` | Downloaded. | डाउनलोड हो गया। | ડાઉનલોડ થઈ ગયું. | [ ] |
+| `summary.shareFailed` | Could not share. Use Copy or Download instead. | साझा नहीं हो सका। इसके बजाय कॉपी या डाउनलोड करें। | શેર થઈ શક્યું નથી. તેના બદલે કૉપિ અથવા ડાઉનલોડ કરો. | [ ] |
+| `summary.shareNote` | You choose where this goes. The app does not upload or send it. | यह कहाँ जाएगा, यह आप तय करते हैं। ऐप इसे अपलोड या भेजता नहीं है। | આ ક્યાં જશે તે તમે નક્કી કરો છો. એપ તેને અપલોડ કે મોકલતી નથી. | [ ] |
+| `past.title` | Past alerts | पिछले अलर्ट | અગાઉના એલર્ટ | [ ] |
+| `past.none` | No past alerts yet. | अभी कोई पिछला अलर्ट नहीं है। | હજી કોઈ અગાઉનું એલર્ટ નથી. | [ ] |
+
+## Phase 6 additions: everything else (50 strings)
+
+Demo panel and rehearsal checklist text (only visible in demo builds) and small labels.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `unit.bpm` | bpm | bpm | bpm | [ ] |
+| `unit.percent` | % | % | % | [ ] |
+| `unit.mgdl` | mg/dL | mg/dL | mg/dL | [ ] |
+| `unit.perMinute` | per minute | प्रति मिनट | પ્રતિ મિનિટ | [ ] |
+| `unit.mmhg` | mmHg | mmHg | mmHg | [ ] |
+| `emergency.fromCheckIn` | Started because you did not answer the safety check-in (simulated) | शुरू हुआ क्योंकि आपने सुरक्षा जाँच का जवाब नहीं दिया (सिमुलेटेड) | શરૂ થયું કારણ કે તમે સલામતી તપાસનો જવાબ આપ્યો નહીં (સિમ્યુલેટેડ) | [ ] |
+| `emergency.backOnlineSending` | Back online. Sending your alert... | इंटरनेट वापस आ गया। आपका अलर्ट भेजा जा रहा है... | ઇન્ટરનેટ પાછું આવ્યું. તમારું એલર્ટ મોકલાઈ રહ્યું છે... | [ ] |
+| `emergency.backOnlineSent` | Back online. Your alert was sent. | इंटरनेट वापस आ गया। आपका अलर्ट भेज दिया गया। | ઇન્ટરનેટ પાછું આવ્યું. તમારું એલર્ટ મોકલાઈ ગયું. | [ ] |
+| `emergency.viewSummary` | See the record of this alert | इस अलर्ट का रिकॉर्ड देखें | આ એલર્ટનો રેકોર્ડ જુઓ | [ ] |
+| `emergencyType.UNKNOWN` | Safety check-in | सुरक्षा जाँच | સલામતી તપાસ | [ ] |
+| `home.reminders` | Medicine reminders | दवा के रिमाइंडर | દવાના રિમાઇન્ડર | [ ] |
+| `profile.reminders` | Medicine reminders | दवा के रिमाइंडर | દવાના રિમાઇન્ડર | [ ] |
+| `demo.status` | Speed {{speed}}× · Vitals: {{profile}} | गति {{speed}}× · वाइटल्स: {{profile}} | ઝડપ {{speed}}× · વાઇટલ્સ: {{profile}} | [ ] |
+| `demo.statusLoading` | Loading demo state... | डेमो की स्थिति लोड हो रही है... | ડેમોની સ્થિતિ લોડ થઈ રહી છે... | [ ] |
+| `demo.speedTitle` | Speed | गति | ઝડપ | [ ] |
+| `demo.speedHelp` | Applies to alerts started after you change it. | बदलाव के बाद शुरू होने वाले अलर्ट पर लागू होता है। | બદલ્યા પછી શરૂ થતા એલર્ટ પર લાગુ પડે છે. | [ ] |
+| `demo.profileTitle` | Simulated wearable (vitals profile) | सिमुलेटेड वियरेबल (वाइटल्स प्रोफ़ाइल) | સિમ્યુલેટેડ વેરેબલ (વાઇટલ્સ પ્રોફાઇલ) | [ ] |
+| `demo.profile.normal` | Resting | आराम की स्थिति | આરામની સ્થિતિ | [ ] |
+| `demo.profile.heart_attack` | Heart emergency | हृदय आपातकाल | હૃદય કટોકટી | [ ] |
+| `demo.profile.stroke` | Stroke | स्ट्रोक | સ્ટ્રોક | [ ] |
+| `demo.profile.low_glucose` | Low glucose | कम ग्लूकोज़ | ઓછું ગ્લુકોઝ | [ ] |
+| `demo.profile.asthma` | Asthma | अस्थमा | અસ્થમા | [ ] |
+| `demo.pinTitle` | Pin a value (leave empty for automatic) | कोई मान तय करें (खाली छोड़ें तो अपने आप) | કોઈ કિંમત નક્કી કરો (ખાલી રાખો તો આપોઆપ) | [ ] |
+| `demo.vital.heart_rate` | Heart rate | हृदय गति | હૃદયના ધબકારા | [ ] |
+| `demo.vital.spo2` | SpO2 | SpO2 | SpO2 | [ ] |
+| `demo.vital.bp_sys` | BP top number | रक्तचाप ऊपर की संख्या | બ્લડ પ્રેશર ઉપરનો આંકડો | [ ] |
+| `demo.vital.bp_dia` | BP bottom number | रक्तचाप नीचे की संख्या | બ્લડ પ્રેશર નીચેનો આંકડો | [ ] |
+| `demo.vital.glucose` | Glucose | ग्लूकोज़ | ગ્લુકોઝ | [ ] |
+| `demo.vital.resp_rate` | Breathing rate | साँस की दर | શ્વાસનો દર | [ ] |
+| `demo.pinApply` | Apply | लागू करें | લાગુ કરો | [ ] |
+| `demo.pinClear` | Clear pinned values | तय किए मान हटाएँ | નક્કી કરેલી કિંમતો હટાવો | [ ] |
+| `demo.simTitle` | Simulate | सिमुलेट करें | સિમ્યુલેટ કરો | [ ] |
+| `demo.fall` | Simulated fall | सिमुलेटेड गिरना | સિમ્યુલેટેડ પડી જવું | [ ] |
+| `demo.offline` | No data connection (simulated) | डेटा कनेक्शन नहीं (सिमुलेटेड) | ડેટા કનેક્શન નથી (સિમ્યુલેટેડ) | [ ] |
+| `demo.serverError` | Server errors (simulated) | सर्वर त्रुटियाँ (सिमुलेटेड) | સર્વર ભૂલો (સિમ્યુલેટેડ) | [ ] |
+| `demo.simHelp` | These switches only change the app's behaviour. They never touch your real network. Reset turns them off. | ये स्विच केवल ऐप का व्यवहार बदलते हैं। ये आपके असली नेटवर्क को नहीं छूते। रीसेट करने पर ये बंद हो जाते हैं। | આ સ્વિચ ફક્ત એપની વર્તણૂક બદલે છે. તે તમારા સાચા નેટવર્કને અડતા નથી. રીસેટ કરવાથી તે બંધ થાય છે. | [ ] |
+| `rehearsal.title` | Rehearsal script | रिहर्सल सूची | રિહર્સલ યાદી | [ ] |
+| `rehearsal.reset` | Press Reset demo, then sign in | डेमो रीसेट दबाएँ, फिर साइन इन करें | ડેમો રીસેટ દબાવો, પછી સાઇન ઇન કરો | [ ] |
+| `rehearsal.home` | Home: live vitals, trend and usual range | होम: लाइव वाइटल्स, ट्रेंड और सामान्य सीमा | હોમ: લાઇવ વાઇટલ્સ, ટ્રેન્ડ અને સામાન્ય સીમા | [ ] |
+| `rehearsal.language` | Switch to Hindi, then Gujarati, then English | हिन्दी, फिर ગુજરાતી, फिर English चुनें | હિન્દી, પછી ગુજરાતી, પછી English પસંદ કરો | [ ] |
+| `rehearsal.profile` | Choose the Heart emergency profile and watch the trend change | हृदय आपातकाल प्रोफ़ाइल चुनें और ट्रेंड बदलते देखें | હૃદય કટોકટી પ્રોફાઇલ પસંદ કરો અને ટ્રેન્ડ બદલાતો જુઓ | [ ] |
+| `rehearsal.scenario` | Run a scenario (for example Stroke) | एक परिदृश्य चलाएँ (जैसे स्ट्रोक) | એક પરિદૃશ્ય ચલાવો (જેમ કે સ્ટ્રોક) | [ ] |
+| `rehearsal.why` | Open Why this alert | "यह अलर्ट क्यों" खोलें | "આ એલર્ટ કેમ" ખોલો | [ ] |
+| `rehearsal.contacts` | Point out the contacts notified and Time since alert | सूचित संपर्क और अलर्ट के बाद का समय दिखाएँ | જાણ કરાયેલા સંપર્કો અને એલર્ટ પછીનો સમય બતાવો | [ ] |
+| `rehearsal.summary` | Open the alert record and show Share | अलर्ट का रिकॉर्ड खोलें और साझा करना दिखाएँ | એલર્ટનો રેકોર્ડ ખોલો અને શેર કરવું બતાવો | [ ] |
+| `rehearsal.passport` | Create the passport QR and open the responder page | पासपोर्ट QR बनाएँ और सहायक का पेज खोलें | પાસપોર્ટ QR બનાવો અને સહાયકનું પેજ ખોલો | [ ] |
+| `rehearsal.offline` | Turn on No data connection and show the SMS card | डेटा कनेक्शन नहीं चालू करें और SMS कार्ड दिखाएँ | ડેટા કનેક્શન નથી ચાલુ કરો અને SMS કાર્ડ બતાવો | [ ] |
+| `rehearsal.fall` | Press Simulated fall and let the check-in time out | सिमुलेटेड गिरना दबाएँ और जाँच का समय पूरा होने दें | સિમ્યુલેટેડ પડી જવું દબાવો અને તપાસનો સમય પૂરો થવા દો | [ ] |
+| `rehearsal.reminder` | Show the medicine reminders screen | दवा के रिमाइंडर की स्क्रीन दिखाएँ | દવાના રિમાઇન્ડરની સ્ક્રીન બતાવો | [ ] |
+| `screen.needsConnection` | This screen needs an internet connection the first time you open it. Go back, or call 112 / 108 if you need help now. | यह स्क्रीन पहली बार खोलने पर इंटरनेट माँगती है। वापस जाएँ, या अभी मदद चाहिए तो 112 / 108 पर कॉल करें। | આ સ્ક્રીન પહેલી વાર ખોલતી વખતે ઇન્ટરનેટ માંગે છે. પાછા જાઓ, અથવા હમણાં મદદ જોઈએ તો 112 / 108 પર કૉલ કરો. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

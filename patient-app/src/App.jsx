@@ -6,6 +6,8 @@ import OfflineBanner from './components/OfflineBanner';
 import SkipLink from './components/SkipLink';
 import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
+import ReminderBanner from './components/ReminderBanner';
+import SafetyCheckInHost from './components/SafetyCheckInHost';
 import AppRoutes from './routes';
 import useAuth from './hooks/useAuth';
 import useLanguageSync from './hooks/useLanguageSync';
@@ -27,11 +29,13 @@ export default function App() {
       <SimulatedBanner />
       <main id="main" tabIndex={-1} className="flex-1 p-4">
         <OfflineBanner />
+        {isLoggedIn && !pathname.startsWith('/p/') && <ReminderBanner />}
         <ErrorBoundary key={pathname}>
           <AppRoutes />
         </ErrorBoundary>
       </main>
       {showNav && <BottomNav />}
+      {isLoggedIn && <SafetyCheckInHost />}
     </div>
   );
 }

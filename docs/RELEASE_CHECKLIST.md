@@ -6,12 +6,12 @@ Honest status of a SIMULATED prototype. A tick means it was run, with the result
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests | `npm run test:unit -w patient-app` | 28 passed (6 files) |
-| Browser tests | `npm run test:browser -w patient-app` | 7 of 7 files, 199 checks passed (emergency 29, data 37, language and voice 51, offline 21, accessibility 24, passport 28, resilience 9) |
-| API contract (mock server) | `npm run contract` | 16 of 16 passed |
+| Unit tests | `npm run test:unit -w patient-app` | 74 passed (13 files) |
+| Browser tests | `npm run test:browser -w patient-app` | 10 of 10 files, 275 checks passed (emergency 29, data 37, language and voice 51, offline 21, accessibility 24, passport 28, resilience 9, phase6-alert 28, phase6-safety 26, phase6-reminders 22) |
+| API contract (mock server) | `npm run contract` | 20 of 20 passed |
 | Integration (events) | `npm run integration` | all checks passed (10 event types, agreed shape) |
-| Accessibility audit (axe-core) | `npm run audit` | 13 screens x 3 languages: 0 violations |
-| Production build | `npm run build` | precache 406 KiB (limit 450 KiB), main script 108 KiB gzip |
+| Accessibility audit (axe-core) | `npm run audit` | 19 screens x 3 languages: 0 violations |
+| Production build | `npm run build` | precache 437.9 KiB (limit 450 KiB; tight). Passport, Reminders, Summary and the demo panel are lazy-loaded and cached when first opened, so they are NOT available offline on a first visit |
 | Console | all browser tests | no unexpected errors or warnings |
 
 `npm test` runs the unit tests and the browser tests in one command (about 4.5 minutes). The CI workflow `.github/workflows/ci.yml` runs build, unit tests, contract, integration, audit and browser tests. **It has not been run on GitHub from here**; the same commands were run locally, including from a clean clone (see the end of this file).

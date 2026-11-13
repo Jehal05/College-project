@@ -2,8 +2,10 @@
 // Timing is divided by DEMO_SPEED (default 1) so demos can run faster, e.g. DEMO_SPEED=5.
 const store = require('./store');
 const { chooseHospital, DEMO_LOCATION } = require('./helpers');
+const { getSpeed } = require('./demoState');
+const { evaluate } = require('./rules');
+const { currentVitals } = require('./vitals');
 
-const SPEED = Number(process.env.DEMO_SPEED) || 1;
 let wss = null; // set by server.js
 const timers = new Map(); // emergency id -> list of timeouts
 
@@ -28,7 +30,7 @@ function emit(emergency, type, state, payload = {}, patch = {}) {
 }
 
 function later(emergency, nominalMs, fn) {
-  const handle = setTimeout(fn, nominalMs / SPEED);
+  const handle = setTimeout(fn, nominalMs / getSpeed()); // the speed can change between emergencies (/demo/speed)
   if (!timers.has(emergency.id)) timers.set(emergency.id, []);
   timers.get(emergency.id).push(handle);
 }
@@ -40,17 +42,35 @@ function stopTimers(id) {
 
 function stopAll() { [...timers.keys()].forEach(stopTimers); }
 
+// The readings the rules engine and the summary use. Only when the patient shares vitals.
+const VITAL_KEYS = ['heart_rate', 'spo2', 'bp_sys', 'bp_dia', 'glucose', 'resp_rate'];
+function sharedVitals(consents) {
+  if (consents && consents.vitals === false) return null;
+  const reading = currentVitals();
+  return { ...Object.fromEntries(VITAL_KEYS.map((k) => [k, reading[k]])), timestamp: reading.timestamp };
+}
+
 // Create an emergency in state EMERGENCY_DETECTED and announce it.
-function createEmergency({ patient_id, type, symptoms, consents }) {
+// source says what started it: MANUAL (the person), FALL_CHECK or INACTIVITY_CHECK (the safety check-in).
+function createEmergency({ patient_id, type, symptoms, consents, source }) {
   const id = store.nextEmergencyId();
+  const patient = store.patients[patient_id] || {};
+  const shared = { ...(patient.consents || {}), ...(consents || {}) }; // consent as it was when the alert started
+  const vitals_at_alert = sharedVitals(shared);
+  const reasons = {
+    ...evaluate(symptoms, vitals_at_alert || {}),
+    inputs: { symptoms, vitals: vitals_at_alert ? Object.fromEntries(VITAL_KEYS.map((k) => [k, vitals_at_alert[k]])) : {},
+      vitals_at: vitals_at_alert ? vitals_at_alert.timestamp : null },
+    simulated: true,
+  };
   const emergency = {
-    id, patient_id, type, symptoms, consents: consents || null, location: null,
+    id, patient_id, type, symptoms, consents: shared, location: null, source: source || 'MANUAL', reasons, vitals_at_alert,
     state: 'EMERGENCY_DETECTED', severity: 'EMERGENCY', hospital: null, ambulance: null, eta_seconds: null,
     status_events: [{ state: 'EMERGENCY_DETECTED', timestamp: new Date().toISOString() }],
   };
   store.emergencies.set(id, emergency);
-  broadcast({ type: 'emergency.created', emergency_id: id, state: emergency.state,
-    timestamp: emergency.status_events[0].timestamp, payload: { type, severity: emergency.severity, symptoms } });
+  broadcast({ type: 'emergency.created', emergency_id: id, state: emergency.state, timestamp: emergency.status_events[0].timestamp,
+    payload: { type, severity: emergency.severity, symptoms, source: emergency.source, reasons } });
   return emergency;
 }
 

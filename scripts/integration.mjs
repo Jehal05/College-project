@@ -25,7 +25,7 @@ const events = []; const t0 = Date.now(); const ws = new WebSocket(BASE.replace(
 ws.onmessage = (m) => { const e = JSON.parse(m.data); if (e.type !== 'vitals.update') events.push({ ...e, at: Date.now() - t0 }); };
 await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('cannot open the WebSocket')); });
 
-const made = await api('POST', '/emergencies', tok, { patient_id: 'HT-1001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] });
+const made = await api('POST', '/emergencies', tok, { patient_id: 'HT-1001', type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'], source: 'MANUAL' });
 await api('POST', '/emergencies/' + made.id + '/sos', tok, { location: { lat: 21.17, lng: 72.83, accuracy: 20, source: 'gps' } });
 const passport = await api('POST', '/patients/HT-1001/passport', tok, { hours: 1 }); await api('GET', '/passport/' + passport.token);
 for (let i = 0; i < 400 && !events.some((e) => e.type === 'emergency.handover_done'); i++) await new Promise((r) => setTimeout(r, 250));
@@ -43,6 +43,11 @@ const types = new Set(mine.map((e) => e.type)); const missing = REQUIRED.filter(
 const notified = mine.find((e) => e.type === 'contacts.notified');
 notified && JSON.stringify(notified).match(/\+?\d{8,}/) ? problem('contacts.notified contains a phone number') : ok('contacts.notified has names only (no phone numbers)');
 const loc = mine.find((e) => e.type === 'ambulance.location'); loc && typeof loc.payload.lat === 'number' && typeof loc.payload.eta_seconds === 'number' ? ok('ambulance.location carries lat, lng and eta_seconds') : problem('ambulance.location lacks lat/lng/eta_seconds');
+const created = mine.find((e) => e.type === 'emergency.created');
+created && created.payload.source === 'MANUAL' ? ok('emergency.created carries source') : problem('emergency.created lacks payload.source');
+created && created.payload.reasons && Array.isArray(created.payload.reasons.matched_rules) && created.payload.reasons.reviewed === false ? ok('emergency.created carries reasons (matched_rules, reviewed:false)') : problem('emergency.created lacks payload.reasons');
+const reasonText = created ? JSON.stringify(created.payload.reasons) : '';
+/diagnos|probab|score/i.test(reasonText) ? problem('reasons contain a diagnosis, score or probability word') : ok('reasons contain no diagnosis, score or probability');
 
 console.log('\nEvent sequence (ms after start):');
 for (const e of mine) console.log('  ' + String(e.at).padStart(6) + '  ' + e.type.padEnd(26) + e.state);

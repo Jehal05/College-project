@@ -58,7 +58,7 @@ Changes apply to the NEXT emergency and to the passport page immediately.
 
 | Call | Body / answer |
 |---|---|
-| `POST /emergencies` | `{ patient_id, type (HEART\|STROKE\|DIABETIC\|ASTHMA), symptoms[ID], consents? }` -> `201 { id, state: "EMERGENCY_DETECTED", severity }`; `400` for an unknown type or a symptom not valid for that type |
+| `POST /emergencies` | `{ patient_id, type (HEART\|STROKE\|DIABETIC\|ASTHMA\|UNKNOWN for check-in alerts), symptoms[ID], consents?, source? (MANUAL\|FALL_CHECK\|INACTIVITY_CHECK, default MANUAL) }` -> `201 { id, state: "EMERGENCY_DETECTED", severity }`; `400` for an unknown type or a symptom not valid for that type |
 | `POST /emergencies/:id/sos` | `{ location?: { lat, lng, accuracy, source } }` -> `200 { id, state, hospital }`. Sending twice is harmless. `409` if cancelled |
 | `POST /emergencies/:id/cancel` | `200 { id, state: "CANCELLED" }`; `409` if already finished |
 | `GET /emergencies/:id` | `{ id, patient_id, type, symptoms[], location, state, severity, hospital, ambulance, eta_seconds, status_events[ { state, timestamp } ], contacts_notified[] }`; `404` |
@@ -101,6 +101,27 @@ Every message: `{ type, emergency_id (or null), state, timestamp, payload }`.
 
 `npm run integration` plays one emergency and checks these shapes.
 
+## Phase 6 additions
+
+| Call | Body / answer |
+|---|---|
+| `POST /emergencies` | New optional `source` (`MANUAL`, `FALL_CHECK`, `INACTIVITY_CHECK`); `400` for any other value. `type: "UNKNOWN"` with `symptoms: []` is accepted only with a check-in `source`. It is stored and returned by `GET /emergencies/:id` |
+| `GET /emergencies/:id/reasons` | `{ severity, matched_rules: [ { id, type, severity, reason, reviewed } ], inputs: { symptoms[], vitals{} }, reviewed: false, simulated: true }`. `reviewed` stays `false` until a doctor signs the rules off. Vitals are used only if the vitals consent was on. `404` for unknown ids |
+| `GET /patients/:id/emergencies` | Newest first, last 5 or more: `[ { id, started_at, source, final_state } ]` |
+| `GET /patients/:id/emergencies/:eid/summary` | `{ id, started_at, ended_at, source, final_state, simulated: true, timeline: [ { state, timestamp } ], durations: { to_acknowledged, to_dispatched, to_arrived, to_handover } (seconds or null), shared: { location, history, vitals, reports } (as consented at the time), symptoms[], vitals_at_alert{}, contacts_notified: [ { name } ], hospital: { name } or null, ambulance_id or null }`. A record of what the app did; no interpretation |
+| `GET/PUT /patients/:id/preferences` | `{ safety_checkin: { enabled: boolean, minutes: 5\|15\|30 } }`; `400` for anything else |
+| `GET/POST /patients/:id/reminders` | `{ name (max 60), dose_note (max 60), times: ["HH:MM", 1 to 4], days: [0..6] (0 = Sunday), paused }`; at most 8 (`409` on the ninth); `400` with a plain message when invalid |
+| `PUT/DELETE /patients/:id/reminders/:rid` | Update (`200`) / delete (`200`); `404` unknown |
+| `POST /patients/:id/reminders/:rid/shown` | `{ scheduled_for }` records that a reminder was shown |
+| `POST /patients/:id/reminders/:rid/taken` | `{ scheduled_for, at }`. Deviation from the Phase 6 prompt (`{ at }` only): the slot time is needed to know which dose was marked |
+| `GET /patients/:id/reminders/log` | Last 7 days: `[ { reminder_id, scheduled_for, taken_at (or null) } ]`. Only a record; no advice |
+
+`emergency.created` payload adds `source` and `reasons` (same object as `/reasons`). `vitals.update` payload may add `bp_sys`, `bp_dia` and `resp_rate` next to the existing `bp` string (consumers that ignore them keep working).
+
+Names: the app uses `CHEST_PAIN`, the rules use `chest_pain`, `bp` is `bp_sys` + `bp_dia`. These translations live in one adapter file per side.
+
 ## Mock-only helpers (a real backend does NOT need them)
 
 `POST /demo/scenario { type }`, `POST /demo/reset`, `POST /demo/passport/expire`, `POST /demo/fail { mode: off|server|expired|slow }` (makes the mock answer 500, 401 or slowly so error handling can be tested).
+
+Phase 6 demo helpers: `POST /demo/vitals { profile?, overrides? }` (profiles `normal`, `heart_attack`, `stroke`, `low_glucose`, `asthma`; an unknown profile or an out-of-range value gives `400` and changes nothing; `{ "heart_rate": null }` inside `overrides` clears one pinned value; `{}` clears all), `POST /demo/speed { multiplier }` (only 1, 2, 5, 10, 20; applies to timers started afterwards), `GET /demo/state` (`{ speed, allowed_speeds, vitals: { profile, overrides, profiles } }`). `POST /demo/reset` returns everything to normal, including reminders, past emergencies and preferences.

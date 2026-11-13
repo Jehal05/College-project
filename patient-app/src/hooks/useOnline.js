@@ -3,6 +3,7 @@
 // in the app (event "ht:network-fail") also flips it to offline; while offline we check /health every 5 s.
 import { useSyncExternalStore } from 'react';
 import { API_URL } from '../services/api';
+import { isSimulatedOffline, onSimulatedOffline } from '../utils/simulatedOffline';
 
 let online = typeof navigator === 'undefined' ? true : navigator.onLine;
 let timer = null;
@@ -36,7 +37,12 @@ window.addEventListener('online', ping);
 window.addEventListener('ht:network-fail', () => setOnline(false));
 if (!online) setOnline(false); // starts the 5 second check
 
-const subscribe = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
+// The demo panel can also switch "no data connection" on (utils/simulatedOffline.js), so the SMS fallback can be rehearsed.
+const subscribe = (fn) => {
+  listeners.add(fn);
+  const stopSimulated = onSimulatedOffline(fn);
+  return () => { listeners.delete(fn); stopSimulated(); };
+};
 export default function useOnline() {
-  return useSyncExternalStore(subscribe, () => online);
+  return useSyncExternalStore(subscribe, () => online && !isSimulatedOffline());
 }

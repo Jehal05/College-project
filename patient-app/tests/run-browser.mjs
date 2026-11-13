@@ -13,6 +13,7 @@ const app = path.resolve(here, '..');
 const API = process.env.TEST_API_URL || 'http://localhost:4100';
 const APP = process.env.TEST_APP_URL || 'http://localhost:5273';
 const DEV = process.env.TEST_DEV_URL || 'http://localhost:5274';
+const NORMAL = process.env.TEST_NORMAL_URL || 'http://localhost:5275'; // a build WITHOUT the demo panel
 const children = [];
 const stop = () => children.forEach((c) => c.kill());
 process.on('exit', stop);
@@ -30,17 +31,20 @@ const run = (cmd, args, options) => children.push(spawn(cmd, args, { stdio: 'ign
 if (!process.env.TEST_NO_SERVERS) {
   const env = { ...process.env, VITE_API_URL: API };
   console.log('Building the app for the tests (API ' + API + ')...');
-  const build = spawnSync('npx', ['vite', 'build', '--outDir', 'dist-test', '--emptyOutDir'], { cwd: app, env, stdio: 'ignore' });
-  if (build.status !== 0) { console.error('Build failed'); process.exit(1); }
-  run('node', ['server.js'], { cwd: path.resolve(app, '../mock-server'), env: { ...env, PORT: port(API), DEMO_SPEED: '10', CORS_ORIGINS: [APP, DEV].join(',') } });
+  // The main test build has the demo panel on (VITE_DEMO_TOOLS=true); the second one is a normal build without it.
+  const build = spawnSync('npx', ['vite', 'build', '--outDir', 'dist-test', '--emptyOutDir'], { cwd: app, env: { ...env, VITE_DEMO_TOOLS: 'true' }, stdio: 'ignore' });
+  const normal = spawnSync('npx', ['vite', 'build', '--outDir', 'dist-normal', '--emptyOutDir'], { cwd: app, env, stdio: 'ignore' });
+  if (build.status !== 0 || normal.status !== 0) { console.error('Build failed'); process.exit(1); }
+  run('node', ['server.js'], { cwd: path.resolve(app, '../mock-server'), env: { ...env, PORT: port(API), DEMO_SPEED: '10', CORS_ORIGINS: [APP, DEV, NORMAL].join(',') } });
   run('npx', ['vite', 'preview', '--outDir', 'dist-test', '--port', port(APP), '--strictPort'], { cwd: app, env });
+  run('npx', ['vite', 'preview', '--outDir', 'dist-normal', '--port', port(NORMAL), '--strictPort'], { cwd: app, env });
   run('npx', ['vite', '--port', port(DEV), '--strictPort'], { cwd: app, env });
-  await waitFor(API + '/health', 'mock server'); await waitFor(APP + '/', 'app'); await waitFor(DEV + '/', 'dev server');
+  await waitFor(API + '/health', 'mock server'); await waitFor(APP + '/', 'app'); await waitFor(DEV + '/', 'dev server'); await waitFor(NORMAL + '/', 'normal build');
 }
 
 const only = process.argv[2];
 const files = readdirSync(path.join(here, 'browser')).filter((f) => f.endsWith('.test.mjs') && (!only || f.includes(only))).sort();
-const env = { ...process.env, TEST_API_URL: API, TEST_APP_URL: APP, TEST_DEV_URL: DEV };
+const env = { ...process.env, TEST_API_URL: API, TEST_APP_URL: APP, TEST_DEV_URL: DEV, TEST_NORMAL_URL: NORMAL };
 const summary = [];
 for (const file of files) {
   console.log('\n=== ' + file + ' ===');

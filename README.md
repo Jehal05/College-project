@@ -1,4 +1,4 @@
-# HealthTwin AI - Patient App (Phase 5)
+# HealthTwin AI - Patient App (Phase 6)
 
 Simulated emergency-response prototype for a college project. **Not a medical device. It never diagnoses.**
 Every screen shows: "Simulated event. Not a medical diagnosis."
@@ -157,6 +157,29 @@ score or the words normal/abnormal/risk/danger; the clock only measures time ("T
 7. **200% zoom:** no sideways scrolling.
 8. **Crash screen (dev only):** open `/demo?crash=1` with `npm run dev`; the crash screen shows the call button and the simulated banner.
 9. **Walkthrough:** follow `docs/DEMO_SCRIPT.md` once from start to end.
+Phase 6 adds a "Why this alert" card, vitals trends, a safety check-in, a demo panel, an SMS fallback, medicine reminders and a shareable alert record.
+
+## Phase 6: smarter, safer, demo-ready
+
+- **Why this alert:** collapsed card on the emergency screen. Shows what you told us, the readings (only if vitals sharing is on) and a neutral checklist line. The rules (`mock-server/data/rules.json`, copy of Daksh's v0.1) are all pending doctor review, so no rule sentence is shown. It never says what is wrong and shows no score.
+- **Vitals trend:** Home sparklines for heart rate, SpO2, blood pressure and glucose with the usual range as a band and "Within your usual range" / "Changed from your usual". Last 60 readings in memory only.
+- **Safety check-in:** Profile switch (off by default) and "Simulated fall" in the demo panel. 30 second "Are you OK?" countdown; no answer starts an alert (source `FALL_CHECK` / `INACTIVITY_CHECK`) through the normal SOS path.
+- **Demo panel (`/demo`):** scenarios, reset, speed 1x-20x, vitals profile, pinned values, simulated fall / offline / server error, rehearsal checklist. Only exists in builds made with `VITE_DEMO_TOOLS=true` (and `npm run dev`).
+- **SMS fallback:** when an alert cannot be sent for lack of internet, `sms:` links to each contact with a fixed text that holds no health data. You must press send yourself; the app cannot know whether it was sent.
+- **Medicine reminders (`/reminders`):** up to 8, stored on the mock server, in-app banner with Taken / Remind me in 10 minutes. Only works while the app is open. No dose advice.
+- **Alert record (`/summary/:id`):** timeline, durations, what was shared, contacts notified (simulated), symptoms and vitals at alert; Share, Copy, Download, Print/Save as PDF. Also under Profile > Past alerts.
+- **New endpoints:** `GET /emergencies/:id/reasons`, `GET /patients/:id/emergencies[/:eid/summary]`, `GET/PUT /patients/:id/preferences`, reminders (`/patients/:id/reminders...`), `POST /demo/vitals`, `POST /demo/speed`, `GET /demo/state` (see `docs/API_CONTRACT.md`).
+- **Honest limits:** no real fall detection (the web app does not use motion sensors and cannot run when closed); reminders only work while the app is open; SMS needs the user to tap send; wearable data is simulated; the rules engine is a mock port, not the real backend; nothing has been reviewed by a doctor or by native Hindi/Gujarati speakers.
+- **Tests:** 74 unit tests, 10 browser test files (275 checks), `npm run contract` 20 checks, `npm run integration`, `npm run audit` (19 screens x 3 languages).
+
+### Manual test checklist (Phase 6)
+
+1. `/demo`: pick a vitals profile, go Home: the sparkline moves and the label changes within a few seconds.
+2. Run a scenario, open "Why this alert": no medical sentence, no score.
+3. Press "Simulated fall": press "I'm OK"; run it again and wait 30 seconds: an alert starts; Cancel works.
+4. Switch "No data connection" on and start an emergency: SMS card, tel:112 first, no health data in the text.
+5. Reminders: add one for the next minute (keep the app open): banner appears.
+6. After an alert ends: open the record, Copy, Download.
 
 ## Phase 5: health passport, integration and release
 
