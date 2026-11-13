@@ -16,7 +16,7 @@ import { DEMO_ENABLED } from '../config/demo';
 
 export default function Login() {
   const { t } = useTranslation();
-  const { isLoggedIn, signIn } = useAuth();
+  const { isLoggedIn, session, signIn } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +24,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [notice] = useState(takeNotice); // 'expired' when the server ended the session
 
-  if (isLoggedIn) return <Navigate to="/" replace />;
+  if (isLoggedIn) return <Navigate to={session && session.role === 'FAMILY' ? '/family' : '/'} replace />;
 
   async function submit(e) {
     e.preventDefault();
@@ -32,10 +32,10 @@ export default function Login() {
     setLoading(true);
     try {
       const result = await login(email.trim(), password);
-      if (result.role !== 'PATIENT') setError(t('login.wrongRole'));
+      if (result.role !== 'PATIENT' && result.role !== 'FAMILY') setError(t('login.wrongRole'));
       else {
         signIn(result);
-        navigate('/', { replace: true });
+        navigate(result.role === 'FAMILY' ? '/family' : '/', { replace: true });
       }
     } catch (err) {
       setError(err.code === 'NETWORK' || err.code === 'TIMEOUT' ? t('login.networkError') : t('login.error'));

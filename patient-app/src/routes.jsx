@@ -23,6 +23,7 @@ const Consent = screen(() => import('./screens/Consent'));
 const Reports = screen(() => import('./screens/Reports'));
 const Reminders = screen(() => import('./screens/Reminders'));
 const Summary = screen(() => import('./screens/Summary'));
+const Family = screen(() => import('./screens/Family'));
 const DemoTools = DEMO_ENABLED ? screen(() => import('./screens/DemoTools')) : null; // left out of normal builds
 
 function Waiting() {
@@ -35,9 +36,17 @@ function Waiting() {
 }
 import NotFound from './screens/NotFound';
 
+// Patient screens. A relative who signs in goes to /family and cannot open patient screens.
 function Protected({ children }) {
-  const { isLoggedIn } = useAuth();
-  return isLoggedIn ? children : <Navigate to="/login" replace />;
+  const { isLoggedIn, session } = useAuth();
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  return session && session.role === 'FAMILY' ? <Navigate to="/family" replace /> : children;
+}
+
+function FamilyOnly({ children }) {
+  const { isLoggedIn, session } = useAuth();
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  return session && session.role === 'FAMILY' ? children : <Navigate to="/" replace />;
 }
 
 export default function AppRoutes() {
@@ -52,6 +61,7 @@ export default function AppRoutes() {
       <Route path="/reports" element={<Protected><Reports /></Protected>} />
       <Route path="/passport" element={<Protected><Passport /></Protected>} />
       <Route path="/p/:token" element={<PassportView />} />
+      <Route path="/family" element={<FamilyOnly><Family /></FamilyOnly>} />
       <Route path="/symptoms" element={<Protected><Symptoms /></Protected>} />
       <Route path="/emergency/:id" element={<Protected><Emergency /></Protected>} />
       <Route path="/cancelled" element={<Protected><Cancelled /></Protected>} />

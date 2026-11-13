@@ -204,3 +204,31 @@ and then `hospital.alerted` for the new hospital (`payload: { hospital_id, rank,
 **Always shown, whatever the consents (Phase 9 follow-up):** name, age, sex and blood group (`patient`, `patient_summary` and the passport page agree). Allergies, conditions, medications and contacts need the `history` consent. Doctor review of this minimum is still pending.
 
 **Core vs optional contract checks:** `npm run contract` counts the Phase 6 extras (safety check-in setting, medication reminders) separately as optional. A backend can skip them in its first pass: they print `OPTIONAL FAIL` and do not fail the run.
+
+## Phase 10: family, responder and admin apps (mock; shapes follow Daksh's `backend/CONTRACT.md` section 4)
+
+Shagun's three apps are shared out (see `docs/SHAGUN_WORK_SPLIT.md`). The mock now has the endpoints they need, so nobody waits for the real backend. All answers carry `"simulated": true`. A field the patient did not share is **left out**, never `null`. Contract checks: `npm run contract` (Phase 10 checks are optional, 9 of them).
+
+Demo logins (password `demo1234`): `family@demo.test` (FAMILY, not linked yet), `responder@demo.test` (RESPONDER, verified). Usernames `family1` and `responder1` (password `demo-password`) also work.
+
+| Endpoint | Who | Answer |
+|---|---|---|
+| `POST /patients/{id}/family-invites` | PATIENT (own) | `201 { code, expires_at }` (code like `FAM-4821`, valid 24 h). The demo code `FAM-0417` always works. |
+| `POST /family/link { invite_code }` | FAMILY | `200 { patient_id, name, linked }`; `404` unknown code, `410` expired, `400` missing |
+| `GET /family/patients` | FAMILY | List of `{ patient_id, name, shared_fields, vitals?, active_emergency }`. `vitals` only with the vitals consent. `active_emergency` is `null` or `{ id, state, started_at, hospital?{name}, eta_seconds?, location?{lat,lng}, checkins[] }` (location only with the location consent). Never allergies, conditions, medications, severity or phone numbers. |
+| `POST /family/checkin { patient_id, emergency_id?, message }` | FAMILY (linked) | `201 { id, emergency_id, message, at }`. `message` is `ON_MY_WAY`, `CALLING_NOW` or `CANNOT_REACH`. `403` not linked, `404` no emergency, `400` bad message. |
+| `POST /responders/register { name, email, password }` | public | `201 { id, verified:false }`; `409` email taken; `400` missing or password under 8 characters |
+| `GET /responders/alerts` | RESPONDER (verified) | List of `{ id, type, distance_m, state, accepted }`. No name, no location. `403` while not verified. |
+| `POST /responders/{id}/accept` | RESPONDER (verified) | `200 { id, accepted, patient:{name, age, allergies?}, location? }`: allergies need the history consent, location needs the location consent. `404` unknown or finished. |
+| `GET /admin/users?role=` | ADMIN | List of `{ id, email, role, disabled, verified? (responders), hospital_id?, patient_id? }`. No passwords. |
+| `PATCH /admin/users { id, disabled?, role?, verified? }` | ADMIN | The changed user. A disabled user is signed out at once and cannot log in (`403`). `409` own account, `404` unknown, `422` bad value. |
+| `GET /content/{type}` | all (admin sees unapproved too) | `{ type, version, approved, approved_by, items[] }`; `404` for unapproved content unless ADMIN. Seed: `emergency_numbers` (approved), `first_aid_basics` (not approved, because no doctor has reviewed it). |
+| `PUT /content/{type} { items, approved? }` | ADMIN | Version goes up by 1. A changed text is **not approved** unless the same request sets `approved:true`. |
+| `POST /feedback { emergency_id, rating 1-5, comment? }` | PATIENT, FAMILY (linked) | `201 { id }`; `409` second feedback for the same emergency; `422` bad rating |
+| `POST /privacy-requests { type: EXPORT or DELETE, patient_id? }` | PATIENT (own), ADMIN | `202 { id, status:"RECEIVED" }`. Nothing is exported or deleted in the mock. |
+
+**WebSocket per role.** Patients, staff and admin receive every event as before. A **family** socket receives only `family.status` (`{ emergency_id, state, timestamp, payload:{} }`) for linked patients: no vitals, no details. Re-read `GET /family/patients` when one arrives. A **verified responder** socket receives only `responder.alert` (`payload: { alert_id, distance_m, type }`). Other roles receive nothing.
+
+Audit rows added (visible to admin at `GET /audit`): `family.invite_created`, `family.link`, `family.checkin`, `responder.register`, `responder.accept`, `admin.user_update`, `content.update`, `privacy.export_request`, `privacy.delete_request`.
+
+States used by these endpoints (from Daksh's table): `SOS_SENT`, `HOSPITAL_ACKNOWLEDGED`, `AMBULANCE_DISPATCHED`, `EN_ROUTE`, `ARRIVED` count as "live".

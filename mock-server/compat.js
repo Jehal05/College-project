@@ -9,7 +9,7 @@ const { evaluate } = require('./rules');
 
 const ENGINE_TO_APP = {};
 Object.entries(SYMPTOM_TO_ENGINE).forEach(([appId, engine]) => { if (engine && !ENGINE_TO_APP[engine]) ENGINE_TO_APP[engine] = appId; });
-const USERNAMES = { patient1: 'patient@demo.test', staff1: 'staff@demo.test', admin1: 'admin@demo.test' };
+const USERNAMES = { patient1: 'patient@demo.test', staff1: 'staff@demo.test', admin1: 'admin@demo.test', family1: 'family@demo.test', responder1: 'responder@demo.test' };
 const PORTAL_LOGINS = { 'staff@demo': { email: 'staff@demo.test', role: 'staff', hospital_id: 'HSP-AMD-002' },
   'admin@demo': { email: 'admin@demo.test', role: 'admin', hospital_id: 'HSP-AMD-002' } };
 const CONSENT_KEYS = ['location', 'history', 'vitals', 'reports'];

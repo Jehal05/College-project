@@ -17,5 +17,18 @@
     "password": "demo1234",
     "role": "ADMIN",
     "patient_id": null
+  },
+  {
+    "email": "family@demo.test",
+    "password": "demo1234",
+    "role": "FAMILY",
+    "patient_id": null
+  },
+  {
+    "email": "responder@demo.test",
+    "password": "demo1234",
+    "role": "RESPONDER",
+    "patient_id": null,
+    "verified": true
   }
 ]

@@ -210,6 +210,13 @@ Mock server and one patient-app message (details in `docs/API_CONTRACT.md`, "Pha
 - Joint rehearsal now has 26 checks against the current portal (`origin/Puneet`). Reply for Puneet: `docs/REPLY_TO_PUNEET.md`.
 - Not built, waiting for Daksh: notes, chat, checklist, hospital add/edit/verify endpoints.
 
+## Phase 10: family, responder and admin work, shared out
+Shagun's three apps are shared between Jehal, Puneet and Daksh (`docs/SHAGUN_WORK_SPLIT.md`).
+- **Mock server:** endpoints for family linking and status, volunteer responders, admin users, approved content, feedback and privacy requests (`mock-server/otherApps.js`, table in `docs/API_CONTRACT.md`, "Phase 10"). Family and responder WebSockets get reduced events only. 9 optional contract checks.
+- **Family screen (patient app):** a relative signs in with `family@demo.test` (password `demo1234`), links with an invite code (`FAM-0417`, or a code the patient makes under Profile > Emergency contacts > "Invite a family member"), sees only what the patient shared, follows a plain live status and sends a check-in ("I'm on my way"). Patient screens are closed to a relative. Staff and responders are still told to use their own app.
+- Family texts are separate small files (`src/i18n/family.*.json`) loaded with the screen, so the offline install stays under budget (447 KiB of 450). **Hindi and Gujarati family texts are AI-written and need a native speaker** (add them to `docs/TRANSLATION_REVIEW.md`).
+- Not built: the responder app and the admin app (Puneet), and the real backend endpoints (Daksh).
+
 ## Phase 5: health passport, integration and release
 
 - **Health passport:** Home or Profile > "Health passport (QR)". Choose 1 hour, 24 hours (default) or 7 days and press Create. The QR holds **only a link** `<app>/p/<random token>`, never personal or health data. People scanning it see a public, read-only page (no login, 3 languages, starts with Call 112 / 108) with the name, age and blood group, and, only if the **Medical history** consent is on, allergies, conditions, medicines and emergency contacts. It says "Prepared by the patient. Not verified by a doctor." The patient can download the QR as PNG, print it, revoke it, and sees "Opened N times" (times only, no IP or device data). Expired or revoked links answer 410 and show a plain message.

@@ -11,6 +11,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import OfflineNote from '../components/OfflineNote';
 import useOnline from '../hooks/useOnline';
 import Button from '../components/ui/Button';
+import FamilyInvite from '../components/FamilyInvite';
 import Icon from '../components/icons';
 import { Skeleton } from '../components/ui/Feedback';
 
@@ -60,6 +61,7 @@ export default function Contacts() {
               {full && <p role="status" className="mt-2 text-sm text-slate-700">{t('contacts.limit')}</p>}
             </>
           )}
+          <FamilyInvite patientId={session.patient_id} disabled={!online} />
         </>
       )}
     </div>

@@ -14,7 +14,7 @@ function attach(wss) {
     if (ws.authed) return;
     const token = new URL(req.url, 'http://localhost').searchParams.get('token');
     if (token) {
-      if (valid(token)) { ws.authed = true; return; }
+      if (valid(token)) { ws.authed = true; ws.user = store.tokens.get(token); return; }
       return ws.close(1008, 'Unauthorized');
     }
     const timer = setTimeout(() => ws.close(1008, 'Unauthorized'), WAIT_MS);
@@ -23,7 +23,7 @@ function attach(wss) {
       if (ws.authed) return;
       let msg = null; try { msg = JSON.parse(raw); } catch { /* not JSON */ }
       if (!msg || msg.type !== 'auth' || !valid(msg.token)) return ws.close(1008, 'Unauthorized');
-      ws.authed = true; clearTimeout(timer);
+      ws.authed = true; ws.user = store.tokens.get(msg.token); clearTimeout(timer);
       ws.send(JSON.stringify({ event: 'auth.ok', type: 'auth.ok', emergency_id: null, timestamp: new Date().toISOString(), payload: {} }));
     });
   });

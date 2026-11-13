@@ -123,6 +123,11 @@ export const markReminderTaken = (id, rid, scheduledFor, at) =>
 export const getReminderLog = (id) => request(patientPath(id, '/reminders/log'));
 export const getPreferences = (id) => request(patientPath(id, '/preferences'));
 export const savePreferences = (id, preferences) => request(patientPath(id, '/preferences'), { method: 'PUT', body: preferences });
+// Family (Phase 10): a relative links with an invite code, sees only what the patient shared and can send a short check-in.
+export const createFamilyInvite = (id) => request(patientPath(id, '/family-invites'), { method: 'POST' });
+export const familyLink = (inviteCode) => request('/family/link', { method: 'POST', body: { invite_code: inviteCode } });
+export const getFamilyPatients = () => request('/family/patients');
+export const familyCheckin = (body) => request('/family/checkin', { method: 'POST', body });
 export const getDemoState = () => request('/demo/state');
 export const setDemoSpeed = (multiplier) => request('/demo/speed', { method: 'POST', body: { multiplier } });
 export const setDemoVitals = (change) => request('/demo/vitals', { method: 'POST', body: change });

@@ -32,9 +32,9 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
         // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
-        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools}-*.js'],
+        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family}-*.js', '**/assets/family.*-*.js'],
         runtimeCaching: [{
-          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools)-[^/]+\.js$/.test(url.pathname),
+          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools|Family|family\.(en|hi|gu))-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'ht-server-screens', expiration: { maxEntries: 12 } },
         }],

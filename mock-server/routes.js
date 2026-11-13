@@ -20,6 +20,7 @@ router.post('/auth/login', (req, res) => {
   const { email, password } = req.body || {};
   const user = store.users.find((u) => u.email === email && u.password === password);
   if (!user) return res.status(401).json({ error: 'Invalid email or password' });
+  if (user.disabled) return res.status(403).json({ error: 'This account is disabled' });
   const token = crypto.randomBytes(16).toString('hex');
   store.tokens.set(token, user);
   res.json({ token, role: user.role, patient_id: user.patient_id, ...(user.hospital_id ? { hospital_id: user.hospital_id } : {}) });
@@ -55,6 +56,7 @@ router.use(demoState.router); // demo speed, vitals profiles (Phase 6)
 router.use(require('./demoScenario'));
 router.use(require('./hospitalMode').router); // portal-driven hospital steps, ambulances (Phase 7)
 router.use(require('./hospitalAdmin')); // availability, staff passport audit, GET /audit (Phase 9)
+router.use(require('./otherApps').router); // family, responder, admin, content, feedback, privacy (Phase 10)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.
@@ -123,6 +125,7 @@ router.post('/demo/reset', requireAuth, (req, res) => {
   store.resetStore();
   demoState.reset();
   require('./failMode').reset();
+  require('./otherApps').reset();
   res.json({ ok: true });
 });
 

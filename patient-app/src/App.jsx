@@ -17,13 +17,14 @@ import { useAutoSend } from './hooks/usePendingEmergency';
 import { useNotificationFeed } from './hooks/useNotifications';
 
 export default function App() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, session } = useAuth();
+  const isPatient = Boolean(session) && session.role !== 'FAMILY'; // a relative has no reminders or safety check-in
   const { pathname } = useLocation();
   useLanguageSync(); // use the language saved on the patient record
   useAutoSend(); // send an unsent emergency when the connection returns
   useNotificationFeed(); // turn live events into bell notifications
   useRouteFocus(pathname); // move focus to the heading after a page change
-  const showNav = isLoggedIn && !pathname.startsWith('/emergency') && !pathname.startsWith('/p/');
+  const showNav = isPatient && !pathname.startsWith('/emergency') && !pathname.startsWith('/p/');
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-lift">
       <SkipLink />
@@ -31,13 +32,13 @@ export default function App() {
       {!pathname.startsWith('/emergency') && !pathname.startsWith('/p/') && <AppHeader />}
       <main id="main" tabIndex={-1} className="flex-1 p-4">
         <OfflineBanner />
-        {isLoggedIn && !pathname.startsWith('/p/') && <ReminderBanner />}
+        {isPatient && !pathname.startsWith('/p/') && <ReminderBanner />}
         <ErrorBoundary key={pathname}>
           <AppRoutes />
         </ErrorBoundary>
       </main>
       {showNav && <BottomNav />}
-      {isLoggedIn && <SafetyCheckInHost />}
+      {isPatient && <SafetyCheckInHost />}
     </div>
   );
 }

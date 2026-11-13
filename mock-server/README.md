@@ -143,3 +143,6 @@ Mock (from the repo root):
 HOSPITAL_MODE=manual DEMO_SPEED=5 CORS_ORIGINS=http://localhost:5173,http://localhost:5174 npm run mock
 ```
 Portal (`hospital-portal/.env`): `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:4000`, `VITE_WS_URL=ws://localhost:4000/ws`. Log in as `staff@demo` / `demo123`. If the queue looks empty click "All hospitals". Set `VITE_PORTAL_SIMULATES_AMBULANCE=false` so the mock moves the ambulance.
+
+## Phase 10: family, responder and admin endpoints
+`otherApps.js` holds them (table in `docs/API_CONTRACT.md`, "Phase 10"). Demo logins, password `demo1234`: `family@demo.test` (link with the invite code `FAM-0417`), `responder@demo.test` (verified volunteer). A new volunteer who signs up is **not verified** until an admin sets `verified:true` with `PATCH /admin/users`. `POST /demo/reset` forgets links, invites, check-ins, feedback, privacy requests, content edits and new volunteers.

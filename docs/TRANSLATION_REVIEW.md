@@ -560,6 +560,53 @@ Demo panel and rehearsal checklist text (only visible in demo builds) and small 
 | `rehearsal.reminder` | Show the medicine reminders screen | दवा के रिमाइंडर की स्क्रीन दिखाएँ | દવાના રિમાઇન્ડરની સ્ક્રીન બતાવો | [ ] |
 | `screen.needsConnection` | This screen needs an internet connection the first time you open it. Go back, or call 112 / 108 if you need help now. | यह स्क्रीन पहली बार खोलने पर इंटरनेट माँगती है। वापस जाएँ, या अभी मदद चाहिए तो 112 / 108 पर कॉल करें। | આ સ્ક્રીન પહેલી વાર ખોલતી વખતે ઇન્ટરનેટ માંગે છે. પાછા જાઓ, અથવા હમણાં મદદ જોઈએ તો 112 / 108 પર કૉલ કરો. | [ ] |
 
+## Family screen and invite (Phase 10, AI-written, not reviewed)
+
+The texts of the family screen live in `src/i18n/family.*.json` (loaded with the screen); the invite and sign-in texts are in the main files.
+
+| Key | English | Hindi | Gujarati | OK |
+|---|---|---|---|---|
+| `family.title` | Family | परिवार | પરિવાર | [ ] |
+| `family.intro` | See how the people who shared their safety with you are doing. You only see what they chose to share. | जिन लोगों ने अपनी सुरक्षा आपके साथ साझा की है, उनकी स्थिति देखें। आपको केवल वही दिखता है जो उन्होंने साझा करना चुना है। | જેમણે પોતાની સુરક્ષા તમારી સાથે વહેંચી છે તેમની સ્થિતિ જુઓ. તમને ફક્ત તે જ દેખાય છે જે તેમણે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
+| `family.linkTitle` | Link a person | किसी व्यक्ति को जोड़ें | વ્યક્તિને જોડો | [ ] |
+| `family.codeLabel` | Invite code | आमंत्रण कोड | આમંત્રણ કોડ | [ ] |
+| `family.linkButton` | Link | जोड़ें | જોડો | [ ] |
+| `family.linkNotFound` | This code was not found. Check it and try again. | यह कोड नहीं मिला। जाँचकर दोबारा कोशिश करें। | આ કોડ મળ્યો નથી. તપાસીને ફરી પ્રયત્ન કરો. | [ ] |
+| `family.linkExpired` | This code has expired. Ask for a new one. | यह कोड समाप्त हो गया है। नया कोड माँगें। | આ કોડની મુદત પૂરી થઈ ગઈ છે. નવો કોડ માંગો. | [ ] |
+| `family.linkError` | Could not link. Please try again. | जोड़ा नहीं जा सका। कृपया दोबारा कोशिश करें। | જોડી શકાયું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `family.empty` | You are not linked to anyone yet. Ask the person for an invite code. | आप अभी किसी से जुड़े नहीं हैं। उस व्यक्ति से आमंत्रण कोड माँगें। | તમે હજી કોઈની સાથે જોડાયેલા નથી. તે વ્યક્તિ પાસેથી આમંત્રણ કોડ માંગો. | [ ] |
+| `family.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `family.shared` | Shared with you | आपके साथ साझा | તમારી સાથે વહેંચાયેલું | [ ] |
+| `family.sharedNone` | Nothing else is shared | और कुछ साझा नहीं है | બીજું કંઈ વહેંચાયેલું નથી | [ ] |
+| `family.share.location` | Location | स्थान | સ્થાન | [ ] |
+| `family.share.history` | Health history | स्वास्थ्य इतिहास | આરોગ્ય ઇતિહાસ | [ ] |
+| `family.share.vitals` | Vitals | महत्वपूर्ण संकेत | મહત્ત્વના સંકેતો | [ ] |
+| `family.share.reports` | Reports | रिपोर्ट | રિપોર્ટ | [ ] |
+| `family.vitals` | Latest readings (simulated) | नवीनतम रीडिंग (सिमुलेटेड) | નવીનતમ રીડિંગ (સિમ્યુલેટેડ) | [ ] |
+| `family.hr` | Heart rate | हृदय गति | હૃદય ગતિ | [ ] |
+| `family.spo2` | Oxygen | ऑक्सीजन | ઓક્સિજન | [ ] |
+| `family.noEmergency` | No active emergency. | कोई सक्रिय आपात स्थिति नहीं है। | કોઈ સક્રિય કટોકટી નથી. | [ ] |
+| `family.activeTitle` | Emergency in progress (simulated) | आपात स्थिति जारी है (सिमुलेटेड) | કટોકટી ચાલુ છે (સિમ્યુલેટેડ) | [ ] |
+| `family.state.SOS_SENT` | The alert was sent to a hospital. | अलर्ट अस्पताल को भेजा गया। | ચેતવણી હૉસ્પિટલને મોકલવામાં આવી છે. | [ ] |
+| `family.state.HOSPITAL_ACKNOWLEDGED` | The hospital has seen the alert. | अस्पताल ने अलर्ट देख लिया है। | હૉસ્પિટલે ચેતવણી જોઈ છે. | [ ] |
+| `family.state.AMBULANCE_DISPATCHED` | An ambulance has been sent. | एम्बुलेंस भेजी गई है। | એમ્બ્યુલન્સ મોકલવામાં આવી છે. | [ ] |
+| `family.state.EN_ROUTE` | The ambulance is on its way. | एम्बुलेंस रास्ते में है। | એમ્બ્યુલન્સ રસ્તામાં છે. | [ ] |
+| `family.state.ARRIVED` | The ambulance has arrived. | एम्बुलेंस पहुँच गई है। | એમ્બ્યુલન્સ પહોંચી ગઈ છે. | [ ] |
+| `family.hospital` | Hospital: {{name}} | अस्पताल: {{name}} | હૉસ્પિટલ: {{name}} | [ ] |
+| `family.eta` | About {{minutes}} min away | लगभग {{minutes}} मिनट दूर | લગભગ {{minutes}} મિનિટ દૂર | [ ] |
+| `family.checkin.title` | Let them know | उन्हें बताएँ | તેમને જણાવો | [ ] |
+| `family.checkin.ON_MY_WAY` | I'm on my way | मैं आ रहा हूँ | હું આવી રહ્યો છું | [ ] |
+| `family.checkin.CALLING_NOW` | I'm calling them | मैं उन्हें कॉल कर रहा हूँ | હું તેમને કૉલ કરું છું | [ ] |
+| `family.checkin.CANNOT_REACH` | I can't reach them | मैं उनसे संपर्क नहीं कर पा रहा | હું તેમનો સંપર્ક કરી શકતો નથી | [ ] |
+| `family.checkin.done` | Your message was sent. | आपका संदेश भेज दिया गया। | તમારો સંદેશ મોકલવામાં આવ્યો છે. | [ ] |
+| `family.checkin.error` | Could not send. Please try again. | भेजा नहीं जा सका। कृपया दोबारा कोशिश करें। | મોકલી શકાયું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `login.wrongRole` | This app is for patients and their family. Staff should use the hospital portal. | यह ऐप मरीज़ों और उनके परिवार के लिए है। स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ અને તેમના પરિવાર માટે છે. સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
+| `invite.title` | Invite a family member | परिवार के सदस्य को आमंत्रित करें | પરિવારના સભ્યને આમંત્રિત કરો | [ ] |
+| `invite.help` | Create a code and give it to a relative. They sign in to this app with their own account and enter it. They only see what you chose to share. | एक कोड बनाएँ और किसी रिश्तेदार को दें। वे अपने खाते से इस ऐप में साइन इन करके इसे दर्ज करते हैं। उन्हें केवल वही दिखता है जो आपने साझा करना चुना है। | કોડ બનાવો અને સંબંધીને આપો. તેઓ પોતાના ખાતાથી આ એપમાં સાઇન ઇન કરીને તે દાખલ કરે છે. તેમને ફક્ત તે જ દેખાય છે જે તમે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
+| `invite.create` | Create invite code | आमंત्रण कोड बनाएँ | આમંત્રણ કોડ બનાવો | [ ] |
+| `invite.valid` | Valid for 24 hours. | 24 घंटे के लिए मान्य। | 24 કલાક માટે માન્ય. | [ ] |
+| `invite.error` | Could not create a code. Please try again. | कोड नहीं बन सका। कृपया दोबारा कोशिश करें। | કોડ બનાવી શકાયો નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

@@ -294,7 +294,99 @@ await test('Phase 9: WebSocket needs a login: no token or a wrong token is close
   if (!got) fail('a first auth message with a good token should start the event stream');
 });
 
+// ---------------- Phase 10: family, responder and admin apps, content, feedback, privacy (optional: a backend adds them step by step) ----------------
+const as = async (tok, method, path, body) => {
+  const res = await fetch(BASE + path, { method, headers: { ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(tok ? { Authorization: 'Bearer ' + tok } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  const text = await res.text(); let json = null; try { json = JSON.parse(text); } catch { /* not JSON */ } return { status: res.status, json, text };
+};
+const loginUser = async (email, password = 'demo1234') => { const r = await as(null, 'POST', '/auth/login', { email, password }); if (r.status !== 200) fail('login as ' + email + ' gave ' + r.status); return r.json.token; };
+const P10 = { optional: true };
+const hasNo = (obj, words, where) => { const t = JSON.stringify(obj).toLowerCase(); words.forEach((w) => { if (t.includes(w)) fail(where + ' must not contain "' + w + '"'); }); };
+
+await test('Phase 10: family link with an invite code, GET /family/patients shows only what the patient shared, wrong role -> 403', async () => {
+  const fam = await loginUser('family@demo.test');
+  expectError(await as(fam, 'POST', '/family/link', { invite_code: 'FAM-0000-NOPE' }), 404);
+  expectError(await as(fam, 'POST', '/family/link', {}), 400);
+  expectError(await as(token, 'GET', '/family/patients'), 403);
+  const linked = await as(fam, 'POST', '/family/link', { invite_code: 'FAM-0417' }); expectStatus(linked, 200); expectShape(linked.json, { patient_id: 'string', name: 'string' });
+  const list = await as(fam, 'GET', '/family/patients'); expectStatus(list, 200); if (!Array.isArray(list.json) || !list.json.length) fail('expected the linked patient');
+  expectShape(list.json[0], { patient_id: 'string', name: 'string', shared_fields: 'array' }, 'family patient');
+  hasNo(list.json, ['allerg', 'medication', 'condition', 'phone', 'token', 'password'], 'GET /family/patients');
+}, P10);
+await test('Phase 10: family sees an active emergency as a plain status and can reply with a check-in (ON_MY_WAY / CALLING_NOW / CANNOT_REACH)', async () => {
+  const fam = await loginUser('family@demo.test'); await as(fam, 'POST', '/family/link', { invite_code: 'FAM-0417' });
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
+  try {
+    const list = await as(fam, 'GET', '/family/patients'); const ae = list.json[0].active_emergency; if (!ae) fail('no active_emergency after the SOS');
+    expectShape(ae, { id: 'string', state: 'string', started_at: 'iso' }, 'active_emergency'); hasNo(ae, ['severity', 'symptom', 'diagnos', 'allerg'], 'active_emergency');
+    expectError(await as(fam, 'POST', '/family/checkin', { patient_id: list.json[0].patient_id, message: 'HELLO' }), 400);
+    const ok = await as(fam, 'POST', '/family/checkin', { patient_id: list.json[0].patient_id, emergency_id: made.json.id, message: 'ON_MY_WAY' }); expectStatus(ok, 201); expectShape(ok.json, { id: 'string', at: 'iso' });
+    expectError(await as(fam, 'POST', '/family/checkin', { patient_id: 'PT-0000-0000', message: 'ON_MY_WAY' }), 403);
+  } finally { await call('POST', '/emergencies/' + made.json.id + '/cancel'); }
+}, P10);
+await test('Phase 10: responder sign-up starts unverified (alerts -> 403); a verified responder sees alerts with no identity until accepting', async () => {
+  const mail = 'volunteer' + Date.now() + '@demo.test';
+  const reg = await as(null, 'POST', '/responders/register', { name: 'Test Volunteer', email: mail, password: 'volunteer-pass-1' }); expectStatus(reg, 201); expectShape(reg.json, { id: 'string', verified: 'boolean' });
+  expectError(await as(null, 'POST', '/responders/register', { name: 'x' }), 400);
+  const fresh = await loginUser(mail, 'volunteer-pass-1'); expectError(await as(fresh, 'GET', '/responders/alerts'), 403);
+  const resp = await loginUser('responder@demo.test');
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
+  try {
+    const alerts = await as(resp, 'GET', '/responders/alerts'); expectStatus(alerts, 200); const mine = alerts.json.find((a) => a.id === made.json.id); if (!mine) fail('the new emergency is not in the alert list');
+    expectShape(mine, { id: 'string', type: 'string', distance_m: 'number' }, 'alert'); hasNo(mine, ['rahul', 'name', 'allerg', 'phone', '"lat"'], 'responder alert before accepting');
+    const acc = await as(resp, 'POST', '/responders/' + made.json.id + '/accept'); expectStatus(acc, 200); expectShape(acc.json, { patient: 'object' }); expectShape(acc.json.patient, { name: 'string' }, 'patient'); hasNo(acc.json, ['phone', 'password', 'token'], 'accept answer');
+    expectError(await as(resp, 'POST', '/responders/EM-NOPE/accept'), 404);
+  } finally { await call('POST', '/emergencies/' + made.json.id + '/cancel'); }
+}, P10);
+await test('Phase 10: GET /admin/users and PATCH /admin/users (admin only; disable signs the user out; cannot disable yourself)', async () => {
+  const adm = await loginUser('admin@demo.test');
+  expectError(await as(token, 'GET', '/admin/users'), 403); expectError(await as(token, 'PATCH', '/admin/users', { id: 'usr_001', disabled: true }), 403);
+  const list = await as(adm, 'GET', '/admin/users'); expectStatus(list, 200); if (!Array.isArray(list.json) || list.json.length < 3) fail('expected the demo users');
+  expectShape(list.json[0], { id: 'string', email: 'string', role: 'string', disabled: 'boolean' }, 'user'); hasNo(list.json, ['password', 'token'], 'GET /admin/users');
+  const family = list.json.find((u) => u.email === 'family@demo.test'); const me = list.json.find((u) => u.email === 'admin@demo.test');
+  expectError(await as(adm, 'PATCH', '/admin/users', { id: me.id, disabled: true }), 409); expectError(await as(adm, 'PATCH', '/admin/users', { id: 'usr_999', disabled: true }), 404);
+  expectError(await as(adm, 'PATCH', '/admin/users', { id: family.id, role: 'KING' }), 422);
+  const famTok = await loginUser('family@demo.test');
+  try {
+    expectStatus(await as(adm, 'PATCH', '/admin/users', { id: family.id, disabled: true }), 200);
+    expectError(await as(famTok, 'GET', '/family/patients'), 401); expectError(await as(null, 'POST', '/auth/login', { email: 'family@demo.test', password: 'demo1234' }), 403, 401);
+  } finally { await as(adm, 'PATCH', '/admin/users', { id: family.id, disabled: false }); }
+}, P10);
+await test('Phase 10: content has version and approved; others only see approved content; only an admin can PUT; an edit is unapproved until an admin approves it', async () => {
+  const adm = await loginUser('admin@demo.test');
+  const ok = await as(token, 'GET', '/content/emergency_numbers'); expectStatus(ok, 200); expectShape(ok.json, { version: 'number', approved: 'boolean', items: 'array' }); if (ok.json.approved !== true) fail('others must only get approved content');
+  expectError(await as(token, 'GET', '/content/first_aid_basics'), 404); expectStatus(await as(adm, 'GET', '/content/first_aid_basics'), 200);
+  expectError(await as(token, 'PUT', '/content/first_aid_basics', { items: ['x'] }), 403); expectError(await as(adm, 'PUT', '/content/first_aid_basics', { items: [] }), 422);
+  const before = (await as(adm, 'GET', '/content/first_aid_basics')).json; const put = await as(adm, 'PUT', '/content/first_aid_basics', { items: before.items }); expectStatus(put, 200);
+  if (put.json.version !== before.version + 1) fail('version must go up by one'); if (put.json.approved !== false) fail('an edited text is not approved until an admin approves it');
+  expectError(await as(token, 'GET', '/content/first_aid_basics'), 404);
+}, P10);
+await test('Phase 10: POST /feedback (rating 1-5, one per person and emergency) and POST /privacy-requests (EXPORT or DELETE, simulated)', async () => {
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
+  try {
+    expectError(await as(token, 'POST', '/feedback', { emergency_id: made.json.id, rating: 9 }), 422); expectError(await as(token, 'POST', '/feedback', { emergency_id: 'EM-NOPE', rating: 4 }), 404);
+    const f = await as(token, 'POST', '/feedback', { emergency_id: made.json.id, rating: 4, comment: 'Clear steps' }); expectStatus(f, 201); expectShape(f.json, { id: 'string' });
+    expectError(await as(token, 'POST', '/feedback', { emergency_id: made.json.id, rating: 5 }), 409);
+  } finally { await call('POST', '/emergencies/' + made.json.id + '/cancel'); }
+  expectError(await as(token, 'POST', '/privacy-requests', { type: 'SHRED' }), 400);
+  const pr = await as(token, 'POST', '/privacy-requests', { type: 'EXPORT' }); expectStatus(pr, 202, 201); expectShape(pr.json, { id: 'string', status: 'string' });
+  expectError(await as(token, 'POST', '/privacy-requests', { type: 'DELETE', patient_id: 'PT-0000-0000' }), 403, 404);
+}, P10);
+
+await test('Phase 10: a family WebSocket receives only plain family.status events for linked patients (no vitals, no patient details)', async () => {
+  const fam = await loginUser('family@demo.test'); await as(fam, 'POST', '/family/link', { invite_code: 'FAM-0417' });
+  const events = []; const ws = new WebSocket(BASE.replace(/^http/, 'ws') + '/ws?token=' + fam); ws.onmessage = (m) => { try { events.push(JSON.parse(m.data)); } catch { /* ignore */ } };
+  await new Promise((resolve, reject) => { ws.onopen = resolve; setTimeout(() => reject(new Error('timeout opening WebSocket')), 5000); });
+  const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); await call('POST', '/emergencies/' + made.json.id + '/sos', { body: {} });
+  try {
+    for (let i = 0; i < 40 && !events.some((e) => e.type === 'family.status'); i++) await new Promise((r) => setTimeout(r, 250));
+    if (!events.some((e) => e.type === 'family.status' && e.emergency_id === made.json.id)) fail('no family.status event');
+    const bad = events.find((e) => e.type !== 'family.status'); if (bad) fail('a family socket must not receive ' + bad.type);
+    hasNo(events, ['rahul', 'heart_rate', 'allerg', 'severity'], 'family events');
+  } finally { await call('POST', '/emergencies/' + made.json.id + '/cancel'); ws.close(); }
+}, P10);
+
 const passed = results.filter((r) => r[1]).length;
 const optPassed = optionalResults.filter((r) => r[1]).length;
-console.log('\nContract: ' + passed + '/' + results.length + ' core checks passed against ' + BASE + (optionalResults.length ? ' (optional Phase 6 extras: ' + optPassed + '/' + optionalResults.length + ')' : ''));
+console.log('\nContract: ' + passed + '/' + results.length + ' core checks passed against ' + BASE + (optionalResults.length ? ' (optional extras, Phase 6 and Phase 10: ' + optPassed + '/' + optionalResults.length + ')' : ''));
 process.exit(passed === results.length ? 0 : 1);

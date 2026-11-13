@@ -11,7 +11,7 @@ export const markPickedBeforeLogin = () => { pickedBeforeLogin = true; };
 export default function useLanguageSync() {
   const { session } = useAuth();
   useEffect(() => {
-    if (!session) return;
+    if (!session || session.role === 'FAMILY') return; // a relative has no patient record
     getPatient(session.patient_id).then((patient) => {
       if (pickedBeforeLogin) {
         pickedBeforeLogin = false;

@@ -17,7 +17,13 @@ function setServer(server) { wss = server; }
 function broadcast(event) {
   if (!wss) return;
   const message = JSON.stringify({ event: event.type, ...event }); // `event` is Daksh's name for `type`; both are sent
-  wss.clients.forEach((client) => { if (client.readyState === 1 && client.authed) client.send(message); });
+  const { filterFor } = require('./otherApps'); // family and volunteer sockets get reduced events (Phase 10)
+  wss.clients.forEach((client) => {
+    if (client.readyState !== 1 || !client.authed) return;
+    if (!client.user) return client.send(message);
+    const ev = filterFor(client.user, event);
+    if (ev) client.send(JSON.stringify({ event: ev.type, ...ev }));
+  });
 }
 
 // Update the emergency, add a status event if the state changed, then broadcast.
