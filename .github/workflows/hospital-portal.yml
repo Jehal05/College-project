@@ -1,0 +1,31 @@
+# Automatic check for the hospital portal (Puneet's part).
+# Runs on every push and pull request that touches hospital-portal: install, unit tests, production build.
+name: Hospital portal checks
+
+on:
+  push:
+    paths:
+      - 'hospital-portal/**'
+      - '.github/workflows/hospital-portal.yml'
+  pull_request:
+    paths:
+      - 'hospital-portal/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hospital-portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hospital-portal/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_USE_MOCK: 'true'
