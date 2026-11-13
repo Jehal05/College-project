@@ -173,8 +173,11 @@ def test_granting_and_revoking_changes_the_next_view_and_the_row(api, engine, fu
     assert rows(engine)[-1]["fields_released"] == ["reports"]
 
 
-def test_contacts_come_out_in_notification_order(api, engine, full):
-    contacts = get(api, token=create_passport_token("pat_001")).json()["contacts"]
+def test_contacts_need_the_history_consent_and_come_out_in_notification_order(api, engine, full):
+    token = create_passport_token("pat_001")
+    assert "contacts" not in get(api, token=token).json()          # no history consent: left out, never null
+    share(engine, history=True)
+    contacts = get(api, token=token).json()["contacts"]
     assert [(c["order"], c["name"]) for c in contacts] == [(1, "First Contact"), (2, "Second Contact")]
 
 

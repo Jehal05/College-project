@@ -38,6 +38,21 @@ def call_insights(api):
     return api.get("/patients/pat_001/insights")
 
 
+def call_patient(api):
+    api.login_as(PATIENT)
+    return api.get("/patients/pat_001")
+
+
+def call_patient_update(api):
+    api.login_as(PATIENT)
+    return api.patch("/patients/pat_001", json={"language": "hi"})
+
+
+def call_vitals(api):
+    api.login_as(PATIENT)
+    return api.get("/patients/pat_001/vitals")
+
+
 def call_audit(api):
     api.login_as(ADMIN)
     return api.get("/audit")
@@ -54,7 +69,7 @@ def demo_mode_on(monkeypatch):
 
 
 CALLS = [call_health, call_passport, call_consents, call_consent_update, call_consent_history,
-         call_insights, call_audit, call_demo_vitals]
+         call_insights, call_audit, call_demo_vitals, call_patient, call_patient_update, call_vitals]
 
 
 @pytest.mark.parametrize("call", CALLS, ids=lambda c: c.__name__)

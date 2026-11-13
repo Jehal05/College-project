@@ -24,6 +24,7 @@ def build_passport(session: Session, patient_id: str) -> Optional[Tuple[dict, li
         "patient_id": patient.id,
         "name": patient.name,
         "age": patient.age,
+        "sex": patient.sex,
         "blood_group": patient.blood_group,
         "conditions": patient.conditions or [],
         "allergies": patient.allergies or [],
@@ -33,6 +34,8 @@ def build_passport(session: Session, patient_id: str) -> Optional[Tuple[dict, li
     }
     consents = current_consents(session, patient_id)
     view = apply_consent(full, consents)
+    if view.get("sex") is None:
+        view.pop("sex", None)                       # unknown is left out, never null
     released = [f for f in CONSENT_FIELDS if any(FIELD_CONSENT.get(k) == f for k in view)]
     view["shared_fields"] = shared_fields(consents)
     view["simulated"] = True

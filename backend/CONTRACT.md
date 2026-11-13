@@ -147,12 +147,17 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 |---|---|---|---|
 | POST /auth/login | Log in, get token and role | public | all |
 | GET /health | Liveness check. Returns `{"status": "ok", "simulated": true}`. No patient data | public | all |
-| GET /patients/{id} | Read patient profile | PATIENT (own), HOSPITAL_STAFF (with consent), ADMIN | Jehal |
-| PATCH /patients/{id} | Update patient profile | PATIENT (own), ADMIN | Jehal |
+| GET /patients/{id} | Read patient profile | PATIENT (own: everything). ADMIN (only what the patient shared, no phone numbers, audited). Others 403 | Jehal |
+| PATCH /patients/{id} | Update patient profile | PATIENT (own) only | Jehal |
 | GET /patients/{id}/consents | Current consent choices | PATIENT (own), ADMIN (read-only) | Jehal, Shagun |
 | PUT /patients/{id}/consents | Change consent choices | PATIENT (own only) | Jehal |
 | GET /patients/{id}/consents/history | Every consent change, oldest first | PATIENT (own), ADMIN (read-only) | Jehal, Shagun |
-| GET /patients/{id}/vitals | Latest vitals (also streamed as `vitals.update`) | PATIENT (own), FAMILY (linked) | Jehal |
+| GET /patients/{id}/vitals | Latest vitals (also streamed as `vitals.update`) | PATIENT (own). FAMILY (linked, with vitals consent) is not built yet | Jehal |
+| GET /patients/{id}/baseline | The patient's own usual ranges, for the "usual range" display | PATIENT (own) | Jehal |
+| GET /patients/{id}/contacts | List emergency contacts | PATIENT (own) | Jehal |
+| POST /patients/{id}/contacts | Add an emergency contact | PATIENT (own) | Jehal |
+| PUT /patients/{id}/contacts/{contactId} | Change an emergency contact | PATIENT (own) | Jehal |
+| DELETE /patients/{id}/contacts/{contactId} | Remove an emergency contact | PATIENT (own) | Jehal |
 | POST /emergencies | Create an emergency | PATIENT | Jehal |
 | POST /emergencies/{id}/cancel | Cancel a false alarm | PATIENT | Jehal |
 | GET /emergencies/{id} | Details and timeline | all, scoped by role | all |
@@ -387,6 +392,22 @@ Response 200:
 ```
 `reading` is the last reading already sent, so it can still show the old profile. The next tick shows the new one. Errors: `400` unknown profile, unknown vital or out-of-range value (nothing is changed), `400` unknown field.
 
+**Patient record, vitals, baseline and contacts** (Task 3; checked by `scripts/contract.mjs`)
+
+`GET /patients/{id}` answers (owner):
+```json
+{ "id": "PT-2026-0417", "name": "Rahul Mehta", "age": 54, "sex": "M", "blood_group": "B+", "blood_group_verified": false,
+  "language": "en", "allergies": ["Penicillin"], "conditions": ["Hypertension"], "medications": ["Amlodipine"],
+  "contacts": [ { "id": "C-1", "name": "Sunita Mehta", "relation": "Mother", "phone": "+91 00000 00001", "is_primary": true, "simulated": true } ],
+  "consents": { "location": true, "history": true, "vitals": true, "reports": true }, "simulated": true }
+```
+- `sex` is left out when unknown. Nothing is ever sent as `null`.
+- **Who:** the patient reads and changes their own record. An `ADMIN` may read it, and then sees only what the patient shared (allergies, conditions, medications and contacts need the `history` consent), **no phone numbers**, and every such read is audited (`patient.read`). Everybody else gets `403`, and the attempt is audited. The permission check comes before "does this patient exist", so a refusal never reveals whether an id exists (a patient asking for another id gets `403`, even if it does not exist).
+- **`PATCH`** accepts `name`, `age`, `sex`, `blood_group`, `allergies`, `conditions`, `medications`, `language`, and answers with the updated record. Rules (the patient app's own): name not empty (100 characters at most); age a whole number 0 to 120; `blood_group` one of `A+ A- B+ B- AB+ AB- O+ O-`; `language` `en`, `hi` or `gu`; `sex` `M`, `F` or `O`; each list at most 20 items of 100 characters. Anything else is `400` with a plain sentence. `consents` and `contacts` are refused with `400` and a pointer to their own endpoints. A new `blood_group` is stored as not verified.
+- **`GET .../vitals`** (simulated): `{ patient_id, heart_rate, spo2, bp: "120/80", bp_sys, bp_dia, glucose, resp_rate, timestamp, simulated }`. Owner only for now.
+- **`GET .../baseline`**: `{ heart_rate: {min,max}, spo2, bp_systolic, bp_diastolic, glucose, updated_at, simulated }`, `404` if the patient has none.
+- **Contacts:** at most 5, exactly one primary. A contact is `{ id, name, relation, phone, is_primary }`. `relation` is `Mother Father Spouse Sibling Child Friend Other`. A phone number, after removing spaces and dashes, is an optional `+` and 8 to 15 digits. `POST` answers `201`, a bad body `400`, a sixth contact `409`; `PUT` answers `200`, `404` for an unknown contact; `DELETE` answers `204`, then `404`. The first contact becomes primary; sending `is_primary: true` moves the marker; deleting the primary makes the first remaining contact primary. Contact ids are random and opaque.
+
 **Consent API** (feature 51)
 
 Four consent flags: `location`, `history`, `vitals`, `reports`.
@@ -395,8 +416,10 @@ Four consent flags: `location`, `history`, `vitals`, `reports`.
 ```json
 { "patient_id": "pat_001",
   "consents": { "location": true, "history": true, "vitals": false, "reports": false },
+  "changes": [ { "key": "history", "value": true, "timestamp": "2026-11-16T10:00:00Z" } ],
   "simulated": true }
 ```
+`changes` is the patient's own last 20 changes, newest first (the demo seed rows are not changes). `PUT` answers with the same fields plus `changed`.
 
 `PUT /patients/{id}/consents`: send only the flags you want to change. Values must be real `true` or `false`.
 ```json
@@ -423,10 +446,10 @@ Which flag guards which field (used for the passport, the hospital alert, SMS an
 | Payload field | Needs consent |
 |---|---|
 | `location`, `lat`, `lng`, `accuracy`, `map_link` | `location` |
-| `conditions`, `allergies`, `medications` | `history` |
+| `conditions`, `allergies`, `medications`, `contacts` | `history` |
 | `vitals` | `vitals` |
 | `reports` | `reports` |
-| name, age, blood group, contacts, emergency type | always shown |
+| name, age, sex, blood group, emergency type | always shown |
 
 **Encrypted at rest:** conditions, allergies, medications, contact phone numbers and report file names. The API still returns normal readable values. Only the database holds ciphertext, and you cannot search or sort by those columns.
 
@@ -535,4 +558,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
 | 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
 | 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |
-| 14 Nov 2026 | 0.7 (in progress) | **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |
+| 14 Nov 2026 | 0.7 (in progress) | **Patient record, vitals, baseline, contacts (Task 3)**, contacts now need the `history` consent, `sex` is always shown, consent answers carry `changes`. **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |

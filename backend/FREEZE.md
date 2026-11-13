@@ -10,14 +10,14 @@ rules once it has.
 
 | | Count |
 |---|---|
-| Endpoints described in CONTRACT.md | 37 |
-| Built in the app | 9 |
-| **Not built yet** | **28** |
+| Endpoints described in CONTRACT.md | 42 |
+| Built in the app | 17 |
+| **Not built yet** | **25** |
 | Served but not documented | 0 |
 
-All 9 built endpoints work with a real login now (`POST /auth/login` is built): `GET /health`, login, the passport, `GET /audit`, the three consent endpoints, insights and `POST /demo/vitals`.
+All 17 built endpoints work with a real login: `GET /health`, login, the patient record (`GET` and `PATCH`), vitals, baseline, the four contact endpoints, the three consent endpoints, the passport, `GET /audit`, insights and `POST /demo/vitals`.
 
-Not built yet: patient profile and vitals, the whole emergency lifecycle (create, cancel, acknowledge,
+Not built yet: the whole emergency lifecycle (create, cancel, acknowledge,
 dispatch, status), hospitals and availability, ambulance location, demo reset and scenarios, reports, and the
 family, responder, admin, content, feedback and privacy endpoints. Also not built: the WebSocket manager, the
 notification engine, the escalation scheduler and the trend warning, FHIR export and metrics.

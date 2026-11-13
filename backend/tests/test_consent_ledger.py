@@ -101,7 +101,7 @@ def test_revoking_history_removes_it_on_the_very_next_call(patients):
 
 def test_no_consent_means_no_sensitive_fields_at_all(patients):
     view = svc.consented_view(patients, "pat_001", PASSPORT)
-    assert set(view) == {"patient_id", "name", "age", "blood_group", "contacts"}
+    assert set(view) == {"patient_id", "name", "age", "blood_group"}
     assert None not in view.values()
 
 

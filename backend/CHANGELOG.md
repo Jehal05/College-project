@@ -11,7 +11,11 @@ The contract version lives at the top of `CONTRACT.md`.
 - **Login and roles (feature 33):** `POST /auth/login` with bcrypt checks, 8-hour login tokens that are re-checked against the user on every request, `require_role`, and a login rate limit (429 after 5 wrong attempts). The placeholder 501 answers are gone: a missing login is 401.
 - **One error shape** for the whole API (`error` and `detail`, same text), 400 instead of 422, and no echo of what the caller sent.
 - `/demo/*` exist only in demo mode, and any logged-in user may use them (the patient app's demo panel and the contract script need that).
-- Tests: 979 passing.
+- **Patient record, vitals, baseline, contacts (Task 3):** `GET` and `PATCH /patients/{id}` (validation copied from the patient app's own form; a patient sees only themselves; an admin sees only what the patient shared, no phone numbers, audited), `GET .../vitals`, `GET .../baseline`, contacts CRUD (at most 5, exactly one primary), and consent answers with a `changes` list.
+- Contacts now need the `history` consent in the passport, and `sex` is always shown (agreed with Jehal and Puneet).
+- `POST /demo/vitals` defaults to the caller's own patient (it used to default to a made-up id).
+- Random ids are now 64 bits (were 32): a measured 0.035% collision rate per 2000 ids made one test flaky and would have broken primary keys at scale.
+- Tests: 1222 passing. Jehal's `npm run contract` passes 13 of 27 core checks against this backend (it was 1 at the start of the day).
 
 ## 0.6.2: draft rules for unmapped symptoms (pending doctor review)
 - 12 new rules: the 7 patient-app symptoms that had no rule (they gave "no indicators"), sudden confusion as a stroke sign, and a safety check-in with no reply (EMERGENCY, type `UNKNOWN`).

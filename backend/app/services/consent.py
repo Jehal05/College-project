@@ -27,6 +27,7 @@ FIELD_CONSENT: Dict[str, str] = {
     "conditions": "history",
     "allergies": "history",
     "medications": "history",
+    "contacts": "history",
     "vitals": "vitals",
     "reports": "reports",
 }

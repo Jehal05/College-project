@@ -10,6 +10,7 @@ from app.db import get_db
 from app.models.patient_data import Patient
 from app.security.actor import Actor
 from app.services import consent as service
+from app.services.patient_record import consent_changes
 
 router = APIRouter(prefix="/patients", tags=["consents"])
 
@@ -34,7 +35,8 @@ def _check_read(actor: Actor, patient_id: str, db: Session) -> None:
 @router.get("/{patient_id}/consents")
 def read_consents(patient_id: str, actor: Actor = Depends(get_current_actor), db: Session = Depends(get_db)) -> dict:
     _check_read(actor, patient_id, db)
-    return {"patient_id": patient_id, "consents": service.current_consents(db, patient_id), "simulated": True}
+    return {"patient_id": patient_id, "consents": service.current_consents(db, patient_id),
+            "changes": consent_changes(db, patient_id), "simulated": True}
 
 
 @router.put("/{patient_id}/consents")
@@ -56,6 +58,7 @@ def update_consents(
     return {
         "patient_id": patient_id,
         "consents": service.current_consents(db, patient_id),
+        "changes": consent_changes(db, patient_id),
         "changed": changed,
         "simulated": True,
     }

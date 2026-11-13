@@ -10,7 +10,7 @@ from typing import Mapping, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import audit, auth, consents, demo_vitals, insights, passport
+from app.api import audit, auth, consents, contacts, demo_vitals, insights, passport, patients
 from app.config import demo_mode, parse_cors_origins
 from app.db import get_session_factory, init_db
 from app.errors import install_error_handlers
@@ -56,6 +56,8 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
 
     application.include_router(auth.router)
     application.include_router(demo_vitals.router)
+    application.include_router(patients.router)
+    application.include_router(contacts.router)
     application.include_router(consents.router)
     application.include_router(passport.router)
     application.include_router(audit.router)

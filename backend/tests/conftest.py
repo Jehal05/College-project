@@ -12,6 +12,7 @@ from app.main import app
 from app.models.patient_data import Contact, Patient, Report
 from app.security import crypto, passport_token
 from app.security.login_limiter import reset_limiter
+from app.sim.wearable import registry as wearable_registry
 
 
 @pytest.fixture(autouse=True)
@@ -29,10 +30,12 @@ def fresh_key(monkeypatch):
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
     reset_limiter()
+    wearable_registry.reset_all()          # no test may inherit another test's demo vitals profile
     yield
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
     reset_limiter()
+    wearable_registry.reset_all()
 
 
 @pytest.fixture

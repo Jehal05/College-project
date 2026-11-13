@@ -48,8 +48,9 @@ def status(done: bool, note: str = "", partial: bool = False) -> Tuple[str, str]
 # Daksh's 20 features from the plan: number -> (name, tier, status function)
 FEATURES: Dict[int, Tuple[str, str, Callable[[], Tuple[str, str]]]] = {
     2: ("Live vitals service", "T1", lambda: status(
-        has_endpoint("GET", "/patients/{}/vitals"), "the simulator exists (13) but there is no vitals stream or endpoint",
-        partial=False)),
+        has_endpoint("GET", "/patients/{}/vitals") and has_regex(r"\.websocket\(|WebSocketDisconnect"),
+        "GET /patients/{id}/vitals exists, but the one-reading-per-second stream (WebSocket) does not",
+        partial=has_endpoint("GET", "/patients/{}/vitals"))),
     4: ("Rule-based emergency engine", "T1", lambda: status(has_file("app/rules/engine.py"))),
     8: ("Real-time hospital notification", "T1", lambda: status(has_regex(r"\.websocket\(|WebSocketDisconnect"), "no WebSocket manager yet")),
     11: ("Emergency passport", "T1", lambda: status(has_endpoint("GET", "/passport/{}"), "works with a token; staff and patient access wait for login")),
@@ -97,7 +98,8 @@ PHASES = [
           ["tests/test_startup_key.py", "tests/test_states_roles.py", "tests/test_models_foundation.py", "tests/test_ids.py",
            "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_startup_seed.py",
            "tests/test_access_tokens.py", "tests/test_login_limiter.py", "tests/test_login_api.py", "tests/test_error_shape.py",
-           "tests/test_role_dependencies.py"], [33], [
+           "tests/test_role_dependencies.py", "tests/test_patient_record_service.py", "tests/test_patients_api.py",
+           "tests/test_contacts_api.py"], [33], [
         ("CONTRACT.md present", lambda: has_file("CONTRACT.md")),
         (f"database tables from the contract: {_tables()[0]} of {_tables()[1]}", lambda: _tables()[0] == _tables()[1]),
         ("states, roles and the transition table (app/models/enums.py)", lambda: has_regex(r"ALLOWED_TRANSITIONS")),
