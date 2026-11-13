@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.1 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.2 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -28,6 +28,26 @@ Extra states: `CANCELLED`, `ESCALATED`.
 `EMERGENCY`, `URGENT`, `WATCH`, `NONE`
 
 **Safety rule:** a low score from any model must never reduce severity when emergency symptoms are reported. Only the rules engine decides severity.
+
+**Rules engine status:** every rule in `app/rules/rules.yaml` is marked **pending doctor review**. Symptom lists and thresholds are draft values, not medical advice. Chest pain always gives `EMERGENCY` (a hard-coded safety floor repeats the YAML rule). Vitals alone never go above `URGENT`. Severity never drops when evidence is added.
+
+**What each severity triggers**
+
+| Severity | Action code | Meaning |
+|---|---|---|
+| EMERGENCY | `alert_hospital_now` | Create the emergency, alert the hospital, notify family |
+| URGENT | `prompt_symptom_check` | Ask the patient to confirm symptoms, show the call 112/108 option |
+| WATCH | `log_only` | Record the reading, no alert |
+| NONE | `no_action` | No indicators. This does not rule out any condition |
+
+**Rules engine output** (used inside the `POST /emergencies` response):
+```json
+{ "type": "HEART", "severity": "EMERGENCY", "reasons": ["Chest pain is a red-flag symptom"],
+  "action": "alert_hospital_now", "rule_ids": ["HEART_CHEST_PAIN"], "review_status": "pending doctor review" }
+```
+`type` is `null` when severity is `NONE`.
+
+**Symptom names** the engine understands: `chest_pain`, `breathlessness`, `sweating`, `left_arm_pain`, `face_drooping`, `arm_weakness`, `slurred_speech`, `confusion`, `wheeze`, `low_glucose`. Vital names: `heart_rate`, `spo2`, `bp_sys`, `bp_dia`, `glucose`, `resp_rate`. Unknown names are ignored.
 
 ### 1.4 Roles
 
@@ -315,3 +335,4 @@ Passwords are set in the seed script and are demo values only.
 | Date | Version | Change |
 |---|---|---|
 | 13 Nov 2026 | 0.1 | First draft for team review |
+| 13 Nov 2026 | 0.2 | Added rules engine status, action codes, symptom and vital names |
