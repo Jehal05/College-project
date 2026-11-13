@@ -5,10 +5,10 @@ random value, you cannot search or sort by an encrypted column.
 """
 import json
 
-from sqlalchemy import Text
+from sqlalchemy import LargeBinary, Text
 from sqlalchemy.types import TypeDecorator
 
-from app.security.crypto import decrypt_text, encrypt_text
+from app.security.crypto import decrypt_bytes, decrypt_text, encrypt_bytes, encrypt_text
 
 
 class EncryptedText(TypeDecorator):
@@ -32,3 +32,15 @@ class EncryptedJSON(TypeDecorator):
 
     def process_result_value(self, value, dialect):
         return None if value is None else json.loads(decrypt_text(value))
+
+
+class EncryptedBytes(TypeDecorator):
+    """For uploaded files (reports). The database holds only the encrypted bytes."""
+    impl = LargeBinary
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        return None if value is None else encrypt_bytes(bytes(value))
+
+    def process_result_value(self, value, dialect):
+        return None if value is None else decrypt_bytes(value)

@@ -97,3 +97,14 @@ def rotate_token(token: str) -> str:
         return get_cipher().rotate(token.encode("ascii")).decode("ascii")
     except (InvalidToken, UnicodeError):
         raise DecryptionError("Could not decrypt a stored value (wrong key or damaged data).") from None
+
+
+def encrypt_bytes(data: bytes) -> bytes:
+    return get_cipher().encrypt(data)
+
+
+def decrypt_bytes(token: bytes) -> bytes:
+    try:
+        return get_cipher().decrypt(bytes(token))
+    except (InvalidToken, TypeError):
+        raise DecryptionError("Could not decrypt a stored value (wrong key or damaged data).") from None
