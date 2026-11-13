@@ -12,8 +12,10 @@ import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import AvailabilityForm from '../components/AvailabilityForm.jsx';
 import OwnCapacity from '../components/OwnCapacity.jsx';
+import { useT } from '../i18n/index.js';
 
 export default function Dashboard() {
+  const t = useT();
   const { session } = useAuth();
   const { emergencies: everyAlert, visibleEmergencies, unreadCount, loading, error, refresh, markRead } = useEmergencies();
   const scope = useSyncExternalStore(subscribeUi, getScope);
@@ -60,7 +62,7 @@ export default function Dashboard() {
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-3 border-b border-slate-300 bg-white px-6 py-3">
         <h1 className="text-2xl font-bold">{hospital?.name || 'Hospital'}</h1>
-        <SimulatedBadge text="Simulated event. Not a medical diagnosis." />
+        <SimulatedBadge text={t('dash.simulatedEvent')} />
         <ConnectionBadge />
         <button
           data-testid="toggle-availability"
@@ -104,15 +106,15 @@ export default function Dashboard() {
         {/* Left: alert queue */}
         <section id="alert-queue" tabIndex={-1} aria-labelledby="queue-heading" className="focus:outline-none">
           <h2 id="queue-heading" className="mb-3 text-xl font-bold">
-            Alert queue <span data-testid="open-count" className="text-slate-500">({openCount} open)</span>
+            {t('dash.queue')} <span data-testid="open-count" className="text-slate-500">{t('dash.open', { n: openCount })}</span>
             {unreadCount > 0 && (
               <span data-testid="unread-count" className="ml-2 rounded-full bg-sky-500 px-2.5 py-0.5 text-sm font-bold text-white">
-                {unreadCount} unread
+                {t('dash.unread', { n: unreadCount })}
               </span>
             )}
           </h2>
           <div className="mb-3 flex flex-wrap items-center gap-3" role="group" aria-label="Which alerts to show">
-            {[['mine', 'My hospital'], ['all', 'All hospitals']].map(([value, label]) => (
+            {[['mine', t('dash.mine')], ['all', t('dash.all')]].map(([value, label]) => (
               <button
                 key={value}
                 data-testid={`scope-${value}`}
@@ -129,7 +131,7 @@ export default function Dashboard() {
               </span>
             )}
           </div>
-          {loading && emergencies.length === 0 && <p className="text-slate-500">Loading alerts…</p>}
+          {loading && emergencies.length === 0 && <p className="text-slate-500">{t('dash.loading')}</p>}
           {!loading && emergencies.length === 0 && <p data-testid="queue-empty" className="text-slate-500">{scope === 'mine' ? 'No active alerts for this hospital.' : 'No active alerts.'}</p>}
           <ul ref={listRef} aria-label="Alert queue" onKeyDown={onListKeyDown} className="space-y-3">
             {emergencies.map((e) => (

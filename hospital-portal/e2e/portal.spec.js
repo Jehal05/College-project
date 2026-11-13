@@ -100,3 +100,28 @@ test.describe('reduced motion', () => {
     expect(style.border).not.toBe('0px');
   });
 });
+
+test.describe('language switch', () => {
+  test('Hindi and Gujarati change the screen, <html lang> and survive a reload; symptom words stay English', async ({ page }) => {
+    await login(page);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    const sw = page.locator('[data-testid=lang-switch]');
+    await sw.focus();
+    await sw.selectOption('hi');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hi');
+    await expect(page.locator('nav >> text=डैशबोर्ड')).toBeVisible();
+    await expect(page.locator('[data-testid=connection]')).toContainText('नकली डेटा');
+    await expect(page.locator('header')).toContainText('Simulated'); // the word stays English
+    // clinical words are not translated
+    const cardText = await cards(page).first().innerText();
+    expect(cardText).toMatch(/[A-Za-z]/);
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hi'); // saved
+    await sw.selectOption('gu');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'gu');
+    await expect(page.locator('nav >> text=ડેશબોર્ડ')).toBeVisible();
+    await sw.selectOption('en');
+    await expect(page.locator('nav >> text=Dashboard')).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});

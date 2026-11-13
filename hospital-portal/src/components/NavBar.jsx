@@ -5,18 +5,21 @@ import SimulatedBadge from './SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { resetDemo } from '../services/demoReset.js';
 import { useHospitals } from './HospitalProvider.jsx';
+import { useT } from '../i18n/index.js';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
 
 const links = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/map', label: 'Map' },
-  { to: '/fleet', label: 'Fleet' },
-  { to: '/history', label: 'History' },
-  { to: '/activity', label: 'Activity' },
-  { to: '/analytics', label: 'Analytics' },
-  { to: '/admin', label: 'Admin', adminOnly: true },
+  { to: '/dashboard', label: 'nav.dashboard' },
+  { to: '/map', label: 'nav.map' },
+  { to: '/fleet', label: 'nav.fleet' },
+  { to: '/history', label: 'nav.history' },
+  { to: '/activity', label: 'nav.activity' },
+  { to: '/analytics', label: 'nav.analytics' },
+  { to: '/admin', label: 'nav.admin', adminOnly: true },
 ];
 
 export default function NavBar() {
+  const t = useT();
   const { session, role, logout, chooseHospital } = useAuth();
   const { hospitals } = useHospitals();
   const navigate = useNavigate();
@@ -25,8 +28,8 @@ export default function NavBar() {
   return (
     <header className="bg-slate-900 text-white">
       <div className="flex flex-wrap items-center gap-4 px-6 py-3">
-        <span className="text-xl font-bold">HealthTwin AI · Hospital Portal</span>
-        <SimulatedBadge text="Simulated prototype" />
+        <span className="text-xl font-bold">{t('app.title')}</span>
+        <SimulatedBadge text={t('app.simulated')} />
         <nav className="flex gap-1 ml-4">
           {links
             .filter((l) => !l.adminOnly || role === 'admin')
@@ -38,7 +41,7 @@ export default function NavBar() {
                   `rounded-lg px-3 py-1.5 font-medium ${isActive ? 'bg-white text-slate-900' : 'hover:bg-slate-700'}`
                 }
               >
-                {l.label}
+                {t(l.label)}
               </NavLink>
             ))}
         </nav>
@@ -57,7 +60,7 @@ export default function NavBar() {
           )}
           {session?.hospital_from_login === false && hospitals.length > 0 && (
             <label className="flex items-center gap-2 text-sm text-slate-300">
-              Desk hospital
+              {t('nav.deskHospital')}
               <select data-testid="desk-hospital" value={session.hospital_id || ''} onChange={(e) => chooseHospital(e.target.value)} className="rounded bg-slate-800 px-2 py-1 text-white">
                 {hospitals.filter((h) => h.verified).map((h) => (
                   <option key={h.id} value={h.id}>{h.name}</option>
@@ -65,6 +68,7 @@ export default function NavBar() {
               </select>
             </label>
           )}
+          <LanguageSwitcher />
           <span className="text-slate-300">
             {session?.name} ({role})
           </span>
@@ -75,7 +79,7 @@ export default function NavBar() {
             }}
             className="rounded-lg bg-slate-700 px-3 py-1.5 hover:bg-slate-600"
           >
-            Log out
+            {t('nav.logout')}
           </button>
         </div>
       </div>

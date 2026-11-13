@@ -21,13 +21,13 @@ export function bannerView({ lostAt, backAt, reloaded, now }) {
   if (!Number.isFinite(lostAt)) return none;
   if (!Number.isFinite(backAt)) {
     return now - lostAt >= LOST_AFTER_MS
-      ? { kind: 'lost', text: `Connection lost at ${clockText(lostAt)}. New alerts may be missing.` }
+      ? { kind: 'lost', key: 'offline.lost', vars: { time: clockText(lostAt) }, text: `Connection lost at ${clockText(lostAt)}. New alerts may be missing.` }
       : none;
   }
   if (backAt - lostAt < LOST_AFTER_MS) return none; // it was short, the banner never showed
   if (now - backAt >= BACK_FOR_MS) return none;
-  if (!Number.isFinite(reloaded)) return { kind: 'back', text: 'Reconnected. Reloading alerts…' };
-  return { kind: 'back', text: `Reconnected. Reloaded ${reloaded} ${reloaded === 1 ? 'alert' : 'alerts'}.` };
+  if (!Number.isFinite(reloaded)) return { kind: 'back', key: 'offline.backLoading', vars: {}, text: 'Reconnected. Reloading alerts…' };
+  return { kind: 'back', key: reloaded === 1 ? 'offline.backOne' : 'offline.back', vars: { n: reloaded }, text: `Reconnected. Reloaded ${reloaded} ${reloaded === 1 ? 'alert' : 'alerts'}.` };
 }
 
 /** Milliseconds until the view could next change (for the timer), or null when nothing is pending. */

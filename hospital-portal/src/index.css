@@ -2,6 +2,11 @@
 
 /* Large, readable base size: the dashboard is shown to a jury from a distance. */
 html { font-size: 18px; }
+/* Hindi and Gujarati need a font that has the glyphs. Noto Sans first, then common system fonts that cover both. */
+body {
+  font-family: ui-sans-serif, system-ui, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Gujarati', 'Nirmala UI', 'Mangal', 'Shruti', 'Segoe UI', Roboto, sans-serif;
+}
+html[lang='hi'] body, html[lang='gu'] body { line-height: 1.6; }
 body { @apply bg-slate-100 text-slate-900 antialiased; }
 
 /* Leaflet divIcon wrapper: remove the default white square. */

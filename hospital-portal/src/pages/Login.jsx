@@ -4,11 +4,14 @@ import { useAuth } from '../components/AuthProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { LOGIN_FIELD } from '../services/auth.js';
+import { useT } from '../i18n/index.js';
+import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
 
 export default function Login() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const t = useT();
   const [email, setEmail] = useState(USE_MOCK ? 'staff@demo' : 'staff1');
   const [password, setPassword] = useState(USE_MOCK ? 'demo123' : 'demo-password');
   const [error, setError] = useState('');
@@ -34,13 +37,14 @@ export default function Login() {
     <div className="min-h-screen grid place-items-center bg-slate-900 p-6">
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5 rounded-2xl bg-white p-8 shadow-xl">
         <div>
-          <h1 className="text-3xl font-bold">Hospital Portal</h1>
-          <p className="text-slate-600">HealthTwin AI · staff login</p>
-          <SimulatedBadge text="Simulated prototype. No real hospital is contacted." className="mt-3" />
+          <div className="mb-2 flex justify-end"><LanguageSwitcher /></div>
+          <h1 className="text-3xl font-bold">{t('login.title')}</h1>
+          <p className="text-slate-600">{t('login.subtitle')}</p>
+          <SimulatedBadge text={t('login.simulated')} className="mt-3" />
         </div>
 
         <label className="block">
-          <span className="font-medium" data-testid="login-label">{LOGIN_FIELD === 'username' ? 'Username' : 'Email'}</span>
+          <span className="font-medium" data-testid="login-label">{LOGIN_FIELD === 'username' ? t('login.username') : t('login.email')}</span>
           {LOGIN_FIELD === 'username' && <span className="ml-2 text-sm text-slate-500">The backend asks for a username, not an email.</span>}
           <input
             value={email}
@@ -50,7 +54,7 @@ export default function Login() {
           />
         </label>
         <label className="block">
-          <span className="font-medium">Password</span>
+          <span className="font-medium">{t('login.password')}</span>
           <input
             type="password"
             value={password}
@@ -66,7 +70,7 @@ export default function Login() {
           disabled={busy}
           className="w-full rounded-lg bg-sky-600 py-3 text-lg font-bold text-white hover:bg-sky-700 disabled:opacity-60"
         >
-          {busy ? 'Logging in…' : 'Log in'}
+          {busy ? t('login.busy') : t('login.submit')}
         </button>
 
         {USE_MOCK && (

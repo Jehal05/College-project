@@ -7,6 +7,7 @@ import * as api from '../services/api.js';
 import { useAuth } from '../components/AuthProvider.jsx';
 import { useHistory } from '../components/HistoryProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
+import { useT } from '../i18n/index.js';
 import { buildActivity, filterActivity, auditRows, auditError, KINDS, WHO } from '../services/activity.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
@@ -63,6 +64,7 @@ function AuditLog() {
 }
 
 export default function Activity() {
+  const t = useT();
   const { role } = useAuth();
   const { cases, loading, error } = useHistory();
   const [f, setF] = useState({ kind: 'all', who: 'all', text: '' });
@@ -73,7 +75,7 @@ export default function Activity() {
   return (
     <div className="space-y-5 p-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Staff activity log</h1>
+        <h1 className="text-3xl font-bold">{t('activity.title')}</h1>
         <SimulatedBadge text="Simulated cases · sample patients" />
         <span data-testid="activity-count" className="ml-auto text-xl font-semibold">{rows.length} of {all.length} entries</span>
       </div>
