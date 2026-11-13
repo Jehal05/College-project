@@ -1,6 +1,6 @@
 {
-  "HEART":    ["Chest pain or pressure", "Shortness of breath", "Sweating", "Nausea", "Pain in left arm or jaw", "Fainting"],
-  "STROKE":   ["Face drooping", "Arm or leg weakness", "Slurred speech", "Sudden confusion", "Sudden severe headache"],
-  "DIABETIC": ["Confusion", "Shaking", "Sweating", "Fainting", "Very low glucose reading"],
-  "ASTHMA":   ["Wheezing", "Cannot speak full sentences", "Severe shortness of breath", "Blue lips"]
+  "HEART":    ["CHEST_PAIN", "SHORT_BREATH", "SWEATING", "NAUSEA", "ARM_JAW_PAIN", "FAINTING"],
+  "STROKE":   ["FACE_DROOP", "LIMB_WEAKNESS", "SLURRED_SPEECH", "SUDDEN_CONFUSION", "SEVERE_HEADACHE"],
+  "DIABETIC": ["DIA_CONFUSION", "DIA_SHAKING", "DIA_SWEATING", "DIA_FAINTING", "LOW_GLUCOSE_READING"],
+  "ASTHMA":   ["WHEEZING", "CANNOT_SPEAK_SENTENCES", "SEVERE_SHORT_BREATH", "BLUE_LIPS"]
 }

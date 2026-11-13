@@ -1,9 +1,11 @@
-// Home: greeting, live vitals card and the emergency status bar (Monitoring for now).
+// Home: emergency button, active-emergency banner, greeting, live vitals and the status bar.
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import useVitals from '../hooks/useVitals';
-import { getPatient } from '../services/api';
+import { getEmergency, getPatient } from '../services/api';
+import { clearActive, getActive } from '../utils/activeEmergency';
 import VitalsCard from '../components/VitalsCard';
 import StatusBar from '../components/StatusBar';
 
@@ -12,6 +14,7 @@ export default function Home() {
   const { session, signOut } = useAuth();
   const { vitals, connected } = useVitals();
   const [name, setName] = useState('');
+  const [activeId, setActiveId] = useState(null); // only set after we confirmed it is still running
 
   useEffect(() => {
     getPatient(session.patient_id)
@@ -19,9 +22,32 @@ export default function Home() {
       .catch((err) => { if (err.status === 401) signOut(); }); // Token no longer valid.
   }, [session.patient_id, signOut]);
 
+  // If an emergency was running, check it is not finished before showing the banner.
+  useEffect(() => {
+    const id = getActive();
+    if (!id) return;
+    getEmergency(id)
+      .then((e) => {
+        if (e.state === 'CANCELLED' || e.state === 'HANDOVER_DONE') clearActive();
+        else setActiveId(id);
+      })
+      .catch((err) => { if (err.status === 404) clearActive(); });
+  }, []);
+
   return (
     <div>
       <h1 className="mb-4 text-2xl font-bold">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+      {activeId && (
+        <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
+          <p className="mb-2 font-bold text-red-900">{t('home.activeEmergency')}</p>
+          <Link to={'/emergency/' + activeId} className="inline-flex min-h-[48px] items-center rounded-lg bg-red-700 px-4 font-bold text-white">
+            {t('home.returnToEmergency')}
+          </Link>
+        </div>
+      )}
+      <Link to="/symptoms" className="mb-5 flex min-h-[80px] w-full items-center justify-center rounded-xl bg-red-700 text-2xl font-extrabold text-white shadow">
+        {t('home.emergency')}
+      </Link>
       <VitalsCard vitals={vitals} connected={connected} />
       <h2 className="mb-2 mt-5 text-lg font-bold">{t('home.state')}</h2>
       <StatusBar state={vitals?.state || 'MONITORING'} />

@@ -6,6 +6,7 @@ const cors = require('cors');
 const { WebSocketServer } = require('ws');
 const routes = require('./routes');
 const { delay, normalVitals } = require('./helpers');
+const simulator = require('./simulator');
 
 const PORT = process.env.PORT || 4000;
 // Extra ports are allowed so Puneet's hospital portal can call this server too.
@@ -20,6 +21,7 @@ app.use('/', routes);
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
+simulator.setServer(wss); // the simulator uses it to broadcast emergency events
 
 // Every second, send a vitals.update event to every connected client.
 setInterval(() => {
@@ -31,10 +33,7 @@ setInterval(() => {
     timestamp: v.timestamp,
     payload: { patient_id: 'HT-1001', heart_rate: v.heart_rate, spo2: v.spo2 },
   };
-  const message = JSON.stringify(event);
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) client.send(message);
-  });
+  simulator.broadcast(event);
 }, 1000);
 
 server.listen(PORT, () => {

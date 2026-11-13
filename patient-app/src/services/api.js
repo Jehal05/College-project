@@ -34,3 +34,13 @@ export const login = (email, password) => request('/auth/login', { method: 'POST
 export const getPatient = (id) => request('/patients/' + id);
 export const updatePatient = (id, fields) => request('/patients/' + id, { method: 'PATCH', body: fields });
 export const getVitals = (id) => request('/patients/' + id + '/vitals');
+
+// ---- Emergency flow (Phase 2) ----
+export const createEmergency = (body) => request('/emergencies', { method: 'POST', body });
+export const sendSos = (id, location) => request('/emergencies/' + id + '/sos', { method: 'POST', body: { location } });
+export const cancelEmergency = (id) => request('/emergencies/' + id + '/cancel', { method: 'POST' });
+export const getEmergency = (id) => request('/emergencies/' + id);
+
+// ---- Demo helpers ----
+export const runDemoScenario = (type) => request('/demo/scenario', { method: 'POST', body: { type } });
+export const resetDemo = () => request('/demo/reset', { method: 'POST' });

@@ -1,5 +1,5 @@
 // Small helper functions: fake delay, auth check, distance maths, random vitals.
-const { tokens } = require('./store');
+const { tokens, hospitals } = require('./store');
 
 // Adds a 200-400 ms delay so loading states can be tested in the app.
 function delay(req, res, next) {
@@ -30,6 +30,28 @@ function randomInt(min, max) {
   return Math.floor(min + Math.random() * (max - min + 1));
 }
 
+// Demo location used when the patient app sends no location (same as the app's demo location).
+const DEMO_LOCATION = { lat: 21.1702, lng: 72.8311, accuracy: 50 };
+
+// What each emergency type needs from a hospital.
+const REQUIRED_CAPABILITY = {
+  HEART: 'CARDIAC_CATH_LAB', STROKE: 'STROKE_UNIT', ASTHMA: 'PULMONOLOGY', DIABETIC: 'EMERGENCY',
+};
+
+// PLACEHOLDER for Puneet's real hospital ranking (feature 15).
+// Picks the nearest verified, available hospital with the needed capability;
+// falls back to the nearest verified, available hospital with EMERGENCY.
+function chooseHospital(type, location) {
+  const where = location || DEMO_LOCATION;
+  const withDistance = hospitals
+    .filter((h) => h.verified && h.available)
+    .map((h) => ({ ...h, distance_km: Number(distanceKm(where.lat, where.lng, h.lat, h.lng).toFixed(2)) }))
+    .sort((a, b) => a.distance_km - b.distance_km);
+  const needed = REQUIRED_CAPABILITY[type];
+  return withDistance.find((h) => h.capabilities.includes(needed)) ||
+    withDistance.find((h) => h.capabilities.includes('EMERGENCY')) || null;
+}
+
 // Normal resting vitals for a healthy-looking simulated patient.
 function normalVitals() {
   return {
@@ -42,4 +64,4 @@ function normalVitals() {
   };
 }
 
-module.exports = { delay, requireAuth, distanceKm, normalVitals };
+module.exports = { delay, requireAuth, distanceKm, normalVitals, chooseHospital, DEMO_LOCATION };

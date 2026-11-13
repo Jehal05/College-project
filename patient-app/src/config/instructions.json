@@ -1,0 +1,7 @@
+{
+  "GENERAL": ["instructions.general1", "instructions.general2", "instructions.general3"],
+  "HEART":    { "reviewed": false, "lines": [] },
+  "STROKE":   { "reviewed": false, "lines": [] },
+  "DIABETIC": { "reviewed": false, "lines": [] },
+  "ASTHMA":   { "reviewed": false, "lines": [] }
+}

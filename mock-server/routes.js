@@ -2,7 +2,8 @@
 const express = require('express');
 const crypto = require('crypto');
 const store = require('./store');
-const { requireAuth, distanceKm, normalVitals } = require('./helpers');
+const simulator = require('./simulator');
+const { requireAuth, distanceKm, normalVitals, DEMO_LOCATION } = require('./helpers');
 
 const router = express.Router();
 const EDITABLE = ['name', 'age', 'sex', 'blood_group', 'allergies', 'conditions',
@@ -40,35 +41,74 @@ router.get('/patients/:id/vitals', requireAuth, (req, res) => {
   res.json(normalVitals());
 });
 
-// ---- Emergency endpoints are stubs for Phase 2 ----
+// ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
+// Check a type and symptom IDs. Returns an error text or null.
+function checkEmergencyBody({ patient_id, type, symptoms }) {
+  if (!patient_id || !store.emergencyTypes[type]) return 'patient_id and a valid type are required';
+  if (!Array.isArray(symptoms) || symptoms.length === 0) return 'symptoms must be a non-empty list of symptom IDs';
+  const unknown = symptoms.find((id) => !store.emergencyTypes[type].includes(id));
+  return unknown ? 'Unknown symptom ID for ' + type + ': ' + unknown : null;
+}
+
 router.post('/emergencies', requireAuth, (req, res) => {
-  const { patient_id, type, symptoms = [], location = null } = req.body || {};
-  if (!patient_id || !store.emergencyTypes[type]) {
-    return res.status(400).json({ error: 'patient_id and a valid type are required' });
+  const problem = checkEmergencyBody(req.body || {});
+  if (problem) return res.status(400).json({ error: problem });
+  const e = simulator.createEmergency(req.body);
+  res.status(201).json({ id: e.id, state: e.state, severity: e.severity });
+});
+
+const findEmergency = (req, res) => {
+  const e = store.emergencies.get(req.params.id);
+  if (!e) res.status(404).json({ error: 'Emergency not found' });
+  return e;
+};
+
+// Starts the simulated hospital response. Sending it twice is harmless (same answer).
+router.post('/emergencies/:id/sos', requireAuth, (req, res) => {
+  const e = findEmergency(req, res);
+  if (!e) return;
+  if (e.state === 'CANCELLED') return res.status(409).json({ error: 'Emergency was cancelled' });
+  if (e.state === 'EMERGENCY_DETECTED') {
+    const loc = req.body && req.body.location;
+    simulator.sendSos(e, loc ? { lat: loc.lat, lng: loc.lng, accuracy: loc.accuracy, source: loc.source } : null);
   }
-  const id = store.nextEmergencyId();
-  const now = new Date().toISOString();
-  const emergency = {
-    id, patient_id, type, symptoms, location,
-    state: 'EMERGENCY_DETECTED', severity: 'EMERGENCY',
-    status_events: [{ state: 'EMERGENCY_DETECTED', timestamp: now }],
-  };
-  store.emergencies.set(id, emergency);
-  res.status(201).json({ id, state: emergency.state, severity: emergency.severity });
+  res.json({ id: e.id, state: e.state, hospital: e.hospital });
 });
 
 router.post('/emergencies/:id/cancel', requireAuth, (req, res) => {
-  const emergency = store.emergencies.get(req.params.id);
-  if (!emergency) return res.status(404).json({ error: 'Emergency not found' });
-  emergency.state = 'CANCELLED';
-  emergency.status_events.push({ state: 'CANCELLED', timestamp: new Date().toISOString() });
-  res.json({ id: emergency.id, state: emergency.state });
+  const e = findEmergency(req, res);
+  if (!e) return;
+  if (e.state === 'HANDOVER_DONE') return res.status(409).json({ error: 'Emergency already finished' });
+  if (e.state !== 'CANCELLED') simulator.cancelEmergency(e);
+  res.json({ id: e.id, state: e.state });
 });
 
 router.get('/emergencies/:id', requireAuth, (req, res) => {
-  const emergency = store.emergencies.get(req.params.id);
-  if (!emergency) return res.status(404).json({ error: 'Emergency not found' });
-  res.json(emergency);
+  const e = findEmergency(req, res);
+  if (e) res.json(e);
+});
+
+// ---- Demo helpers for the demo control panel ----
+const DEFAULT_SYMPTOMS = {
+  HEART: ['CHEST_PAIN', 'SHORT_BREATH', 'SWEATING'],
+  STROKE: ['FACE_DROOP', 'LIMB_WEAKNESS', 'SLURRED_SPEECH'],
+  DIABETIC: ['DIA_CONFUSION', 'DIA_SHAKING', 'LOW_GLUCOSE_READING'],
+  ASTHMA: ['WHEEZING', 'CANNOT_SPEAK_SENTENCES', 'SEVERE_SHORT_BREATH'],
+};
+
+router.post('/demo/scenario', requireAuth, (req, res) => {
+  const type = req.body && req.body.type;
+  if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be HEART, STROKE, DIABETIC or ASTHMA' });
+  const patient = store.patients['HT-1001'];
+  const e = simulator.createEmergency({ patient_id: patient.id, type, symptoms: DEFAULT_SYMPTOMS[type], consents: patient.consents });
+  simulator.sendSos(e, { ...DEMO_LOCATION, source: 'demo' });
+  res.status(201).json({ id: e.id, state: e.state });
+});
+
+router.post('/demo/reset', requireAuth, (req, res) => {
+  simulator.stopAll();
+  store.resetStore();
+  res.json({ ok: true });
 });
 
 // Hospitals sorted by distance from lat/lng (defaults to a demo point in Surat).
