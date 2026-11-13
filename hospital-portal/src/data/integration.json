@@ -205,6 +205,18 @@
       "used_for": "Early notice before the patient confirms SOS (no sound, no Acknowledge)",
       "status": "agreed",
       "fallback": "If alerts are created at SOS_SENT, they behave as normal alerts."
+    },
+    {
+      "used_for": "Keeps the token out of the address (VITE_WS_AUTH=message)",
+      "status": "proposed",
+      "fallback": "Portal keeps using ?token= in the address (default)",
+      "name": "WebSocket first-message auth {\"type\":\"auth\",\"token\"}"
+    },
+    {
+      "used_for": "Who moves the simulated ambulance: auto | true | false",
+      "status": "portal setting",
+      "fallback": "auto: portal moves it unless the backend sends ambulance.location within 3 s",
+      "name": "VITE_PORTAL_SIMULATES_AMBULANCE"
     }
   ]
 }

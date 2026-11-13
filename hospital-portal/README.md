@@ -23,7 +23,29 @@ Log in with `staff@demo` or `admin@demo`, password `demo123` (mock mode only).
 | `VITE_USE_MOCK=true` | Uses the fake JSON in `src/data/`. No backend needed. |
 | `VITE_USE_MOCK=false` | Calls Daksh's backend at `VITE_API_BASE_URL` and `VITE_WS_URL`. |
 
+| `VITE_PORTAL_SIMULATES_AMBULANCE` | `auto` (default), `true` or `false`. Who moves the (simulated) ambulance on the map. See below. |
+| `VITE_WS_AUTH` | `query` (default, token in the WebSocket address) or `message` (token sent as the first message, needs Daksh's OK). |
+
 Restart `npm run dev` after changing `.env`.
+
+### Who moves the ambulance?
+
+Everything about the ambulance is **simulated**. Only one side should move it, or the map jumps between two routes.
+
+| Setting | Mock mode | Real mode |
+|---|---|---|
+| `auto` | the portal moves it | the portal waits 3 s after Dispatch; if the backend sends `ambulance.location`, the backend moves it and the portal stays quiet; if not, the portal moves it. If a backend position arrives later, the portal stops its own trip. |
+| `true` | the portal moves it | the portal moves it |
+| `false` | nobody (frozen) | only the backend moves it |
+
+The screen always says which: "Ambulance movement: simulated by the portal" or "… by the backend". The portal ignores the echo of its own positions, so it does not mistake them for the backend.
+
+### Known limitations (honest list)
+
+- **The login token is kept in the browser.** It is in `sessionStorage` (gone when the tab is closed), not `localStorage`. A script running on the page could still read it. This is a prototype; a real product would use short-lived tokens in an HttpOnly cookie.
+- **The token is sent in the WebSocket address** (`ws://…/ws?token=…`) by default. Addresses can end up in server logs. `VITE_WS_AUTH=message` sends it as the first message instead, but the backend must support that (question for Daksh in [docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md](docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md)).
+- **sessionStorage is per tab.** A new tab starts logged out. The "Open the crew view" link keeps the login because it opens from the portal. Opening `/crew/…` by typing the address asks for a login.
+- Everything medical, hospital and ambulance related is a simulated sample. This is not a real emergency system.
 
 ## What is in Phase 1
 

@@ -58,6 +58,13 @@ The login answer has no hospital. After login, the top bar shows **Desk hospital
 8. [ ] **Safety check-in:** trigger a fall check without symptoms. Portal: card says "No symptoms reported. Started by the safety check-in … Simulated." Detail opens without errors; after the SOS it can be acknowledged and dispatched; the report opens.
 9. [ ] Stop the mock for 10 seconds: badge shows Reconnecting, then Live; nothing crashes.
 
+## Who moves the ambulance (decide this before the demo)
+Only one side should simulate the ambulance. `VITE_PORTAL_SIMULATES_AMBULANCE` in the portal `.env`:
+- `auto` (default): with Jehal's mock, which sends no `ambulance.location` of its own after Dispatch, the portal waits 3 s and then moves the ambulance. If a backend starts sending positions, the portal stops.
+- `true`: always the portal. `false`: never the portal (use when Daksh's backend simulates the trip).
+The map shows "Ambulance movement: simulated by the portal / by the backend". Check that line during rehearsal step 4.
+Also: the portal keeps the login in the browser tab only (`sessionStorage`), so after closing the tab you log in again.
+
 ## Re-capture the real events (for the integration test)
 `src/services/jehal-fixture.json` is a saved run of Jehal's mock, used by `src/services/integration.test.js`.
 To refresh it after Jehal changes his output: run his mock, run `npm run integration` on branch `Jehal`, copy the new events into the fixture (keep the same keys: `ids`, `events`, `details`, `hospitals`) and run `npm test`. A failing test tells you which field the portal can no longer read.

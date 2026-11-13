@@ -77,4 +77,5 @@ Ignored without error: `vitals.update`, `contacts.notified`, any unknown event.
 ## F. Please also confirm
 
 - `ESCALATED` followed by `SOS_SENT` (your table) vs the portal's single `ESCALATED` state: the portal accepts both orders.
-- A second `ambulance.location` stream is sent by the portal itself (its simulated trip). If your backend also simulates the ambulance, tell us which one should win; only one should run in the demo.
+- A second `ambulance.location` stream is sent by the portal itself (its simulated trip). If your backend also simulates the ambulance, tell us which one should win; only one should run in the demo. The portal's `VITE_PORTAL_SIMULATES_AMBULANCE=auto` already handles both: it stops its own trip as soon as it sees a position that it did not send. Set it to `false` once you confirm the backend simulates the trip.
+- **WebSocket first-message auth.** Today the portal connects to `ws://…/ws?token=<jwt>`. Tokens in addresses can leak into logs. Can the socket also accept the token as the **first message**, `{"type":"auth","token":"<jwt>"}`, and close with an error if none arrives in a few seconds? The portal already supports it: set `VITE_WS_AUTH=message` (default `query`). **If you say no:** nothing changes, the portal keeps using `?token=`.
