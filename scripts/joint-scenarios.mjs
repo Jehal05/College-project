@@ -65,6 +65,17 @@ export async function runScenarios(env) {
   console.log('NOTE f2 how the portal renders type UNKNOWN: ' + JSON.stringify(ft.replace(/\n/g, ' | ')));
   k.note('f2 UNKNOWN card text: ' + ft.replace(/\n/g, ' | '));
 
+  // h) cancel AFTER dispatch: Daksh's table forbids it (manual mode answers 409). Record what each side shows.
+  const h = await patientStart('/symptoms'); await card(h.id).waitFor({ timeout: 15000 }); await card(h.id).click();
+  await desk.locator('button[data-action=HOSPITAL_ACKNOWLEDGED]').click(); await quiet(800);
+  await desk.locator('button[data-action=AMBULANCE_DISPATCHED]').click(); await desk.locator('[data-testid=confirm-dispatch]').click(); await quiet(1500);
+  await h.page.getByRole('button', { name: 'False alarm? Cancel' }).click();
+  await h.page.getByRole('button', { name: /yes|cancel|confirm/i }).last().click().catch(() => {}); await quiet(2500);
+  const stateH = await card(h.id).getAttribute('data-state'); const pTxt = (await h.page.innerText('main')).replace(/\n+/g, ' | ');
+  check('h1 cancel after dispatch is refused: portal card is NOT cancelled (data-state=' + stateH + ')', stateH !== 'CANCELLED');
+  console.log('NOTE h2 patient screen after the refused cancel: ' + JSON.stringify(pTxt.slice(0, 260)));
+  k.note('h2 patient screen: ' + pTxt.slice(0, 260));
+
   // g) console errors in both apps
   const bad = k.logs.filter((l) => !/401|404|409|Failed to load resource/.test(l));
   check('g1 no unexpected console errors in either app', bad.length === 0, bad.slice(0, 4));
