@@ -4,6 +4,7 @@ import { useState } from 'react';
 import SimulatedBadge from './SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { resetDemo } from '../services/demoReset.js';
+import { useHospitals } from './HospitalProvider.jsx';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -15,7 +16,8 @@ const links = [
 ];
 
 export default function NavBar() {
-  const { session, role, logout } = useAuth();
+  const { session, role, logout, chooseHospital } = useAuth();
+  const { hospitals } = useHospitals();
   const navigate = useNavigate();
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -51,6 +53,16 @@ export default function NavBar() {
               <button data-testid="reset-yes" onClick={resetDemo} className="rounded bg-red-600 px-3 py-1 font-bold text-white">Yes, reset</button>
               <button data-testid="reset-no" onClick={() => setConfirmReset(false)} className="rounded bg-slate-300 px-3 py-1 font-semibold">No</button>
             </span>
+          )}
+          {session?.hospital_from_login === false && hospitals.length > 0 && (
+            <label className="flex items-center gap-2 text-sm text-slate-300">
+              Desk hospital
+              <select data-testid="desk-hospital" value={session.hospital_id || ''} onChange={(e) => chooseHospital(e.target.value)} className="rounded bg-slate-800 px-2 py-1 text-white">
+                {hospitals.filter((h) => h.verified).map((h) => (
+                  <option key={h.id} value={h.id}>{h.name}</option>
+                ))}
+              </select>
+            </label>
           )}
           <span className="text-slate-300">
             {session?.name} ({role})

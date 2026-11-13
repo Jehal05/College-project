@@ -3,13 +3,14 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
+import { LOGIN_FIELD } from '../services/auth.js';
 
 export default function Login() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('staff@demo');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail] = useState(USE_MOCK ? 'staff@demo' : 'staff1');
+  const [password, setPassword] = useState(USE_MOCK ? 'demo123' : 'demo-password');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -39,7 +40,8 @@ export default function Login() {
         </div>
 
         <label className="block">
-          <span className="font-medium">Email</span>
+          <span className="font-medium" data-testid="login-label">{LOGIN_FIELD === 'username' ? 'Username' : 'Email'}</span>
+          {LOGIN_FIELD === 'username' && <span className="ml-2 text-sm text-slate-500">The backend asks for a username, not an email.</span>}
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -69,7 +71,7 @@ export default function Login() {
 
         {USE_MOCK && (
           <p className="text-sm text-slate-500">
-            Mock mode demo accounts: <b>staff@demo</b> or <b>admin@demo</b>, password <b>demo123</b>
+            Mock mode demo accounts: <b>staff@demo</b> or <b>admin@demo</b>, password <b>demo123</b>. Jehal's logins also work: <b>staff@demo.test</b> / <b>demo1234</b> and <b>staff1</b> / <b>demo-password</b>.
           </p>
         )}
       </form>

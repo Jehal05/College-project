@@ -3,11 +3,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as api from '../services/api.js';
 import { useAuth } from './AuthProvider.jsx';
+import { defaultHospitalId } from '../services/adapters.js';
 
 const HospitalContext = createContext(null);
 
 export function HospitalProvider({ children }) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, session, chooseHospital } = useAuth();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -28,6 +29,11 @@ export function HospitalProvider({ children }) {
     if (isLoggedIn) reload();
     else setHospitals([]);
   }, [isLoggedIn, reload]);
+
+  // Login gave no hospital (Daksh v0.6 does not send one yet): use the first verified hospital until the desk picks another.
+  useEffect(() => {
+    if (isLoggedIn && !session?.hospital_id && hospitals.length) chooseHospital(defaultHospitalId(hospitals, null));
+  }, [isLoggedIn, session?.hospital_id, hospitals, chooseHospital]);
 
   /** Save beds / ICU / unit readiness for one hospital. Throws if the save fails. */
   const saveAvailability = useCallback(async (id, availability) => {

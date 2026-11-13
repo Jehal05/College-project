@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import * as auth from '../services/auth.js';
 import { connect, disconnect } from '../services/socket.js';
+import { saveSession } from '../services/session.js';
 
 const AuthContext = createContext(null);
 
@@ -22,6 +23,13 @@ export function AuthProvider({ children }) {
       const s = await auth.login(email, password);
       setSession(s);
       return s;
+    },
+    /** The backend did not say which hospital this desk belongs to, so the desk picks one (saved with the session). */
+    chooseHospital(id) {
+      if (!session || !id || id === session.hospital_id) return;
+      const next = { ...session, hospital_id: String(id) };
+      saveSession(next);
+      setSession(next);
     },
     logout() {
       auth.logout();
