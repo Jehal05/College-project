@@ -54,6 +54,11 @@ def _secret() -> str:
     return _demo_secret
 
 
+def signing_secret() -> str:
+    """The signing key (JWT_SECRET_KEY). Login tokens and passport tokens share it but carry different `purpose` claims."""
+    return _secret()
+
+
 def reset_demo_secret() -> None:
     global _demo_secret
     _demo_secret = None

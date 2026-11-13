@@ -1,6 +1,4 @@
 """Password hashing (feature 33)."""
-import time
-
 import pytest
 
 from app.security import passwords
@@ -71,17 +69,25 @@ def test_an_unknown_user_gets_false_after_real_work():
     assert verify_or_burn("wrong", h) is False
 
 
-def test_unknown_user_and_wrong_password_take_about_the_same_time(monkeypatch):
-    monkeypatch.setenv("BCRYPT_ROUNDS", "8")
+def test_unknown_user_and_wrong_password_do_the_same_bcrypt_work(monkeypatch):
+    """Deterministic (no stopwatch): both paths run exactly one bcrypt comparison at the current cost."""
+    monkeypatch.setenv("BCRYPT_ROUNDS", "6")
     passwords._dummy_hash = None
-    h = hash_password("demo1234")
+    real_hash = hash_password("demo1234")
+    calls = []
+    real_check = passwords.bcrypt.checkpw
+    monkeypatch.setattr(passwords.bcrypt, "checkpw", lambda plain, hashed: calls.append(hashed) or real_check(plain, hashed))
 
-    def timed(hashed):
-        start = time.perf_counter()
-        for _ in range(3):
-            verify_or_burn("wrong-password", hashed)
-        return time.perf_counter() - start
+    assert verify_or_burn("wrong-password", real_hash) is False      # a wrong password for a real user
+    assert verify_or_burn("wrong-password", None) is False           # an unknown user
+    assert len(calls) == 2                                           # one comparison each, never a shortcut
+    assert calls[0] == real_hash.encode() and calls[1].startswith(b"$2b$06$")    # the stand-in has the same cost
 
-    timed(None)                                    # warm up the dummy hash
-    wrong, unknown = timed(h), timed(None)
-    assert unknown > wrong * 0.5                   # the unknown-user path is not a cheap shortcut
+
+def test_the_stand_in_hash_is_made_once_and_reused(monkeypatch):
+    monkeypatch.setenv("BCRYPT_ROUNDS", "5")
+    passwords._dummy_hash = None
+    verify_or_burn("x", None)
+    first = passwords._dummy_hash
+    verify_or_burn("y", None)
+    assert passwords._dummy_hash is first and first.startswith("$2b$05$")
