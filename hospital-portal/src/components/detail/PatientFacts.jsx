@@ -1,5 +1,6 @@
 import { NOT_SHARED } from '../../services/adapters.js';
 import { formatTime } from '../AlertCard.jsx';
+import { accuracyText } from '../../services/locationText.js';
 
 /** Patient ID, emergency ID, alert time and location. Missing data reads "Not shared". */
 export default function PatientFacts({ emergency: e }) {
@@ -11,7 +12,7 @@ export default function PatientFacts({ emergency: e }) {
       <div>
         <dt className="text-sm text-slate-500">Location</dt>
         <dd className="font-semibold">
-          {e.location ? `${e.location.lat.toFixed(4)}, ${e.location.lng.toFixed(4)} (±${e.location.accuracy_m ?? e.location.accuracy ?? '?'} m)` : 'Not shared'}
+          {e.location ? `${e.location.lat.toFixed(4)}, ${e.location.lng.toFixed(4)}${accuracyText(e.location)}` : 'Not shared'}
         </dd>
       </div>
     </dl>
