@@ -10,9 +10,28 @@ import { canEscalate, lastAlertTime, nextHospital } from './escalation.js';
 import { emitMock } from './socket.js';
 import { canTransition, canCancel, isFinal } from './stateMachine.js';
 import { EVENT_FOR_STATE } from './contract.js';
+import { MOCK_HOSPITALS_KEY } from './demoReset.js';
 
 const records = new Map(); // emergency_id -> emergency with status_events
-const hospitals = new Map(hospitalsSeed.map((h) => [h.id, { ...h, availability: { ...h.availability } }]));
+// Hospital changes (availability, new hospitals, verification) are kept in the browser so a page
+// reload does not undo them. "Reset demo" clears them.
+function loadHospitals() {
+  try {
+    const raw = localStorage.getItem(MOCK_HOSPITALS_KEY);
+    if (raw) return new Map(JSON.parse(raw).map((h) => [h.id, h]));
+  } catch {
+    /* fall back to the sample hospitals */
+  }
+  return new Map(hospitalsSeed.map((h) => [h.id, { ...h, availability: { ...h.availability } }]));
+}
+const hospitals = loadHospitals();
+function saveHospitals() {
+  try {
+    localStorage.setItem(MOCK_HOSPITALS_KEY, JSON.stringify([...hospitals.values()]));
+  } catch {
+    /* storage blocked: changes last until reload */
+  }
+}
 const timers = new Map(); // emergency_id -> escalation timer
 const ambulances = new Map(ambulancesSeed.map((a) => [a.id, { ...a }]));
 let noteCounter = 0;
@@ -56,7 +75,39 @@ export async function patchAvailability(id, availability) {
   const hospital = hospitals.get(id);
   if (!hospital) throw new Error(`Hospital ${id} not found`);
   hospital.availability = { ...hospital.availability, ...availability };
+  saveHospitals();
   return { id, availability: { ...hospital.availability } };
+}
+
+/** Admin: add a hospital (feature #47). It always starts unverified, so it is not ranked yet. */
+export async function addHospital(data) {
+  await delay();
+  const n = [...hospitals.keys()].map((k) => Number(String(k).replace(/\D/g, ''))).filter(Number.isFinite);
+  const id = `H${Math.max(0, ...n) + 1}`;
+  const hospital = { ...data, id, verified: false, capabilities: { ...data.capabilities }, availability: { ...data.availability } };
+  hospitals.set(id, hospital);
+  saveHospitals();
+  return { ...hospital };
+}
+
+/** Admin: change a hospital's details. Verification is not changed here. */
+export async function updateHospital(id, data) {
+  await delay();
+  const old = hospitals.get(id);
+  if (!old) throw new Error(`Hospital ${id} not found`);
+  hospitals.set(id, { ...old, ...data, id, verified: old.verified, capabilities: { ...data.capabilities }, availability: { ...data.availability } });
+  saveHospitals();
+  return { ...hospitals.get(id) };
+}
+
+/** Admin: mark a hospital verified (or not). Only verified hospitals are ranked. */
+export async function setHospitalVerified(id, verified) {
+  await delay();
+  const hospital = hospitals.get(id);
+  if (!hospital) throw new Error(`Hospital ${id} not found`);
+  hospital.verified = Boolean(verified);
+  saveHospitals();
+  return { id, verified: hospital.verified };
 }
 
 // ---------- Auto-escalation (feature #43) ----------

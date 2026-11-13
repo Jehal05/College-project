@@ -36,7 +36,29 @@ export function HospitalProvider({ children }) {
     setHospitals((list) => list.map((h) => (h.id === id ? { ...h, availability: { ...h.availability, ...saved } } : h)));
   }, []);
 
-  const value = useMemo(() => ({ hospitals, loading, error, reload, saveAvailability }), [hospitals, loading, error, reload, saveAvailability]);
+  /** Admin: add a hospital. It starts unverified. Throws if the save fails. */
+  const addHospital = useCallback(async (data) => {
+    const saved = await api.createHospital(data);
+    setHospitals((list) => [...list, { verified: false, ...data, ...saved }]);
+    return saved;
+  }, []);
+
+  /** Admin: change a hospital's details. Throws if the save fails. */
+  const editHospital = useCallback(async (id, data) => {
+    const saved = await api.updateHospital(id, data);
+    setHospitals((list) => list.map((h) => (h.id === id ? { ...h, ...data, ...(saved && typeof saved === 'object' ? saved : {}), id, verified: h.verified } : h)));
+  }, []);
+
+  /** Admin: verify or unverify. The ranking changes at once. Throws if the save fails. */
+  const setVerified = useCallback(async (id, verified) => {
+    await api.setHospitalVerified(id, verified);
+    setHospitals((list) => list.map((h) => (h.id === id ? { ...h, verified } : h)));
+  }, []);
+
+  const value = useMemo(
+    () => ({ hospitals, loading, error, reload, saveAvailability, addHospital, editHospital, setVerified }),
+    [hospitals, loading, error, reload, saveAvailability, addHospital, editHospital, setVerified],
+  );
   return <HospitalContext.Provider value={value}>{children}</HospitalContext.Provider>;
 }
 

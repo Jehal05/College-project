@@ -1,0 +1,56 @@
+[
+  {
+    "id": "RSP-1",
+    "name": "Volunteer Asha (Sample)",
+    "lat": 23.024,
+    "lng": 72.57,
+    "skill": "CPR trained",
+    "available": true,
+    "sample": true
+  },
+  {
+    "id": "RSP-2",
+    "name": "Volunteer Bhavin (Sample)",
+    "lat": 23.02,
+    "lng": 72.576,
+    "skill": "First-aid certified",
+    "available": true,
+    "sample": true
+  },
+  {
+    "id": "RSP-3",
+    "name": "Volunteer Chirag (Sample)",
+    "lat": 23.03,
+    "lng": 72.58,
+    "skill": "CPR trained",
+    "available": true,
+    "sample": true
+  },
+  {
+    "id": "RSP-4",
+    "name": "Volunteer Divya (Sample)",
+    "lat": 23.01,
+    "lng": 72.565,
+    "skill": "Nursing student",
+    "available": true,
+    "sample": true
+  },
+  {
+    "id": "RSP-5",
+    "name": "Volunteer Esha (Sample)",
+    "lat": 23.036,
+    "lng": 72.56,
+    "skill": "CPR trained",
+    "available": true,
+    "sample": true
+  },
+  {
+    "id": "RSP-6",
+    "name": "Volunteer Farhan (Sample)",
+    "lat": 23.2,
+    "lng": 72.65,
+    "skill": "First-aid certified",
+    "available": true,
+    "sample": true
+  }
+]

@@ -8,6 +8,7 @@ import { AuthProvider } from './components/AuthProvider.jsx';
 import { EmergencyProvider } from './components/EmergencyProvider.jsx';
 import { HospitalProvider } from './components/HospitalProvider.jsx';
 import { AmbulanceProvider } from './components/AmbulanceProvider.jsx';
+import { HistoryProvider } from './components/HistoryProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <HospitalProvider>
           <EmergencyProvider>
             <AmbulanceProvider>
-              <App />
+              <HistoryProvider>
+                <App />
+              </HistoryProvider>
             </AmbulanceProvider>
           </EmergencyProvider>
         </HospitalProvider>

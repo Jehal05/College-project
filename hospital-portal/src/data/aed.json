@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "id": "AED-1",
+    "name": "Ashram Road Metro Station (Sample)",
+    "lat": 23.0258,
+    "lng": 72.5718,
+    "note": "Station entrance, 24 hours",
+    "sample": true
+  },
+  {
+    "id": "AED-2",
+    "name": "City Mall, Ground Floor (Sample)",
+    "lat": 23.019,
+    "lng": 72.564,
+    "note": "Security desk, 10:00 to 22:00",
+    "sample": true
+  },
+  {
+    "id": "AED-3",
+    "name": "Law Garden Community Hall (Sample)",
+    "lat": 23.033,
+    "lng": 72.556,
+    "note": "Reception, 08:00 to 20:00",
+    "sample": true
+  },
+  {
+    "id": "AED-4",
+    "name": "Railway Station Booking Hall (Sample)",
+    "lat": 23.027,
+    "lng": 72.601,
+    "note": "Station office, 24 hours",
+    "sample": true
+  },
+  {
+    "id": "AED-5",
+    "name": "Riverfront Park Office (Sample)",
+    "lat": 23.012,
+    "lng": 72.579,
+    "note": "Park office, 06:00 to 21:00",
+    "sample": true
+  },
+  {
+    "id": "AED-6",
+    "name": "University Gate 2 Security (Sample)",
+    "lat": 23.042,
+    "lng": 72.544,
+    "note": "Gate cabin, 24 hours",
+    "sample": true
+  }
+]

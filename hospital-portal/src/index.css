@@ -16,3 +16,10 @@ body { @apply bg-slate-100 text-slate-900 antialiased; }
 
 /* Ambulance marker glides between position updates (one update per second). */
 .ht-smooth { transition: transform 1s linear; }
+
+/* Printing the post-event report (feature #31): only the report, on white paper. */
+@media print {
+  header, .no-print { display: none !important; }
+  body { background: #fff; font-size: 12pt; }
+  .report { box-shadow: none !important; padding: 0 !important; }
+}

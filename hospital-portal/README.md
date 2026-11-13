@@ -1,4 +1,4 @@
-# HealthTwin AI – Hospital Portal (Phases 1 to 3)
+# HealthTwin AI – Hospital Portal (Phases 1 to 5)
 
 Puneet's section: hospital dashboard, map and ambulance.
 **Simulated prototype. No real hospital, ambulance or emergency service is contacted.**
@@ -240,6 +240,50 @@ In mock mode the simulator sets En route and Arrived itself. With the real backe
 - `POST /emergencies/{id}/dispatch` body `{ambulance_id}`.
 - Proposed: `POST /emergencies/{id}/notes` (assignment, corridor, pickup), `POST /emergencies/{id}/chat`, events `emergency.note` and `chat.message`.
 - EN_ROUTE is carried by `ambulance.location` with `state: "EN_ROUTE"`.
+
+## What is in Phase 5 (analytics, reports, admin, community features, freeze)
+
+| Feature | Where |
+|---|---|
+| #48 Case history | `pages/History.jsx`, `services/cases.js`, `components/HistoryProvider.jsx`. Search and filter by type, severity, state, date, hospital. Opens the report. |
+| #31 Post-event report | `pages/Report.jsx`, `services/report.js`. One page: hospital and why, ambulance, team, timeline, step durations, checklist, notes. **Print** (print stylesheet in `index.css`) and **Download (.txt)**. |
+| #30 Analytics | `pages/Analytics.jsx`, `services/analytics.js`, `components/BarChart.jsx`. By type, severity and state, average step times, escalations, ambulance use. All numbers come from the stored timeline events. Shows "Not enough data yet" when empty. |
+| #47 Hospital onboarding | `pages/Admin.jsx`, `services/hospitalForm.js`. Admin only. New hospitals start **unverified** and are not ranked until an admin marks them verified. |
+| #23 AED finder | Map page toggle, `data/aed.json`, `services/nearby.js`, and "Nearby help" on each emergency. Sample data. |
+| #24 Community responders | Map page toggle, `data/responders.json`, "Nearby help". "Notify responder" is simulated: it only writes a timeline note and never says anyone is coming. |
+| Reset demo | Button in the top bar (mock mode only). Restores the sample data, keeps you logged in. |
+| Integration list | Admin page, "Backend connection" (data in `data/integration.json`). Every endpoint and event, marked agreed or proposed. |
+
+Charts are drawn with plain SVG instead of Recharts. This needs no extra package, works offline and was fully tested here. Large text, a title, a labelled axis, the value on every bar, colour-blind-safe colours.
+
+How past cases are stored:
+- Mock mode: 7 sample past cases (`data/sample-history.json`, marked sample) plus every case you finish. Finished cases, added hospitals and availability changes are kept in the browser (localStorage). **Reset demo** clears them.
+- Real mode: history comes from the backend (proposed `GET /emergencies?status=finished`, each item with `status_events`).
+
+### Phase 5 test checklist
+1. Log in as `staff@demo`. History shows 7 finished sample cases. Try each filter and the search box.
+2. Open the report of E-0901: hospital and why, durations, timeline, checklist 6 of 6. Click Print (menu and buttons disappear in the preview) and Download.
+3. Open the cancelled case E-0906: outcome says cancelled, no ambulance.
+4. Analytics: 10 cases at the start (7 sample plus 3 live). Finish a case and watch the numbers change.
+5. Map: tick "AED locations" (6 markers, nearest AED panel) and "Community responders" (5 markers).
+6. Open an emergency: "Nearby help" lists the 3 nearest AEDs. Click "Notify responder (simulated)": a timeline note appears.
+7. Log out, log in as `admin@demo`. Admin: submit the empty form (errors), add a hospital (starts Unverified). On the Map choose Heart attack: the new hospital is NOT ranked ("Not verified"). Mark it verified: it is ranked.
+8. Staff cannot see the Admin link. Opening `/admin` shows "Access denied".
+9. Click **Reset demo** then Yes: starting data is back.
+
+### Final list to confirm with Daksh
+See the table on the Admin page (or `src/data/integration.json`). The agreed items come from the team plan. These are **proposed** and need his OK before the demo:
+`GET /emergencies?status=active`, `GET /emergencies?status=finished` (with `status_events`), `PATCH /emergencies/{id}/checklist`, `GET /ambulances`, `POST /emergencies/{id}/notes`, `POST /emergencies/{id}/chat`, `POST /hospitals` (must save as `verified: false`), `PUT /hospitals/{id}`, `PATCH /hospitals/{id}/verify`, events `emergency.note` and `chat.message`, and the WebSocket token as `?token=`.
+For Jehal and Daksh: the contract event `responder.alert` is not used by this portal. "Notify responder" is a timeline note only.
+
+### Switching to the real backend (one switch)
+Set `VITE_USE_MOCK=false` in `.env`, set `VITE_API_BASE_URL` and `VITE_WS_URL`, restart `npm run dev`. The Admin page shows which mode is active.
+
+### Label rules checked in Phase 5
+Every page shows "Simulated" in the top bar. Sample content (symptoms, checklists, AEDs, responders, history, crews) says sample or pending medical review. "Alert sent" never reads as "ambulance dispatched": that only appears after Dispatch is clicked.
+
+### Jury demo script (about 5 minutes) and backup video
+See [DEMO.md](DEMO.md).
 
 ## Suggested Git branches and commits
 

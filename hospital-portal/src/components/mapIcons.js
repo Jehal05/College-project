@@ -45,3 +45,20 @@ export function ambulanceIcon(heading = 0, label = '') {
   }
   return ambulanceIcons.get(key);
 }
+
+// Sample AED (#23): green square with a heart. Sample responder (#24): purple round pin.
+export const aedIcon = L.divIcon({
+  className: 'ht-marker',
+  iconSize: [34, 34],
+  iconAnchor: [17, 17],
+  html: `<div style="width:34px;height:34px;border-radius:8px;background:#009E73;color:#fff;font-weight:800;font-size:12px;
+    display:grid;place-items:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">AED</div>`,
+});
+
+export const responderIcon = L.divIcon({
+  className: 'ht-marker',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  html: `<div style="width:30px;height:30px;border-radius:50%;background:#CC79A7;color:#fff;font-weight:800;font-size:12px;
+    display:grid;place-items:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">R</div>`,
+});

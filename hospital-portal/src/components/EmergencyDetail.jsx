@@ -12,6 +12,9 @@ import EscalationCountdown from './EscalationCountdown.jsx';
 import TrackingMap from './TrackingMap.jsx';
 import TeamAssignment from './TeamAssignment.jsx';
 import ChatPanel from './ChatPanel.jsx';
+import NearbyHelp from './NearbyHelp.jsx';
+import { Link } from 'react-router-dom';
+import { isFinal } from '../services/stateMachine.js';
 import { formatTime } from './AlertCard.jsx';
 import ActionButtons from './ActionButtons.jsx';
 import PatientMiniMap from './PatientMiniMap.jsx';
@@ -87,7 +90,7 @@ export default function EmergencyDetail({ emergency }) {
           </dl>
 
           <div>
-            <h3 className="mb-2 font-semibold">Reported symptoms</h3>
+            <h3 className="mb-2 font-semibold">Reported symptoms <span className="text-sm font-normal text-slate-500">(sample content, pending doctor review)</span></h3>
             <div className="flex flex-wrap gap-2">
               {(e.symptoms || []).map((s) => (
                 <span key={s} className="rounded-lg bg-red-50 px-3 py-1 font-medium text-red-800">{s}</span>
@@ -177,6 +180,17 @@ export default function EmergencyDetail({ emergency }) {
           </div>
         </div>
       )}
+
+      {isFinal(e.state) && (
+        <Link data-testid="open-report" to={`/report/${e.emergency_id}?t=${encodeURIComponent(e.created_at)}`} className="inline-block rounded-lg bg-slate-800 px-5 py-3 text-lg font-bold text-white hover:bg-slate-900">
+          Open post-event report
+        </Link>
+      )}
+
+      <div>
+        <h3 className="mb-2 text-xl font-bold">Nearby help</h3>
+        <NearbyHelp emergency={e} />
+      </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div>

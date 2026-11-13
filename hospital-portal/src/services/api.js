@@ -58,6 +58,28 @@ export async function updateAvailability(id, availability) {
   return request('PATCH', `/hospitals/${id}/availability`, availability);
 }
 
+/**
+ * Admin: add a hospital (feature #47). PROPOSED endpoint, not in the contract yet.
+ * POST /hospitals  body: { name, address, phone, lat, lng, capabilities, availability }
+ * The backend must save it with verified = false and return the new hospital with its id.
+ */
+export async function createHospital(data) {
+  if (USE_MOCK) return mock.addHospital(data);
+  return request('POST', '/hospitals', data);
+}
+
+/** Admin: edit a hospital. PROPOSED: PUT /hospitals/{id}  (same body; does not change verified). */
+export async function updateHospital(id, data) {
+  if (USE_MOCK) return mock.updateHospital(id, data);
+  return request('PUT', `/hospitals/${id}`, data);
+}
+
+/** Admin: verify or unverify. PROPOSED: PATCH /hospitals/{id}/verify  body: { verified }  -> { id, verified } */
+export async function setHospitalVerified(id, verified) {
+  if (USE_MOCK) return mock.setHospitalVerified(id, verified);
+  return request('PATCH', `/hospitals/${id}/verify`, { verified });
+}
+
 // ---------- Emergencies ----------
 // In mock mode these go to services/mockBackend.js, which also sends the matching
 // WebSocket event. In real mode they call Daksh's backend, which does the same.
@@ -68,6 +90,14 @@ const actor = () => getSession()?.name || 'Hospital staff';
 export async function getAlerts() {
   if (USE_MOCK) return mock.listAlerts();
   return request('GET', '/emergencies?status=active');
+}
+
+/**
+ * Finished and cancelled emergencies for case history and analytics (features #48, #31, #30).
+ * PROPOSED: GET /emergencies?status=finished  -> list where every item includes status_events.
+ */
+export async function getHistory() {
+  return request('GET', '/emergencies?status=finished');
 }
 
 /** GET /emergencies/{id}: details and timeline (status_events). */

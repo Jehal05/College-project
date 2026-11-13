@@ -10,7 +10,10 @@ import { EMERGENCY_TYPES, TYPE_LABELS, hasCapabilities } from '../services/contr
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
-import { patientIcon } from '../components/mapIcons.js';
+import { patientIcon, aedIcon, responderIcon } from '../components/mapIcons.js';
+import aedData from '../data/aed.json';
+import responderData from '../data/responders.json';
+import { nearestAeds, respondersNear, withDistanceFrom } from '../services/nearby.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
 function hospitalIcon(h, selected, isTop) {
@@ -39,6 +42,8 @@ export default function MapPage() {
   const { session } = useAuth();
   const [type, setType] = useState('');
   const [selectedId, setSelectedId] = useState(null);
+  const [showAed, setShowAed] = useState(false);
+  const [showResponders, setShowResponders] = useState(false);
 
   // Distance and capability match are worked out here, so colours and details change at once.
   const hospitals = useMemo(
@@ -48,6 +53,9 @@ export default function MapPage() {
   const ranking = useRanking(type, DEMO_LOCATION);
   const topId = ranking?.ranked[0]?.hospital.id || null;
   const selected = hospitals.find((h) => h.id === selectedId) || null;
+  const aedList = useMemo(() => withDistanceFrom(aedData, DEMO_LOCATION), []);
+  const nearAed = useMemo(() => nearestAeds(aedData, DEMO_LOCATION, 1)[0], []);
+  const nearResponders = useMemo(() => respondersNear(responderData, DEMO_LOCATION), []);
   const byDistance = useMemo(() => [...hospitals].sort((a, b) => a.distance_km - b.distance_km), [hospitals]);
 
   return (
@@ -56,7 +64,15 @@ export default function MapPage() {
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">Nearby hospitals</h1>
           <SimulatedBadge text={`Simulated ETA · assumed ${ASSUMED_SPEED_KMH} km/h`} />
-          <label className="ml-auto flex items-center gap-2">
+          <label className="ml-auto flex items-center gap-2 text-lg">
+            <input data-testid="toggle-aed" type="checkbox" className="h-6 w-6" checked={showAed} onChange={(e) => setShowAed(e.target.checked)} />
+            AED locations (sample)
+          </label>
+          <label className="flex items-center gap-2 text-lg">
+            <input data-testid="toggle-responders" type="checkbox" className="h-6 w-6" checked={showResponders} onChange={(e) => setShowResponders(e.target.checked)} />
+            Community responders (sample)
+          </label>
+          <label className="flex items-center gap-2">
             <span className="font-medium">Emergency type</span>
             <select
               value={type}
@@ -92,6 +108,16 @@ export default function MapPage() {
               radius={5000}
               pathOptions={{ color: '#dc2626', weight: 1, fillOpacity: 0.04 }}
             />
+            {showAed && aedList.map((a) => (
+              <Marker key={a.id} position={[a.lat, a.lng]} icon={aedIcon}>
+                <Tooltip direction="top" offset={[0, -14]}>{a.name} · {a.distance_km} km (sample)</Tooltip>
+              </Marker>
+            ))}
+            {showResponders && nearResponders.map((r) => (
+              <Marker key={r.id} position={[r.lat, r.lng]} icon={responderIcon}>
+                <Tooltip direction="top" offset={[0, -14]}>{r.name} · {r.distance_km} km (sample)</Tooltip>
+              </Marker>
+            ))}
             {hospitals.map((h) => (
               <Marker
                 key={h.id}
@@ -114,10 +140,20 @@ export default function MapPage() {
           <span><b className="text-yellow-500">●</b> Top ranked (yellow ring)</span>
           <span><b className="text-red-600">●</b> Patient (demo location)</span>
           <span>CL = Cath Lab · SU = Stroke Unit</span>
+          {showAed && <span><b className="text-emerald-600">■</b> AED (sample)</span>}
+          {showResponders && <span><b className="text-purple-600">●</b> Community responder (sample)</span>}
         </div>
       </section>
 
       <aside className="space-y-4">
+        {showAed && nearAed && (
+          <div data-testid="nearest-aed" className="rounded-2xl border-2 border-emerald-500 bg-white p-4 shadow">
+            <h2 className="text-lg font-bold">Nearest AED to the patient</h2>
+            <p className="text-xl font-semibold">{nearAed.name}</p>
+            <p>{nearAed.distance_km} km away · about {nearAed.walk_min} min on foot (simulated)</p>
+            <p className="text-sm text-slate-500">Sample data. {nearAed.note}</p>
+          </div>
+        )}
         <HospitalDetails hospital={selected} type={type} onClose={() => setSelectedId(null)} />
 
         {ranking ? (
