@@ -13,6 +13,8 @@ import CallButton from '../components/CallButton';
 import EmergencyHeader from '../components/EmergencyHeader';
 import Countdown from '../components/Countdown';
 import ResponseCard from '../components/ResponseCard';
+import GoldenHourClock from '../components/GoldenHourClock';
+import ContactsNotified from '../components/ContactsNotified';
 import InstructionsCard from '../components/InstructionsCard';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -109,7 +111,13 @@ export default function Emergency() {
           <ErrorMessage onRetry={counting ? send : undefined} retryLabel={t('emergency.retry')}>{problem}</ErrorMessage>
         </div>
       )}
-      {!counting && <ResponseCard emergency={emergency} events={events} />}
+      {!counting && (
+        <>
+          <GoldenHourClock events={events} />
+          <ResponseCard emergency={emergency} events={events} />
+          <ContactsNotified emergency={emergency} />
+        </>
+      )}
       <InstructionsCard type={emergency.type} />
 
       {state === 'HANDOVER_DONE' && (

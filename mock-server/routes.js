@@ -6,8 +6,9 @@ const simulator = require('./simulator');
 const { requireAuth, distanceKm, normalVitals, DEMO_LOCATION } = require('./helpers');
 
 const router = express.Router();
+// Contacts and consents have their own endpoints now (patientData.js), so the profile PATCH ignores contacts.
 const EDITABLE = ['name', 'age', 'sex', 'blood_group', 'allergies', 'conditions',
-  'medications', 'language', 'contacts', 'consents'];
+  'medications', 'language', 'consents'];
 
 // Health check (no login needed) so teammates can test the connection.
 router.get('/health', (req, res) => res.json({ status: 'ok', mock: true }));
@@ -40,6 +41,9 @@ router.get('/patients/:id/vitals', requireAuth, (req, res) => {
   if (!store.patients[req.params.id]) return res.status(404).json({ error: 'Patient not found' });
   res.json(normalVitals());
 });
+
+// Consents, contacts, reports and baseline (Phase 3) live in their own file.
+router.use(require('./patientData'));
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
 // Check a type and symptom IDs. Returns an error text or null.

@@ -15,7 +15,7 @@ Every route except `/health` and `/auth/login` needs the header `Authorization: 
 | Method and path | Notes |
 | --- | --- |
 | POST /auth/login | `{ email, password }` -> `{ token, role, patient_id }` or 401 |
-| GET, PATCH /patients/:id | Patient profile (edits kept in memory) |
+| GET, PATCH /patients/:id | Patient profile (edits kept in memory). Contacts and consents are no longer changed through PATCH contacts: use the endpoints below |
 | GET /patients/:id/vitals | One normal vitals reading |
 | POST /emergencies | Body `{ patient_id, type, symptoms[], consents? }` -> 201 `{ id, state: "EMERGENCY_DETECTED", severity }`. Location is NOT sent here |
 | POST /emergencies/:id/sos | Body `{ location: { lat, lng, accuracy, source: "gps"\|"demo" } \| null }` -> `{ id, state: "SOS_SENT", hospital }`. Starts the simulated response. Safe to call twice |
@@ -24,7 +24,18 @@ Every route except `/health` and `/auth/login` needs the header `Authorization: 
 | POST /demo/scenario | Body `{ type }` -> creates an emergency with default symptoms, sends the SOS with the demo location, returns `{ id, state }` |
 | POST /demo/reset | Cancels timers, clears emergencies, restores the seed patient -> `{ ok: true }` |
 | GET /hospitals?lat=&lng= | Five fake hospitals with `distance_km`, nearest first |
-| WebSocket /ws | `vitals.update` every second, plus the emergency events below |
+| GET /patients/:id/consents | `{ consents: { location, history, vitals, reports }, changes: [ { key, value, timestamp } ] }` (last 20 changes, newest first) |
+| PUT /patients/:id/consents | Body: all four booleans. Same answer as GET. 400 if a key is missing or not true/false |
+| GET /patients/:id/contacts | `[ { id, name, relation, phone, is_primary } ]` |
+| POST /patients/:id/contacts | Body `{ name, relation, phone, is_primary? }` -> 201 contact. 400 invalid, 409 when 5 already exist |
+| PUT /patients/:id/contacts/:contactId | Same body -> 200 contact (setting `is_primary: true` moves the marker) |
+| DELETE /patients/:id/contacts/:contactId | 204. If the primary is deleted the first remaining contact becomes primary |
+| GET /patients/:id/reports | `[ { id, name, content_type, size, uploaded_at } ]` |
+| POST /patients/:id/reports?name=lab.pdf | Raw file body with `Content-Type` application/pdf, image/jpeg or image/png, max 2 MB -> 201 report. 415 wrong type, 413 too large, 409 after 10 reports |
+| GET /patients/:id/reports/:reportId/file | The stored bytes with the stored content type (needs the Authorization header) |
+| DELETE /patients/:id/reports/:reportId | 204 |
+| GET /patients/:id/baseline | `{ heart_rate, spo2, bp_systolic, bp_diastolic, glucose: { min, max }, updated_at }` |
+| WebSocket /ws | `vitals.update` every second (payload now also has `bp` and `glucose`), plus the emergency events below |
 
 Settings: `PORT` (default 4000) and `CORS_ORIGINS` (comma-separated; default allows localhost ports 5173, 5174 and 3000).
 
@@ -41,6 +52,7 @@ Every event is `{ type, emergency_id, state, timestamp, payload }` (`emergency_i
 | 1000 ms | hospital.alerted | SOS_SENT | `{ hospital: { id, name, distance_km } }` |
 | 4000 ms | hospital.acknowledged | HOSPITAL_ACKNOWLEDGED | `{ hospital_id, acknowledged_by }` |
 | 8000 ms | ambulance.dispatched | AMBULANCE_DISPATCHED | `{ ambulance_id, eta_seconds: 60 }` |
+| 2000 ms | contacts.notified | (unchanged, current state) | `{ contacts: [ { id, name, relation } ] }`, only if the patient has contacts. No phone numbers. Also stored as `contacts_notified` on the emergency |
 | 10000 ms, then every 2000 ms | ambulance.location | EN_ROUTE | `{ ambulance_id, lat, lng, eta_seconds }` |
 | 40000 ms | emergency.arrived | ARRIVED | `{ ambulance_id }` |
 | 50000 ms | emergency.handover_done | HANDOVER_DONE | `{}` |
@@ -64,3 +76,12 @@ Note: the seed Chest Institute is marked unavailable, so ASTHMA falls back to th
 Contract notes for Puneet and Daksh: `consents` on create is optional (the server falls back to the patient's saved consents);
 the demo location is the same coordinates as the seed Heart hospital, so the ambulance does not visibly move in the HEART demo.
 Also: `simulator.js` holds the broadcast helper and the timers.
+
+## Phase 3 notes
+
+- Seed contacts (fake): `C-1 Asha Demo, Mother, +91 00000 00001, primary` and `C-2 Ravi Demo, Friend, +91 00000 00002`. The patient field is named `contacts`.
+  Relations: Mother, Father, Spouse, Sibling, Child, Friend, Other. Phone: after removing spaces and dashes, an optional `+` then 8 to 15 digits.
+- `GET /patients/:id/consents` is an addition beyond the original list so the screen can show the change log after a reload.
+- Reports live in memory only (max 10, names cleaned to letters, digits, space, dot, dash, underscore). `POST /demo/reset` clears reports,
+  restores the two contacts, and clears the consent change log.
+- Files: `patientData.js` holds the consents, contacts, reports and baseline routes.

@@ -5,13 +5,39 @@
   "sex": "M",
   "blood_group": "B+",
   "blood_group_verified": false,
-  "allergies": ["Penicillin"],
-  "conditions": ["Hypertension", "Type 2 Diabetes"],
-  "medications": ["Amlodipine", "Metformin", "Aspirin"],
+  "allergies": [
+    "Penicillin"
+  ],
+  "conditions": [
+    "Hypertension",
+    "Type 2 Diabetes"
+  ],
+  "medications": [
+    "Amlodipine",
+    "Metformin",
+    "Aspirin"
+  ],
   "language": "en",
   "contacts": [
-    { "id": "c1", "name": "Anita Mehta", "relation": "Wife", "phone": "+91-90000-00001", "priority": 1 },
-    { "id": "c2", "name": "Karan Mehta", "relation": "Son", "phone": "+91-90000-00002", "priority": 2 }
+    {
+      "id": "C-1",
+      "name": "Asha Demo",
+      "relation": "Mother",
+      "phone": "+91 00000 00001",
+      "is_primary": true
+    },
+    {
+      "id": "C-2",
+      "name": "Ravi Demo",
+      "relation": "Friend",
+      "phone": "+91 00000 00002",
+      "is_primary": false
+    }
   ],
-  "consents": { "location": true, "history": true, "vitals": true, "reports": true }
+  "consents": {
+    "location": true,
+    "history": true,
+    "vitals": true,
+    "reports": true
+  }
 }

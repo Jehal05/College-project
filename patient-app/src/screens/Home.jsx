@@ -6,13 +6,16 @@ import useAuth from '../hooks/useAuth';
 import useVitals from '../hooks/useVitals';
 import { getEmergency, getPatient } from '../services/api';
 import { clearActive, getActive } from '../utils/activeEmergency';
+import useBaseline from '../hooks/useBaseline';
 import VitalsCard from '../components/VitalsCard';
+import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
 
 export default function Home() {
   const { t } = useTranslation();
   const { session, signOut } = useAuth();
   const { vitals, connected } = useVitals();
+  const { baseline, status: baselineStatus, reload: reloadBaseline } = useBaseline(session.patient_id);
   const [name, setName] = useState('');
   const [activeId, setActiveId] = useState(null); // only set after we confirmed it is still running
 
@@ -49,6 +52,7 @@ export default function Home() {
         {t('home.emergency')}
       </Link>
       <VitalsCard vitals={vitals} connected={connected} />
+      <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline} />
       <h2 className="mb-2 mt-5 text-lg font-bold">{t('home.state')}</h2>
       <StatusBar state={vitals?.state || 'MONITORING'} />
       <button type="button" onClick={signOut} className="mt-8 min-h-[44px] rounded-lg bg-slate-200 px-4 font-semibold">

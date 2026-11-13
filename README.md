@@ -1,4 +1,4 @@
-# HealthTwin AI - Patient App (Phase 2)
+# HealthTwin AI - Patient App (Phase 3)
 
 Simulated emergency-response prototype for a college project. **Not a medical device. It never diagnoses.**
 Every screen shows: "Simulated event. Not a medical diagnosis."
@@ -6,6 +6,8 @@ Every screen shows: "Simulated event. Not a medical diagnosis."
 Phase 1 is the foundation (login, profile, live vitals). Phase 2 adds the core emergency flow: symptom checklist,
 emergency screen with a 10-second countdown (alarm, vibration, cancel), SOS with location, and a simulated
 hospital/ambulance response arriving live over the WebSocket.
+Phase 3 adds personal data and context: a consent screen, an emergency contacts manager, report upload, a digital twin bar on Home,
+a "Time since alert" clock and a "contacts notified" card on the emergency screen.
 
 ## Setup
 
@@ -23,15 +25,19 @@ Open http://localhost:5173 and sign in with `patient@demo.test` / `demo1234`.
 
 ```
 patient-app/        React 18 + Vite + Tailwind + i18next + PWA
-  src/screens/      Login, Home, Profile, NotFound, Symptoms, Emergency, Cancelled, DemoTools
-  src/components/   SimulatedBanner, StatusBar, Timeline, Countdown, ConsentToggles (shell), CallButton, EmergencyHeader,
+  src/screens/      Login, Home, Profile, NotFound, Symptoms, Emergency, Cancelled, DemoTools,
+                    Consent, Contacts, Reports
+  src/components/   SimulatedBanner, StatusBar, Timeline, Countdown, ConsentToggles, Switch, ConfirmDialog, ContactForm,
+                    ReportUpload, ReportList, DigitalTwinBar, GoldenHourClock, ContactsNotified, CallButton, EmergencyHeader,
                     InstructionsCard, SymptomGroup, ResponseCard, DemoLocationToggle,
                     VitalsCard, BottomNav, FormField, ContactsEditor, ErrorMessage
   src/services/     api.js (HTTP), socket.js (WebSocket), auth.js (token in memory + sessionStorage)
-  src/hooks/        useAuth.js, useVitals.js, useEmergency.js, useCountdown.js
+  src/hooks/        useAuth.js, useVitals.js, useEmergency.js, useCountdown.js,
+                    useConsents.js, useContacts.js, useReports.js, useBaseline.js
   src/config/       symptoms.js, instructions.json (doctor-reviewed text only), demo.js
   src/i18n/         en.json now; hi.json and gu.json are empty until Phase 4
-  src/utils/        validate.js, alarm.js (beep + vibrate), activeEmergency.js (sessionStorage)
+  src/utils/        validate.js, alarm.js (beep + vibrate), activeEmergency.js (sessionStorage),
+                    time.js (clock format), twin.js (usual-range rule)
 mock-server/        Express + ws, fake data in memory (see mock-server/README.md)
 ```
 
@@ -94,12 +100,37 @@ instruction lines are shown; condition-specific lines stay hidden until a doctor
 9. **Reload:** refresh mid-emergency; the same state returns, and Home shows "Return to it" until it ends.
 10. **/demo:** run Heart, Stroke, Diabetic and Asthma scenarios, then Reset.
 
-## What Phase 3 plugs into
+## Phase 3: personal data and context
 
-| Phase 3 feature | Files it will touch |
+New endpoints (details in `mock-server/README.md`): `GET/PUT /patients/:id/consents`, `GET/POST /patients/:id/contacts`,
+`PUT/DELETE /patients/:id/contacts/:contactId`, `GET/POST /patients/:id/reports`, `GET .../reports/:reportId/file`,
+`DELETE .../reports/:reportId`, `GET /patients/:id/baseline`. New event: `contacts.notified` (names only, no phone numbers).
+The live `vitals.update` payload now also carries `bp` and `glucose`.
+
+Privacy and honesty rules in the code: nothing is shared unless its switch is on, and changes apply to the next emergency;
+reports are fake demo files only; the twin bar says "Within your usual range" or "Different from your usual range" and never shows a
+score or the words normal/abnormal/risk/danger; the clock only measures time ("Time since alert") and makes no medical claim.
+
+### Manual test checklist (Phase 3)
+
+1. **Consent:** Profile > Consent settings. Turn Reports off: "Saved" appears and the change shows under Recent changes. Reload: it stays off.
+2. **Rollback:** stop the mock server, flip a switch: the switch goes back and "Retry" appears. Start the server and press Retry.
+3. **Consent changes the flow:** turn Location off, run an emergency and press Send now: the screen says location sharing is off. Turn it back on.
+4. **Contacts:** add a contact, edit it, make another primary, delete one (in-page confirm). Add until 5: the Add button is disabled with a message.
+5. **Phone validation:** try `12ab` and a blank name: clear error messages. `+91 00000 00003` is accepted.
+6. **Reports upload:** choose a `.txt` file and then a file over 2 MB: both are refused with a message before upload. Upload a small PDF.
+7. **Share indicator and delete:** the report says "Will be shared"; turn Reports consent off and it says "Not shared". Open it, then delete it (confirm).
+8. **Twin bar:** Home shows four vitals with their usual ranges and "Within your usual range". (Change `data/baseline.json` to see "Different from your usual range".)
+9. **Clock and contacts card:** run `/demo` Heart. "Time since alert" counts up, fills its milestones, freezes at handover and survives a reload.
+   After about 2 seconds "Your contacts were notified (simulated)" lists the contacts. Delete all contacts and run again: it says you have no contacts.
+10. **Reset:** `/demo` > Reset demo restores 2 contacts, all consents on, no reports and an empty change log.
+
+## What Phase 4 plugs into
+
+| Phase 4 feature | Files it will touch |
 | --- | --- |
-| Consent screen UI | `components/ConsentToggles.jsx`, new screen, `routes.jsx`; Emergency.jsx already reads `consents.location` |
-| Contacts manager | `components/ContactsEditor.jsx`, `screens/Profile.jsx`, `services/api.js` |
-| Report upload | new screen and `services/api.js`, mock `routes.js` |
-| Digital twin bar | `screens/Home.jsx`, `hooks/useVitals.js` |
-| Golden-hour clock | `screens/Emergency.jsx` (new component beside `StatusBar`), `hooks/useEmergency.js` |
+| Hindi and Gujarati | `i18n/hi.json`, `i18n/gu.json`, `i18n/index.js`, a language switch on `screens/Profile.jsx` |
+| Voice input | `screens/Symptoms.jsx`, new `services/speech.js` |
+| Offline mode | `vite.config.js` (PWA caching), `services/api.js`, `screens/Emergency.jsx` (call button must keep working) |
+| Accessibility audit | all screens; `components/Switch.jsx`, `ConfirmDialog.jsx`, `GoldenHourClock.jsx` |
+| Final polish | `App.jsx`, `routes.jsx`, `README.md` |

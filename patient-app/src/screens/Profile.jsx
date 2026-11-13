@@ -1,18 +1,17 @@
 // Feature 1: view, edit and save the patient profile (GET then PATCH).
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import { getPatient, updatePatient } from '../services/api';
 import { BLOOD_GROUPS, validateProfile, toList, fromList } from '../utils/validate';
 import FormField from '../components/FormField';
-import ContactsEditor from '../components/ContactsEditor';
 import ErrorMessage from '../components/ErrorMessage';
 
 // Turn the patient from the API into plain strings the form can edit.
 const toForm = (p) => ({
   name: p.name, age: String(p.age), blood_group: p.blood_group,
-  allergies: fromList(p.allergies), conditions: fromList(p.conditions),
-  medications: fromList(p.medications), contacts: p.contacts,
+  allergies: fromList(p.allergies), conditions: fromList(p.conditions), medications: fromList(p.medications),
 });
 
 export default function Profile() {
@@ -45,7 +44,7 @@ export default function Profile() {
       await updatePatient(session.patient_id, {
         name: form.name.trim(), age: Number(form.age), blood_group: form.blood_group,
         allergies: toList(form.allergies), conditions: toList(form.conditions),
-        medications: toList(form.medications), contacts: form.contacts,
+        medications: toList(form.medications),
       });
       setMessage({ type: 'ok', text: t('profile.saved') });
     } catch {
@@ -62,6 +61,13 @@ export default function Profile() {
   return (
     <form onSubmit={save} noValidate>
       <h1 className="mb-4 text-2xl font-bold">{t('profile.title')}</h1>
+      <nav aria-label={t('profile.links')} className="mb-5 grid gap-2">
+        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports']].map(([to, key]) => (
+          <Link key={to} to={to} className="flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
+            {t(key)}<span aria-hidden="true">›</span>
+          </Link>
+        ))}
+      </nav>
       <FormField label={t('profile.name')} value={form.name} onChange={set('name')} error={e('name')} autoComplete="name" />
       <FormField label={t('profile.age')} value={form.age} onChange={set('age')} error={e('age')} type="number" inputMode="numeric" min="0" max="120" />
       <FormField label={t('profile.bloodGroup')} value={form.blood_group} onChange={set('blood_group')} error={e('blood_group')}
@@ -69,7 +75,6 @@ export default function Profile() {
       <FormField label={t('profile.allergies')} value={form.allergies} onChange={set('allergies')} />
       <FormField label={t('profile.conditions')} value={form.conditions} onChange={set('conditions')} />
       <FormField label={t('profile.medications')} value={form.medications} onChange={set('medications')} />
-      <ContactsEditor contacts={form.contacts} onChange={set('contacts')} errors={errors.contacts} />
       {message.type === 'ok' && <p role="status" className="mb-3 rounded-lg bg-green-100 p-3 font-semibold text-green-800">{message.text}</p>}
       {message.type === 'error' && <div className="mb-3"><ErrorMessage>{message.text}</ErrorMessage></div>}
       <button type="submit" disabled={saving} className="min-h-[48px] w-full rounded-lg bg-blue-700 px-4 text-lg font-bold text-white disabled:opacity-60">

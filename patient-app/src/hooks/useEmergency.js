@@ -15,6 +15,7 @@ function applyEvent(current, event) {
   const p = event.payload || {};
   if (p.hospital) next.hospital = p.hospital;
   if (p.ambulance_id) next.ambulance = { id: p.ambulance_id };
+  if (p.contacts) next.contacts_notified = p.contacts; // contacts.notified event
   if (typeof p.eta_seconds === 'number') next.eta_seconds = p.eta_seconds;
   return next;
 }

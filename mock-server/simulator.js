@@ -60,6 +60,13 @@ function sendSos(emergency, location) {
   const h = hospital && { id: hospital.id, name: hospital.name, distance_km: hospital.distance_km, lat: hospital.lat, lng: hospital.lng };
   const where = location || DEMO_LOCATION;
   emit(emergency, 'emergency.sos_sent', 'SOS_SENT', {}, { location, hospital: h && { id: h.id, name: h.name, distance_km: h.distance_km } });
+
+  // Phase 3: tell the patient's contacts (simulated). Phone numbers are never put in the event.
+  const contacts = ((store.patients[emergency.patient_id] || {}).contacts || [])
+    .map((c) => ({ id: c.id, name: c.name, relation: c.relation }));
+  if (contacts.length) {
+    later(emergency, 2000, () => emit(emergency, 'contacts.notified', emergency.state, { contacts }, { contacts_notified: contacts }));
+  }
   if (!h) return emergency;
 
   later(emergency, 1000, () => emit(emergency, 'hospital.alerted', 'SOS_SENT', { hospital: emergency.hospital }));
