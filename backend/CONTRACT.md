@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.3 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.5 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -117,6 +117,9 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | POST /auth/login | Log in, get token and role | public | all |
 | GET /patients/{id} | Read patient profile | PATIENT (own), HOSPITAL_STAFF (with consent), ADMIN | Jehal |
 | PATCH /patients/{id} | Update patient profile | PATIENT (own), ADMIN | Jehal |
+| GET /patients/{id}/consents | Current consent choices | PATIENT (own), ADMIN (read-only) | Jehal, Shagun |
+| PUT /patients/{id}/consents | Change consent choices | PATIENT (own only) | Jehal |
+| GET /patients/{id}/consents/history | Every consent change, oldest first | PATIENT (own), ADMIN (read-only) | Jehal, Shagun |
 | GET /patients/{id}/vitals | Latest vitals (also streamed as `vitals.update`) | PATIENT (own), FAMILY (linked) | Jehal |
 | POST /emergencies | Create an emergency | PATIENT | Jehal |
 | POST /emergencies/{id}/cancel | Cancel a false alarm | PATIENT | Jehal |
@@ -127,7 +130,8 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | GET /hospitals?lat&lng&type | Candidate hospitals with capabilities | HOSPITAL_STAFF, PATIENT, ADMIN | Puneet |
 | PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF | Puneet |
 | POST /ambulances/{id}/location | Ambulance position update | HOSPITAL_STAFF | Puneet |
-| GET /passport/{id}?token | Emergency passport (respects consent) | signed token or HOSPITAL_STAFF | Hospital staff |
+| GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
+| GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
 | POST /reports | Upload a health report | PATIENT | Jehal |
 | POST /demo/scenario | Run a scenario | ADMIN (demo) | Demo panel |
 | POST /demo/reset | Reset to start state | ADMIN (demo) | Demo panel |
@@ -251,6 +255,47 @@ Returns only what the patient consented to share. Tokens expire (`PASSPORT_TOKEN
 ```
 Fields that the patient did not consent to are omitted, not sent as `null`.
 
+**Passport access and errors**
+
+Who can open `GET /passport/{id}`: a valid signed token **for that patient** (`?token=...`), a logged-in `HOSPITAL_STAFF` user, or the patient themselves. Admin, family and responders cannot.
+
+| Status | When | Audit reason |
+|---|---|---|
+| 200 | allowed | none |
+| 401 | token expired | `expired_token` |
+| 401 | token tampered, forged or garbage | `tampered_token` |
+| 401 | no token and no login | `missing_credentials` |
+| 403 | token belongs to another patient | `token_patient_mismatch` |
+| 403 | logged in, but not staff or that patient | `forbidden_role` |
+| 404 | no such patient | `patient_not_found` |
+
+A token is valid for `PASSPORT_TOKEN_EXPIRE_MINUTES` (default 30) and opens one patient only. Fields the patient did not consent to are omitted (see the consent rules above).
+
+**Audit log** (feature 50)
+
+Every passport view and every emergency read writes exactly one row, allowed or denied. Rows can never be edited or deleted (only `POST /demo/reset` in demo mode clears them).
+
+`GET /audit?patient_id&user_id&action&from&to&page&page_size` (ADMIN only; `403` for everyone else). `from` and `to` are ISO 8601 times such as `2026-11-16T10:00:00Z` (an offset like `+05:30` also works). `page` starts at 1. `page_size` is 1 to 200, default 50. Newest first.
+```json
+{
+  "items": [
+    { "id": 7, "timestamp": "2026-11-16T10:04:12Z", "user_id": "usr_010", "role": "HOSPITAL_STAFF",
+      "action": "passport.view", "resource_type": "passport", "resource_id": "pat_001",
+      "patient_id": "pat_001", "outcome": "allowed", "reason": null,
+      "fields_released": ["history", "reports"] },
+    { "id": 6, "timestamp": "2026-11-16T10:03:55Z", "user_id": null, "role": "ANONYMOUS",
+      "action": "passport.view", "resource_type": "passport", "resource_id": "pat_001",
+      "patient_id": "pat_001", "outcome": "denied", "reason": "expired_token",
+      "fields_released": [] }
+  ],
+  "page": 1, "page_size": 50, "total": 2, "simulated": true
+}
+```
+- `role` is a user role, or `TOKEN` (opened with a valid token) or `ANONYMOUS` (no valid credentials).
+- `fields_released` lists consent **names** only (`location`, `history`, `vitals`, `reports`), never values.
+- The log never contains a token, a password or any patient data. Reasons come from the fixed list above. Ids that are not plain ids are stored as `invalid_id`.
+- Actions so far: `passport.view`, `emergency.read`.
+
 **POST /demo/scenario**
 ```json
 { "scenario": "HEART" }
@@ -280,6 +325,49 @@ Response 200:
 }
 ```
 `reading` is the last reading already sent, so it can still show the old profile. The next tick shows the new one. Errors: `400` unknown profile, unknown vital or out-of-range value (nothing is changed), `422` unknown field.
+
+**Consent API** (feature 51)
+
+Four consent flags: `location`, `history`, `vitals`, `reports`.
+
+`GET /patients/{id}/consents` response:
+```json
+{ "patient_id": "pat_001",
+  "consents": { "location": true, "history": true, "vitals": false, "reports": false },
+  "simulated": true }
+```
+
+`PUT /patients/{id}/consents`: send only the flags you want to change. Values must be real `true` or `false`.
+```json
+{ "history": false }
+```
+Response: the same as GET plus `"changed": ["history"]`. A flag that already has that value is not in `changed` and adds no history row. Errors: `400` empty body, `403` not the patient (staff, admin, family and responders can never change consent), `404` unknown patient, `422` unknown field or non-boolean value.
+
+`GET /patients/{id}/consents/history` response:
+```json
+{ "patient_id": "pat_001",
+  "history": [ { "field": "history", "granted": true, "timestamp": "2026-11-16T10:00:00Z",
+                 "actor": "usr_001", "actor_role": "PATIENT" } ],
+  "simulated": true }
+```
+
+Rules every app and endpoint must follow:
+- **No row means no consent.** A patient who never chose anything shares nothing sensitive.
+- **Revoking takes effect on the very next request.** Nothing is cached.
+- **Omit, never null.** A field without consent is left out of the JSON completely.
+- **The ledger is append-only.** Rows are never edited or deleted (only `POST /demo/reset` in demo mode clears it).
+
+Which flag guards which field (used for the passport, the hospital alert, SMS and map links, and report lists):
+
+| Payload field | Needs consent |
+|---|---|
+| `location`, `lat`, `lng`, `accuracy`, `map_link` | `location` |
+| `conditions`, `allergies`, `medications` | `history` |
+| `vitals` | `vitals` |
+| `reports` | `reports` |
+| name, age, blood group, contacts, emergency type | always shown |
+
+**Encrypted at rest:** conditions, allergies, medications, contact phone numbers and report file names. The API still returns normal readable values. Only the database holds ciphertext, and you cannot search or sort by those columns.
 
 ### 4.2 Error format
 
@@ -362,3 +450,5 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.1 | First draft for team review |
 | 13 Nov 2026 | 0.2 | Added rules engine status, action codes, symptom and vital names |
 | 13 Nov 2026 | 0.3 | Added POST /demo/vitals and wearable profiles (feature 13) |
+| 13 Nov 2026 | 0.4 | Added consent API, default-deny and omit-not-null rules, field-to-consent map, encrypted fields (feature 51) |
+| 13 Nov 2026 | 0.5 | Added GET /audit, audit rules, passport access rules and error codes (features 11, 50) |
