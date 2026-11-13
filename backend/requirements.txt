@@ -10,3 +10,4 @@ cryptography
 websockets
 pytest
 httpx
+numpy

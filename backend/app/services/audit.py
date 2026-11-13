@@ -19,7 +19,7 @@ OUTCOMES = ("allowed", "denied")
 # Every reason that may appear in the log.
 REASONS = frozenset({
     "missing_credentials", "expired_token", "tampered_token", "token_patient_mismatch",
-    "forbidden_role", "patient_not_found", "emergency_not_found",
+    "forbidden_role", "patient_not_found", "emergency_not_found", "consent_missing",
 })
 
 # fullmatch (not match with $) so a trailing newline can never slip through

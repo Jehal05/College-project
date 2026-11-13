@@ -1,9 +1,11 @@
 """Shared FastAPI dependencies."""
-from typing import Optional
+from typing import Callable, Optional
 
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
 from app.security.actor import Actor
+from app.sim.history import History, generate_history
 
 
 def get_current_actor() -> Actor:
@@ -26,3 +28,21 @@ def get_optional_actor() -> Optional[Actor]:
     version that reads an optional Authorization header.
     """
     return None
+
+
+def get_family_link_checker() -> Callable[[Session, Actor, str], bool]:
+    """Returns a function that says whether a FAMILY user is linked to a patient.
+
+    TODO(feature 61): the family link table does not exist yet. Until it does,
+    nobody is linked, so family members are refused. Replace this with a real
+    lookup. Tests override this dependency to check the consent rules.
+    """
+    return lambda session, actor, patient_id: False
+
+
+def get_history_provider() -> Callable[[str], History]:
+    """Returns a function that makes the (synthetic) wearable history for a patient.
+
+    Tests override this to try empty, calm or stressed data.
+    """
+    return lambda patient_id: generate_history(patient_id)

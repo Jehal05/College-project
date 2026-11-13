@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import audit, consents, demo_vitals, passport
+from app.api import audit, consents, demo_vitals, insights, passport
 from app.db import init_db
 from app.security import crypto, passport_token
 
@@ -32,6 +32,7 @@ app.include_router(demo_vitals.router)
 app.include_router(consents.router)
 app.include_router(passport.router)
 app.include_router(audit.router)
+app.include_router(insights.router)
 
 
 @app.get("/health", tags=["system"])

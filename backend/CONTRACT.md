@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.5 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.6 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -132,6 +132,7 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | POST /ambulances/{id}/location | Ambulance position update | HOSPITAL_STAFF | Puneet |
 | GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
+| GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent, once feature 61 exists | Shagun (feature 67) |
 | POST /reports | Upload a health report | PATIENT | Jehal |
 | POST /demo/scenario | Run a scenario | ADMIN (demo) | Demo panel |
 | POST /demo/reset | Reset to start state | ADMIN (demo) | Demo panel |
@@ -294,7 +295,35 @@ Every passport view and every emergency read writes exactly one row, allowed or 
 - `role` is a user role, or `TOKEN` (opened with a valid token) or `ANONYMOUS` (no valid credentials).
 - `fields_released` lists consent **names** only (`location`, `history`, `vitals`, `reports`), never values.
 - The log never contains a token, a password or any patient data. Reasons come from the fixed list above. Ids that are not plain ids are stored as `invalid_id`.
-- Actions so far: `passport.view`, `emergency.read`.
+- Actions so far: `passport.view`, `emergency.read`, `insights.read`. Extra reason code: `consent_missing`.
+
+**Wellbeing insights** (feature 54) `GET /patients/{id}/insights`
+
+Plain-language notes on sleep, activity and stress from the last 7 days of **simulated** wearable data. They are wellbeing notes only: **never a severity, never an alert, never a diagnosis**, and they never change what the rules engine decides.
+
+```json
+{
+  "patient_id": "pat_001",
+  "period_days": 7,
+  "sleep":    { "status": "ok", "avg_hours": 7.8, "nights_used": 6, "band": "typical",
+                "message": "Estimated sleep was in a typical range." },
+  "activity": { "status": "ok", "avg_steps_per_day": 9629, "avg_active_minutes_per_day": 61, "days_used": 7,
+                "band": "typical", "message": "Daily steps were in a typical range." },
+  "stress":   { "status": "ok", "index": 47, "band": "typical",
+                "message": "Your heart rate variability was close to your own usual." },
+  "summary": "Over the last 7 days: sleep in a typical range; steps in a typical range; variability close to usual. These are general notes from simulated data. If something worries you, talk to a doctor.",
+  "wording_review": "pending doctor review",
+  "data_note": "based on simulated wearable data, not a diagnosis",
+  "simulated": true
+}
+```
+- `band` values: sleep `shorter` / `typical` / `longer`, activity `lower` / `typical` / `higher`, stress `lower` / `typical` / `higher`. Stress `index` is 0 to 100, where 50 means "the same as your own usual".
+- Not enough data: `status` is `"not_enough_data"`, `band` and the numbers are `null`, and `message` says "Not enough data yet ...". Needs at least 3 nights (sleep), 3 days (activity) or 3 baseline days plus recent data (stress).
+- **All wording is fixed text, pending doctor review.** No diagnosis or urgency words appear anywhere (a test scans every possible sentence).
+- Bands and thresholds are draft values, pending doctor review.
+- **Who can read it:** the patient (no audit row). A linked `FAMILY` member only while the patient's `vitals` consent is on. Everyone else gets `403`. Every read by anyone other than the patient is written to the audit log (`insights.read`, allowed or denied, reason `forbidden_role` or `consent_missing`).
+- **TODO (feature 61):** family linking does not exist yet, so for now only the patient can read this. Shagun's feature 67 can be built against the mock server and will work for family once feature 61 is done.
+- `404` unknown patient (only after the access check passes). Revoking `vitals` consent blocks a family member on the very next request.
 
 **POST /demo/scenario**
 ```json
@@ -452,3 +481,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.3 | Added POST /demo/vitals and wearable profiles (feature 13) |
 | 13 Nov 2026 | 0.4 | Added consent API, default-deny and omit-not-null rules, field-to-consent map, encrypted fields (feature 51) |
 | 13 Nov 2026 | 0.5 | Added GET /audit, audit rules, passport access rules and error codes (features 11, 50) |
+| 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
