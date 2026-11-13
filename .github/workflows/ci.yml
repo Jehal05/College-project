@@ -21,9 +21,11 @@ jobs:
       - name: Unit tests
         run: npm run test:unit -w patient-app
       - name: Start the mock server for the contract test and the audit
+        # The audit also opens the demo panel screens, so it uses a separate build made with the demo tools on.
         run: |
+          (cd patient-app && VITE_DEMO_TOOLS=true npx vite build --outDir dist-audit --emptyOutDir)
           (cd mock-server && DEMO_SPEED=10 node server.js &) 
-          (cd patient-app && npx vite preview --port 5173 --strictPort &)
+          (cd patient-app && npx vite preview --outDir dist-audit --port 5173 --strictPort &)
           npx --yes wait-on http://localhost:4000/health http://localhost:5173
       - name: API contract test (mock server)
         run: npm run contract -- http://localhost:4000
