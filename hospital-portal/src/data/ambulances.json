@@ -1,0 +1,7 @@
+[
+  { "id": "AMB-1", "call_sign": "Alpha 1", "crew": { "driver": "R. Solanki (Sample)", "paramedic": "N. Dave (Sample)" }, "base_hospital_id": "H1", "lat": 23.0335, "lng": 72.5690, "status": "available" },
+  { "id": "AMB-2", "call_sign": "Bravo 2", "crew": { "driver": "K. Parmar (Sample)", "paramedic": "S. Joshi (Sample)" }, "base_hospital_id": "H2", "lat": 23.0390, "lng": 72.5470, "status": "available" },
+  { "id": "AMB-3", "call_sign": "Charlie 3", "crew": { "driver": "M. Rathod (Sample)", "paramedic": "P. Trivedi (Sample)" }, "base_hospital_id": "H3", "lat": 22.9990, "lng": 72.6000, "status": "available" },
+  { "id": "AMB-4", "call_sign": "Delta 4", "crew": { "driver": "H. Chauhan (Sample)", "paramedic": "A. Bhatt (Sample)" }, "base_hospital_id": "H4", "lat": 23.0400, "lng": 72.5310, "status": "available" },
+  { "id": "AMB-5", "call_sign": "Echo 5", "crew": { "driver": "V. Thakor (Sample)", "paramedic": "D. Pandya (Sample)" }, "base_hospital_id": "H5", "lat": 23.0680, "lng": 72.6520, "status": "available" }
+]

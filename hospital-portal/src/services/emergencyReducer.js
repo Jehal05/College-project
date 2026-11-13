@@ -71,12 +71,41 @@ export function applyEvent(list, msg) {
     });
   }
 
+  // A timeline note with no state change: patient picked up, corridor request, team assignment.
+  if (event === 'emergency.note') {
+    if (!payload.note) return list;
+    const noteId = payload.note_id || `${timestamp}|${payload.note}`;
+    if (current.status_events.some((e) => e.note_id === noteId)) return list; // duplicate
+    return replace({
+      ...current,
+      ...(payload.fields || {}),
+      status_events: [
+        ...current.status_events,
+        { state: 'NOTE', kind: payload.kind || null, note: payload.note, note_id: noteId, timestamp: timestamp || new Date().toISOString(), actor: payload.actor || null },
+      ],
+    });
+  }
+
+  // Ambulance position update. May also carry the change to EN_ROUTE.
+  if (event === 'ambulance.location') {
+    if (isFinal(current.state)) return list;
+    const { actor: _actor, ...position } = payload;
+    const moved = { ...current, ambulance: { ...current.ambulance, ...position, updated_at: timestamp || new Date().toISOString() } };
+    if (payload.ambulance_id && !current.ambulance_id) moved.ambulance_id = payload.ambulance_id;
+    if (state === 'EN_ROUTE' && current.state === 'AMBULANCE_DISPATCHED') {
+      moved.state = 'EN_ROUTE';
+      moved.status_events = [...current.status_events, { state: 'EN_ROUTE', timestamp: timestamp || new Date().toISOString(), actor: payload.actor || null }];
+    }
+    return replace(moved);
+  }
+
   if (!state) return list; // an event without a state
   if (current.state === state) return list; // duplicate (e.g. our own click echoed back)
   if (isFinal(current.state)) return list; // a finished or cancelled emergency never changes
 
   const updated = {
     ...current,
+    ...(payload.ambulance_id ? { ambulance_id: payload.ambulance_id } : {}),
     state,
     status_events: [
       ...current.status_events,

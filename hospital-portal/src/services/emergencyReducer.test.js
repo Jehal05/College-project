@@ -128,3 +128,50 @@ test('mergeDetails takes the timeline from the backend', () => {
   assert.equal(merged[0].state, 'EN_ROUTE');
   assert.equal(merged[0].status_events.length, 2);
 });
+
+// ---------- Phase 4 ----------
+
+test('dispatch records which ambulance was sent', () => {
+  let list = applyEvent(base(), ev('hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED'));
+  list = applyEvent(list, ev('ambulance.dispatched', 'AMBULANCE_DISPATCHED', { payload: { actor: 'Desk', ambulance_id: 'AMB-2' } }));
+  assert.equal(list[0].ambulance_id, 'AMB-2');
+});
+
+const loc = (over = {}) => ({ event: 'ambulance.location', emergency_id: 'E1', state: 'EN_ROUTE', timestamp: '2026-11-13T08:01:00Z', payload: { ambulance_id: 'AMB-2', lat: 23.01, lng: 72.55, eta_seconds: 300, progress: 0.2, leg: 'to_patient', ...over } });
+const dispatched = () => {
+  let list = applyEvent(base(), ev('hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED'));
+  return applyEvent(list, ev('ambulance.dispatched', 'AMBULANCE_DISPATCHED', { payload: { actor: 'Desk', ambulance_id: 'AMB-2' } }));
+};
+
+test('ambulance.location keeps the latest position and ETA, and moves the state to EN_ROUTE once', () => {
+  let list = applyEvent(dispatched(), loc());
+  assert.equal(list[0].state, 'EN_ROUTE');
+  assert.equal(list[0].ambulance.eta_seconds, 300);
+  const events = list[0].status_events.length;
+  list = applyEvent(list, loc({ lat: 23.02, eta_seconds: 240, progress: 0.4 }));
+  assert.equal(list[0].ambulance.lat, 23.02);
+  assert.equal(list[0].ambulance.eta_seconds, 240);
+  assert.equal(list[0].status_events.length, events, 'no new timeline entry for each position');
+});
+
+test('ambulance.location is ignored once the emergency is finished or cancelled', () => {
+  const cancelled = applyEvent(base(), ev('emergency.cancelled', 'CANCELLED'));
+  assert.equal(applyEvent(cancelled, loc()), cancelled);
+});
+
+test('a position update never moves an unacknowledged alert to EN_ROUTE', () => {
+  const list = applyEvent(base(), loc());
+  assert.equal(list[0].state, 'SOS_SENT');
+});
+
+const note = (id, text, fields) => ({ event: 'emergency.note', emergency_id: 'E1', timestamp: '2026-11-13T08:02:00Z', payload: { note_id: id, kind: 'assignment', note: text, actor: 'Desk', fields } });
+
+test('emergency.note adds a timeline note and stores its fields, without changing the state', () => {
+  const list = applyEvent(base(), note('n1', 'Assigned to Dr. X (Cardiology)', { assigned_team: { id: 'D1' } }));
+  assert.equal(list[0].state, 'SOS_SENT');
+  assert.equal(list[0].assigned_team.id, 'D1');
+  assert.deepEqual(list[0].status_events.at(-1).state, 'NOTE');
+  assert.equal(list[0].status_events.at(-1).note, 'Assigned to Dr. X (Cardiology)');
+  assert.equal(applyEvent(list, note('n1', 'Assigned to Dr. X (Cardiology)')), list, 'duplicate is ignored');
+  assert.equal(applyEvent(list, note('n2', 'Corridor request logged (simulated)')).at(0).status_events.length, 3);
+});

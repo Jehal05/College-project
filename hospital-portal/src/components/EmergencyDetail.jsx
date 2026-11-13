@@ -9,6 +9,9 @@ import { useRanking } from './useRanking.js';
 import RankingTable from './RankingTable.jsx';
 import Checklist from './Checklist.jsx';
 import EscalationCountdown from './EscalationCountdown.jsx';
+import TrackingMap from './TrackingMap.jsx';
+import TeamAssignment from './TeamAssignment.jsx';
+import ChatPanel from './ChatPanel.jsx';
 import { formatTime } from './AlertCard.jsx';
 import ActionButtons from './ActionButtons.jsx';
 import PatientMiniMap from './PatientMiniMap.jsx';
@@ -35,6 +38,7 @@ export default function EmergencyDetail({ emergency }) {
   }
   const last = e.status_events[e.status_events.length - 1];
   const cancelled = e.state === 'CANCELLED';
+  const hasAmbulance = Boolean(e.ambulance_id);
 
   async function cancelAsPatient() {
     setCancelError('');
@@ -107,9 +111,16 @@ export default function EmergencyDetail({ emergency }) {
             </div>
           </div>
 
+          {!hasAmbulance && (
+            <div>
+              <h3 className="mb-2 font-semibold">Patient location</h3>
+              <PatientMiniMap location={e.location} />
+            </div>
+          )}
+
           <div>
-            <h3 className="mb-2 font-semibold">Patient location</h3>
-            <PatientMiniMap location={e.location} />
+            <h3 className="mb-2 font-semibold">On-call team</h3>
+            <TeamAssignment emergency={e} />
           </div>
         </div>
 
@@ -122,7 +133,7 @@ export default function EmergencyDetail({ emergency }) {
             </div>
             {last && (
               <p data-testid="last-action" className="mt-3 text-slate-600">
-                Last update: <b>{STATE_LABELS[last.state] || last.state}</b>
+                Last update: <b>{last.state === 'NOTE' ? last.note : STATE_LABELS[last.state] || last.state}</b>
                 {last.actor ? <> by <b>{last.actor}</b></> : null} at {formatTime(last.timestamp)}
               </p>
             )}
@@ -153,6 +164,19 @@ export default function EmergencyDetail({ emergency }) {
           </div>
         </div>
       </div>
+
+      {hasAmbulance && (
+        <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+          <div>
+            <h3 className="mb-2 text-xl font-bold">Ambulance tracking</h3>
+            <TrackingMap emergency={e} />
+          </div>
+          <div>
+            <h3 className="mb-2 text-xl font-bold">Desk and crew chat</h3>
+            <ChatPanel emergencyId={e.emergency_id} role="desk" senderName={session?.name || 'Hospital desk'} />
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div>

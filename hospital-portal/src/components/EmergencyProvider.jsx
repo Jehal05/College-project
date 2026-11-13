@@ -60,14 +60,17 @@ export function EmergencyProvider({ children }) {
 
   /** Staff action. Throws an Error with a readable message if it is not allowed or fails. */
   const act = useCallback(
-    async (id, target) => {
+    async (id, target, options = {}) => {
       const current = listRef.current.find((e) => e.emergency_id === id);
       if (!current) throw new Error('This emergency is no longer in the list.');
       if (!canTransition(current.state, target)) throw new Error(whyNot(current.state, target));
 
       let res;
       if (target === 'HOSPITAL_ACKNOWLEDGED') res = await api.acknowledge(id);
-      else if (target === 'AMBULANCE_DISPATCHED') res = await api.dispatch(id, 'AMB-1'); // fleet choice comes in Phase 4
+      else if (target === 'AMBULANCE_DISPATCHED') {
+        if (!options.ambulanceId) throw new Error('Choose an ambulance to dispatch.');
+        res = await api.dispatch(id, options.ambulanceId);
+      }
       else res = await api.updateStatus(id, target);
 
       // Apply the result straight away. The WebSocket echo of the same change is ignored as a duplicate.
@@ -78,7 +81,10 @@ export function EmergencyProvider({ children }) {
           emergency_id: id,
           state: res?.state || target,
           timestamp: res?.timestamp || new Date().toISOString(),
-          payload: { actor: res?.actor || session?.name || 'Hospital staff' },
+          payload: {
+            actor: res?.actor || session?.name || 'Hospital staff',
+            ...(options.ambulanceId ? { ambulance_id: res?.ambulance_id || options.ambulanceId } : {}),
+          },
         },
       });
     },
@@ -95,6 +101,21 @@ export function EmergencyProvider({ children }) {
     }
   }, []);
 
+  /** Add a timeline note with no state change (pickup, corridor request, team assignment). */
+  const addNote = useCallback(async (id, kind, note, fields = {}) => {
+    const res = await api.addNote(id, { kind, note, fields });
+    const timestamp = res?.timestamp || new Date().toISOString();
+    send({
+      type: 'event',
+      msg: {
+        event: 'emergency.note',
+        emergency_id: id,
+        timestamp,
+        payload: { note_id: res?.note_id || `${timestamp}|${note}`, kind, note, fields: res?.fields || fields, actor: res?.actor || session?.name || 'Hospital staff' },
+      },
+    });
+  }, [session?.name]);
+
   /** Mark an alert as opened (clears its unread dot). */
   const markRead = useCallback((id) => send({ type: 'read', id }), []);
 
@@ -107,8 +128,8 @@ export function EmergencyProvider({ children }) {
   }, [session?.name]);
 
   const value = useMemo(
-    () => ({ emergencies: sortForQueue(list), unreadCount: countUnread(list), loading, error, act, refresh, reload, markRead, tick }),
-    [list, loading, error, act, refresh, reload, markRead, tick],
+    () => ({ emergencies: sortForQueue(list), unreadCount: countUnread(list), loading, error, act, refresh, reload, markRead, tick, addNote }),
+    [list, loading, error, act, refresh, reload, markRead, tick, addNote],
   );
 
   return <EmergencyContext.Provider value={value}>{children}</EmergencyContext.Provider>;

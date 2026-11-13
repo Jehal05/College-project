@@ -7,6 +7,7 @@ import MapPage from './pages/Map.jsx';
 import Fleet from './pages/Fleet.jsx';
 import Analytics from './pages/Analytics.jsx';
 import Admin from './pages/Admin.jsx';
+import Crew from './pages/Crew.jsx';
 
 function Shell({ children }) {
   return (
@@ -44,6 +45,8 @@ export default function App() {
         path="/admin"
         element={<ProtectedRoute roles={['admin']}><Shell><Admin /></Shell></ProtectedRoute>}
       />
+      {/* Crew side of the chat (feature #49). Open it in a second browser tab. */}
+      <Route path="/crew/:emergencyId" element={<ProtectedRoute roles={staff}><Crew /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

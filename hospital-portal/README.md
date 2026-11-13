@@ -210,6 +210,37 @@ Not from the backend in either mode: `checklists.json` and `ranking-config.json`
 9. **Which alerts does a hospital see?** The mock dashboard shows every alert. Should the real list
    contain only alerts sent to the logged-in hospital?
 
+## What is in Phase 4 (ambulance and response operations)
+
+| Feature | Where |
+|---|---|
+| #25 Live ambulance tracking (Tier 2) | `components/TrackingMap.jsx`, `sim/ambulance-route.js`. Ambulance moves base to patient to hospital, ETA counts down. All simulated and labelled. |
+| #44 Fleet dashboard and dispatch dialog | `pages/Fleet.jsx`, dialog in `components/ActionButtons.jsx`. Nearest free unit is preselected. If no unit is free, Dispatch is blocked with a clear message. |
+| #45 Traffic-aware ETA and green corridor | `services/traffic.js`, `data/traffic-config.json`. Light, moderate or heavy (auto by hour or chosen). Corridor request is logged on the timeline (simulated). |
+| #46 On-call team assignment | `components/TeamAssignment.jsx`, `data/roster.json` (sample names). Options match the emergency type. |
+| #49 Desk and crew chat | `components/ChatPanel.jsx`, crew page at `/crew/<emergency id>` (open in a second tab). Simulated. |
+
+Speed of the simulation is set in `data/sim-config.json` (`time_scale` 9, so a 6 minute trip takes about 40 seconds).
+In mock mode the simulator sets En route and Arrived itself. With the real backend the manual buttons stay as fallback.
+
+### Phase 4 test checklist
+1. Log in, open E-1001 (heart), Acknowledge, Dispatch: the dialog lists 5 units, nearest preselected.
+2. Confirm: tracking map appears, ETA counts down, state moves to En route, then Arrived.
+3. Change traffic to Heavy: ETA goes up. Click the green corridor button: timeline shows the request.
+4. Pause and Resume the trip. Reset puts the unit back at base.
+5. Assign a team member: timeline shows it.
+6. Open `/crew/E-1001` in a second tab: messages go both ways.
+7. Fleet page: unit shows En route, then At hospital, then Available after Handed over.
+8. Dispatch three emergencies until all units are busy: the dialog says no ambulance is available.
+9. Manual four-type test: Heart goes to a cardiac-capable hospital, Stroke to a stroke unit, Diabetic and Asthma to the best-scoring capable hospital. The ranking table shows why. Cancel an emergency before dispatch: Dispatch stays disabled.
+
+### Phase 4: fields to confirm with Daksh
+- `GET /ambulances` (id, call_sign, crew, base_hospital_id, lat, lng, status).
+- `POST /ambulances/{id}/location` body: emergency_id, lat, lng, heading, eta_seconds, remaining_km, progress, leg.
+- `POST /emergencies/{id}/dispatch` body `{ambulance_id}`.
+- Proposed: `POST /emergencies/{id}/notes` (assignment, corridor, pickup), `POST /emergencies/{id}/chat`, events `emergency.note` and `chat.message`.
+- EN_ROUTE is carried by `ambulance.location` with `state: "EN_ROUTE"`.
+
 ## Suggested Git branches and commits
 
 | Branch | Commit message |

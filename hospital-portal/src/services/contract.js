@@ -69,6 +69,22 @@ export function hasCapabilities(hospital, type) {
   return needed.every((cap) => hospital.capabilities?.[cap]);
 }
 
+// ---------- Added in Phase 4 ----------
+
+// PROPOSED events, not in the day-1 contract. Agree them with Daksh.
+//   emergency.note  payload { note_id, kind, note, actor, fields }  a timeline note with no state change
+//                   (kind: pickup | corridor | assignment)
+//   chat.message    payload { message_id, sender_role: 'desk' | 'crew', sender_name, text }
+export const PROPOSED_EVENTS = ['emergency.note', 'chat.message'];
+
+// Specialty that fits each emergency type (used to suggest who to assign).
+export const SPECIALTY_FOR_TYPE = {
+  HEART: 'Cardiology',
+  STROKE: 'Neurology',
+  DIABETIC: 'Emergency Medicine',
+  ASTHMA: 'Pulmonology',
+};
+
 // ---------- Added in Phase 2 ----------
 
 // Which WebSocket event announces each state change.

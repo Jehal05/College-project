@@ -20,6 +20,8 @@ const LABELS = {
   CANCELLED: 'Cancelled',
   ESCALATED: 'Escalated to next hospital',
 };
+// An event with state 'NOTE' is a note with no state change: its `note` text is the title.
+const isNote = (e) => e.state === 'NOTE';
 
 export function formatDuration(totalSeconds) {
   const s = Math.max(0, Math.round(totalSeconds));
@@ -64,22 +66,22 @@ export default function Timeline({ events = [], createdAt }) {
 
       <ol className="space-y-0">
         {sorted.map((e, i) => {
-          const special = e.state === 'CANCELLED' ? 'cancelled' : e.state === 'ESCALATED' ? 'escalated' : 'done';
-          const dot = { cancelled: 'bg-red-600', escalated: 'bg-orange-500', done: 'bg-emerald-600' }[special];
-          const text = { cancelled: 'text-red-700', escalated: 'text-orange-700', done: 'text-slate-900' }[special];
+          const special = e.state === 'CANCELLED' ? 'cancelled' : e.state === 'ESCALATED' ? 'escalated' : isNote(e) ? 'note' : 'done';
+          const dot = { cancelled: 'bg-red-600', escalated: 'bg-orange-500', note: 'bg-sky-500', done: 'bg-emerald-600' }[special];
+          const text = { cancelled: 'text-red-700', escalated: 'text-orange-700', note: 'text-sky-800', done: 'text-slate-900' }[special];
           return (
-            <li key={`${e.state}-${e.ms}`} data-stage={e.state} data-reached="true" className="relative flex gap-3 pb-4">
+            <li key={`${e.state}-${e.ms}-${i}`} data-stage={e.state} data-reached="true" className="relative flex gap-3 pb-4">
               <div className="flex flex-col items-center">
                 <span className={`mt-1 h-4 w-4 shrink-0 rounded-full ${dot}`} />
                 {(i < sorted.length - 1 || pending.length > 0) && <span className="w-0.5 flex-1 bg-slate-300" />}
               </div>
               <div>
-                <div className={`text-lg font-bold ${text}`}>{LABELS[e.state] || e.state}</div>
+                <div className={`text-lg font-bold ${text}`}>{isNote(e) ? e.note : LABELS[e.state] || e.state}</div>
                 <div className="text-slate-600">
                   {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} since alert
                   {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} after previous step`}
                 </div>
-                {e.note && <div className="font-semibold text-orange-700">{e.note}</div>}
+                {e.note && !isNote(e) && <div className="font-semibold text-orange-700">{e.note}</div>}
                 {e.actor && <div className="text-sm text-slate-500">By {e.actor}</div>}
               </div>
             </li>

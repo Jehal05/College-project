@@ -84,7 +84,7 @@ export async function acknowledge(id) {
 
 /** POST /emergencies/{id}/dispatch */
 export async function dispatch(id, ambulanceId) {
-  if (USE_MOCK) return mock.transition(id, 'AMBULANCE_DISPATCHED', actor());
+  if (USE_MOCK) return mock.transition(id, 'AMBULANCE_DISPATCHED', actor(), { ambulance_id: ambulanceId });
   return request('POST', `/emergencies/${id}/dispatch`, { ambulance_id: ambulanceId });
 }
 
@@ -111,8 +111,47 @@ export const mockCreateEmergency = (type) => mock.createEmergency(type);
 
 // ---------- Ambulances ----------
 
-/** POST /ambulances/{id}/location (used by the route simulator in feature #25). */
-export async function postAmbulanceLocation(id, { lat, lng, emergency_id }) {
-  if (USE_MOCK) return { id, lat, lng };
-  return request('POST', `/ambulances/${id}/location`, { lat, lng, emergency_id });
+/**
+ * List of ambulance units (feature #44).
+ * PROPOSED endpoint, not in the contract yet: GET /ambulances
+ * -> [{ id, call_sign, crew: { driver, paramedic }, base_hospital_id, lat, lng, status }]
+ */
+export async function getAmbulances() {
+  if (USE_MOCK) return mock.listAmbulances();
+  return request('GET', '/ambulances');
 }
+
+/**
+ * POST /ambulances/{id}/location, sent on every simulator tick (feature #25).
+ * body: { emergency_id, lat, lng, heading, eta_seconds, remaining_km, progress, leg }
+ * The backend should broadcast the same fields in the ambulance.location event.
+ */
+export async function postAmbulanceLocation(id, body) {
+  if (USE_MOCK) return mock.ambulanceLocation(id, body);
+  return request('POST', `/ambulances/${id}/location`, body);
+}
+
+// ---------- Timeline notes and chat (PROPOSED endpoints, not in the contract yet) ----------
+
+/**
+ * A timeline note with no state change: patient picked up, corridor request, team assignment.
+ * POST /emergencies/{id}/notes  body: { kind, note, fields }  ->  { note_id, kind, note, fields, timestamp, actor }
+ * The backend stores it, merges `fields` into the emergency, and broadcasts emergency.note.
+ */
+export async function addNote(id, { kind, note, fields }) {
+  if (USE_MOCK) return mock.addNote(id, { kind, note, fields }, actor());
+  return request('POST', `/emergencies/${id}/notes`, { kind, note, fields });
+}
+
+/**
+ * Desk and crew chat (feature #49).
+ * POST /emergencies/{id}/chat  body: { text, sender_role, sender_name }
+ * The backend broadcasts chat.message { message_id, sender_role, sender_name, text } to both sides.
+ */
+export async function sendChat(id, { text, sender_role, sender_name }) {
+  if (USE_MOCK) return mock.chat(id, { text, sender_role, sender_name });
+  return request('POST', `/emergencies/${id}/chat`, { text, sender_role, sender_name });
+}
+
+export const mockCrewReply = (id) => mock.crewReply(id);
+export const CANNED_CREW_REPLIES = mock.CANNED_CREW_REPLIES;

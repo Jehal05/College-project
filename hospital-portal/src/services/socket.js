@@ -2,7 +2,7 @@
 // { event, emergency_id, state, timestamp, payload }
 // In mock mode no connection is opened; services/mockBackend.js calls emitMock() instead.
 import { USE_MOCK, WS_URL } from './config.js';
-import { WS_EVENTS } from './contract.js';
+import { WS_EVENTS, PROPOSED_EVENTS } from './contract.js';
 
 let ws = null;
 let reconnectTimer = null;
@@ -79,7 +79,7 @@ export function disconnect() {
  * Returns an unsubscribe function, so it can be returned straight from useEffect.
  */
 export function subscribe(event, callback) {
-  if (event !== '*' && !WS_EVENTS.includes(event)) {
+  if (event !== '*' && !WS_EVENTS.includes(event) && !PROPOSED_EVENTS.includes(event)) {
     console.warn(`Unknown event "${event}". Check the team contract.`);
   }
   if (!handlers.has(event)) handlers.set(event, new Set());

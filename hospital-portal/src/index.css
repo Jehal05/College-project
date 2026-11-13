@@ -13,3 +13,6 @@ body { @apply bg-slate-100 text-slate-900 antialiased; }
   50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0.45); }
 }
 .ht-flash { animation: ht-flash 0.8s ease-in-out 3; }
+
+/* Ambulance marker glides between position updates (one update per second). */
+.ht-smooth { transition: transform 1s linear; }
