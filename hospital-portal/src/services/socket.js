@@ -1,7 +1,7 @@
 // WebSocket client. Every event follows the contract:
 // { event, emergency_id, state, timestamp, payload }
 // In mock mode no connection is opened; services/mockBackend.js calls emitMock() instead.
-import { USE_MOCK, WS_URL } from './config.js';
+import { USE_MOCK, WS_URL, WS_AUTH } from './config.js';
 import { WS_EVENTS, PROPOSED_EVENTS } from './contract.js';
 import { normaliseEvent } from './adapters.js';
 
@@ -27,6 +27,8 @@ export function onStatus(callback) {
 function deliver(raw) {
   const message = normaliseEvent(raw); // one adapter for every shape (services/adapters.js)
   if (!message) return;
+  message.received_at = Date.now(); // local clock: flashing and timing never depend on the backend's clock
+  if (raw.local) message.local = true;
   handlers.get(message.event)?.forEach((cb) => cb(message));
   handlers.get('*')?.forEach((cb) => cb(message));
 }
@@ -36,7 +38,8 @@ export function connect(token) {
   if (USE_MOCK) return setStatus('mock');
   wanted = true;
   if (ws) return;
-  const url = token ? `${WS_URL}?token=${encodeURIComponent(token)}` : WS_URL;
+  // VITE_WS_AUTH=query (default): token in the address. =message: the token is sent as the first message instead.
+  const url = token && WS_AUTH === 'query' ? `${WS_URL}?token=${encodeURIComponent(token)}` : WS_URL;
   let socket;
   try {
     socket = new WebSocket(url);
@@ -45,7 +48,10 @@ export function connect(token) {
     return scheduleReconnect(token);
   }
   ws = socket;
-  socket.onopen = () => setStatus('live');
+  socket.onopen = () => {
+    if (token && WS_AUTH === 'message') socket.send(JSON.stringify({ type: 'auth', token }));
+    setStatus('live');
+  };
   socket.onmessage = (e) => {
     try {
       deliver(JSON.parse(e.data));
@@ -96,5 +102,5 @@ export function unsubscribe(event, callback) {
 
 /** Fake an incoming event (mock mode and local testing). */
 export function emitMock(event, { emergency_id, state, timestamp, payload = {} }) {
-  deliver({ event, emergency_id, state, timestamp: timestamp || new Date().toISOString(), payload });
+  deliver({ event, emergency_id, state, timestamp: timestamp || new Date().toISOString(), payload, local: true });
 }

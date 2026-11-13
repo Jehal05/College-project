@@ -2,6 +2,10 @@
 // No React in here, so it is easy to test (see emergencyReducer.test.js).
 import { isFinal, isEarly } from './stateMachine.js';
 import { withMotion } from './adapters.js';
+import { inScope } from './queueScope.js';
+
+// Local receive time of an event (ms). The socket adds received_at; without it we fall back to the event's own timestamp.
+const receivedMs = (msg) => (Number.isFinite(msg?.received_at) ? msg.received_at : new Date(msg?.timestamp || Date.now()).getTime());
 import { canEscalate } from './escalation.js';
 
 const SEVERITY_ORDER = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
@@ -34,7 +38,16 @@ export function applyEvent(list, msg) {
     if (idx >= 0) return list; // already known
     const s = state || 'SOS_SENT';
     // An early notice (patient has not confirmed yet) is not "new" in the loud sense: no flash.
-    const created = normalise({ created_at: timestamp, ...payload, emergency_id, state: s, _new: !isEarly(s) && !isFinal(s) });
+    const real = !isEarly(s) && !isFinal(s);
+    const created = normalise({
+      created_at: timestamp,
+      ...payload,
+      emergency_id,
+      state: s,
+      _new: real,
+      // When it became a real SOS here: the card flashes from this moment, not from when the case was created.
+      ...(real ? { sos_sent_at: timestamp || new Date().toISOString(), flash_from: receivedMs(msg) } : {}),
+    });
     return [created, ...list];
   }
 
@@ -59,6 +72,11 @@ export function applyEvent(list, msg) {
       ...current,
       state: 'ESCALATED',
       escalation_level: level,
+      // It is a new alert for the hospital it moved to: unread again, flash again.
+      _new: true,
+      _read: false,
+      escalated_at: timestamp || new Date().toISOString(),
+      flash_from: receivedMs(msg),
       alerted_ids: from && !current.alerted_ids.includes(from) ? [...current.alerted_ids, from] : current.alerted_ids,
       alerted_hospital_id: payload.to_hospital_id || current.alerted_hospital_id,
       escalated_to_name: payload.to_hospital_name || null,
@@ -112,7 +130,9 @@ export function applyEvent(list, msg) {
     ...current,
     ...(payload.ambulance_id ? { ambulance_id: payload.ambulance_id } : {}),
     // The patient confirmed the SOS: from now on it is a real alert for the desk (flash, sound, unread).
-    ...(isEarly(current.state) && state === 'SOS_SENT' ? { _new: true, _read: false } : {}),
+    ...(isEarly(current.state) && state === 'SOS_SENT'
+      ? { _new: true, _read: false, sos_sent_at: timestamp || new Date().toISOString(), flash_from: receivedMs(msg) }
+      : {}),
     ...(state === 'CANCELLED' ? { _new: false } : {}),
     state,
     status_events: [
@@ -158,21 +178,34 @@ export function sortForQueue(list) {
 }
 
 /** Open alerts nobody has opened yet. */
-export const countUnread = (list) => list.filter((e) => !e._read && !isFinal(e.state) && !isEarly(e.state)).length;
+export const countUnread = (list, ctx = {}) =>
+  list.filter((e) => !e._read && !isFinal(e.state) && !isEarly(e.state) && inScope(e, ctx.hospitalId, ctx.scope || 'all')).length;
 
 /**
  * Should this event play the alert sound? Only when an EMERGENCY-level alert becomes a real SOS:
  * created already at SOS_SENT, or an early notice that now reaches SOS_SENT. Never for early notices or cancelled ones.
  */
-export function shouldAlertSound(list, msg) {
+export function shouldAlertSound(list, msg, ctx = {}) {
   if (!msg?.emergency_id) return false;
   const known = list.find((e) => e.emergency_id === msg.emergency_id);
+  const visible = (e) => inScope(e, ctx.hospitalId, ctx.scope || 'all'); // only alerts this desk can see make a sound
   if (msg.event === 'emergency.created') {
     if (known) return false;
     const s = msg.state || 'SOS_SENT';
-    return msg.payload?.severity === 'EMERGENCY' && !isEarly(s) && !isFinal(s);
+    return msg.payload?.severity === 'EMERGENCY' && !isEarly(s) && !isFinal(s) && visible({ ...msg.payload, state: s });
   }
-  return Boolean(known) && msg.state === 'SOS_SENT' && isEarly(known.state) && known.severity === 'EMERGENCY';
+  if (!known || known.severity !== 'EMERGENCY') return false;
+  // Escalated TO this desk: sound once, like a new alert (not when it leaves or when we already hold it).
+  // Checked before the scope test: before the move the alert was at another hospital, so it was not visible here yet.
+  const escalatedToMe =
+    msg.event === 'hospital.escalated' &&
+    ctx.hospitalId != null &&
+    String(msg.payload?.to_hospital_id) === String(ctx.hospitalId) &&
+    String(known.alerted_hospital_id) !== String(ctx.hospitalId) &&
+    canEscalate(known.state);
+  if (escalatedToMe) return true;
+  if (!visible(known)) return false;
+  return msg.state === 'SOS_SENT' && isEarly(known.state);
 }
 
 export function emergencyReducer(list, action) {

@@ -4,6 +4,10 @@ import { useRanking } from './useRanking.js';
 import EscalationCountdown from './EscalationCountdown.jsx';
 import { isEarly } from '../services/stateMachine.js';
 import { NOT_SHARED, originText } from '../services/adapters.js';
+import { shouldFlash, showNewBadge } from '../services/alertFlags.js';
+import { elsewhereLabel } from '../services/queueScope.js';
+import { useAuth } from './AuthProvider.jsx';
+import { useHospitals } from './HospitalProvider.jsx';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -17,14 +21,18 @@ export default function AlertCard({ alert, selected, onSelect }) {
   const { emergency_id, patient_id, type, severity, symptoms, location, created_at, state } = alert;
   const vitals = alert.vitals || {};
   const early = isEarly(state);
+  const { session } = useAuth();
+  const { hospitals } = useHospitals();
+  const elsewhere = elsewhereLabel(alert, session?.hospital_id, hospitals);
   const fromCheckIn = originText(alert);
   const ranking = useRanking(type, location);
   const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
   const unread = !alert._read && state !== 'CANCELLED' && state !== 'HANDOVER_DONE' && !early;
   const cancelled = state === 'CANCELLED';
   const finished = state === 'HANDOVER_DONE';
-  // Flash only alerts that arrived live in the last few seconds (not on every page visit).
-  const flash = alert._new && Date.now() - new Date(created_at).getTime() < 5000;
+  // Flash for a few seconds after it BECAME a real SOS here (not from when the case was first created).
+  const flash = shouldFlash(alert);
+  const isNew = showNewBadge(alert);
   const border = cancelled || finished || early
     ? 'border-slate-400'
     : severity === 'EMERGENCY' ? 'border-red-600' : severity === 'URGENT' ? 'border-orange-500' : 'border-yellow-400';
@@ -36,6 +44,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
       data-state={state}
       data-unread={unread ? 'true' : 'false'}
       data-early={early ? 'true' : 'false'}
+      data-new={isNew ? 'true' : 'false'}
       onClick={() => onSelect?.(alert)}
       className={`w-full rounded-2xl border-l-8 bg-white p-4 text-left shadow transition hover:shadow-md ${border} ${
         selected ? 'ring-4 ring-sky-400' : ''
@@ -45,6 +54,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
         <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
           {unread && <span title="Not opened yet" className="h-3.5 w-3.5 shrink-0 rounded-full bg-sky-500" />}
           {TYPE_LABELS[type] || type}
+          {isNew && <span data-testid="new-badge" className="rounded bg-sky-600 px-1.5 py-0.5 text-xs font-bold text-white">NEW</span>}
         </span>
         {cancelled ? (
           <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">CANCELLED</span>
@@ -67,6 +77,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
         {STATE_LABELS[state] || state}
       </div>
+      {elsewhere && <div data-testid="elsewhere" className="mt-2 text-sm font-semibold text-slate-600">{elsewhere}</div>}
       {fromCheckIn && !early && !cancelled && (
         <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">Safety check-in alert. Simulated.</div>
       )}
