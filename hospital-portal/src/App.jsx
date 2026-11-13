@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AlertAnnouncer from './components/AlertAnnouncer.jsx';
+import OfflineBanner from './components/OfflineBanner.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import NavBar from './components/NavBar.jsx';
 import Login from './pages/Login.jsx';
@@ -31,6 +32,7 @@ function Shell({ children }) {
       )}
       <AlertAnnouncer />
       <NavBar />
+      <OfflineBanner />
       <main className="flex-1">{children}</main>
     </div>
   );

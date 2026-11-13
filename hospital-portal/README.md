@@ -44,6 +44,9 @@ The screen always says which: "Ambulance movement: simulated by the portal" or "
 
 Each open alert shows a card with the ambulance ETA (simulated), what the patient app already shared (symptoms, vitals, location, or **Not shared**), checklist progress and the assigned team. The **Open passport** button calls `GET /passport/{patient_id}` **once per click** (the backend records every view; the portal never opens it by itself). It shows only what the patient agreed to share, and plain messages for 401, 403 and 404. Mock mode shows a clearly labelled sample.
 
+### Connection lost banner
+If the live connection is down for 10 seconds, a red banner (`role="alert"`) says "Connection lost at HH:MM:SS. New alerts may be missing." with a Reload button. When the connection comes back it shows "Reconnected. Reloaded N alerts." for 5 seconds. Short drops (under 10 seconds) show nothing, and mock mode never shows it. The timing is a pure function in `src/services/offlineBanner.js` with unit tests. No new backend call: Reload uses the normal alert list call.
+
 ### Handover and desk notes
 
 Staff can add a **handover note** (for the next shift) or a **desk note** (500 characters at most, with a counter). They appear in the detail, the timeline, the post-event report ("Shift handover") and the text report. They use `POST /emergencies/{id}/notes` with kind `handover` or `desk`. If the backend has no such endpoint, the note stays on this screen and is marked "saved on this screen only".

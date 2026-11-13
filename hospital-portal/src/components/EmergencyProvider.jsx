@@ -31,10 +31,13 @@ export function EmergencyProvider({ children }) {
   const ctxRef = useRef({});
   ctxRef.current = { hospitalId, scope };
 
+  const [lastReload, setLastReload] = useState(null); // { at, count } of the latest successful load
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      send({ type: 'load', list: await api.getAlerts() });
+      const loaded = await api.getAlerts();
+      send({ type: 'load', list: loaded });
+      setLastReload({ at: Date.now(), count: Array.isArray(loaded) ? loaded.length : 0 });
       setError('');
     } catch (err) {
       setError(`Could not load the alert list: ${err.message} New alerts will still appear live.`);
@@ -169,9 +172,9 @@ export function EmergencyProvider({ children }) {
       visibleEmergencies: sortForQueue(scopeList(list, hospitalId, scope)),
       unreadCount: countUnread(list, { hospitalId, scope }),
       announcement,
-      loading, error, act, refresh, reload, markRead, tick, addNote,
+      loading, error, lastReload, act, refresh, reload, markRead, tick, addNote,
     }),
-    [list, hospitalId, scope, announcement, loading, error, act, refresh, reload, markRead, tick, addNote],
+    [list, hospitalId, scope, announcement, loading, error, lastReload, act, refresh, reload, markRead, tick, addNote],
   );
 
   return <EmergencyContext.Provider value={value}>{children}</EmergencyContext.Provider>;
