@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.2 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.3 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -131,6 +131,7 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | POST /reports | Upload a health report | PATIENT | Jehal |
 | POST /demo/scenario | Run a scenario | ADMIN (demo) | Demo panel |
 | POST /demo/reset | Reset to start state | ADMIN (demo) | Demo panel |
+| POST /demo/vitals | Switch wearable profile or override vitals | ADMIN (demo) | Demo panel |
 
 ### Added for family, responder and admin apps (Shagun)
 
@@ -256,6 +257,30 @@ Fields that the patient did not consent to are omitted, not sent as `null`.
 ```
 Allowed values: `HEART`, `STROKE`, `DIABETIC`, `ASTHMA`. **POST /demo/reset** takes no body and returns `{ "status": "reset" }`.
 
+**POST /demo/vitals** (ADMIN, demo only)
+
+Request (send `profile`, `overrides`, or both; `patient_id` defaults to `pat_001`):
+```json
+{ "patient_id": "pat_001", "profile": "heart_attack", "overrides": { "heart_rate": 150 } }
+```
+- `profile`: `normal`, `heart_attack`, `stroke`, `low_glucose`, `asthma`. The scenario names `HEART`, `STROKE`, `DIABETIC`, `ASTHMA` are also accepted.
+- `overrides`: pins a vital to an exact value. `{"heart_rate": null}` clears one override, `{}` clears all. Vitals: `heart_rate`, `spo2`, `bp_sys`, `bp_dia`, `glucose`, `resp_rate`.
+- A profile switch shows in the `vitals.update` stream within 2 seconds (the stream ticks once per second).
+- `POST /demo/reset` also returns every simulator to `normal`.
+
+Response 200:
+```json
+{
+  "patient_id": "pat_001",
+  "profile": "heart_attack",
+  "overrides": { "heart_rate": 150.0 },
+  "reading": { "patient_id": "pat_001", "profile": "normal", "timestamp": "2026-11-16T10:00:00Z",
+               "heart_rate": 72, "spo2": 98.0, "bp_sys": 120, "bp_dia": 80, "glucose": 100, "resp_rate": 16 },
+  "simulated": true
+}
+```
+`reading` is the last reading already sent, so it can still show the old profile. The next tick shows the new one. Errors: `400` unknown profile, unknown vital or out-of-range value (nothing is changed), `422` unknown field.
+
 ### 4.2 Error format
 
 ```json
@@ -336,3 +361,4 @@ Passwords are set in the seed script and are demo values only.
 |---|---|---|
 | 13 Nov 2026 | 0.1 | First draft for team review |
 | 13 Nov 2026 | 0.2 | Added rules engine status, action codes, symptom and vital names |
+| 13 Nov 2026 | 0.3 | Added POST /demo/vitals and wearable profiles (feature 13) |
