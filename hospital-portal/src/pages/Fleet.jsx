@@ -1,3 +1,5 @@
+import { movementText } from '../services/movement.js';
+import { USE_MOCK } from '../services/config.js';
 // Ambulance fleet dashboard (feature #44) with live tracking of every active trip (feature #25).
 import { useAmbulances } from '../components/AmbulanceProvider.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
@@ -14,7 +16,7 @@ const STATUS = {
 };
 
 export default function Fleet() {
-  const { ambulances, error } = useAmbulances();
+  const { ambulances, error, movementMode } = useAmbulances();
   const { emergencies } = useEmergencies();
   const { hospitals } = useHospitals();
   const hospitalName = (id) => hospitals.find((h) => h.id === id)?.name || id;
@@ -30,6 +32,9 @@ export default function Fleet() {
           {free} of {ambulances.length} available
         </span>
       </div>
+      <p data-testid="fleet-movement" className="text-slate-600">
+        {movementText(movementMode === 'true' ? 'portal' : movementMode === 'false' ? 'backend' : USE_MOCK ? 'portal' : 'auto')}
+      </p>
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
 
       <div className="overflow-x-auto rounded-2xl bg-white shadow">

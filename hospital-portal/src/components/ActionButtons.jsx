@@ -15,7 +15,7 @@ const SIMULATOR_DRIVEN = ['EN_ROUTE', 'ARRIVED'];
  */
 export default function ActionButtons({ emergency }) {
   const { act } = useEmergencies();
-  const { availableFor, startTrip } = useAmbulances();
+  const { availableFor, requestTrip } = useAmbulances();
   const [busy, setBusy] = useState(null); // target state being sent
   const [error, setError] = useState('');
   const [confirming, setConfirming] = useState(null); // action waiting for confirmation
@@ -43,7 +43,7 @@ export default function ActionButtons({ emergency }) {
       const result = await act(id, action.target, options);
       if (result?.local_only) setError(`${action.label} was applied on this screen only: the backend has no endpoint for it yet.`);
       // The portal that dispatches also runs the simulated trip.
-      if (action.target === 'AMBULANCE_DISPATCHED') setTimeout(() => startTrip(id), 0);
+      if (action.target === 'AMBULANCE_DISPATCHED') setTimeout(() => requestTrip(id), 0);
     } catch (err) {
       setError(`${action.label} failed: ${err.message}`);
     } finally {

@@ -14,6 +14,9 @@ import { isFinal } from '../services/stateMachine.js';
 import { haversineKm, DEMO_LOCATION } from '../services/geo.js';
 import { originFor, placeSampleFleet } from '../services/adapters.js';
 import { routeForEmergency } from './tripRoute.js';
+import { USE_MOCK, PORTAL_SIMULATES_AMBULANCE } from '../services/config.js';
+import { subscribe } from '../services/socket.js';
+import { decideTrip, parseMode, movementSource, classifyLocationEvent, BACKEND_WAIT_MS } from '../services/movement.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
@@ -32,6 +35,10 @@ export function AmbulanceProvider({ children }) {
   const [traffic, setTraffic] = useState('auto'); // auto | light | moderate | heavy
   const [trips, setTrips] = useState({}); // emergency_id -> 'running' | 'paused'
   const sims = useRef(new Map());
+  const mode = parseMode(PORTAL_SIMULATES_AMBULANCE);
+  const backendSeen = useRef(new Set()); // emergencies for which the BACKEND has sent positions
+  const recentPosts = useRef(new Map()); // emergency_id -> positions the portal itself just posted (to recognise the backend's echo)
+  const [backendMoving, setBackendMoving] = useState({}); // emergency_id -> true
   const latest = useRef({});
   latest.current = { emergencies, hospitals, units, traffic, hospitalId: session?.hospital_id };
 
@@ -119,6 +126,8 @@ export function AmbulanceProvider({ children }) {
             enRouteSent = true;
             run(() => act(id, 'EN_ROUTE'));
           }
+          const posts = (recentPosts.current.get(id) || []).filter((r) => Date.now() - r.at < 10000);
+          recentPosts.current.set(id, [...posts, { lat: s.lat, lng: s.lng, at: Date.now() }]);
           run(() =>
             api.postAmbulanceLocation(route.ambulance.id, {
               emergency_id: id,
@@ -146,6 +155,37 @@ export function AmbulanceProvider({ children }) {
     [act, addNote, stopTrip],
   );
 
+  // The backend moves the ambulance too? Then in "auto" mode the portal stops its own trip for that emergency.
+  useEffect(() => {
+    if (!isLoggedIn) return undefined;
+    return subscribe('ambulance.location', (msg) => {
+      const id = msg.emergency_id;
+      if (!id) return;
+      if (classifyLocationEvent(msg, recentPosts.current.get(id) || []) !== 'backend') return;
+      backendSeen.current.add(id);
+      setBackendMoving((m) => (m[id] ? m : { ...m, [id]: true }));
+      if (mode === 'auto' && !USE_MOCK && sims.current.has(id)) stopTrip(id);
+    });
+  }, [isLoggedIn, mode, stopTrip]);
+
+  /** After Dispatch: start the portal trip, wait for the backend, or do nothing, as VITE_PORTAL_SIMULATES_AMBULANCE says. */
+  const requestTrip = useCallback(
+    (id) => {
+      const decide = (elapsedMs) => decideTrip({ mode, useMock: USE_MOCK, backendSeen: backendSeen.current.has(id), elapsedMs });
+      const first = decide(0);
+      if (first === 'start') return startTrip(id);
+      if (first === 'wait') setTimeout(() => decide(BACKEND_WAIT_MS) === 'start' && startTrip(id), BACKEND_WAIT_MS);
+      return false;
+    },
+    [mode, startTrip],
+  );
+
+  /** 'portal' | 'backend' | 'auto': who moves the ambulance of this emergency (for the note on screen). */
+  const movementFor = useCallback(
+    (id) => movementSource({ mode, useMock: USE_MOCK, portalTripRunning: Boolean(trips[id]), backendSeen: Boolean(backendMoving[id]) }),
+    [mode, trips, backendMoving],
+  );
+
   const pauseTrip = useCallback((id) => {
     sims.current.get(id)?.pause();
     setTrips((t) => (t[id] ? { ...t, [id]: 'paused' } : t));
@@ -157,8 +197,8 @@ export function AmbulanceProvider({ children }) {
   const resetTrip = useCallback((id) => sims.current.get(id)?.reset(), []);
 
   const value = useMemo(
-    () => ({ ambulances, units, error, availableFor, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip }),
-    [ambulances, units, error, availableFor, traffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip],
+    () => ({ ambulances, units, error, availableFor, traffic, setTraffic, trips, startTrip, requestTrip, movementFor, movementMode: mode, pauseTrip, resumeTrip, resetTrip }),
+    [ambulances, units, error, availableFor, traffic, trips, startTrip, requestTrip, movementFor, mode, pauseTrip, resumeTrip, resetTrip],
   );
   return <AmbulanceContext.Provider value={value}>{children}</AmbulanceContext.Provider>;
 }

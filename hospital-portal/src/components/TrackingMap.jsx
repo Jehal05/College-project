@@ -10,6 +10,7 @@ import { resolveLevel } from '../services/traffic.js';
 import { isFinal } from '../services/stateMachine.js';
 import { routeForEmergency } from './tripRoute.js';
 import { patientIcon, hospitalPinIcon, ambulanceIcon } from './mapIcons.js';
+import { movementText } from '../services/movement.js';
 import { useAmbulances } from './AmbulanceProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
@@ -24,7 +25,7 @@ export function formatEta(seconds) {
 export default function TrackingMap({ emergency, compact = false }) {
   const { session } = useAuth();
   const { hospitals } = useHospitals();
-  const { units, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip } = useAmbulances();
+  const { units, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip, movementFor } = useAmbulances();
   const { addNote } = useEmergencies();
   const [message, setMessage] = useState('');
   const e = emergency;
@@ -66,6 +67,7 @@ export default function TrackingMap({ emergency, compact = false }) {
           <div data-testid="eta" data-seconds={arrived ? 0 : e.ambulance?.eta_seconds ?? ''} className={`text-4xl font-bold tabular-nums ${arrived ? 'text-emerald-600' : 'text-red-600'}`}>
             {arrived ? 'Arrived' : live ? `ETA ${formatEta(e.ambulance.eta_seconds)}` : 'ETA …'}
           </div>
+          <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id))}</div>
           <div data-testid="trip-leg" className="font-semibold text-slate-700">
             {arrived
               ? 'Ambulance is at the hospital'
