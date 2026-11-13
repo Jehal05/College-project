@@ -6,12 +6,13 @@ Honest status of a SIMULATED prototype. A tick means it was run, with the result
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests | `npm run test:unit -w patient-app` | 74 passed (13 files) |
-| Browser tests | `npm run test:browser -w patient-app` | 10 of 10 files, 275 checks passed (emergency 29, data 37, language and voice 51, offline 21, accessibility 24, passport 28, resilience 9, phase6-alert 28, phase6-safety 26, phase6-reminders 22) |
-| API contract (mock server) | `npm run contract` | 21 of 21 passed |
+| Unit tests | `npm run test:unit -w patient-app` | 85 passed (14 files) |
+| Browser tests | `npm run test:browser -w patient-app` | 11 of 11 files, 286 checks passed (emergency 29, data 37, language and voice 51, offline 21, accessibility 24, passport 28, resilience 9, phase6-alert 28, phase6-safety 26, phase6-reminders 22) |
+| API contract (mock server) | `npm run contract` | 24 of 24 passed |
 | Integration (events) | `npm run integration` | all checks passed (10 event types, agreed shape) |
 | Accessibility audit (axe-core) | `npm run audit` | 19 screens x 3 languages: 0 violations |
 | Production build | `npm run build` | precache 438.1 KiB (limit 450 KiB; tight). Passport, Reminders, Summary and the demo panel are lazy-loaded and cached when first opened, so they are NOT available offline on a first visit |
+| Joint rehearsal (real portal, not in CI) | `node scripts/joint-rehearsal.mjs` | 17 of 17 passed (`docs/JOINT_REHEARSAL.md`) |
 | Console | all browser tests | no unexpected errors or warnings |
 
 `npm test` runs the unit tests and the browser tests in one command (about 4.5 minutes). The CI workflow `.github/workflows/ci.yml` runs build, unit tests, contract, integration, audit and browser tests. **It has not been run on GitHub from here**; the same commands were run locally, including from a clean clone (see the end of this file).
