@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDateTime, formatTime } from '../utils/time';
 import { summaryFacts } from '../utils/summaryText';
 
-const H = 'mt-4 text-base font-bold';
+const H = 'mb-1 mt-5 border-t border-slate-100 pt-4 text-base font-bold text-slate-900';
 
 export default function SummaryView({ summary }) {
   const { t } = useTranslation();
@@ -11,7 +11,7 @@ export default function SummaryView({ summary }) {
   const none = <p>{t('summary.none')}</p>;
   return (
     <div>
-      <p className="font-semibold">{t('summary.record')}</p>
+      <p className="rounded-xl bg-slate-50 p-3 text-sm font-semibold text-slate-700">{t('summary.record')}</p>
       <p className="mt-2">{t('summary.started', { time: formatDateTime(summary.started_at) })}</p>
       <p>{t('summary.startedBy', { who: f.startedBy })}</p>
       <h2 className={H}>{t('summary.timeline')}</h2>

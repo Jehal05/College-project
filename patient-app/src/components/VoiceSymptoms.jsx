@@ -29,28 +29,28 @@ export default function VoiceSymptoms({ currentType, onApply }) {
   function cancel() { if (stop.current) stop.current(); setState('idle'); }
   function apply() { onApply(suggestion); setState('idle'); }
 
-  const small = 'min-h-[48px] rounded-lg px-4 font-semibold ';
+  const small = 'min-h-[48px] rounded-xl px-4 font-semibold ';
   return (
     <section aria-label={t('voice.title')} className="mb-4">
       {state !== 'listening' && (
-        <button type="button" onClick={listen} className={small + 'w-full border-2 border-blue-700 text-blue-800'}>🎤 {t('voice.start')}</button>
+        <button type="button" onClick={listen} className={small + 'w-full border-2 border-brand-700 text-brand-800'}>🎤 {t('voice.start')}</button>
       )}
       {state === 'listening' && (
-        <div role="status" className="rounded-lg border-2 border-blue-700 bg-blue-50 p-3">
+        <div role="status" className="rounded-xl border-2 border-brand-700 bg-brand-50 p-3">
           <p className="mb-2 font-bold">{t('voice.listening')}</p>
           <button type="button" onClick={cancel} className={small + 'bg-white border border-slate-400'}>{t('voice.stop')}</button>
         </div>
       )}
-      {state === 'error' && <p role="alert" className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{problem || t('voice.error.nospeech')}</p>}
+      {state === 'error' && <p role="alert" className="mt-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{problem || t('voice.error.nospeech')}</p>}
       {state === 'result' && (
-        <div role="status" className="mt-2 rounded-lg border border-slate-300 p-3">
+        <div role="status" className="mt-2 rounded-xl border-2 border-slate-300 bg-white p-3">
           <p className="text-sm text-slate-700">{t('voice.heard')}: <q>{heard}</q></p>
           {suggestion.ids.length === 0 ? <p className="mt-2 font-semibold">{t('voice.noMatch')}</p> : (
             <>
               <p className="mt-2 font-bold">{t('voice.tickThese')} ({t('category.' + suggestion.category)})</p>
               <ul className="mb-2 list-disc pl-5">{suggestion.ids.map((id) => <li key={id}>{t('symptom.' + id)}</li>)}</ul>
               <p className="mb-2 text-sm text-slate-700">{t('voice.check')}</p>
-              <button type="button" onClick={apply} className={small + 'mr-2 bg-blue-700 text-white'}>{t('voice.apply')}</button>
+              <button type="button" onClick={apply} className={small + 'mr-2 bg-brand-700 text-white'}>{t('voice.apply')}</button>
             </>
           )}
           <button type="button" onClick={() => setState('idle')} className={small + 'border border-slate-400'}>{t('voice.dismiss')}</button>

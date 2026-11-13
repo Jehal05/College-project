@@ -14,14 +14,14 @@ function Banner({ patientId }) {
   const first = due[0];
   const name = first.reminder.name;
   return (
-    <section aria-label={t('reminders.bannerLabel')} role="status" className="mb-3 rounded-xl border-2 border-blue-700 bg-blue-50 p-3 text-slate-900">
+    <section aria-label={t('reminders.bannerLabel')} role="status" className="mb-3 rounded-xl border-2 border-brand-700 bg-brand-50 p-3 text-slate-900">
       <p className="text-lg font-bold">{t('reminders.timeFor', { name })}</p>
       {first.reminder.dose_note && <p className="text-sm">{first.reminder.dose_note}</p>}
       <p className="text-xs text-slate-700">{t('reminders.dueAt', { time: formatDateTime(first.slot.toISOString()) })}</p>
       {due.length > 1 && <p className="text-sm font-semibold">{t('reminders.more', { count: due.length - 1 })}</p>}
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => taken(first)} className="min-h-[48px] rounded-lg bg-blue-700 px-2 font-bold text-white">{t('reminders.taken')}</button>
-        <button type="button" onClick={() => snooze(first)} className="min-h-[48px] rounded-lg border-2 border-slate-500 px-2 font-semibold">{t('reminders.snooze')}</button>
+        <button type="button" onClick={() => taken(first)} className="min-h-[48px] rounded-xl bg-brand-700 hover:bg-brand-800 px-2 font-bold text-white">{t('reminders.taken')}</button>
+        <button type="button" onClick={() => snooze(first)} className="min-h-[48px] rounded-xl border-2 border-slate-500 px-2 font-semibold">{t('reminders.snooze')}</button>
       </div>
     </section>
   );

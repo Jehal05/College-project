@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatElapsed, secondsBetween } from '../utils/time';
+import Icon from './icons';
 
 const ENDED = ['HANDOVER_DONE', 'CANCELLED'];
 const MILESTONES = [
@@ -28,16 +29,16 @@ export default function GoldenHourClock({ events }) {
   const elapsed = secondsBetween(start, ended ? ended.timestamp : now);
   const minutes = Math.floor(elapsed / 60);
   return (
-    <section aria-label={t('clock.title')} className="mt-4 rounded-xl bg-white p-4 text-slate-900">
-      <h2 className="text-sm font-semibold text-slate-700">{t('clock.title')}</h2>
-      <p className="text-5xl font-extrabold tabular-nums">{formatElapsed(elapsed)}</p>
+    <section aria-label={t('clock.title')} className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
+      <h2 className="flex items-center gap-1 text-sm font-semibold text-slate-700"><Icon name="clock" size={16} />{t('clock.title')}</h2>
+      <p className="num text-5xl font-extrabold">{formatElapsed(elapsed)}</p>
       <p className="sr-only" role="status" aria-live="polite">{ANNOUNCE_AT.includes(minutes) ? t('clock.announce', { count: minutes }) : ''}</p>
       <ul className="mt-3 text-sm">
         {MILESTONES.map(([state, key]) => {
           const hit = events.find((e) => e.state === state);
           return (
-            <li key={state} className={'flex justify-between py-1 ' + (hit ? 'font-semibold' : 'text-slate-600')}>
-              <span>{t(key)}</span><span>{hit ? formatElapsed(secondsBetween(start, hit.timestamp)) : t('clock.waiting')}</span>
+            <li key={state} className={'flex justify-between gap-2 border-t border-slate-100 py-2 ' + (hit ? 'font-semibold' : 'text-slate-600')}>
+              <span className="flex items-center gap-2">{hit && <Icon name="check" size={14} strokeWidth={3} className="text-brand-700" />}{t(key)}</span><span className="num">{hit ? formatElapsed(secondsBetween(start, hit.timestamp)) : t('clock.waiting')}</span>
             </li>
           );
         })}

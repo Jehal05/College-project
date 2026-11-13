@@ -59,16 +59,16 @@ export default function DemoTools() {
   // Development only: lets us test the error screen on purpose (/demo?crash=1). Never active in a build.
   if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('crash')) throw new Error('Deliberate test crash');
 
-  const button = 'mb-3 min-h-[52px] w-full rounded-lg px-4 text-lg font-bold disabled:opacity-60 ';
+  const button = 'mb-3 min-h-[52px] w-full rounded-xl px-4 text-lg font-bold disabled:opacity-60 ';
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold">{t('demo.title')}</h1>
-      <p role="status" data-testid="demo-status" className="mb-2 rounded-lg bg-slate-100 p-2 font-semibold">
+      <h1 className="mb-1 text-2xl font-extrabold">{t('demo.title')}</h1>
+      <p role="status" data-testid="demo-status" className="mb-2 rounded-xl bg-slate-100 p-2 font-semibold">
         {state ? t('demo.status', { speed: state.speed, profile: t('demo.profile.' + state.vitals.profile) }) : t('demo.statusLoading')}
       </p>
       <p className="mb-4 text-slate-700">{t('demo.note')}</p>
       <ErrorMessage>{error || (stateError ? t('demo.error') : '')}</ErrorMessage>
-      {message && <p role="status" className="mb-3 rounded-lg bg-green-100 p-3 font-semibold text-green-800">{message}</p>}
+      {message && <p role="status" className="mb-3 rounded-xl bg-green-100 p-3 font-semibold text-green-900">{message}</p>}
       {CATEGORIES.map((c) => (
         <button key={c.type} type="button" disabled={busy} onClick={() => run(c.type)} className={button + 'bg-red-700 text-white'}>
           {t('demo.run', { type: t('emergencyType.' + c.type) })}

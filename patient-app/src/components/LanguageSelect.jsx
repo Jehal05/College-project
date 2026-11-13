@@ -24,7 +24,7 @@ export default function LanguageSelect({ saveToRecord = true }) {
   return (
     <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-semibold text-slate-800">{t('language.label')}</label>
-      <select id={id} value={i18n.language} onChange={change} className="mt-1 block min-h-[44px] w-full rounded-lg border border-slate-300 px-3 text-base">
+      <select id={id} value={i18n.language} onChange={change} className="mt-1 block min-h-[48px] w-full rounded-xl border-2 border-slate-300 bg-white px-3 text-base">
         {LANGUAGES.map((l) => <option key={l.code} value={l.code} lang={l.code}>{l.label}</option>)}
       </select>
       {deviceOnly && <p role="status" className="mt-1 text-sm text-amber-900">{t('language.deviceOnly')}</p>}

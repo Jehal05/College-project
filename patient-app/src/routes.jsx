@@ -6,13 +6,12 @@ import useAuth from './hooks/useAuth';
 import Login from './screens/Login';
 import Home from './screens/Home';
 import Profile from './screens/Profile';
-import Consent from './screens/Consent';
 import Contacts from './screens/Contacts';
-import Reports from './screens/Reports';
 import Symptoms from './screens/Symptoms';
 import Emergency from './screens/Emergency';
 import Cancelled from './screens/Cancelled';
 import { DEMO_ENABLED } from './config/demo';
+import { Skeleton } from './components/ui/Feedback';
 import NeedsConnection from './components/NeedsConnection';
 
 // Screens that only work with the server are loaded the first time they are opened (they are not part of the offline install,
@@ -20,13 +19,19 @@ import NeedsConnection from './components/NeedsConnection';
 const screen = (load) => lazy(() => load().catch(() => ({ default: NeedsConnection })));
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
+const Consent = screen(() => import('./screens/Consent'));
+const Reports = screen(() => import('./screens/Reports'));
 const Reminders = screen(() => import('./screens/Reminders'));
 const Summary = screen(() => import('./screens/Summary'));
 const DemoTools = DEMO_ENABLED ? screen(() => import('./screens/DemoTools')) : null; // left out of normal builds
 
 function Waiting() {
   const { t } = useTranslation();
-  return <p role="status">{t('common.working')}</p>;
+  return (
+    <div role="status" aria-label={t('common.working')} className="space-y-3 pt-2">
+      <Skeleton className="h-8 w-1/2" /><Skeleton className="h-24" /><Skeleton className="h-24" />
+    </div>
+  );
 }
 import NotFound from './screens/NotFound';
 

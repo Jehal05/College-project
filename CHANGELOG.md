@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 8: a real-looking health product (UI only)
+- New design system (teal brand, tokens, system fonts, inline icons, shared Button/Card/Chip/Notice/Skeleton/EmptyState). Shell with header and status chip, restyled Home, Symptoms, Emergency, Profile, Contacts, Consent, Reports, Reminders, Summary, Passport, responder page and Login.
+- Emergency red is limited to the emergency flow; Login's Call 112 / 108 link is now dark outline instead of red (still a plain `tel:112` link, 56 px).
+- Skeleton loading, empty and error states with Retry on every sub-screen. Reminder times show as 8:00 am / 8:00 pm.
+- Manifest and browser colours changed to the teal brand.
+- Consent, Reports and voice input load on first use (kept out of the offline install; precache 442 KiB, limit 450).
+- English strings changed: `status.online` "Online", `status.offline` "Offline", `status.demo` "Demo" (new, in en/hi/gu; hi/gu AI-written, need native review). Login title "Sign in" is now an h2 under the app name. No other wording changed.
+- New test `phase8-ui.test.mjs` (41 checks). Language test allowlist gained avatar initials (rm, sm, km).
+
 ## Phase 7: made for the hospital portal
 - `emergency.created` is now sent at SOS (state `SOS_SENT`), not when the emergency is created, and carries patient summary, readable symptoms, `symptom_ids`, vitals and location (consent decides, omitted not null). `hospital.alerted` has `hospital_id` and `rank`.
 - Hospitals H1-H5 style data copied from the portal's seed (Ahmedabad), with capability and availability objects; ambulances too. Realistic-looking fictional IDs and names everywhere (`PT-2026-0417`, `EM-YYYYMMDD-nnnn`, `HSP-AMD-001`, `AMB-AMD-01`, Sunita Mehta, Metformin 500 mg). Demo location moved to Ahmedabad.

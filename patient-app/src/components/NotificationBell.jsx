@@ -6,6 +6,8 @@ import { clearNotifications, markAllRead } from '../utils/notifications';
 import { alertsOn, alertsSupported, disableAlerts, enableAlerts } from '../utils/browserAlerts';
 import { formatTime } from '../utils/time';
 import Switch from './Switch';
+import Icon from './icons';
+import Button from './ui/Button';
 
 export default function NotificationBell() {
   const { t } = useTranslation();
@@ -30,22 +32,22 @@ export default function NotificationBell() {
   return (
     <div className="relative">
       <button type="button" onClick={toggle} aria-expanded={open} aria-controls="notif-panel"
-        aria-label={t('notif.bell', { count: unread })} className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-300 text-xl">
-        <span aria-hidden="true">🔔</span>
-        {unread > 0 && <span aria-hidden="true" className="absolute -right-1 -top-1 min-w-[20px] rounded-full bg-blue-700 px-1 text-center text-xs font-bold text-white">{unread}</span>}
+        aria-label={t('notif.bell', { count: unread })} className="relative flex min-h-[48px] min-w-[48px] items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-card">
+        <Icon name="bell" />
+        {unread > 0 && <span aria-hidden="true" className="absolute -right-1 -top-1 min-w-[20px] rounded-full bg-brand-700 px-1 text-center text-xs font-bold text-white">{unread}</span>}
       </button>
       <p role="status" className="sr-only">{unread > 0 ? t('notif.bell', { count: unread }) : ''}</p>
       {open && (
-        <section id="notif-panel" aria-label={t('notif.title')} className="absolute right-0 z-20 mt-2 w-72 rounded-xl border border-slate-300 bg-white p-3 shadow-lg">
+        <section id="notif-panel" aria-label={t('notif.title')} className="absolute right-0 z-20 mt-2 w-72 rounded-card border border-slate-200 bg-white p-3 shadow-lift">
           <h2 className="mb-2 text-lg font-bold">{t('notif.title')}</h2>
           {items.length === 0 ? <p className="text-sm text-slate-700">{t('notif.empty')}</p> : (
             <ul className="mb-2 space-y-2 text-sm">
               {items.map((i) => (
-                <li key={i.id} className="rounded-lg bg-slate-50 p-2"><span className="font-semibold">{t(i.key)}</span> <span className="text-slate-600">· {formatTime(i.at)}</span></li>
+                <li key={i.id} className="rounded-xl bg-slate-50 p-2"><span className="font-semibold">{t(i.key)}</span> <span className="text-slate-600">· {formatTime(i.at)}</span></li>
               ))}
             </ul>
           )}
-          {items.length > 0 && <button type="button" onClick={clearNotifications} className="mb-3 min-h-[44px] rounded-lg bg-slate-200 px-4 font-semibold">{t('notif.clear')}</button>}
+          {items.length > 0 && <Button variant="secondary" onClick={clearNotifications} className="mb-3">{t('notif.clear')}</Button>}
           {alertsSupported() && (
             <div className="border-t border-slate-200 pt-2">
               <p id="alerts-label" className="font-semibold">{t('notif.browser.label')}</p>

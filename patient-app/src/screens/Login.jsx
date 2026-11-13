@@ -8,6 +8,11 @@ import useAuth from '../hooks/useAuth';
 import FormField from '../components/FormField';
 import ErrorMessage from '../components/ErrorMessage';
 import LanguageSelect from '../components/LanguageSelect';
+import Icon, { LogoMark } from '../components/icons';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import { InlineNotice } from '../components/ui/Feedback';
+import { DEMO_ENABLED } from '../config/demo';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -40,21 +45,22 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={submit} noValidate>
-      <LanguageSelect />
-      <h1 className="mb-1 text-2xl font-bold">{t('app.title')}</h1>
-      <h2 className="mb-4 text-lg text-slate-700">{t('login.title')}</h2>
-      {notice === 'expired' && !error && <p role="status" className="mb-3 rounded-lg bg-amber-50 p-3 font-semibold text-amber-900">{t('login.expired')}</p>}
+    <form onSubmit={submit} noValidate className="pt-2">
+      <div className="mb-6 flex flex-col items-center text-center">
+        <LogoMark size={72} />
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-900">{t('app.title')}</h1>
+        <h2 className="mt-1 text-lg text-slate-700">{t('login.title')}</h2>
+      </div>
+      {notice === 'expired' && !error && <div className="mb-3"><InlineNotice tone="warning" role="status">{t('login.expired')}</InlineNotice></div>}
       <ErrorMessage>{error}</ErrorMessage>
-      <div className="mt-3">
+      <Card className="mt-3">
         <FormField label={t('login.email')} type="email" value={email} onChange={setEmail} autoComplete="username" required />
         <FormField label={t('login.password')} type="password" value={password} onChange={setPassword} autoComplete="current-password" required />
-      </div>
-      <button type="submit" disabled={loading} className="min-h-[48px] w-full rounded-lg bg-blue-700 px-4 text-lg font-bold text-white disabled:opacity-60">
-        {loading ? t('login.loading') : t('login.submit')}
-      </button>
-      <p className="mt-4 text-sm text-slate-600">{t('login.demoHint')}</p>
-      <a href="tel:112" className="mt-4 flex min-h-[48px] items-center justify-center rounded-lg border-2 border-red-700 font-bold text-red-800">{t('emergency.call')}</a>
+        <Button type="submit" full large disabled={loading} icon="lock">{loading ? t('login.loading') : t('login.submit')}</Button>
+      </Card>
+      <div className="mt-4"><LanguageSelect /></div>
+      {DEMO_ENABLED && <p className="mt-2 text-sm text-slate-600">{t('login.demoHint')}</p>}
+      <a href="tel:112" className="mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-xl border-2 border-slate-900 bg-white font-bold text-slate-900"><Icon name="phone" />{t('emergency.call')}</a>
     </form>
   );
 }

@@ -9,7 +9,7 @@ export default function NeedsConnection() {
     <div role="status">
       <p className="mb-4">{t('screen.needsConnection')}</p>
       <a href="tel:112" className="mb-3 flex min-h-[56px] w-full items-center justify-center rounded-xl bg-red-700 text-lg font-bold text-white">{t('emergency.call')}</a>
-      <Link to="/" className="inline-flex min-h-[48px] items-center rounded-lg bg-blue-700 px-4 font-bold text-white">{t('cancelled.home')}</Link>
+      <Link to="/" className="inline-flex min-h-[48px] items-center rounded-xl bg-brand-700 hover:bg-brand-800 px-4 font-bold text-white">{t('cancelled.home')}</Link>
     </div>
   );
 }

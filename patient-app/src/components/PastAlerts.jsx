@@ -19,7 +19,7 @@ export default function PastAlerts() {
       <ul className="grid gap-2">
         {list.slice(0, 5).map((e) => (
           <li key={e.id}>
-            <Link to={'/summary/' + e.id} className="flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
+            <Link to={'/summary/' + e.id} className="flex min-h-[48px] items-center justify-between rounded-xl border-2 border-slate-300 bg-white px-4 font-semibold text-brand-800">
               <span>{formatDateTime(e.started_at)} · {t('emergencyType.' + e.type)} · {t('state.' + e.final_state)}</span><span aria-hidden="true">›</span>
             </Link>
           </li>

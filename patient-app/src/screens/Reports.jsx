@@ -1,6 +1,7 @@
 // Reports: upload fake demo files, see which will be shared (follows the Reports consent), open and delete.
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import BackLink from '../components/BackLink';
+import { InlineNotice, Skeleton } from '../components/ui/Feedback';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import useReports from '../hooks/useReports';
@@ -43,17 +44,17 @@ export default function Reports() {
 
   return (
     <div>
-      <Link to="/profile" className="mb-2 inline-flex min-h-[44px] items-center font-semibold text-blue-700 underline">{t('common.back')}</Link>
-      <h1 className="mb-2 text-2xl font-bold">{t('reports.title')}</h1>
-      <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">{t('reports.demoOnly')}</p>
+      <BackLink />
+      <h1 className="mb-2 text-2xl font-bold text-slate-900">{t('reports.title')}</h1>
+      <InlineNotice tone="warning" className="mb-4">{t('reports.demoOnly')}</InlineNotice>
       <OfflineNote />
       <ReportUpload onUpload={upload} disabled={!online} />
       {problem && <div className="mb-3"><ErrorMessage>{problem}</ErrorMessage></div>}
-      {status === 'loading' && <p role="status">{t('reports.loading')}</p>}
+      {status === 'loading' && <div role="status" aria-label={t('reports.loading')} className="space-y-3"><Skeleton className="h-20" /><Skeleton className="h-20" /></div>}
       {status === 'error' && <ErrorMessage onRetry={load} retryLabel={t('common.retry')}>{t('reports.loadError')}</ErrorMessage>}
       {status === 'ready' && (
         <>
-          <h2 className="mb-2 text-lg font-bold">{t('reports.yours')}</h2>
+          <h2 className="mb-2 mt-2 text-lg font-bold">{t('reports.yours')}</h2>
           {deleting && <ConfirmDialog title={t('reports.confirmDelete', { name: deleting.name })} confirmLabel={t('reports.confirmYes')}
             onConfirm={confirmDelete} onCancel={() => setDeleting(null)} busy={busy} />}
           <ReportList reports={reports} shareOn={consents ? consents.reports : null} disabled={!online} onOpen={open} onDelete={(r) => { setProblem(''); setDeleting(r); }} />

@@ -1,6 +1,5 @@
 // Feature 1: view, edit and save the patient profile (GET then PATCH).
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import { getPatient, updatePatient } from '../services/api';
@@ -12,6 +11,11 @@ import OfflineNote from '../components/OfflineNote';
 import useOnline from '../hooks/useOnline';
 import CheckInSetting from '../components/CheckInSetting';
 import PastAlerts from '../components/PastAlerts';
+import Button from '../components/ui/Button';
+import Card, { Avatar, ListRow } from '../components/ui/Card';
+import { Chip, InlineNotice, Skeleton } from '../components/ui/Feedback';
+
+const LINKS = [['/consent', 'profile.consent', 'shield'], ['/contacts', 'profile.contacts', 'users'], ['/reports', 'profile.reports', 'file'], ['/reminders', 'profile.reminders', 'pill'], ['/passport', 'profile.passport', 'qr']];
 
 // Turn the patient from the API into plain strings the form can edit.
 const toForm = (p) => ({
@@ -60,25 +64,31 @@ export default function Profile() {
     }
   }
 
-  if (status === 'loading') return <p role="status">{t('profile.loading')}</p>;
+  if (status === 'loading') return <div role="status" className="space-y-3"><Skeleton className="h-20 w-full" /><Skeleton className="h-40 w-full" /><span className="sr-only">{t('profile.loading')}</span></div>;
   if (status === 'loadError') return <ErrorMessage onRetry={load} retryLabel={t('profile.retry')}>{t('profile.loadError')}</ErrorMessage>;
 
   const e = (key) => (errors[key] ? t(errors[key]) : undefined);
   return (
     <form onSubmit={save} noValidate>
-      <h1 className="mb-4 text-2xl font-bold">{t('profile.title')}</h1>
+      <h1 className="mb-3 text-2xl font-extrabold">{t('profile.title')}</h1>
+      <Card className="mb-4 flex items-center gap-4">
+        <Avatar name={form.name} size={64} />
+        <div className="min-w-0">
+          <p className="break-words text-xl font-extrabold">{form.name}</p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {form.age && <Chip>{form.age}</Chip>}
+            {form.blood_group && <Chip tone="brand" icon="drop">{form.blood_group}</Chip>}
+          </div>
+        </div>
+      </Card>
       <LanguageSelect />
       <OfflineNote />
-      <nav aria-label={t('profile.links')} className="mb-5 grid gap-2">
-        {[['/consent', 'profile.consent'], ['/contacts', 'profile.contacts'], ['/reports', 'profile.reports'], ['/reminders', 'profile.reminders'], ['/passport', 'profile.passport']].map(([to, key]) => (
-          <Link key={to} to={to} className="flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
-            {t(key)}<span aria-hidden="true">›</span>
-          </Link>
-        ))}
-      </nav>
+      <Card as="nav" aria-label={t('profile.links')} className="mb-5 !p-1">
+        {LINKS.map(([to, key, icon]) => <ListRow key={to} to={to} icon={icon} title={t(key)} />)}
+      </Card>
       <CheckInSetting />
       <PastAlerts />
-      <fieldset disabled={!online} className="contents">
+      <Card as="div" className="mb-4"><fieldset disabled={!online} className="contents">
       <FormField label={t('profile.name')} value={form.name} onChange={set('name')} error={e('name')} autoComplete="name" />
       <FormField label={t('profile.age')} value={form.age} onChange={set('age')} error={e('age')} type="number" inputMode="numeric" min="0" max="120" />
       <FormField label={t('profile.bloodGroup')} value={form.blood_group} onChange={set('blood_group')} error={e('blood_group')}
@@ -86,12 +96,10 @@ export default function Profile() {
       <FormField label={t('profile.allergies')} value={form.allergies} onChange={set('allergies')} />
       <FormField label={t('profile.conditions')} value={form.conditions} onChange={set('conditions')} />
       <FormField label={t('profile.medications')} value={form.medications} onChange={set('medications')} />
-      </fieldset>
-      {message.type === 'ok' && <p role="status" className="mb-3 rounded-lg bg-green-100 p-3 font-semibold text-green-800">{message.text}</p>}
+      </fieldset></Card>
+      {message.type === 'ok' && <div className="mb-3"><InlineNotice tone="success" role="status">{message.text}</InlineNotice></div>}
       {message.type === 'error' && <div className="mb-3"><ErrorMessage>{message.text}</ErrorMessage></div>}
-      <button type="submit" disabled={saving || !online} className="min-h-[48px] w-full rounded-lg bg-blue-700 px-4 text-lg font-bold text-white disabled:opacity-60">
-        {saving ? t('profile.saving') : t('profile.save')}
-      </button>
+      <Button type="submit" full large icon="check" disabled={saving || !online}>{saving ? t('profile.saving') : t('profile.save')}</Button>
     </form>
   );
 }

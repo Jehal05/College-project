@@ -32,9 +32,9 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
         // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
-        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Summary,DemoTools}-*.js'],
+        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools}-*.js'],
         runtimeCaching: [{
-          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Summary|DemoTools)-[^/]+\.js$/.test(url.pathname),
+          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools)-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'ht-server-screens', expiration: { maxEntries: 12 } },
         }],
@@ -45,8 +45,8 @@ export default defineConfig(({ mode }) => ({
         name: 'HealthTwin AI',
         short_name: 'HealthTwin',
         description: 'Simulated emergency response prototype. Not a medical device.',
-        theme_color: '#1d4ed8',
-        background_color: '#ffffff',
+        theme_color: '#0f766e',
+        background_color: '#f8fafc',
         display: 'standalone',
         start_url: '/',
         icons: [

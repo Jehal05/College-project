@@ -3,7 +3,7 @@ import { BASE, api, check, finish, freshState, launch, login, newPage, phone, sl
 
 const BANNERS = { en: 'Simulated event. Not a medical diagnosis.', hi: 'सिमुलेटेड घटना। यह चिकित्सीय निदान नहीं है।', gu: 'સિમ્યુલેટેડ ઘટના. આ તબીબી નિદાન નથી.' };
 // Latin words that may stay in Hindi/Gujarati screens: product names, units, fake data, hospital names.
-const ALLOWED = new Set(('qr english heart care healthtwin ai spo2 bpm api demo_speed patient demo demo1234 mock pdf jpg png mb kb rahul mehta asha ravi sunita karan navrangpura sabarmati civil heritage edited penicillin http localhost com app version hospital city stroke neuro centre general chest respiratory institute community health and sos er desk amb e c r hdl lab b a o ab tel utc id gps iso m s am pm sms').split(' '));
+const ALLOWED = new Set(('qr english heart care healthtwin ai spo2 bpm api demo_speed patient demo demo1234 mock pdf jpg png mb kb rahul mehta asha ravi sunita karan navrangpura sabarmati civil heritage edited penicillin http localhost com app version hospital city stroke neuro centre general chest respiratory institute community health and sos er desk amb e c r hdl lab b a o ab tel utc id gps iso m s am pm sms rm sm km').split(' '));
 const latinWords = (text) => [...new Set((text.match(/[A-Za-z][A-Za-z0-9_]*/g) || []).map((w) => w.toLowerCase()))].filter((w) => !ALLOWED.has(w));
 const RAW_KEY = /\b(?:home|profile|consent|contacts|reports|twin|clock|notified|emergency|symptoms|symptom|category|state|voice|pending|offline|common|relation|error|demo|language|a11y|validation|login|nav|timeline|instructions|cancelled|notfound|passport|notif|view)\.[A-Za-z_.]+/g;
 

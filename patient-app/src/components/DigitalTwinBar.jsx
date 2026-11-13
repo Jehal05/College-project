@@ -6,6 +6,8 @@ import { twinRows } from '../utils/twin';
 import { bandFor, spread } from '../utils/trend';
 import ErrorMessage from './ErrorMessage';
 import Sparkline from './Sparkline';
+import Card from './ui/Card';
+import { Skeleton } from './ui/Feedback';
 
 // Plain-words text alternative of one sparkline, e.g. "Heart rate over the last minute: between 72 and 78, usual range 60-85."
 function altText(t, row, history) {
@@ -27,14 +29,14 @@ export default function DigitalTwinBar({ vitals, baseline, status, onRetry, hist
   const { t } = useTranslation();
   let body;
   if (status === 'error') body = <ErrorMessage onRetry={onRetry} retryLabel={t('common.retry')}>{t('twin.error')}</ErrorMessage>;
-  else if (!baseline || !vitals) body = <div role="status" className="h-24 animate-pulse rounded-lg bg-slate-100"><span className="sr-only">{t('twin.loading')}</span></div>;
+  else if (!baseline || !vitals) body = <div role="status" className="space-y-2"><Skeleton className="h-24 w-full" /><span className="sr-only">{t('twin.loading')}</span></div>;
   else {
     body = (
       <ul className="grid grid-cols-1 gap-2 min-[260px]:grid-cols-2">
         {twinRows(vitals, baseline).map((r) => (
-          <li key={r.key} className={'rounded-lg border-l-4 bg-slate-50 p-2 ' + (r.within === false ? 'border-amber-500' : 'border-blue-600')}>
+          <li key={r.key} className={'rounded-xl border-l-4 bg-slate-50 p-3 ' + (r.within === false ? 'border-amber-500' : 'border-brand-600')}>
             <p className="text-sm text-slate-700">{t('twin.' + r.key)}</p>
-            <p className="text-2xl font-bold text-slate-900">{r.value}</p>
+            <p className="num text-2xl font-extrabold text-slate-900">{r.value}</p>
             <p className="text-xs text-slate-700">{t('twin.usual', { range: r.usual })}</p>
             {r.within !== null && <p className="text-sm font-semibold text-slate-900">{r.within ? t('twin.within') : t('twin.different')}</p>}
             {sharing && <Trend t={t} row={r} history={history} baseline={baseline} />}
@@ -44,17 +46,17 @@ export default function DigitalTwinBar({ vitals, baseline, status, onRetry, hist
     );
   }
   return (
-    <section aria-label={t('twin.title')} className="mt-4 rounded-xl border border-slate-200 p-4">
+    <Card aria-label={t('twin.title')} className="mt-4">
       <h2 className="mb-2 text-lg font-bold">{t('twin.title')}</h2>
       {body}
       {sharingOff && (
         <div role="status" className="mt-2 text-sm font-semibold text-slate-900">
           <p>{t('twin.sharingOff')}</p>
-          <Link to="/consent" className="inline-flex min-h-[44px] items-center text-blue-800 underline">{t('twin.sharingOffLink')}</Link>
+          <Link to="/consent" className="inline-flex min-h-[44px] items-center text-brand-800 underline">{t('twin.sharingOffLink')}</Link>
         </div>
       )}
       {sharing && <p className="mt-2 text-xs text-slate-700">{t('twin.simulated')}</p>}
       <p className="mt-2 text-sm text-slate-700">{t('twin.notDiagnosis')}</p>
-    </section>
+    </Card>
   );
 }

@@ -10,7 +10,7 @@ export default function SkipLink() {
   };
   return (
     <a href="#main" onClick={skip}
-      className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-blue-800 focus:shadow-lg focus:ring-2 focus:ring-blue-700">
+      className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-brand-800 focus:shadow-lg focus:ring-2 focus:ring-brand-700">
       {t('a11y.skip')}
     </a>
   );

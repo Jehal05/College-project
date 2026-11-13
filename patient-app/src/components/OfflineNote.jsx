@@ -6,7 +6,7 @@ export default function OfflineNote() {
   const { t } = useTranslation();
   if (useOnline()) return null;
   return (
-    <p role="status" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">
+    <p role="status" className="mb-3 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">
       {t('offline.savedCopy')} {t('offline.readOnly')}
     </p>
   );

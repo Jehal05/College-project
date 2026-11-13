@@ -3,8 +3,8 @@ import { useId } from 'react';
 
 export default function FormField({ label, value, onChange, error, type = 'text', options, placeholder, ...rest }) {
   const id = useId();
-  const base = 'mt-1 block min-h-[44px] w-full rounded-lg border px-3 text-base ' +
-    (error ? 'border-amber-500' : 'border-slate-300');
+  const base = 'mt-1 block min-h-[48px] w-full rounded-xl border-2 bg-white px-3 text-base text-slate-900 placeholder:text-slate-500 ' +
+    (error ? 'border-amber-500' : 'border-slate-300 focus:border-brand-700');
   return (
     <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-semibold text-slate-800">{label}</label>
@@ -18,7 +18,7 @@ export default function FormField({ label, value, onChange, error, type = 'text'
         <input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} className={base}
           aria-invalid={Boolean(error)} aria-describedby={error ? id + '-err' : undefined} {...rest} />
       )}
-      {error && <p id={id + '-err'} className="mt-1 text-sm text-amber-800">{error}</p>}
+      {error && <p id={id + '-err'} className="mt-1 text-sm font-medium text-amber-900">{error}</p>}
     </div>
   );
 }

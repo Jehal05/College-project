@@ -81,7 +81,7 @@ export default function Emergency() {
     }
   }
 
-  const page = 'relative -m-4 min-h-screen bg-red-700 p-4 text-white';
+  const page = 'safe-bottom relative -m-4 min-h-screen bg-red-700 p-4 pb-8 pt-8 text-white';
   if (!emergency) {
     return (
       <div className={page}>
@@ -102,7 +102,7 @@ export default function Emergency() {
       <CallButton onRed />
       <p className="sr-only" role="status" aria-live="polite">{t('state.' + state)}</p>
       {backOnline && (
-        <p role="status" className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">
+        <p role="status" className="mt-3 rounded-xl bg-white p-3 font-semibold text-slate-900">
           {state === 'EMERGENCY_DETECTED' ? t('emergency.backOnlineSending') : t('emergency.backOnlineSent')}
         </p>
       )}
@@ -126,30 +126,30 @@ export default function Emergency() {
         </>
       )}
       {emergency.source && emergency.source !== 'MANUAL' && (
-        <p role="status" className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">{t('emergency.fromCheckIn')}</p>
+        <p role="status" className="mt-3 rounded-xl bg-white p-3 font-semibold text-slate-900">{t('emergency.fromCheckIn')}</p>
       )}
       <WhyThisAlert emergencyId={id} source={emergency.source} />
       <InstructionsCard type={emergency.type} />
 
       {state === 'HANDOVER_DONE' && (
-        <section role="status" className="mt-4 rounded-xl bg-white p-4 text-slate-900">
+        <section role="status" className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
           <p className="mb-3 font-semibold">{t('emergency.done')}</p>
-          <Link to={'/summary/' + id} className="mb-2 flex min-h-[48px] items-center justify-center rounded-lg border-2 border-blue-700 px-4 font-bold text-blue-800">{t('emergency.viewSummary')}</Link>
-          <Link to="/" className="inline-flex min-h-[48px] items-center rounded-lg bg-blue-700 px-4 font-bold text-white">{t('emergency.back')}</Link>
+          <Link to={'/summary/' + id} className="mb-2 flex min-h-[48px] items-center justify-center rounded-xl border-2 border-brand-700 px-4 font-bold text-brand-800">{t('emergency.viewSummary')}</Link>
+          <Link to="/" className="inline-flex min-h-[48px] items-center rounded-xl bg-brand-700 hover:bg-brand-800 px-4 font-bold text-white">{t('emergency.back')}</Link>
         </section>
       )}
 
       {CAN_CANCEL_AFTER_SOS.includes(state) && !confirming && (
         <button type="button" onClick={() => setConfirming(true)}
-          className="mt-4 min-h-[48px] w-full rounded-xl border-2 border-white text-base font-semibold">
+          className="mt-4 min-h-[52px] w-full rounded-xl border-2 border-white text-base font-semibold hover:bg-red-800">
           {t('emergency.falseAlarm')}
         </button>
       )}
       {confirming && (
-        <div role="alertdialog" aria-labelledby="confirm-title" className="mt-4 rounded-xl bg-white p-4 text-slate-900">
+        <div role="alertdialog" aria-labelledby="confirm-title" className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
           <p id="confirm-title" className="mb-3 font-semibold">{t('emergency.confirmCancel')}</p>
-          <button type="button" onClick={cancel} className="mb-2 min-h-[52px] w-full rounded-lg bg-green-700 font-bold text-white">{t('emergency.confirmYes')}</button>
-          <button type="button" onClick={() => setConfirming(false)} className="min-h-[52px] w-full rounded-lg border-2 border-slate-400 font-semibold">{t('emergency.confirmNo')}</button>
+          <button type="button" onClick={cancel} className="mb-2 min-h-[52px] w-full rounded-xl bg-green-700 font-bold text-white">{t('emergency.confirmYes')}</button>
+          <button type="button" onClick={() => setConfirming(false)} className="min-h-[52px] w-full rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-50 font-semibold">{t('emergency.confirmNo')}</button>
         </div>
       )}
     </div>

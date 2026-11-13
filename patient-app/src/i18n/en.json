@@ -509,5 +509,8 @@
   "rehearsal.offline": "Turn on No data connection and show the SMS card",
   "rehearsal.fall": "Press Simulated fall and let the check-in time out",
   "rehearsal.reminder": "Show the medicine reminders screen",
-  "screen.needsConnection": "This screen needs an internet connection the first time you open it. Go back, or call 112 / 108 if you need help now."
+  "screen.needsConnection": "This screen needs an internet connection the first time you open it. Go back, or call 112 / 108 if you need help now.",
+  "status.online": "Online",
+  "status.offline": "Offline",
+  "status.demo": "Demo"
 }

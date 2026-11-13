@@ -10,9 +10,9 @@ export default function ConsentToggles({ consents, onToggle, disabled = false })
   return (
     <ul>
       {KEYS.map((k) => (
-        <li key={k} className="mb-3 rounded-xl border border-slate-200 p-4">
-          <h2 id={'consent-' + k} className="text-lg font-bold">{t('consent.' + k + '.title')}</h2>
-          <p className="mb-2 text-sm text-slate-700">{t('consent.' + k + '.text')}</p>
+        <li key={k} className="mb-3 rounded-card border border-slate-200 bg-white p-4 shadow-card">
+          <h2 id={'consent-' + k} className="text-lg font-bold text-slate-900">{t('consent.' + k + '.title')}</h2>
+          <p className="mb-3 text-sm text-slate-600">{t('consent.' + k + '.text')}</p>
           <Switch checked={Boolean(consents[k])} onChange={() => onToggle(k)} labelId={'consent-' + k} disabled={disabled} />
         </li>
       ))}

@@ -5,7 +5,7 @@ import { REHEARSAL_STEPS } from '../config/rehearsal';
 export default function DemoRehearsal({ done, onToggle }) {
   const { t } = useTranslation();
   return (
-    <section aria-labelledby="demo-rehearsal" className="mb-4 rounded-xl border border-slate-300 p-3">
+    <section aria-labelledby="demo-rehearsal" className="mb-4 rounded-card border border-slate-200 bg-white p-3 shadow-card">
       <h2 id="demo-rehearsal" className="mb-2 text-lg font-bold">{t('rehearsal.title')}</h2>
       <ul>
         {REHEARSAL_STEPS.map((id) => (

@@ -1,6 +1,7 @@
 // App shell: phone-width column with skip link, simulated banner, offline banner, page content and bottom navigation.
 // The bottom navigation is hidden on the emergency screen so nobody leaves it by accident.
 import { useLocation } from 'react-router-dom';
+import AppHeader from './components/AppHeader';
 import SimulatedBanner from './components/SimulatedBanner';
 import OfflineBanner from './components/OfflineBanner';
 import SkipLink from './components/SkipLink';
@@ -24,9 +25,10 @@ export default function App() {
   useRouteFocus(pathname); // move focus to the heading after a page change
   const showNav = isLoggedIn && !pathname.startsWith('/emergency') && !pathname.startsWith('/p/');
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-white shadow-lg">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-lift">
       <SkipLink />
       <SimulatedBanner />
+      {!pathname.startsWith('/emergency') && !pathname.startsWith('/p/') && <AppHeader />}
       <main id="main" tabIndex={-1} className="flex-1 p-4">
         <OfflineBanner />
         {isLoggedIn && !pathname.startsWith('/p/') && <ReminderBanner />}

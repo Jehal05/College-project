@@ -2,6 +2,10 @@
 // The QR holds only a link with a random token; what the page shows follows the consent settings.
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import { InlineNotice, Skeleton } from '../components/ui/Feedback';
+import BackLink from '../components/BackLink';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import useOnline from '../hooks/useOnline';
@@ -34,23 +38,23 @@ export default function Passport() {
   }
 
   let body;
-  if (status === 'loading') body = <p role="status">{t('common.working')}</p>;
+  if (status === 'loading') body = <div role="status" aria-label={t('common.working')} className="space-y-3"><Skeleton className="h-72" /><Skeleton className="h-12" /></div>;
   else if (status === 'error') body = <ErrorMessage onRetry={reload} retryLabel={t('common.retry')}>{t('passport.loadError')}</ErrorMessage>;
   else if (!passport) {
     body = (
-      <form onSubmit={(e) => { e.preventDefault(); run(() => create(hours), 'passport.createError'); }}>
+      <Card as="form" onSubmit={(e) => { e.preventDefault(); run(() => create(hours), 'passport.createError'); }}>
         <fieldset className="mb-4">
           <legend className="mb-2 font-semibold">{t('passport.validity')}</legend>
           {CHOICES.map(([value, key]) => (
-            <label key={value} className="flex min-h-[48px] items-center gap-3 text-lg">
+            <label key={value} className="flex min-h-[48px] items-center gap-3 rounded-xl px-2 text-lg hover:bg-slate-50">
               <input type="radio" name="hours" checked={hours === value} onChange={() => setHours(value)} className="h-6 w-6" />{t(key)}
             </label>
           ))}
         </fieldset>
-        <button type="submit" disabled={busy || !online} className="min-h-[56px] w-full rounded-xl bg-blue-700 text-lg font-bold text-white disabled:opacity-60">
+        <Button type="submit" large full icon="qr" disabled={busy || !online}>
           {busy ? t('common.working') : t('passport.create')}
-        </button>
-      </form>
+        </Button>
+      </Card>
     );
   } else {
     const left = timeLeft(passport.expires_at);
@@ -60,24 +64,25 @@ export default function Passport() {
         <p className="mt-3 text-lg font-semibold">{t(left.key, { count: left.count })}</p>
         <p className="text-slate-700">{log.length ? t('passport.opens', { count: log.length }) : t('passport.opensNone')}</p>
         {log.length > 0 && <ul className="mb-2 list-disc pl-6 text-sm text-slate-700">{log.map((l, i) => <li key={i}>{formatDateTime(l.opened_at)}</li>)}</ul>}
-        <Link to={'/p/' + passport.token} className="my-2 inline-flex min-h-[44px] items-center font-semibold text-blue-800 underline">{t('passport.openPage')}</Link>
+        <Link to={'/p/' + passport.token} className="my-2 inline-flex min-h-[44px] items-center font-semibold text-brand-800 underline">{t('passport.openPage')}</Link>
         {confirming
           ? <ConfirmDialog title={t('passport.revokeConfirm')} confirmLabel={t('passport.revokeYes')} busy={busy} onCancel={() => setConfirming(false)} onConfirm={() => run(revoke, 'passport.revokeError')} />
-          : <button type="button" onClick={() => setConfirming(true)} disabled={!online} className="mt-2 min-h-[48px] w-full rounded-lg border-2 border-slate-400 font-semibold disabled:opacity-60">{t('passport.revoke')}</button>}
+          : <Button variant="secondary" full className="mt-2" onClick={() => setConfirming(true)} disabled={!online}>{t('passport.revoke')}</Button>}
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-bold">{t('passport.title')}</h1>
+      <BackLink />
+      <h1 className="mb-2 text-2xl font-bold text-slate-900">{t('passport.title')}</h1>
       <p className="mb-3 text-slate-700">{t('passport.intro')}</p>
       <OfflineNote />
-      {!online && passport && <p role="status" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">{t('passport.offlineNote')}</p>}
+      {!online && passport && <InlineNotice tone="warning" role="status" className="mb-3 font-semibold">{t('passport.offlineNote')}</InlineNotice>}
       <ErrorMessage>{problem}</ErrorMessage>
       {body}
-      <p className="mt-4 text-sm text-slate-700">{t('passport.sharedNote')}</p>
-      <Link to="/consent" className="inline-flex min-h-[44px] items-center font-semibold text-blue-800 underline">{t('passport.consentLink')}</Link>
+      <p className="mt-6 text-sm text-slate-600">{t('passport.sharedNote')}</p>
+      <Link to="/consent" className="inline-flex min-h-[44px] items-center font-semibold text-brand-800 underline">{t('passport.consentLink')}</Link>
     </div>
   );
 }

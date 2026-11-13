@@ -6,7 +6,7 @@ import ErrorMessage from './ErrorMessage';
 
 const SPEEDS = [1, 2, 5, 10, 20];
 const VITALS = ['heart_rate', 'spo2', 'bp_sys', 'bp_dia', 'glucose', 'resp_rate'];
-const btn = (on) => 'min-h-[48px] rounded-lg border-2 px-3 font-bold ' + (on ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-400');
+const btn = (on) => 'min-h-[48px] rounded-xl border-2 px-3 font-bold ' + (on ? 'border-brand-700 bg-brand-50 text-brand-900' : 'border-slate-400');
 
 export default function DemoSpeedVitals({ state, refresh }) {
   const { t } = useTranslation();
@@ -20,7 +20,7 @@ export default function DemoSpeedVitals({ state, refresh }) {
     run(setDemoVitals({ overrides }));
   }
   return (
-    <section aria-labelledby="demo-speed" className="mb-4 rounded-xl border border-slate-300 p-3">
+    <section aria-labelledby="demo-speed" className="mb-4 rounded-card border border-slate-200 bg-white p-3 shadow-card">
       <h2 id="demo-speed" className="mb-2 text-lg font-bold">{t('demo.speedTitle')}</h2>
       <div className="mb-4 flex flex-wrap gap-2">
         {SPEEDS.map((x) => <button key={x} type="button" aria-pressed={state?.speed === x} onClick={() => run(setDemoSpeed(x))} className={btn(state?.speed === x)}>{x}×</button>)}
@@ -39,13 +39,13 @@ export default function DemoSpeedVitals({ state, refresh }) {
         {VITALS.map((k) => (
           <label key={k} className="text-sm font-semibold">{t('demo.vital.' + k)}
             <input type="number" inputMode="numeric" value={pins[k] ?? (state?.vitals.overrides[k] ?? '')} onChange={(e) => setPins({ ...pins, [k]: e.target.value })}
-              className="mt-1 block min-h-[44px] w-full rounded-lg border-2 border-slate-400 px-2 font-normal" />
+              className="mt-1 block min-h-[44px] w-full rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-50 px-2 font-normal" />
           </label>
         ))}
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <button type="button" onClick={apply} className="min-h-[48px] rounded-lg bg-blue-700 font-bold text-white">{t('demo.pinApply')}</button>
-        <button type="button" onClick={() => { setPins({}); run(setDemoVitals({ overrides: {} })); }} className="min-h-[48px] rounded-lg border-2 border-slate-400 font-semibold">{t('demo.pinClear')}</button>
+        <button type="button" onClick={apply} className="min-h-[48px] rounded-xl bg-brand-700 hover:bg-brand-800 font-bold text-white">{t('demo.pinApply')}</button>
+        <button type="button" onClick={() => { setPins({}); run(setDemoVitals({ overrides: {} })); }} className="min-h-[48px] rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-50 font-semibold">{t('demo.pinClear')}</button>
       </div>
       <div className="mt-2"><ErrorMessage>{problem}</ErrorMessage></div>
     </section>

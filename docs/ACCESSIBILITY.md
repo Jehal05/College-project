@@ -44,3 +44,9 @@ Problems found by the first run and fixed:
 - Real screen-reader run-through in the three languages (Hindi and Gujarati pronunciation especially).
 - Real phone testing of vibration, beep and voice input (the tests fake the speech engine).
 - Windows high-contrast mode and forced colours.
+
+## Phase 8 (new look)
+- Tested at 360 px width and 130% font in English, Hindi and Gujarati on 8 screens plus Login: no sideways scroll (`phase8-ui.test.mjs`).
+- Every button, link and field is at least 44 px high; Call 112 / 108 and the countdown buttons are at least 56 px and visible without scrolling.
+- axe: 0 serious or critical on 19 screens x 3 languages. Lighthouse (mobile, /login): performance 96, accessibility 100, best practices 100. Home was not run through Lighthouse (it needs a signed-in session).
+- Dark mode was skipped on purpose: it would need a second contrast pass over every screen and the emergency screens are red-on-white by design.

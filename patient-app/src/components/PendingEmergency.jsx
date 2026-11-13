@@ -22,13 +22,13 @@ export default function PendingEmergency({ patientId, pending }) {
   }
   const button = 'mt-3 min-h-[56px] w-full rounded-xl text-lg font-bold disabled:opacity-60 ';
   return (
-    <div className="relative -m-4 min-h-screen bg-red-700 p-4 text-white">
+    <div className="relative -m-4 min-h-screen bg-red-700 p-4 pt-8 text-white">
       <CallButton onRed />
       <h1 className="mt-4 text-3xl font-extrabold">{t('pending.title')}</h1>
       <p className="mt-2 text-lg font-semibold">{t('pending.text')}</p>
       <p role="status" className="mt-2">{failed ? t('pending.failed') : online ? t('pending.online') : t('pending.waiting')}</p>
       {(!online || failed) && <SmsFallback />}
-      {stale && <p className="mt-3 rounded-lg bg-white p-3 font-semibold text-slate-900">{t('pending.stale')}</p>}
+      {stale && <p className="mt-3 rounded-xl bg-white p-3 font-semibold text-slate-900">{t('pending.stale')}</p>}
       <button type="button" onClick={retry} disabled={busy} className={button + 'bg-white text-red-800'}>
         {busy ? t('emergency.sending') : stale ? t('pending.sendAnyway') : t('emergency.retry')}
       </button>

@@ -15,7 +15,7 @@ export default function WhyThisAlert({ emergencyId, source }) {
   const fromCheckIn = source === 'FALL_CHECK' || source === 'INACTIVITY_CHECK';
 
   return (
-    <section aria-label={t('why.title')} className="mt-4 rounded-xl bg-white p-4 text-slate-900">
+    <section aria-label={t('why.title')} className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
       <button type="button" aria-expanded={open} aria-controls={'why-' + emergencyId} onClick={toggle}
         className="flex min-h-[48px] w-full items-center justify-between text-left text-lg font-bold">
         {t('why.title')}<span aria-hidden="true">{open ? '−' : '+'}</span>

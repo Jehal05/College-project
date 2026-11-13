@@ -6,3 +6,5 @@ dist-test/
 dist-normal/
 /dist-audit/
 dist-joint/
+dist-shots/
+dist-audit/

@@ -25,10 +25,10 @@ export default function ReportUpload({ onUpload, disabled = false }) {
   }
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 rounded-card border border-dashed border-slate-300 bg-white p-4">
       <label htmlFor={id} className="block text-sm font-semibold text-slate-800">{t('reports.choose')}</label>
       <input id={id} type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={choose}
-        disabled={uploading || disabled} className="mt-1 block min-h-[44px] w-full text-base" />
+        disabled={uploading || disabled} className="mt-2 block min-h-[44px] w-full text-base file:mr-3 file:min-h-[44px] file:rounded-xl file:border-0 file:bg-brand-700 file:px-4 file:font-semibold file:text-white" />
       <p className="mt-1 text-sm text-slate-600">{t('reports.rules')}</p>
       {uploading && <p role="status" className="mt-2 font-semibold">{t('reports.uploading')}</p>}
       {error && <div className="mt-2"><ErrorMessage>{error}</ErrorMessage></div>}

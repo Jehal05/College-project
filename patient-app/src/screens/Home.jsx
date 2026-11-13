@@ -14,6 +14,12 @@ import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
 import { usePending } from '../hooks/usePendingEmergency';
 import NotificationBell from '../components/NotificationBell';
+import Icon from '../components/icons';
+import Button from '../components/ui/Button';
+import { Avatar, SectionHeader } from '../components/ui/Card';
+
+// Quick links under the emergency button: [route, icon, translation key].
+const QUICK = [['/passport', 'qr', 'home.passport'], ['/reminders', 'pill', 'home.reminders'], ['/contacts', 'users', 'contacts.title'], ['/reports', 'file', 'reports.title']];
 
 export default function Home() {
   const { t } = useTranslation();
@@ -50,41 +56,42 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          {name && <Avatar name={name} />}
+          <h1 className="min-w-0 break-words text-2xl font-extrabold text-slate-900">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+        </div>
         <NotificationBell />
       </div>
       {pending && (
-        <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
-          <p className="mb-2 font-bold text-red-900">{t('pending.homeBanner')}</p>
-          <Link to="/symptoms" className="inline-flex min-h-[48px] items-center rounded-lg bg-red-700 px-4 font-bold text-white">{t('pending.open')}</Link>
+        <div role="status" className="mb-4 rounded-card border-2 border-red-700 bg-red-50 p-4">
+          <p className="mb-3 font-bold text-red-900">{t('pending.homeBanner')}</p>
+          <Button variant="emergency" to="/symptoms" icon="alert">{t('pending.open')}</Button>
         </div>
       )}
       {activeId && (
-        <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
-          <p className="mb-2 font-bold text-red-900">{t('home.activeEmergency')}</p>
-          <Link to={'/emergency/' + activeId} className="inline-flex min-h-[48px] items-center rounded-lg bg-red-700 px-4 font-bold text-white">
-            {t('home.returnToEmergency')}
-          </Link>
+        <div role="status" className="mb-4 rounded-card border-2 border-red-700 bg-red-50 p-4">
+          <p className="mb-3 font-bold text-red-900">{t('home.activeEmergency')}</p>
+          <Button variant="emergency" to={'/emergency/' + activeId} icon="alert">{t('home.returnToEmergency')}</Button>
         </div>
       )}
-      <Link to="/symptoms" className="mb-5 flex min-h-[80px] w-full items-center justify-center rounded-xl bg-red-700 text-2xl font-extrabold text-white shadow">
-        {t('home.emergency')}
+      <Link to="/symptoms" className="mb-5 flex min-h-[88px] w-full items-center justify-center gap-3 rounded-card bg-red-700 px-4 text-2xl font-extrabold text-white shadow-lift hover:bg-red-800">
+        <Icon name="heart" size={32} />{t('home.emergency')}
       </Link>
-      <Link to="/passport" className="mb-5 flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
-        {t('home.passport')}<span aria-hidden="true">›</span>
-      </Link>
-      <Link to="/reminders" className="mb-5 flex min-h-[48px] items-center justify-between rounded-lg border border-slate-300 px-4 font-semibold text-blue-800">
-        {t('home.reminders')}<span aria-hidden="true">›</span>
-      </Link>
+      <nav aria-label={t('profile.links')} className="mb-2 grid grid-cols-2 gap-3">
+        {QUICK.map(([to, icon, key]) => (
+          <Link key={to} to={to} className="flex min-h-[88px] flex-col items-start justify-between rounded-card border border-slate-200 bg-white p-3 shadow-card hover:border-brand-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-700"><Icon name={icon} /></span>
+            <span className="mt-2 break-words text-sm font-bold text-slate-900">{t(key)}</span>
+          </Link>
+        ))}
+      </nav>
       <VitalsCard vitals={vitals} connected={connected} />
       <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline}
         history={history} sharing={sharing} sharingOff={!!consents && consents.vitals === false} />
-      <h2 className="mb-2 mt-5 text-lg font-bold">{t('home.state')}</h2>
+      <SectionHeader>{t('home.state')}</SectionHeader>
       <StatusBar state={vitals?.state || 'MONITORING'} />
-      <button type="button" onClick={signOut} className="mt-8 min-h-[44px] rounded-lg bg-slate-200 px-4 font-semibold">
-        {t('home.signOut')}
-      </button>
+      <Button variant="ghost" icon="logout" onClick={signOut} className="mt-8">{t('home.signOut')}</Button>
     </div>
   );
 }

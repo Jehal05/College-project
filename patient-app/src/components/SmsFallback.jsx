@@ -31,14 +31,14 @@ export default function SmsFallback() {
       <h2 id="sms-title" className="text-lg font-bold">{t('sms.title')}</h2>
       <p className="mt-1 text-sm">{t('sms.help')}</p>
       <p className="mt-2 text-sm font-semibold">{t('sms.textLabel')}</p>
-      <p data-testid="sms-text" className="mb-3 rounded-lg bg-slate-100 p-2 text-sm">{message}</p>
+      <p data-testid="sms-text" className="mb-3 rounded-xl bg-slate-100 p-2 text-sm">{message}</p>
       {contacts === null && <p role="status" className="text-sm">{t('sms.loading')}</p>}
       {contacts && contacts.length === 0 && (
-        <p>{t('notified.none')} <Link to="/contacts" className="font-semibold text-blue-700 underline">{t('notified.add')}</Link></p>
+        <p>{t('notified.none')} <Link to="/contacts" className="font-semibold text-brand-700 underline">{t('notified.add')}</Link></p>
       )}
       {contacts && primaryFirst(contacts).map((c) => (
         <a key={c.id} href={smsHref(c.phone, message, platform)}
-          className="mb-2 flex min-h-[52px] w-full items-center justify-center rounded-lg border-2 border-blue-700 px-3 text-center font-bold text-blue-800">
+          className="mb-2 flex min-h-[52px] w-full items-center justify-center rounded-xl border-2 border-brand-700 px-3 text-center font-bold text-brand-800">
           {t('sms.button', { name: c.name })}
         </a>
       ))}

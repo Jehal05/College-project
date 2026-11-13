@@ -33,7 +33,7 @@ export default function ContactForm({ initial, onSave, onCancel }) {
   }
 
   return (
-    <form onSubmit={submit} noValidate aria-label={initial ? t('contacts.edit') : t('contacts.add')} className="mb-4 rounded-xl border border-slate-300 p-4">
+    <form onSubmit={submit} noValidate aria-label={initial ? t('contacts.edit') : t('contacts.add')} className="mb-4 rounded-card border border-slate-200 bg-white p-4 shadow-card">
       <h2 className="mb-3 text-lg font-bold">{initial ? t('contacts.edit') : t('contacts.add')}</h2>
       <FormField label={t('contacts.name')} value={form.name} onChange={set('name')} error={e('name')} autoComplete="off" />
       <FormField label={t('contacts.relation')} value={form.relation} onChange={set('relation')} error={e('relation')}
@@ -44,10 +44,10 @@ export default function ContactForm({ initial, onSave, onCancel }) {
         <span>{t('contacts.makePrimary')}</span>
       </label>
       {serverError && <div className="mb-3"><ErrorMessage>{serverError}</ErrorMessage></div>}
-      <button type="submit" disabled={saving} className="mb-2 min-h-[48px] w-full rounded-lg bg-blue-700 font-bold text-white disabled:opacity-60">
+      <button type="submit" disabled={saving} className="mb-2 min-h-[48px] w-full rounded-xl bg-brand-700 hover:bg-brand-800 font-bold text-white disabled:opacity-60">
         {saving ? t('common.working') : t('common.save')}
       </button>
-      <button type="button" onClick={onCancel} className="min-h-[48px] w-full rounded-lg border-2 border-slate-400 font-semibold">{t('common.cancel')}</button>
+      <button type="button" onClick={onCancel} className="min-h-[48px] w-full rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-50 font-semibold">{t('common.cancel')}</button>
     </form>
   );
 }

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import { getContacts } from '../services/api';
+import Icon from './icons';
 
 export default function ContactsNotified({ emergency }) {
   const { t } = useTranslation();
@@ -19,16 +20,16 @@ export default function ContactsNotified({ emergency }) {
 
   if (notified) {
     return (
-      <section aria-label={t('notified.title')} className="mt-4 rounded-xl bg-white p-4 text-slate-900">
-        <p role="status" className="font-bold">{t('notified.done')}</p>
+      <section aria-label={t('notified.title')} className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
+        <p role="status" className="flex items-center gap-2 font-bold"><Icon name="users" className="text-brand-700" />{t('notified.done')}</p>
         <p className="text-sm text-slate-700">{notified.map((c) => c.name + ' (' + t('relation.' + c.relation, { defaultValue: c.relation }) + ')').join(', ')}</p>
       </section>
     );
   }
   if (count === 0) {
     return (
-      <section aria-label={t('notified.title')} className="mt-4 rounded-xl bg-white p-4 text-slate-900">
-        <p>{t('notified.none')} <Link to="/contacts" className="font-semibold text-blue-700 underline">{t('notified.add')}</Link></p>
+      <section aria-label={t('notified.title')} className="mt-4 rounded-card bg-white p-4 text-slate-900 shadow-lift">
+        <p>{t('notified.none')} <Link to="/contacts" className="font-semibold text-brand-700 underline">{t('notified.add')}</Link></p>
       </section>
     );
   }

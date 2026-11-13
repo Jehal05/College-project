@@ -1,29 +1,36 @@
 // The list of uploaded reports with a share indicator that follows the Reports consent switch.
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatNumber } from '../utils/time';
+import Icon from './icons';
+import Button from './ui/Button';
+import { Chip, EmptyState } from './ui/Feedback';
 
-const small = 'min-h-[44px] rounded-lg bg-slate-200 px-3 font-semibold disabled:opacity-60';
 const formatSize = (bytes) => (bytes < 1024 * 1024 ? formatNumber(Math.max(1, Math.round(bytes / 1024))) + ' KB' : formatNumber(bytes / 1024 / 1024, { maximumFractionDigits: 1 }) + ' MB');
 const typeName = (type) => (type === 'application/pdf' ? 'PDF' : type === 'image/png' ? 'PNG' : 'JPG');
 
 // shareOn: true / false, or null while the consent is still loading (then no indicator is shown).
 export default function ReportList({ reports, shareOn, onOpen, onDelete, disabled = false }) {
   const { t } = useTranslation();
-  if (reports.length === 0) return <p className="text-slate-700">{t('reports.empty')}</p>;
+  if (reports.length === 0) return <EmptyState icon="file" title={t('reports.empty')} />;
   return (
     <ul>
       {reports.map((r) => (
-        <li key={r.id} className="mb-3 rounded-xl border border-slate-200 p-3">
-          <p className="break-words text-lg font-bold">{r.name}</p>
-          <p className="text-sm text-slate-700">{typeName(r.content_type)} · {formatSize(r.size)} · {formatDate(r.uploaded_at)}</p>
-          {shareOn !== null && (
-            <p className={'mt-1 text-sm font-semibold ' + (shareOn ? 'text-green-800' : 'text-slate-700')}>
-              {shareOn ? t('reports.shared') : t('reports.notShared')}
-            </p>
-          )}
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button type="button" disabled={disabled} className={small} onClick={() => onOpen(r)} aria-label={t('reports.openFor', { name: r.name })}>{t('reports.open')}</button>
-            <button type="button" disabled={disabled} className={small} onClick={() => onDelete(r)} aria-label={t('reports.deleteFor', { name: r.name })}>{t('common.delete')}</button>
+        <li key={r.id} className="mb-3 rounded-card border border-slate-200 bg-white p-3 shadow-card">
+          <div className="flex gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><Icon name="file" /></span>
+            <div className="min-w-0 flex-1">
+              <p className="break-words font-bold text-slate-900">{r.name}</p>
+              <p className="text-sm text-slate-600">{typeName(r.content_type)} · {formatSize(r.size)} · {formatDate(r.uploaded_at)}</p>
+              {shareOn !== null && (
+                <Chip className="mt-1" tone={shareOn ? 'success' : 'neutral'} icon={shareOn ? 'check' : 'lock'}>
+                  {shareOn ? t('reports.shared') : t('reports.notShared')}
+                </Chip>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="secondary" disabled={disabled} onClick={() => onOpen(r)} aria-label={t('reports.openFor', { name: r.name })}>{t('reports.open')}</Button>
+            <Button variant="secondary" disabled={disabled} onClick={() => onDelete(r)} aria-label={t('reports.deleteFor', { name: r.name })}>{t('common.delete')}</Button>
           </div>
         </li>
       ))}

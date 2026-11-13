@@ -13,9 +13,9 @@ export default function DemoSimulate() {
   const [serverError, setServerError] = useState(false);
   const toggleServer = (on) => setDemoFail(on ? 'server' : 'off').then(() => setServerError(on)).catch(() => {});
   return (
-    <section aria-labelledby="demo-sim" className="mb-4 rounded-xl border border-slate-300 p-3">
+    <section aria-labelledby="demo-sim" className="mb-4 rounded-card border border-slate-200 bg-white p-3 shadow-card">
       <h2 id="demo-sim" className="mb-2 text-lg font-bold">{t('demo.simTitle')}</h2>
-      <button type="button" onClick={() => startCheckIn('FALL_CHECK')} className="mb-3 min-h-[52px] w-full rounded-lg border-2 border-slate-500 font-bold">
+      <button type="button" onClick={() => startCheckIn('FALL_CHECK')} className="mb-3 min-h-[52px] w-full rounded-xl border-2 border-slate-500 font-bold">
         {t('demo.fall')}
       </button>
       <p id="sim-offline" className="font-semibold">{t('demo.offline')}</p>
