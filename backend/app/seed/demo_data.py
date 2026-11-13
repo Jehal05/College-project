@@ -24,18 +24,18 @@ DATA_DIR = Path(__file__).parent / "data"
 DEMO_PATIENT_ID = "PT-2026-0417"
 DEMO_HOSPITAL_ID = "HSP-AMD-002"   # the heart and stroke institute: the staff logins belong here
 
-# (id, login, display name, demo password, role, patient id, hospital id)
+# (id, login, display name, demo password, role, patient id, hospital id, label shown in the login answer)
 DEMO_ACCOUNTS = [
-    ("usr_001", "patient@demo.test", "Rahul Mehta", "demo1234", "PATIENT", DEMO_PATIENT_ID, None),
-    ("usr_002", "patient1", "Rahul Mehta", "demo-password", "PATIENT", DEMO_PATIENT_ID, None),
-    ("usr_003", "staff@demo.test", "Desk Staff (Demo)", "demo1234", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID),
-    ("usr_004", "staff@demo", "Desk Staff (Demo)", "demo123", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID),
-    ("usr_005", "staff1", "Desk Staff (Demo)", "demo-password", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID),
-    ("usr_006", "admin@demo.test", "Admin (Demo)", "demo1234", "ADMIN", None, DEMO_HOSPITAL_ID),
-    ("usr_007", "admin@demo", "Admin (Demo)", "demo123", "ADMIN", None, DEMO_HOSPITAL_ID),
-    ("usr_008", "admin1", "Admin (Demo)", "demo-password", "ADMIN", None, DEMO_HOSPITAL_ID),
-    ("usr_009", "family1", "Family (Demo)", "demo-password", "FAMILY", None, None),
-    ("usr_010", "responder1", "Responder (Demo)", "demo-password", "RESPONDER", None, None),
+    ("usr_001", "patient@demo.test", "Rahul Mehta", "demo1234", "PATIENT", DEMO_PATIENT_ID, None, None),
+    ("usr_002", "patient1", "Rahul Mehta", "demo-password", "PATIENT", DEMO_PATIENT_ID, None, None),
+    ("usr_003", "staff@demo.test", "Desk Staff (Demo)", "demo1234", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, None),
+    ("usr_004", "staff@demo", "Desk Staff (Demo)", "demo123", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, "staff"),
+    ("usr_005", "staff1", "Desk Staff (Demo)", "demo-password", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, None),
+    ("usr_006", "admin@demo.test", "Admin (Demo)", "demo1234", "ADMIN", None, DEMO_HOSPITAL_ID, None),
+    ("usr_007", "admin@demo", "Admin (Demo)", "demo123", "ADMIN", None, DEMO_HOSPITAL_ID, "admin"),
+    ("usr_008", "admin1", "Admin (Demo)", "demo-password", "ADMIN", None, DEMO_HOSPITAL_ID, None),
+    ("usr_009", "family1", "Family (Demo)", "demo-password", "FAMILY", None, None, None),
+    ("usr_010", "responder1", "Responder (Demo)", "demo-password", "RESPONDER", None, None, None),
 ]
 
 
@@ -102,9 +102,9 @@ def seed_demo(session: Session) -> Dict[str, object]:
         session.add(Contact(id=c["id"], patient_id=p["id"], name=c["name"], relation=c.get("relation"),
                             phone=c["phone"], is_primary=bool(c.get("is_primary")), position=position))
 
-    for user_id, login, display, password, role, patient_id, hospital_id in DEMO_ACCOUNTS:
+    for user_id, login, display, password, role, patient_id, hospital_id, label in DEMO_ACCOUNTS:
         session.add(User(id=user_id, login=login.lower(), display_name=display, password_hash=_hash(password),
-                         role=role, patient_id=patient_id, hospital_id=hospital_id))
+                         role=role, role_label=label, patient_id=patient_id, hospital_id=hospital_id))
 
     # The demo patient shares everything, as in the mock server. Written through the append-only ledger.
     for field in CONSENT_FIELDS:

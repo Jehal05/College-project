@@ -11,21 +11,20 @@ rules once it has.
 | | Count |
 |---|---|
 | Endpoints described in CONTRACT.md | 37 |
-| Built in the app | 8 |
-| **Not built yet** | **29** |
+| Built in the app | 9 |
+| **Not built yet** | **28** |
 | Served but not documented | 0 |
 
-Of the 8 built, only `GET /health` and `GET /passport/{id}` (with a token) can be used today. The other 6
-(`GET /audit`, `POST /demo/vitals`, the three consent endpoints and insights) answer `501` until login exists.
+All 9 built endpoints work with a real login now (`POST /auth/login` is built): `GET /health`, login, the passport, `GET /audit`, the three consent endpoints, insights and `POST /demo/vitals`.
 
-Not built yet: login, patient profile and vitals, the whole emergency lifecycle (create, cancel, acknowledge,
+Not built yet: patient profile and vitals, the whole emergency lifecycle (create, cancel, acknowledge,
 dispatch, status), hospitals and availability, ambulance location, demo reset and scenarios, reports, and the
 family, responder, admin, content, feedback and privacy endpoints. Also not built: the WebSocket manager, the
 notification engine, the escalation scheduler and the trend warning, FHIR export and metrics.
 
 ## Conditions to START the freeze (all must be ticked)
 
-- [ ] Every Tier 1 endpoint in the plan is built (login, profile, vitals, emergencies, hospitals, passport, demo panel)
+- [ ] Every Tier 1 endpoint in the plan is built (profile, vitals, emergencies, hospitals, demo panel; login and passport are done)
 - [ ] `python scripts/contract_status.py` prints `FREEZE READY`
 - [ ] The heart attack scenario runs end to end with Jehal's and Puneet's apps connected (week 2 checkpoint)
 - [ ] `NOT_BUILT_YET` in `tests/test_contract_conformance.py` is empty or holds only endpoints the team agreed to drop

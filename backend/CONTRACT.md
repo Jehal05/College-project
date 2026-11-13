@@ -102,20 +102,42 @@ Emergency records start at `EMERGENCY_DETECTED`. `MONITORING` and `SYMPTOMS_REPO
 
 ## 3. Authentication
 
-Send `Authorization: Bearer <token>` on every endpoint except `/auth/login`, `/health` and the public passport link (which uses its own signed `token` query value).
+Send `Authorization: Bearer <token>` on every endpoint except `POST /auth/login`, `GET /health` and the public passport link (see the passport rules below). No login: `401`.
 
 ### POST /auth/login
-Request:
+
+Request. The login may be sent as `username` (the portal and the original contract), `email` (the patient app) or `login`; if several are sent, `username` wins. Case and surrounding spaces are ignored.
 ```json
-{ "username": "patient1", "password": "demo-password" }
+{ "username": "staff@demo.test", "password": "demo1234" }
 ```
 Response 200:
 ```json
-{ "token": "eyJhbGciOi...", "role": "PATIENT", "user_id": "usr_001", "patient_id": "pat_001" }
+{
+  "token": "eyJhbGciOi...",
+  "role": "HOSPITAL_STAFF",
+  "user_id": "usr_003",
+  "patient_id": null,
+  "hospital_id": "HSP-AMD-002",
+  "name": "Desk Staff (Demo)",
+  "expires_at": "2026-11-14T18:00:00Z",
+  "simulated": true
+}
 ```
-Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expired token.
+- `patient_id` is set for patient accounts. `hospital_id` is set for hospital desk accounts (and the demo admin). Both are `null` otherwise.
+- **`role` label:** it is the real role (`PATIENT`, `HOSPITAL_STAFF`, `ADMIN`, `FAMILY`, `RESPONDER`), except for the portal's own two demo accounts `staff@demo` and `admin@demo`, which answer with the lowercase labels `staff` and `admin` because Jehal's contract check expects that. Permissions always use the real role, never the label. The portal accepts both spellings. *(Decision for Daksh: it would be cleaner for Jehal to let the check accept both, and then the label can go.)*
+- The token lasts 8 hours (`ACCESS_TOKEN_EXPIRE_MINUTES`). It only proves who the user is: the server looks the user up again on **every** request, so disabling an account or changing a role takes effect at once.
+- A login token cannot open a passport, and a passport token cannot log anyone in.
+- The answer is sent with `Cache-Control: no-store`.
 
-`patient_id` is `null` for staff and admin users.
+Errors (all use the shared error shape in 4.2):
+
+| Status | When |
+|---|---|
+| 400 | login or password missing, empty, the wrong type or too long |
+| 401 | wrong login or password. **The words are always the same** ("Wrong login or password") for an unknown login, a wrong password and a disabled account |
+| 429 | too many wrong attempts: 5 per login and 30 per address in 60 seconds (`LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS`). Comes with a `Retry-After` header. A success clears the login's count. Unknown logins are limited the same way, so the limit does not reveal which logins exist |
+
+For any other endpoint: `401` means no login or a login that is bad, expired or no longer allowed (the answer carries `WWW-Authenticate: Bearer`), and `403` means the login is fine but the role or the data is not allowed.
 
 ---
 
@@ -144,9 +166,9 @@ Errors: `401` wrong credentials. `403` wrong role for the endpoint. `401` expire
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
 | GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent, once feature 61 exists | Shagun (feature 67) |
 | POST /reports | Upload a health report | PATIENT | Jehal |
-| POST /demo/scenario | Run a scenario | ADMIN (demo) | Demo panel |
-| POST /demo/reset | Reset to start state | ADMIN (demo) | Demo panel |
-| POST /demo/vitals | Switch wearable profile or override vitals | ADMIN (demo) | Demo panel |
+| POST /demo/scenario | Run a scenario | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| POST /demo/reset | Reset to start state | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| POST /demo/vitals | Switch wearable profile or override vitals | any logged-in user, demo mode only (404 otherwise) | Demo panel |
 
 ### Added for family, responder and admin apps (Shagun)
 
@@ -341,7 +363,7 @@ Plain-language notes on sleep, activity and stress from the last 7 days of **sim
 ```
 Allowed values: `HEART`, `STROKE`, `DIABETIC`, `ASTHMA`. **POST /demo/reset** takes no body and returns `{ "status": "reset" }`.
 
-**POST /demo/vitals** (ADMIN, demo only)
+**POST /demo/vitals** (demo mode only, any logged-in user)
 
 Request (send `profile`, `overrides`, or both; `patient_id` defaults to `pat_001`):
 ```json
@@ -363,7 +385,7 @@ Response 200:
   "simulated": true
 }
 ```
-`reading` is the last reading already sent, so it can still show the old profile. The next tick shows the new one. Errors: `400` unknown profile, unknown vital or out-of-range value (nothing is changed), `422` unknown field.
+`reading` is the last reading already sent, so it can still show the old profile. The next tick shows the new one. Errors: `400` unknown profile, unknown vital or out-of-range value (nothing is changed), `400` unknown field.
 
 **Consent API** (feature 51)
 
@@ -380,7 +402,7 @@ Four consent flags: `location`, `history`, `vitals`, `reports`.
 ```json
 { "history": false }
 ```
-Response: the same as GET plus `"changed": ["history"]`. A flag that already has that value is not in `changed` and adds no history row. Errors: `400` empty body, `403` not the patient (staff, admin, family and responders can never change consent), `404` unknown patient, `422` unknown field or non-boolean value.
+Response: the same as GET plus `"changed": ["history"]`. A flag that already has that value is not in `changed` and adds no history row. Errors: `400` empty body, `403` not the patient (staff, admin, family and responders can never change consent), `404` unknown patient, `400` unknown field or non-boolean value.
 
 `GET /patients/{id}/consents/history` response:
 ```json
@@ -410,10 +432,15 @@ Which flag guards which field (used for the passport, the hospital alert, SMS an
 
 ### 4.2 Error format
 
+Every error, from every endpoint, has the same two fields with the same plain text. The patient app reads `error`, the original contract reads `detail`:
 ```json
-{ "detail": "Human readable message" }
+{ "error": "Human readable message", "detail": "Human readable message" }
 ```
-Status codes used: `200`, `201`, `400` (bad input), `401` (not logged in or token expired), `403` (wrong role or no consent), `404`, `409` (invalid state transition), `422` (validation error from FastAPI).
+A route may add fields, for example a `409` for an invalid state change is `{ "error": "Invalid transition", "detail": "Invalid transition", "from": "SOS_SENT", "to": "ARRIVED" }`, and a `400` for a bad request lists the names of the bad fields: `{ "error": "Invalid request: password is required", "detail": "...", "fields": ["password"] }`.
+
+Rules: an error never repeats what the caller sent (a password in a bad request never comes back). An unexpected crash is a `500` with the generic text "Something went wrong on the server": no stack trace, no file name, no secret.
+
+Status codes used: `200`, `201`, `400` (bad input, including every validation error; **there is no 422**), `401` (no login, or a bad or expired one), `403` (login fine but role or data not allowed), `404`, `409` (invalid state change), `429` (too many wrong logins), `500`.
 
 ---
 
@@ -508,4 +535,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
 | 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
 | 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |
-| 14 Nov 2026 | 0.7 (in progress) | Foundation, agreed with Puneet: opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |
+| 14 Nov 2026 | 0.7 (in progress) | **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |

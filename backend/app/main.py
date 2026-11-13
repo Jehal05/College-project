@@ -1,7 +1,7 @@
 """HealthTwin AI backend entry point.
 
-Routers are added here as each feature is built. Routes that need login stay
-closed (they answer 501) until the JWT login exists.
+Routers are added here as each feature is built. Login is real: a route without a valid
+login answers 401.
 """
 import os
 from contextlib import asynccontextmanager
@@ -10,9 +10,10 @@ from typing import Mapping, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import audit, consents, demo_vitals, insights, passport
+from app.api import audit, auth, consents, demo_vitals, insights, passport
 from app.config import demo_mode, parse_cors_origins
 from app.db import get_session_factory, init_db
+from app.errors import install_error_handlers
 from app.models.accounts import User
 from app.security import crypto, passport_token
 
@@ -42,6 +43,7 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
+    install_error_handlers(application)
     if origins:
         application.add_middleware(
             CORSMiddleware,
@@ -52,6 +54,7 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
             max_age=600,
         )
 
+    application.include_router(auth.router)
     application.include_router(demo_vitals.router)
     application.include_router(consents.router)
     application.include_router(passport.router)

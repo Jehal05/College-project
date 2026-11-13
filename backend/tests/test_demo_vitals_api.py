@@ -2,13 +2,15 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.api.demo_vitals import require_admin
+from app.api.deps import get_current_actor
 from app.main import app
+from app.security.actor import Actor
 from app.sim.wearable import registry
 
 
 @pytest.fixture(autouse=True)
-def clean_state():
+def clean_state(monkeypatch):
+    monkeypatch.setenv("DEMO_MODE", "true")          # /demo endpoints exist only in demo mode
     registry.reset_all()
     app.dependency_overrides.clear()
     yield
@@ -18,14 +20,28 @@ def clean_state():
 
 @pytest.fixture
 def admin_client():
-    app.dependency_overrides[require_admin] = lambda: None
+    """Any logged-in user may use /demo (it is demo mode only); the login itself is faked here."""
+    app.dependency_overrides[get_current_actor] = lambda: Actor("usr_020", "ADMIN")
     return TestClient(app)
 
 
-def test_endpoint_fails_closed_without_admin_auth():
+def test_endpoint_needs_a_login():
     response = TestClient(app).post("/demo/vitals", json={"profile": "asthma"})
-    assert response.status_code == 501
+    assert response.status_code == 401 and response.headers["www-authenticate"] == "Bearer"
     assert registry.get("pat_001").profile == "normal"
+
+
+def test_endpoint_does_not_exist_outside_demo_mode(admin_client, monkeypatch):
+    monkeypatch.setenv("DEMO_MODE", "false")
+    assert admin_client.post("/demo/vitals", json={"profile": "asthma"}).status_code == 404
+    assert TestClient(app).post("/demo/vitals", json={"profile": "asthma"}).status_code == 404    # not even a 401
+    assert registry.get("pat_001").profile == "normal"
+
+
+@pytest.mark.parametrize("role", ["PATIENT", "HOSPITAL_STAFF", "ADMIN", "FAMILY", "RESPONDER"])
+def test_every_logged_in_role_may_use_the_demo_panel(role):
+    app.dependency_overrides[get_current_actor] = lambda: Actor("usr_x", role, "pat_001" if role == "PATIENT" else None)
+    assert TestClient(app).post("/demo/vitals", json={"profile": "asthma"}).status_code == 200
 
 
 def test_profile_switch(admin_client):
@@ -79,8 +95,8 @@ def test_bad_override_is_400(admin_client):
         assert admin_client.post("/demo/vitals", json={"overrides": bad}).status_code == 400
 
 
-def test_unknown_field_is_422(admin_client):
-    assert admin_client.post("/demo/vitals", json={"profile": "asthma", "color": "red"}).status_code == 422
+def test_unknown_field_is_400(admin_client):
+    assert admin_client.post("/demo/vitals", json={"profile": "asthma", "color": "red"}).status_code == 400
 
 
 def test_health_endpoint_still_works():

@@ -3,8 +3,6 @@ import re
 
 import pytest
 
-from app.api.demo_vitals import require_admin
-from app.main import app
 from app.security.actor import Actor
 from app.security.passport_token import create_passport_token
 
@@ -46,8 +44,13 @@ def call_audit(api):
 
 
 def call_demo_vitals(api):
-    app.dependency_overrides[require_admin] = lambda: None
+    api.login_as(PATIENT)
     return api.post("/demo/vitals", json={"profile": "asthma"})
+
+
+@pytest.fixture(autouse=True)
+def demo_mode_on(monkeypatch):
+    monkeypatch.setenv("DEMO_MODE", "true")
 
 
 CALLS = [call_health, call_passport, call_consents, call_consent_update, call_consent_history,

@@ -1,25 +1,14 @@
-"""POST /demo/vitals (feature 13). ADMIN only, for the demo control panel."""
+"""POST /demo/vitals (feature 13). DEMO_MODE only, any logged-in user (see require_demo_access)."""
 from typing import Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+
+from app.api.deps import require_demo_access
 from pydantic import BaseModel, ConfigDict
 
 from app.sim.wearable import WearableError, registry
 
 router = APIRouter(prefix="/demo", tags=["demo"])
-
-
-def require_admin() -> None:
-    """Placeholder that FAILS CLOSED until login exists (Phase 1, Task 3).
-
-    When require_role("ADMIN") is built, replace this function body or use
-    app.dependency_overrides. Until then the endpoint answers 501, so it can
-    never be used without authentication.
-    """
-    raise HTTPException(
-        status_code=501,
-        detail="Admin authentication is not wired yet. Replace require_admin with require_role('ADMIN').",
-    )
 
 
 class DemoVitalsRequest(BaseModel):
@@ -31,7 +20,7 @@ class DemoVitalsRequest(BaseModel):
     overrides: Optional[Dict[str, Optional[float]]] = None
 
 
-@router.post("/vitals", dependencies=[Depends(require_admin)])
+@router.post("/vitals", dependencies=[Depends(require_demo_access)])
 def set_demo_vitals(body: DemoVitalsRequest) -> dict:
     if body.profile is None and body.overrides is None:
         raise HTTPException(status_code=400, detail="Send a profile, overrides, or both")

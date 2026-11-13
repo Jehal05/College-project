@@ -48,9 +48,9 @@ def use_history(maker):
 
 # ------------------------------------------------------------ the patient reads their own
 
-def test_endpoint_fails_closed_without_login():
+def test_endpoint_needs_a_login():
     app.dependency_overrides.clear()
-    assert TestClient(app).get(URL).status_code == 501
+    assert TestClient(app).get(URL).status_code == 401
 
 
 def test_patient_reads_their_own_insights(api, engine):

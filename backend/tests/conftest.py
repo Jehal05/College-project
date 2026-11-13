@@ -11,6 +11,7 @@ from app.api.deps import get_current_actor, get_optional_actor
 from app.main import app
 from app.models.patient_data import Contact, Patient, Report
 from app.security import crypto, passport_token
+from app.security.login_limiter import reset_limiter
 
 
 @pytest.fixture(autouse=True)
@@ -22,11 +23,16 @@ def fresh_key(monkeypatch):
     monkeypatch.delenv("PASSPORT_TOKEN_EXPIRE_MINUTES", raising=False)
     monkeypatch.setenv("BCRYPT_ROUNDS", "4")          # fast hashing in tests
     monkeypatch.delenv("CORS_ALLOW_ORIGINS", raising=False)
+    monkeypatch.delenv("ACCESS_TOKEN_EXPIRE_MINUTES", raising=False)
+    for name in ("LOGIN_MAX_FAILURES", "LOGIN_IP_MAX_FAILURES", "LOGIN_WINDOW_SECONDS"):
+        monkeypatch.delenv(name, raising=False)
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
+    reset_limiter()
     yield
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
+    reset_limiter()
 
 
 @pytest.fixture
@@ -96,3 +102,38 @@ def file_db(tmp_path, monkeypatch):
     db_module.reset_engine()
     yield path
     db_module.reset_engine()
+
+
+class Demo:
+    """The real app with demo data and the REAL login (no faked users)."""
+
+    def __init__(self, client, engine):
+        self.client, self.engine = client, engine
+
+    def login(self, login, password, field="username"):
+        return self.client.post("/auth/login", json={field: login, "password": password})
+
+    def token(self, login="patient@demo.test", password="demo1234"):
+        return self.login(login, password).json()["token"]
+
+    def headers(self, login="patient@demo.test", password="demo1234"):
+        return {"Authorization": "Bearer " + self.token(login, password)}
+
+    def __getattr__(self, name):
+        return getattr(self.client, name)
+
+
+@pytest.fixture
+def demo(engine, monkeypatch):
+    from app.seed.demo_data import seed_demo
+    monkeypatch.setenv("DEMO_MODE", "true")
+    with Session(engine, expire_on_commit=False) as s:
+        seed_demo(s)
+
+    def db_override():
+        with Session(engine, expire_on_commit=False) as s:
+            yield s
+
+    app.dependency_overrides[db_module.get_db] = db_override
+    yield Demo(TestClient(app), engine)
+    app.dependency_overrides.clear()

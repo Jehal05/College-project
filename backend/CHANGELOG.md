@@ -8,7 +8,10 @@ The contract version lives at the top of `CONTRACT.md`.
 - All 14 contract tables (new: users, hospitals, ambulances, emergencies, status_events, symptom_reports, hospital_alerts, vitals, emergency_passports) plus a counter table for readable ids. Sensitive fields encrypted. The status timeline is append-only.
 - bcrypt password hashing, `EM-YYYYMMDD-nnnn` ids with a safe daily counter, demo seed data (fictional) that loads **only** in demo mode, CORS allow-list from `CORS_ALLOW_ORIGINS` (no wildcard).
 - Decisions agreed with Puneet. Still waiting for Jehal on: the token in his contract checker, the passport URL shape, and whether `sex` is always shared. **Waiting for Daksh to confirm Puneet's change to question 4 (severity floor for a real SOS) before the emergency endpoints are built.**
-- Tests: 822 passing.
+- **Login and roles (feature 33):** `POST /auth/login` with bcrypt checks, 8-hour login tokens that are re-checked against the user on every request, `require_role`, and a login rate limit (429 after 5 wrong attempts). The placeholder 501 answers are gone: a missing login is 401.
+- **One error shape** for the whole API (`error` and `detail`, same text), 400 instead of 422, and no echo of what the caller sent.
+- `/demo/*` exist only in demo mode, and any logged-in user may use them (the patient app's demo panel and the contract script need that).
+- Tests: 979 passing.
 
 ## 0.6.2: draft rules for unmapped symptoms (pending doctor review)
 - 12 new rules: the 7 patient-app symptoms that had no rule (they gave "no indicators"), sudden confusion as a stroke sign, and a safety check-in with no reply (EMERGENCY, type `UNKNOWN`).

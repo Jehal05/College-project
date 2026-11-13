@@ -23,6 +23,9 @@ class User(Base):
     display_name = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)         # bcrypt hash only, never the password
     role = Column(String, nullable=False)
+    # Shown as `role` in the LOGIN ANSWER only when set (the portal's own demo accounts use "staff" / "admin").
+    # Permissions always use `role`, never this label.
+    role_label = Column(String)
     patient_id = Column(String, ForeignKey("patients.id"), nullable=True)
     hospital_id = Column(String, ForeignKey("hospitals.id"), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)

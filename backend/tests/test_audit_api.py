@@ -40,9 +40,9 @@ def ids(response):
     return [i["id"] for i in response.json()["items"]]
 
 
-def test_endpoint_fails_closed_without_login():
+def test_endpoint_needs_a_login():
     app.dependency_overrides.clear()
-    assert TestClient(app).get("/audit").status_code == 501
+    assert TestClient(app).get("/audit").status_code == 401
 
 
 @pytest.mark.parametrize("actor", [PATIENT, STAFF, FAMILY, RESPONDER])
@@ -107,9 +107,9 @@ def test_paging(api, seeded):
 
 
 @pytest.mark.parametrize("query", ["page=0", "page_size=0", "page_size=201", "page=abc"])
-def test_bad_paging_is_422(api, seeded, query):
+def test_bad_paging_is_400(api, seeded, query):
     api.login_as(ADMIN)
-    assert api.get(f"/audit?{query}").status_code == 422
+    assert api.get(f"/audit?{query}").status_code == 400
 
 
 @pytest.mark.parametrize("query", ["from=yesterday", "to=2026-13-45", "from=16/11/2026"])

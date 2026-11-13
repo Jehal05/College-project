@@ -31,12 +31,12 @@ def client(engine, patients):
     app.dependency_overrides.clear()
 
 
-def test_endpoints_fail_closed_without_login():
+def test_endpoints_need_a_login():
     app.dependency_overrides.clear()
     c = TestClient(app)
-    assert c.get("/patients/pat_001/consents").status_code == 501
-    assert c.put("/patients/pat_001/consents", json={"history": True}).status_code == 501
-    assert c.get("/patients/pat_001/consents/history").status_code == 501
+    assert c.get("/patients/pat_001/consents").status_code == 401
+    assert c.put("/patients/pat_001/consents", json={"history": True}).status_code == 401
+    assert c.get("/patients/pat_001/consents/history").status_code == 401
 
 
 def test_default_is_no_consent(client):
@@ -76,8 +76,8 @@ def test_empty_body_is_400(client):
 
 
 @pytest.mark.parametrize("body", [{"photos": True}, {"history": "yes"}, {"history": 1}, {"history": None, "x": 1}])
-def test_bad_body_is_422(client, body):
-    assert client.put("/patients/pat_001/consents", json=body).status_code == 422
+def test_bad_body_is_400(client, body):
+    assert client.put("/patients/pat_001/consents", json=body).status_code == 400
 
 
 @pytest.mark.parametrize("actor", [STAFF, ADMIN, FAMILY, OTHER_PATIENT])

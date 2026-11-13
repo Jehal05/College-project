@@ -59,7 +59,7 @@ FEATURES: Dict[int, Tuple[str, str, Callable[[], Tuple[str, str]]]] = {
     17: ("Family notification", "T2", lambda: status(has_regex(r"notification_log|notification_jobs"))),
     20: ("Severity levels", "T1", lambda: status(has_regex(r"SEVERITY_ACTIONS"))),
     29: ("SMS fallback", "T2", lambda: status(has_regex(r"SIMULATED:"))),
-    33: ("Login and role-based access", "T1", lambda: status(has_endpoint("POST", "/auth/login"), "protected endpoints answer 501 until this exists")),
+    33: ("Login and role-based access", "T1", lambda: status(has_endpoint("POST", "/auth/login"), "POST /auth/login is missing")),
     50: ("Audit log", "T2", lambda: status(has_file("app/models/audit.py") and has_endpoint("GET", "/audit"))),
     51: ("Consent ledger and encryption", "T2", lambda: status(has_file("app/models/consent.py") and has_file("app/security/crypto.py"))),
     52: ("Notification fallback engine", "T2", lambda: status(has_regex(r"dead_letter|notification_jobs"))),
@@ -95,12 +95,15 @@ def _tables() -> tuple:
 PHASES = [
     Phase("Phase 1: Foundation", "contract, repo, models, login",
           ["tests/test_startup_key.py", "tests/test_states_roles.py", "tests/test_models_foundation.py", "tests/test_ids.py",
-           "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_startup_seed.py"], [33], [
+           "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_startup_seed.py",
+           "tests/test_access_tokens.py", "tests/test_login_limiter.py", "tests/test_login_api.py", "tests/test_error_shape.py",
+           "tests/test_role_dependencies.py"], [33], [
         ("CONTRACT.md present", lambda: has_file("CONTRACT.md")),
         (f"database tables from the contract: {_tables()[0]} of {_tables()[1]}", lambda: _tables()[0] == _tables()[1]),
         ("states, roles and the transition table (app/models/enums.py)", lambda: has_regex(r"ALLOWED_TRANSITIONS")),
         ("demo seed data, loaded only in demo mode", lambda: has_file("app/seed/demo_data.py")),
         ("CORS allow-list from the environment", lambda: has_regex(r"parse_cors_origins")),
+        ("login with rate limit and one error shape", lambda: has_file("app/security/login_limiter.py") and has_file("app/errors.py")),
         ("Docker files and .env.example present", lambda: all(has_file(f) for f in ("Dockerfile", "docker-compose.yml", ".env.example"))),
     ]),
     Phase("Phase 2: Safety core and Tier 1", "rules, vitals, alerts, passport, demo panel",
