@@ -23,3 +23,17 @@ When you add or change a package, **commit `package-lock.json` together with `pa
 - `npm run lint` with the real React and react-hooks plugins: 0 errors, 9 `exhaustive-deps` warnings (intended patterns such as `Boolean(x)` dependencies).
 - `npm audit`: 0 vulnerabilities after the react-router 7 upgrade.
 - The larger browser checks written during development (alert flow, ambulance tracking, admin, scope, activity log, offline banner, languages) ran in a sandbox harness that is **not** in this repo. Only the 8 tests in `e2e/portal.spec.js` are repeatable by anyone else.
+
+## Checked against Jehal's mock (14 Nov 2026, by hand on the laptop)
+
+Verified:
+- Staff login returns hospital `HSP-AMD-002`.
+- An unanswered alert escalates and the card shows the escalation (orange banner).
+- Hindi and Gujarati render without boxes.
+- Acknowledge and dispatch work.
+
+Still unconfirmed:
+- The ambulance moving on the map from the mock's own updates.
+- Live availability on a second tab that was already open.
+
+New browser tests in `e2e/flow.spec.js` (escalation, dispatch, Hindi and Gujarati dashboard, availability form) passed in a stand-in runner in the build sandbox, 13 of 13 with the older tests. They have **not** run in real Playwright yet. Run `npm run e2e` on the laptop.

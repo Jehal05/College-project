@@ -37,3 +37,9 @@ Then `npm run dev` and log in as `staff@demo` (password in Jehal's mock README, 
 | Live availability | Save beds on one browser, keep another open | The other map and ranking update without reload |
 
 Record what you saw in `docs/DEMO.md` only after you have actually run it.
+
+## What was checked on 14 Nov 2026
+
+Verified on the laptop: staff login returns `HSP-AMD-002`; escalation shows on the card; Hindi and Gujarati render without boxes; acknowledge and dispatch work.
+
+Still unconfirmed: ambulance movement sent by the mock after dispatch, and a live availability update on a second tab that was already open. See `docs/DEMO_SCRIPT.md` for the fallback if the ambulance does not move.
