@@ -34,7 +34,7 @@ export function saveFinished(live) {
   if (finished.length === 0) return;
   const saved = readSaved();
   const keys = new Set(saved.map(caseKey));
-  const add = finished.filter((e) => !keys.has(caseKey(e))).map(({ _new, _read, ambulance, ...rest }) => rest);
+  const add = finished.filter((e) => !keys.has(caseKey(e))).map(({ _new, _read, ambulance: _ambulance, ...rest }) => rest);
   if (add.length === 0) return;
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify([...saved, ...add]));

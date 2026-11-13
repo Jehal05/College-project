@@ -53,7 +53,6 @@ test('state changes are announced only for the open alert', () => {
 test('escalated to this desk is announced and sounds; escalated away is silent', () => {
   let list = applyEvent([], created('E1', 'SOS_SENT', { alerted_hospital_id: 'h2' }));
   const toMe = { event: 'hospital.escalated', emergency_id: 'E1', state: 'ESCALATED', received_at: 2000, payload: { escalation_level: 1, from_hospital_id: 'h2', to_hospital_id: 'h1' } };
-  const all = { ...ctx, scope: 'all' };
   assert.ok(announcementFor(list, toMe, ctx));
   assert.equal(shouldAlertSound(list, toMe, ctx), true);
   const mine = applyEvent([], created('E3', 'SOS_SENT'));

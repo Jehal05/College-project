@@ -85,6 +85,7 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
       )}
       {role === 'desk' && (
         <div className="mt-2 flex flex-wrap items-center gap-3">
+          {/* eslint-disable-next-line react/jsx-no-target-blank -- same-site link; the new tab must inherit this tab's login (sessionStorage), so no noreferrer */}
           <a href={`/crew/${emergencyId}`} target="_blank" rel="opener" data-testid="crew-link" className="font-semibold text-sky-700 underline">
             Open the crew view in a new tab
           </a>
