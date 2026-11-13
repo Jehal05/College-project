@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import AlertAnnouncer from './components/AlertAnnouncer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import NavBar from './components/NavBar.jsx';
 import Login from './pages/Login.jsx';
@@ -12,8 +13,22 @@ import History from './pages/History.jsx';
 import Report from './pages/Report.jsx';
 
 function Shell({ children }) {
+  const { pathname } = useLocation();
+  // Keyboard users jump over the navigation straight to the queue (only on the dashboard, where the queue is).
+  const skip = (e) => {
+    const target = document.getElementById('alert-queue');
+    if (!target) return;
+    e.preventDefault();
+    target.focus();
+  };
   return (
     <div className="min-h-screen flex flex-col">
+      {pathname === '/dashboard' && (
+        <a href="#alert-queue" onClick={skip} data-testid="skip-link" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[3000] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-slate-900">
+          Skip to alert queue
+        </a>
+      )}
+      <AlertAnnouncer />
       <NavBar />
       <main className="flex-1">{children}</main>
     </div>

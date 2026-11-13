@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { getScope, setScope, setSelectedId as publishSelected, subscribeUi } from '../services/uiStore.js';
+import { hiddenCount } from '../services/queueScope.js';
 import { USE_MOCK, mockCreateEmergency } from '../services/api.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from '../components/AuthProvider.jsx';
@@ -12,7 +14,11 @@ import AvailabilityForm from '../components/AvailabilityForm.jsx';
 
 export default function Dashboard() {
   const { session } = useAuth();
-  const { emergencies, unreadCount, loading, error, refresh, markRead } = useEmergencies();
+  const { emergencies: everyAlert, visibleEmergencies, unreadCount, loading, error, refresh, markRead } = useEmergencies();
+  const scope = useSyncExternalStore(subscribeUi, getScope);
+  const emergencies = visibleEmergencies;
+  const hidden = hiddenCount(everyAlert, session?.hospital_id, scope);
+  const listRef = useRef(null);
   const { hospitals, error: hospitalError } = useHospitals();
   const hospital = hospitals.find((h) => h.id === session?.hospital_id) || hospitals[0] || null;
   const [selectedId, setSelectedId] = useState(null);
@@ -25,6 +31,18 @@ export default function Dashboard() {
   useEffect(() => {
     if (!selected && emergencies.length > 0) setSelectedId(emergencies[0].emergency_id);
   }, [selected, emergencies]);
+
+  useEffect(() => publishSelected(selectedId), [selectedId]); // the live announcer needs to know which alert is open
+
+  // Arrow keys move between cards; Enter opens (the card is a button).
+  function onListKeyDown(e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const cards = [...listRef.current.querySelectorAll('[data-testid=alert-card]')];
+    const i = cards.indexOf(document.activeElement);
+    if (i < 0) return;
+    e.preventDefault();
+    cards[Math.max(0, Math.min(cards.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))].focus();
+  }
 
   // Opening an alert marks it read.
   useEffect(() => {
@@ -71,8 +89,8 @@ export default function Dashboard() {
 
       <div className="grid flex-1 gap-6 p-6 lg:grid-cols-[440px_1fr]">
         {/* Left: alert queue */}
-        <section>
-          <h2 className="mb-3 text-xl font-bold">
+        <section id="alert-queue" tabIndex={-1} aria-labelledby="queue-heading" className="focus:outline-none">
+          <h2 id="queue-heading" className="mb-3 text-xl font-bold">
             Alert queue <span data-testid="open-count" className="text-slate-500">({openCount} open)</span>
             {unreadCount > 0 && (
               <span data-testid="unread-count" className="ml-2 rounded-full bg-sky-500 px-2.5 py-0.5 text-sm font-bold text-white">
@@ -80,18 +98,37 @@ export default function Dashboard() {
               </span>
             )}
           </h2>
-          {loading && emergencies.length === 0 && <p className="text-slate-500">Loading alerts…</p>}
-          {!loading && emergencies.length === 0 && <p className="text-slate-500">No active alerts.</p>}
-          <div className="space-y-3">
-            {emergencies.map((e) => (
-              <AlertCard
-                key={e.emergency_id}
-                alert={e}
-                selected={e.emergency_id === selectedId}
-                onSelect={(a) => setSelectedId(a.emergency_id)}
-              />
+          <div className="mb-3 flex flex-wrap items-center gap-3" role="group" aria-label="Which alerts to show">
+            {[['mine', 'My hospital'], ['all', 'All hospitals']].map(([value, label]) => (
+              <button
+                key={value}
+                data-testid={`scope-${value}`}
+                aria-pressed={scope === value}
+                onClick={() => setScope(value)}
+                className={`rounded-lg border-2 px-3 py-1.5 font-semibold ${scope === value ? 'border-slate-800 bg-slate-800 text-white' : 'border-slate-300 bg-white hover:bg-slate-50'}`}
+              >
+                {label}
+              </button>
             ))}
+            {hidden > 0 && (
+              <span data-testid="hidden-count" className="text-sm font-semibold text-slate-600">
+                {hidden} alert{hidden === 1 ? '' : 's'} at other hospitals
+              </span>
+            )}
           </div>
+          {loading && emergencies.length === 0 && <p className="text-slate-500">Loading alerts…</p>}
+          {!loading && emergencies.length === 0 && <p data-testid="queue-empty" className="text-slate-500">{scope === 'mine' ? 'No active alerts for this hospital.' : 'No active alerts.'}</p>}
+          <ul ref={listRef} aria-label="Alert queue" onKeyDown={onListKeyDown} className="space-y-3">
+            {emergencies.map((e) => (
+              <li key={e.emergency_id}>
+                <AlertCard
+                  alert={e}
+                  selected={e.emergency_id === selectedId}
+                  onSelect={(a) => setSelectedId(a.emergency_id)}
+                />
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Right: detail panel */}

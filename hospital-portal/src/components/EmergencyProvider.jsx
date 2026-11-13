@@ -10,6 +10,9 @@ import { canTransition, whyNot } from '../services/stateMachine.js';
 import { playAlertSound } from '../services/sound.js';
 import { useAuth } from './AuthProvider.jsx';
 import { USE_MOCK } from '../services/config.js';
+import { getScope, getSelectedId, subscribeUi } from '../services/uiStore.js';
+import { announcementFor } from '../services/announce.js';
+import { scopeList } from '../services/queueScope.js';
 
 const EmergencyContext = createContext(null);
 
@@ -21,6 +24,12 @@ export function EmergencyProvider({ children }) {
   const listRef = useRef(list);
   listRef.current = list;
   const refreshRef = useRef(null);
+  const [announcement, setAnnouncement] = useState(null); // { id, text, politeness } for the hidden live region
+  const [scope, setScopeState] = useState(getScope());
+  useEffect(() => subscribeUi(() => setScopeState(getScope())), []);
+  const hospitalId = session?.hospital_id;
+  const ctxRef = useRef({});
+  ctxRef.current = { hospitalId, scope };
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -45,7 +54,10 @@ export function EmergencyProvider({ children }) {
     if (!isLoggedIn) return undefined;
     return subscribe('*', (msg) => {
       // Sound only for new EMERGENCY-level alerts (feature #59), so it keeps its meaning.
-      if (shouldAlertSound(listRef.current, msg)) playAlertSound();
+      const ctx = ctxRef.current;
+      if (shouldAlertSound(listRef.current, msg, ctx)) playAlertSound();
+      const said = announcementFor(listRef.current, msg, { ...ctx, selectedId: getSelectedId() });
+      if (said) setAnnouncement({ ...said, id: `${Date.now()}-${Math.random()}` });
       send({ type: 'event', msg });
       // A real backend's created event may lack patient, location and hospital: fetch the full record once.
       if (!USE_MOCK && msg.event === 'emergency.created' && msg.emergency_id) setTimeout(() => refreshRef.current?.(msg.emergency_id), 400);
@@ -149,8 +161,14 @@ export function EmergencyProvider({ children }) {
   }, [session?.name]);
 
   const value = useMemo(
-    () => ({ emergencies: sortForQueue(list), unreadCount: countUnread(list), loading, error, act, refresh, reload, markRead, tick, addNote }),
-    [list, loading, error, act, refresh, reload, markRead, tick, addNote],
+    () => ({
+      emergencies: sortForQueue(list),
+      visibleEmergencies: sortForQueue(scopeList(list, hospitalId, scope)),
+      unreadCount: countUnread(list, { hospitalId, scope }),
+      announcement,
+      loading, error, act, refresh, reload, markRead, tick, addNote,
+    }),
+    [list, hospitalId, scope, announcement, loading, error, act, refresh, reload, markRead, tick, addNote],
   );
 
   return <EmergencyContext.Provider value={value}>{children}</EmergencyContext.Provider>;
