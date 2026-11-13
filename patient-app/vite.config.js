@@ -1,4 +1,4 @@
-// Vite setup: React plus a basic installable PWA (offline support comes in Phase 4).
+// Vite setup: React plus an installable PWA whose service worker keeps the app shell available offline.
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -9,6 +9,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // The app files are cached so a visited page opens offline. API calls are never cached here
+        // (health data stays out of browser caches; see utils/offlineCache.js for the in-tab saved copies).
+        globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        navigateFallback: '/index.html',
+        cleanupOutdatedCaches: true,
+      },
       manifest: {
         name: 'HealthTwin AI',
         short_name: 'HealthTwin',

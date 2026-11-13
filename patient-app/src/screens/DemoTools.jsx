@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { runDemoScenario, resetDemo } from '../services/api';
+import { runDemoScenario, resetDemo, API_URL } from '../services/api';
+import pkg from '../../package.json';
 import { CATEGORIES } from '../config/symptoms';
 import { setActive, clearActive } from '../utils/activeEmergency';
 import DemoLocationToggle from '../components/DemoLocationToggle';
@@ -41,6 +42,9 @@ export default function DemoTools() {
     }
   }
 
+  // Development only: lets us test the error screen on purpose (/demo?crash=1). Never active in a build.
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('crash')) throw new Error('Deliberate test crash');
+
   const button = 'mb-3 min-h-[52px] w-full rounded-lg px-4 text-lg font-bold disabled:opacity-60 ';
   return (
     <div>
@@ -56,6 +60,7 @@ export default function DemoTools() {
       <button type="button" disabled={busy} onClick={reset} className={button + 'bg-slate-200'}>{t('demo.reset')}</button>
       <DemoLocationToggle />
       <p className="mt-4 text-sm text-slate-600">{t('demo.speedNote')}</p>
+      <p className="mt-2 text-xs text-slate-600">{t('demo.build', { version: pkg.version, api: API_URL })}</p>
     </div>
   );
 }

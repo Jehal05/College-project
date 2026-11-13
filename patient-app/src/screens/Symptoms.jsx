@@ -4,18 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
-import { createEmergency, getPatient } from '../services/api';
+import { getPatient } from '../services/api';
 import { CATEGORIES } from '../config/symptoms';
 import { unlock } from '../utils/alarm';
-import { setActive, setStarted } from '../utils/activeEmergency';
+import { setPending, startEmergency, usePending } from '../hooks/usePendingEmergency';
+import useOnline from '../hooks/useOnline';
 import CallButton from '../components/CallButton';
 import SymptomGroup from '../components/SymptomGroup';
 import DemoLocationToggle from '../components/DemoLocationToggle';
+import VoiceSymptoms from '../components/VoiceSymptoms';
+import PendingEmergency from '../components/PendingEmergency';
 import ErrorMessage from '../components/ErrorMessage';
-
-// Used only if the saved consents cannot be read, so help is never delayed.
-// Phase 3 adds a consent screen that makes these choices explicit.
-const DEFAULT_CONSENTS = { location: true, history: true, vitals: true, reports: true };
 
 export default function Symptoms() {
   const { t } = useTranslation();
@@ -26,6 +25,8 @@ export default function Symptoms() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const consents = useRef(null); // a promise, loaded early so the button responds fast
+  const online = useOnline();
+  const pending = usePending(); // an emergency that could not be sent yet
 
   useEffect(() => {
     consents.current = getPatient(session.patient_id).then((p) => p.consents).catch(() => null);
@@ -35,31 +36,37 @@ export default function Symptoms() {
   const toggle = (id) => setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
   const pick = (next) => { setType(next); setSelected([]); };
 
+  // Voice suggestions are applied only after the person confirmed them.
+  const applyVoice = ({ category, ids }) => {
+    setType(category);
+    setSelected((cur) => (category === type ? [...new Set([...cur, ...ids])] : ids));
+  };
+
   async function getHelp() {
     unlock(); // allows the countdown beep later (browsers need a tap first)
     setBusy(true);
     setError('');
+    if (!online) { setPending(type, selected); setBusy(false); return; } // honest: nothing was sent
     try {
       const saved = consents.current ? await consents.current : null;
-      const e = await createEmergency({
-        patient_id: session.patient_id, type, symptoms: selected, consents: saved || DEFAULT_CONSENTS,
-      });
-      setStarted(e.id, Date.now());
-      setActive(e.id);
+      const e = await startEmergency(session.patient_id, type, selected, saved);
       navigate('/emergency/' + e.id);
-    } catch {
-      setError(t('symptoms.error'));
+    } catch (err) {
+      if (err.code === 'NETWORK') setPending(type, selected);
+      else setError(t('symptoms.error'));
       setBusy(false);
     }
   }
 
   const ready = selected.length > 0 && !busy;
+  if (pending) return <PendingEmergency patientId={session.patient_id} pending={pending} />;
   return (
     <div>
       <CallButton />
       <h1 className="mb-1 mt-4 text-2xl font-bold">{t('symptoms.title')}</h1>
+      <VoiceSymptoms currentType={type} onApply={applyVoice} />
       <p className="mb-3 text-slate-700">{t('symptoms.pickCategory')}</p>
-      <div role="radiogroup" aria-label={t('symptoms.pickCategory')} className="grid grid-cols-2 gap-3">
+      <div role="radiogroup" aria-label={t('symptoms.pickCategory')} className="grid grid-cols-1 gap-3 min-[260px]:grid-cols-2">
         {CATEGORIES.map((c) => (
           <button key={c.type} type="button" role="radio" aria-checked={type === c.type} onClick={() => pick(c.type)}
             className={'min-h-[64px] rounded-xl border-2 px-2 text-lg font-bold ' +

@@ -37,7 +37,7 @@ export default function ContactForm({ initial, onSave, onCancel }) {
       <h2 className="mb-3 text-lg font-bold">{initial ? t('contacts.edit') : t('contacts.add')}</h2>
       <FormField label={t('contacts.name')} value={form.name} onChange={set('name')} error={e('name')} autoComplete="off" />
       <FormField label={t('contacts.relation')} value={form.relation} onChange={set('relation')} error={e('relation')}
-        options={RELATIONS} placeholder={t('contacts.relationPick')} />
+        options={RELATIONS.map((r) => ({ value: r, label: t('relation.' + r) }))} placeholder={t('contacts.relationPick')} />
       <FormField label={t('contacts.phone')} value={form.phone} onChange={set('phone')} error={e('phone')} type="tel" autoComplete="off" />
       <label className="mb-4 flex min-h-[44px] items-center gap-3">
         <input type="checkbox" className="h-6 w-6" checked={form.is_primary} onChange={(ev) => set('is_primary')(ev.target.checked)} />

@@ -11,7 +11,7 @@ export default function DigitalTwinBar({ vitals, baseline, status, onRetry }) {
   else if (!baseline || !vitals) body = <div role="status" className="h-24 animate-pulse rounded-lg bg-slate-100"><span className="sr-only">{t('twin.loading')}</span></div>;
   else {
     body = (
-      <ul className="grid grid-cols-2 gap-2">
+      <ul className="grid grid-cols-1 gap-2 min-[260px]:grid-cols-2">
         {twinRows(vitals, baseline).map((r) => (
           <li key={r.key} className={'rounded-lg border-l-4 bg-slate-50 p-2 ' + (r.within === false ? 'border-amber-500' : 'border-blue-600')}>
             <p className="text-sm text-slate-700">{t('twin.' + r.key)}</p>

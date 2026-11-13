@@ -1,4 +1,4 @@
-# HealthTwin AI - Patient App (Phase 3)
+# HealthTwin AI - Patient App (Phase 4)
 
 Simulated emergency-response prototype for a college project. **Not a medical device. It never diagnoses.**
 Every screen shows: "Simulated event. Not a medical diagnosis."
@@ -8,6 +8,7 @@ emergency screen with a 10-second countdown (alarm, vibration, cancel), SOS with
 hospital/ambulance response arriving live over the WebSocket.
 Phase 3 adds personal data and context: a consent screen, an emergency contacts manager, report upload, a digital twin bar on Home,
 a "Time since alert" clock and a "contacts notified" card on the emergency screen.
+Phase 4 adds Hindi and Gujarati, voice input that only suggests symptoms, offline mode, an accessibility audit and final polish.
 
 ## Setup
 
@@ -30,14 +31,19 @@ patient-app/        React 18 + Vite + Tailwind + i18next + PWA
   src/components/   SimulatedBanner, StatusBar, Timeline, Countdown, ConsentToggles, Switch, ConfirmDialog, ContactForm,
                     ReportUpload, ReportList, DigitalTwinBar, GoldenHourClock, ContactsNotified, CallButton, EmergencyHeader,
                     InstructionsCard, SymptomGroup, ResponseCard, DemoLocationToggle,
-                    VitalsCard, BottomNav, FormField, ContactsEditor, ErrorMessage
-  src/services/     api.js (HTTP), socket.js (WebSocket), auth.js (token in memory + sessionStorage)
+                    VitalsCard, BottomNav, FormField, ContactsEditor, ErrorMessage,
+                    LanguageSelect, VoiceSymptoms, OfflineBanner, OfflineNote, PendingEmergency, SkipLink, ErrorBoundary
+  src/services/     api.js (HTTP), socket.js (WebSocket), auth.js (token in memory + sessionStorage), speech.js (Web Speech API)
   src/hooks/        useAuth.js, useVitals.js, useEmergency.js, useCountdown.js,
-                    useConsents.js, useContacts.js, useReports.js, useBaseline.js
+                    useConsents.js, useContacts.js, useReports.js, useBaseline.js,
+                    useOnline.js, usePendingEmergency.js, useLanguageSync.js, useRouteFocus.js
   src/config/       symptoms.js, instructions.json (doctor-reviewed text only), demo.js
-  src/i18n/         en.json now; hi.json and gu.json are empty until Phase 4
+  src/i18n/         en.json, hi.json, gu.json (hi and gu NOT yet reviewed by native speakers)
   src/utils/        validate.js, alarm.js (beep + vibrate), activeEmergency.js (sessionStorage),
-                    time.js (clock format), twin.js (usual-range rule)
+                    time.js (clock format, language-aware dates), twin.js (usual-range rule),
+                    offlineCache.js (read-only saved copies), symptomMatcher.js (voice words to symptom IDs)
+  scripts/          a11y-audit.mjs (axe-core on every screen in 3 languages)
+docs/               DEMO_SCRIPT.md, ACCESSIBILITY.md, TRANSLATION_REVIEW.md
 mock-server/        Express + ws, fake data in memory (see mock-server/README.md)
 ```
 
@@ -125,12 +131,32 @@ score or the words normal/abnormal/risk/danger; the clock only measures time ("T
    After about 2 seconds "Your contacts were notified (simulated)" lists the contacts. Delete all contacts and run again: it says you have no contacts.
 10. **Reset:** `/demo` > Reset demo restores 2 contacts, all consents on, no reports and an empty change log.
 
-## What Phase 4 plugs into
+## Phase 4: reach, resilience and polish
 
-| Phase 4 feature | Files it will touch |
-| --- | --- |
-| Hindi and Gujarati | `i18n/hi.json`, `i18n/gu.json`, `i18n/index.js`, a language switch on `screens/Profile.jsx` |
-| Voice input | `screens/Symptoms.jsx`, new `services/speech.js` |
-| Offline mode | `vite.config.js` (PWA caching), `services/api.js`, `screens/Emergency.jsx` (call button must keep working) |
-| Accessibility audit | all screens; `components/Switch.jsx`, `ConfirmDialog.jsx`, `GoldenHourClock.jsx` |
-| Final polish | `App.jsx`, `routes.jsx`, `README.md` |
+- **Languages:** English, Hindi, Gujarati. Pick on Login or Profile; it is saved on the patient record (`PATCH language`) and on the device (`ht.lang`), and sets `<html lang>`. Dates and numbers follow the language.
+- **Voice input:** the mic button on Symptoms uses the browser's Web Speech API (en-IN, hi-IN, gu-IN). It only **suggests** symptoms from a keyword list; nothing is ticked until the person presses "Tick them". If it is blocked or unsupported the screen says so and the checklist works as before. Speech goes to the browser vendor's service, not to our server.
+- **Offline:** a service worker keeps the app shell. When offline a banner appears, "Call 112 / 108" still works, and screens show read-only saved copies (kept in `sessionStorage`, cleared at sign-out) with edits switched off and the reason shown. An emergency started offline is kept as **"Not sent yet"** (`ht.pending`); it is sent automatically when the connection returns if it is under 10 minutes old, otherwise the person is asked. The app never says "sent" until the server confirms.
+- **Accessibility:** skip link, focus moves to the page heading on navigation, 44/56 px targets, reduced motion, quiet live regions. Run `CHROME_PATH=/usr/bin/google-chrome npm run audit` (needs `npm run build && npm run preview` and the mock server). Details: `docs/ACCESSIBILITY.md`.
+- **Polish:** a crash screen (ErrorBoundary) that keeps the `tel:112` button, an app version line on `/demo`.
+
+### Manual test checklist (Phase 4)
+
+1. **Language:** switch to हिन्दी and ગુજરાતી on Profile; every screen changes; reload keeps it; sign out and in on the same device keeps it.
+2. **Voice:** Symptoms > "Speak your symptoms" (Chrome, allow the microphone), say "chest pain and sweating". A suggestion appears; "No thanks" ticks nothing; "Tick them" ticks the matches.
+3. **Voice failure:** block the microphone; a plain message appears and the checklist still works.
+4. **Offline:** dev tools > Network > Offline. Banner shows, "Call 112 / 108" is present, Profile is read-only with "Saved copy".
+5. **Offline emergency:** start one offline: "Not sent yet". Go online: it sends itself and opens the emergency screen.
+6. **Keyboard only:** Tab from the page top reaches "Skip to main content"; the whole emergency flow works without a mouse.
+7. **200% zoom:** no sideways scrolling.
+8. **Crash screen (dev only):** open `/demo?crash=1` with `npm run dev`; the crash screen shows the call button and the simulated banner.
+9. **Walkthrough:** follow `docs/DEMO_SCRIPT.md` once from start to end.
+
+## Known limits (what is still simulated or unfinished)
+
+- No real backend: the mock server keeps everything in memory and the hospital, ambulance and contacts are simulated.
+- QR health passport is not built.
+- No real SMS, push or call notifications to contacts or hospitals.
+- Condition-specific guidance is hidden until a doctor reviews it (`reviewed: true`); only 3 general lines are shown.
+- Hindi and Gujarati text and the voice keyword list have not been checked by native speakers (`docs/TRANSLATION_REVIEW.md`).
+- Not tested with a real screen reader or on real phones; voice depends on the browser (best in Chrome).
+- Offline mode keeps read-only copies only; changes made offline are not queued.

@@ -6,6 +6,7 @@ import { login } from '../services/api';
 import useAuth from '../hooks/useAuth';
 import FormField from '../components/FormField';
 import ErrorMessage from '../components/ErrorMessage';
+import LanguageSelect from '../components/LanguageSelect';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -38,6 +39,7 @@ export default function Login() {
 
   return (
     <form onSubmit={submit} noValidate>
+      <LanguageSelect />
       <h1 className="mb-1 text-2xl font-bold">{t('app.title')}</h1>
       <h2 className="mb-4 text-lg text-slate-700">{t('login.title')}</h2>
       <ErrorMessage>{error}</ErrorMessage>

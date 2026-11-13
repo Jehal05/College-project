@@ -1,5 +1,6 @@
 // List of emergency stages with times. events = [{ state, timestamp }]. Reused by Puneet's portal too.
 import { useTranslation } from 'react-i18next';
+import { formatTime } from '../utils/time';
 
 export default function Timeline({ events = [] }) {
   const { t } = useTranslation();
@@ -9,7 +10,7 @@ export default function Timeline({ events = [] }) {
       {events.map((e, i) => (
         <li key={i} className="mb-3">
           <p className="font-semibold text-slate-900">{t('state.' + e.state)}</p>
-          <time dateTime={e.timestamp} className="text-sm text-slate-600">{new Date(e.timestamp).toLocaleTimeString()}</time>
+          <time dateTime={e.timestamp} className="text-sm text-slate-600">{formatTime(e.timestamp)}</time>
         </li>
       ))}
     </ol>

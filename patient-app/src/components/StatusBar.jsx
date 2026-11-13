@@ -12,7 +12,7 @@ export default function StatusBar({ state = 'MONITORING' }) {
       {STATES.map((s, i) => {
         const active = i === current;
         const done = current >= 0 && i < current;
-        const style = active ? 'bg-blue-600 text-white' : done ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-500';
+        const style = active ? 'bg-blue-700 text-white' : done ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700';
         return (
           <li key={s} aria-current={active ? 'step' : undefined} className={'rounded-full px-3 py-1 text-xs font-semibold ' + style}>
             {t('state.' + s)}

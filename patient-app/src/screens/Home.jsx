@@ -10,6 +10,7 @@ import useBaseline from '../hooks/useBaseline';
 import VitalsCard from '../components/VitalsCard';
 import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
+import { usePending } from '../hooks/usePendingEmergency';
 
 export default function Home() {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ export default function Home() {
   const { vitals, connected } = useVitals();
   const { baseline, status: baselineStatus, reload: reloadBaseline } = useBaseline(session.patient_id);
   const [name, setName] = useState('');
+  const pending = usePending(); // an emergency that could not be sent yet (offline)
   const [activeId, setActiveId] = useState(null); // only set after we confirmed it is still running
 
   useEffect(() => {
@@ -40,6 +42,12 @@ export default function Home() {
   return (
     <div>
       <h1 className="mb-4 text-2xl font-bold">{name ? t('home.greeting', { name }) : t('app.title')}</h1>
+      {pending && (
+        <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
+          <p className="mb-2 font-bold text-red-900">{t('pending.homeBanner')}</p>
+          <Link to="/symptoms" className="inline-flex min-h-[48px] items-center rounded-lg bg-red-700 px-4 font-bold text-white">{t('pending.open')}</Link>
+        </div>
+      )}
       {activeId && (
         <div role="status" className="mb-4 rounded-xl border-2 border-red-700 bg-red-50 p-3">
           <p className="mb-2 font-bold text-red-900">{t('home.activeEmergency')}</p>

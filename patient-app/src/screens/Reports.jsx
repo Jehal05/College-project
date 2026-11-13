@@ -10,12 +10,15 @@ import ReportUpload from '../components/ReportUpload';
 import ReportList from '../components/ReportList';
 import ConfirmDialog from '../components/ConfirmDialog';
 import ErrorMessage from '../components/ErrorMessage';
+import OfflineNote from '../components/OfflineNote';
+import useOnline from '../hooks/useOnline';
 
 export default function Reports() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const { reports, status, load, upload, remove } = useReports(session.patient_id);
   const { consents } = useConsents(session.patient_id);
+  const online = useOnline();
   const [deleting, setDeleting] = useState(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
@@ -43,7 +46,8 @@ export default function Reports() {
       <Link to="/profile" className="mb-2 inline-flex min-h-[44px] items-center font-semibold text-blue-700 underline">{t('common.back')}</Link>
       <h1 className="mb-2 text-2xl font-bold">{t('reports.title')}</h1>
       <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">{t('reports.demoOnly')}</p>
-      <ReportUpload onUpload={upload} />
+      <OfflineNote />
+      <ReportUpload onUpload={upload} disabled={!online} />
       {problem && <div className="mb-3"><ErrorMessage>{problem}</ErrorMessage></div>}
       {status === 'loading' && <p role="status">{t('reports.loading')}</p>}
       {status === 'error' && <ErrorMessage onRetry={load} retryLabel={t('common.retry')}>{t('reports.loadError')}</ErrorMessage>}
@@ -52,7 +56,7 @@ export default function Reports() {
           <h2 className="mb-2 text-lg font-bold">{t('reports.yours')}</h2>
           {deleting && <ConfirmDialog title={t('reports.confirmDelete', { name: deleting.name })} confirmLabel={t('reports.confirmYes')}
             onConfirm={confirmDelete} onCancel={() => setDeleting(null)} busy={busy} />}
-          <ReportList reports={reports} shareOn={consents ? consents.reports : null} onOpen={open} onDelete={(r) => { setProblem(''); setDeleting(r); }} />
+          <ReportList reports={reports} shareOn={consents ? consents.reports : null} disabled={!online} onOpen={open} onDelete={(r) => { setProblem(''); setDeleting(r); }} />
         </>
       )}
     </div>

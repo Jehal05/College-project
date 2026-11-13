@@ -12,7 +12,7 @@ export default function FormField({ label, value, onChange, error, type = 'text'
         <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={base}
           aria-invalid={Boolean(error)} aria-describedby={error ? id + '-err' : undefined} {...rest}>
           <option value="">{placeholder}</option>
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
+          {options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o)).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       ) : (
         <input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} className={base}

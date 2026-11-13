@@ -21,7 +21,7 @@ export default function ContactsNotified({ emergency }) {
     return (
       <section aria-label={t('notified.title')} className="mt-4 rounded-xl bg-white p-4 text-slate-900">
         <p role="status" className="font-bold">{t('notified.done')}</p>
-        <p className="text-sm text-slate-700">{notified.map((c) => c.name + ' (' + c.relation + ')').join(', ')}</p>
+        <p className="text-sm text-slate-700">{notified.map((c) => c.name + ' (' + t('relation.' + c.relation, { defaultValue: c.relation }) + ')').join(', ')}</p>
       </section>
     );
   }

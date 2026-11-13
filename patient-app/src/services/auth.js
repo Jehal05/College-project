@@ -1,3 +1,5 @@
+import { clearCopies } from '../utils/offlineCache';
+
 // Login session. The token lives in memory and is copied to sessionStorage
 // so a page reload keeps you signed in (closing the tab signs you out).
 let session = null; // { token, role, patient_id }
@@ -30,6 +32,7 @@ export function setSession(newSession) {
 
 export function clearSession() {
   session = null;
+  clearCopies(); // saved copies and unsent emergencies must not outlive the login
   try {
     sessionStorage.removeItem(KEY);
   } catch {

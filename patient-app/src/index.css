@@ -7,3 +7,22 @@
   outline: 3px solid #1d4ed8;
   outline-offset: 2px;
 }
+
+/* White focus ring on the red emergency screens, where blue would be hard to see. */
+.bg-red-700 :focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Page content and headings receive focus from code (after a page change); they are not controls. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* People who ask their device for less motion get no animations or transitions. The countdown still works. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

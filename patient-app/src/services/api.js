@@ -1,6 +1,7 @@
 // All HTTP calls live here. Components never hard-code URLs.
 // Switch from mock to real backend by changing VITE_API_URL in .env.
 import { getToken } from './auth';
+import { readCopy, saveCopy } from '../utils/offlineCache';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -14,6 +15,7 @@ async function send(path, { method = 'GET', headers = {}, body } = {}) {
   } catch {
     const err = new Error('network');
     err.code = 'NETWORK';
+    window.dispatchEvent(new Event('ht:network-fail')); // lets the offline banner know right away
     throw err; // Server not reachable.
   }
   if (!response.ok) {
@@ -26,11 +28,20 @@ async function send(path, { method = 'GET', headers = {}, body } = {}) {
 }
 
 // JSON in, JSON out (an empty answer such as 204 becomes {}).
+// A few GET answers are remembered; if the network is down they come back as a "saved copy" (read-only use).
 async function request(path, { method = 'GET', body } = {}) {
-  const response = await send(path, {
-    method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined,
-  });
-  return response.json().catch(() => ({}));
+  try {
+    const response = await send(path, {
+      method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (method === 'GET') saveCopy(path, data);
+    return data;
+  } catch (err) {
+    const copy = method === 'GET' && err.code === 'NETWORK' ? readCopy(path) : undefined;
+    if (copy !== undefined) return copy;
+    throw err;
+  }
 }
 
 export const login = (email, password) => request('/auth/login', { method: 'POST', body: { email, password } });
