@@ -83,16 +83,24 @@ class Phase:
     checks: List[Tuple[str, Callable[[], bool]]] = field(default_factory=list)
 
 
-def _tables() -> int:
+def _tables() -> tuple:
+    """(contract tables that exist in the code, contract tables in CONTRACT.md)"""
     from app.db import Base
-    from app.models import audit, consent, patient_data  # noqa: F401
-    return len(Base.metadata.tables)
+    from app.models import accounts, audit, consent, emergencies, hospitals, patient_data  # noqa: F401
+    from tests.contract_tools import contract_tables
+    wanted = contract_tables()
+    return len(wanted & set(Base.metadata.tables)), len(wanted)
 
 
 PHASES = [
-    Phase("Phase 1: Foundation", "contract, repo, models, login", ["tests/test_startup_key.py"], [33], [
+    Phase("Phase 1: Foundation", "contract, repo, models, login",
+          ["tests/test_startup_key.py", "tests/test_states_roles.py", "tests/test_models_foundation.py", "tests/test_ids.py",
+           "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_startup_seed.py"], [33], [
         ("CONTRACT.md present", lambda: has_file("CONTRACT.md")),
-        (f"database tables: {_tables()} of 14 in the contract", lambda: _tables() >= 14),
+        (f"database tables from the contract: {_tables()[0]} of {_tables()[1]}", lambda: _tables()[0] == _tables()[1]),
+        ("states, roles and the transition table (app/models/enums.py)", lambda: has_regex(r"ALLOWED_TRANSITIONS")),
+        ("demo seed data, loaded only in demo mode", lambda: has_file("app/seed/demo_data.py")),
+        ("CORS allow-list from the environment", lambda: has_regex(r"parse_cors_origins")),
         ("Docker files and .env.example present", lambda: all(has_file(f) for f in ("Dockerfile", "docker-compose.yml", ".env.example"))),
     ]),
     Phase("Phase 2: Safety core and Tier 1", "rules, vitals, alerts, passport, demo panel",

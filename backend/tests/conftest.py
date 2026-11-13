@@ -20,6 +20,8 @@ def fresh_key(monkeypatch):
     monkeypatch.delenv("DEMO_MODE", raising=False)
     monkeypatch.setenv("JWT_SECRET_KEY", "test-signing-key-" + secrets.token_urlsafe(32))
     monkeypatch.delenv("PASSPORT_TOKEN_EXPIRE_MINUTES", raising=False)
+    monkeypatch.setenv("BCRYPT_ROUNDS", "4")          # fast hashing in tests
+    monkeypatch.delenv("CORS_ALLOW_ORIGINS", raising=False)
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
     yield
@@ -84,3 +86,13 @@ def api(engine, patients):
     app.dependency_overrides[get_optional_actor] = lambda: state["viewer"]
     yield Api(TestClient(app), state)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def file_db(tmp_path, monkeypatch):
+    """A fresh SQLite FILE for tests that start the real app (startup, demo seeding)."""
+    path = tmp_path / "app.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{path}")
+    db_module.reset_engine()
+    yield path
+    db_module.reset_engine()

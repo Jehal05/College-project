@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.6.2 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.7 (in progress) | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -62,7 +62,10 @@ Also `UNKNOWN`, used **only** for a safety check-in alert (a fall or inactivity 
 ### 1.5 Timestamps and IDs
 
 - All timestamps are ISO 8601 in UTC, for example `2026-11-16T10:00:00Z`.
-- IDs are strings with a prefix: `pat_001`, `em_001`, `hosp_001`, `amb_001`, `usr_001`.
+- **IDs are opaque strings. No app and no backend code may read meaning out of an id.** The demo uses the apps' formats:
+  patient `PT-2026-0417`, emergency `EM-YYYYMMDD-nnnn` (a counter per day that the demo reset sets back to 0001),
+  hospital `HSP-AMD-001` to `HSP-AMD-005`, ambulance `AMB-AMD-01` to `AMB-AMD-05`, contact `C-1`, user `usr_001`.
+  Short ids such as `pat_001` and `em_001` in the examples below are only examples.
 
 ---
 
@@ -231,7 +234,7 @@ Response 201:
     "name": "Sample Hospital A",
     "lat": 23.03, "lng": 72.58,
     "capabilities": { "emergency": true, "cath_lab": true, "stroke_unit": false, "icu": true },
-    "availability": { "icu_beds": 3, "cath_lab_open": true, "stroke_unit_open": false },
+    "availability": { "beds_free": 12, "icu_free": 3, "cath_lab_ready": true, "stroke_unit_ready": false },
     "verified": true,
     "distance_km": 1.8,
     "simulated": true
@@ -457,10 +460,24 @@ Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connect
 
 ---
 
-## 7. Seed users (development only)
+## 7. Seed users (demo mode only)
 
-| Username | Role | Notes |
-|---|---|---|
+Loaded **only** when `DEMO_MODE=true`, and only into an empty database (`python -m app.seed` does the same by hand). A normal start loads no accounts and no demo passwords. Every account is fictional and only a bcrypt hash is stored.
+
+| Login (username or email) | Demo password | Role | Belongs to |
+|---|---|---|---|
+| `patient@demo.test` | `demo1234` | PATIENT | patient `PT-2026-0417` |
+| `staff@demo.test` | `demo1234` | HOSPITAL_STAFF | hospital `HSP-AMD-002` |
+| `admin@demo.test` | `demo1234` | ADMIN | hospital `HSP-AMD-002` |
+| `staff@demo` | `demo123` | HOSPITAL_STAFF | hospital `HSP-AMD-002` (the portal's own login) |
+| `admin@demo` | `demo123` | ADMIN | hospital `HSP-AMD-002` |
+| `patient1`, `staff1`, `admin1` | `demo-password` | PATIENT, HOSPITAL_STAFF, ADMIN | same as the rows above |
+| `family1` | `demo-password` | FAMILY | not linked to anyone yet (feature 61) |
+| `responder1` | `demo-password` | RESPONDER | not verified yet (feature 68) |
+
+Logins are matched in lowercase. A staff account always belongs to a hospital, and a patient account always belongs to a patient (the database enforces both). The demo hospitals, ambulances, patient, contacts and consents come from the same fictional seed files (`app/seed/data/`). The demo patient shares all four consents, as in the mock server.
+
+---|---|---|
 | patient1 | PATIENT | linked to `pat_001` |
 | staff1 | HOSPITAL_STAFF | linked to `hosp_001` |
 | admin1 | ADMIN | demo panel and admin console |
@@ -491,3 +508,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
 | 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
 | 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |
+| 14 Nov 2026 | 0.7 (in progress) | Foundation, agreed with Puneet: opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |

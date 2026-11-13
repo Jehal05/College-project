@@ -11,6 +11,7 @@ Rule: nothing real is ever contacted, and every fake is labelled where a person 
 | Wearable history behind insights (7 days, seeded) | `data_note`: "based on simulated wearable data, not a diagnosis", plus `"simulated": true` | CONTRACT.md, "Wellbeing insights" | `tests/test_simulated_labels.py`, `tests/test_insights_api.py` |
 | Patient data (demo patients) | `"simulated": true` on passport, consents and audit responses | CONTRACT.md, section 8 "Honest labels" | `tests/test_simulated_labels.py` |
 | `GET /health` | `"simulated": true` | CONTRACT.md | `tests/test_simulated_labels.py` |
+| Demo hospitals, ambulances, patient, contacts and logins (`app/seed/data`) | all fictional; loaded only in demo mode; `README.txt` says FICTIONAL; responses add `"simulated": true` | CONTRACT.md, section 7 | `tests/test_seed.py`, `tests/test_startup_seed.py` |
 
 ## Built, but medical content NOT yet approved
 

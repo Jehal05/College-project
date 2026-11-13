@@ -58,3 +58,45 @@ def app_endpoints(app) -> Set[Endpoint]:
             if method.upper() in METHODS:
                 found.add((method.upper(), normalize(path)))
     return found
+
+
+# ---------------------------------------------------------------- other parts of the contract
+
+def _section(title: str) -> str:
+    """The text of one heading of CONTRACT.md, up to the next heading of the same or higher level."""
+    text = CONTRACT.read_text(encoding="utf-8")
+    start = text.index(title)
+    level = len(title) - len(title.lstrip("#"))
+    rest = text[start + len(title):]
+    match = re.search(rf"^#{{1,{level}}} ", rest, flags=re.MULTILINE)
+    return rest[: match.start()] if match else rest
+
+
+def contract_state_chain() -> list:
+    """The nine states of section 1.1 in order."""
+    line = next(l for l in _section("### 1.1 Emergency states (in order)").splitlines() if "→" in l)
+    return re.findall(r"[A-Z][A-Z_]{3,}", line)
+
+
+def contract_extra_states() -> set:
+    line = next(l for l in _section("### 1.1 Emergency states (in order)").splitlines() if l.startswith("Extra states"))
+    return set(re.findall(r"[A-Z][A-Z_]{3,}", line.split(":", 1)[1]))
+
+
+def contract_transitions() -> dict:
+    """Section 2's table: state -> set of allowed next states."""
+    table = {}
+    for line in _section("## 2. State transition table").splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == 2 and re.fullmatch(r"[A-Z][A-Z_]{3,}", cells[0]):
+            table[cells[0]] = set(re.findall(r"[A-Z][A-Z_]{3,}", re.sub(r"\(.*?\)", "", cells[1]).replace("none", "")))
+    return table
+
+
+def contract_roles() -> set:
+    line = next(l for l in _section("### 1.4 Roles").splitlines() if "`" in l)
+    return set(re.findall(r"`([A-Z_]+)`", line))
+
+
+def contract_tables() -> set:
+    return set(re.findall(r"`([a-z_]+)`", _section("## 6. Data tables")))

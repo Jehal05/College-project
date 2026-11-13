@@ -3,6 +3,13 @@
 All numbers are real runs of `python -m pytest`. Dates are 13 November 2026 (the plan's date).
 The contract version lives at the top of `CONTRACT.md`.
 
+## 0.7 (in progress): foundation for the real backend
+- Emergency states, roles and the transition table in code, tested against the table in `CONTRACT.md`.
+- All 14 contract tables (new: users, hospitals, ambulances, emergencies, status_events, symptom_reports, hospital_alerts, vitals, emergency_passports) plus a counter table for readable ids. Sensitive fields encrypted. The status timeline is append-only.
+- bcrypt password hashing, `EM-YYYYMMDD-nnnn` ids with a safe daily counter, demo seed data (fictional) that loads **only** in demo mode, CORS allow-list from `CORS_ALLOW_ORIGINS` (no wildcard).
+- Decisions agreed with Puneet. Still waiting for Jehal on: the token in his contract checker, the passport URL shape, and whether `sex` is always shared. **Waiting for Daksh to confirm Puneet's change to question 4 (severity floor for a real SOS) before the emergency endpoints are built.**
+- Tests: 822 passing.
+
 ## 0.6.2: draft rules for unmapped symptoms (pending doctor review)
 - 12 new rules: the 7 patient-app symptoms that had no rule (they gave "no indicators"), sudden confusion as a stroke sign, and a safety check-in with no reply (EMERGENCY, type `UNKNOWN`).
 - Written by an AI assistant from public first-aid guidance and accepted for the prototype by Daksh. **A doctor has not reviewed them.** Sheet: `docs/review/DOCTOR_REVIEW_NEW_RULES.md`.
