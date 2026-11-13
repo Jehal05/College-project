@@ -51,6 +51,7 @@ router.use(require('./reminders')); // medication reminders (Phase 6)
 router.use(require('./preferences')); // safety check-in setting (Phase 6)
 router.use(require('./summaries')); // past alerts and post-incident summary (Phase 6)
 router.use(demoState.router); // demo speed, vitals profiles (Phase 6)
+router.use(require('./demoScenario'));
 router.use(require('./hospitalMode').router); // portal-driven hospital steps, ambulances (Phase 7)
 
 // ---- Emergency endpoints (Phase 2): create, send SOS, cancel, read ----
@@ -72,16 +73,6 @@ router.post('/emergencies', requireAuth, (req, res) => {
   if (problem) return res.status(400).json({ error: problem });
   const e = simulator.createEmergency(req.body);
   res.status(201).json({ id: e.id, state: e.state, severity: e.severity, source: e.source });
-});
-
-// The portal's lists: ?status=active (not finished or cancelled) or ?status=finished.
-router.get('/emergencies', requireAuth, (req, res) => {
-  const done = (e) => ['HANDOVER_DONE', 'CANCELLED'].includes(e.state);
-  const want = req.query.status;
-  const all = [...store.emergencies.values()].filter((e) => e.state !== 'EMERGENCY_DETECTED' || process.env.ALERT_AT === 'detected');
-  const list = want === 'active' ? all.filter((e) => !done(e)) : want === 'finished' ? all.filter(done) : all;
-  res.json(list.map((e) => ({ ...e, emergency_id: e.id, created_at: e.status_events[0].timestamp, simulated: true,
-    ...(e.consents && e.consents.location && e.location ? {} : { location: undefined }) })));
 });
 
 const findEmergency = (req, res) => {
@@ -123,23 +114,6 @@ router.get('/emergencies/:id', requireAuth, (req, res) => {
 router.get('/emergencies/:id/reasons', requireAuth, (req, res) => {
   const e = findEmergency(req, res);
   if (e) res.json(e.reasons);
-});
-
-// ---- Demo helpers for the demo control panel ----
-const DEFAULT_SYMPTOMS = {
-  HEART: ['CHEST_PAIN', 'SHORT_BREATH', 'SWEATING'],
-  STROKE: ['FACE_DROOP', 'LIMB_WEAKNESS', 'SLURRED_SPEECH'],
-  DIABETIC: ['DIA_CONFUSION', 'DIA_SHAKING', 'LOW_GLUCOSE_READING'],
-  ASTHMA: ['WHEEZING', 'CANNOT_SPEAK_SENTENCES', 'SEVERE_SHORT_BREATH'],
-};
-
-router.post('/demo/scenario', requireAuth, (req, res) => {
-  const type = req.body && req.body.type;
-  if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be HEART, STROKE, DIABETIC or ASTHMA' });
-  const patient = store.patients['PT-2026-0417'];
-  const e = simulator.createEmergency({ patient_id: patient.id, type, symptoms: DEFAULT_SYMPTOMS[type], consents: patient.consents });
-  simulator.sendSos(e, { ...DEMO_LOCATION, source: 'demo' });
-  res.status(201).json({ id: e.id, state: e.state });
 });
 
 router.post('/demo/reset', requireAuth, (req, res) => {

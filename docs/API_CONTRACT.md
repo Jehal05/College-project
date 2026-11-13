@@ -134,7 +134,7 @@ The mock server (`mock-server/compat.js`) now speaks Daksh's names **next to** o
 | Topic | Daksh v0.6 | This mock / app today |
 |---|---|---|
 | Login | `{ username, password }` -> `{ token, role, user_id, patient_id }`; demo `patient1` / `demo-password` | Accepts `username` (the app sends it) and the old `email`; answers with `user_id` too. Both `patient1` and `patient@demo.test` work |
-| IDs | `PT-2026-0417`, `em_001`, `hosp_001`, `amb_001` | Same style now (`PT-2026-0417`, `em_001`, `hosp_001`, `amb_001`) |
+| IDs | `pat_001`, `em_001`, `hosp_001`, `amb_001` | **Different on purpose (Phase 7):** realistic-looking fictional IDs: patient `PT-2026-0417`, emergency `EM-YYYYMMDD-nnnn`, hospital `HSP-AMD-001` to `005`, ambulance `AMB-AMD-01` to `05`. The apps treat IDs as opaque strings. Style lives in `mock-server/data/*.json` and `store.nextEmergencyId()` only. The portal's `H1`-`H5` / `AMB-1`-`AMB-5` are kept in the `portal_id` field of each record. |
 | Errors | `{ "detail": text }` | `{ "error", "detail" }` (both, same text) |
 | Event envelope | `event` | `event` and `type` (both) |
 | WebSocket | `/ws/emergencies/{id}?token=`, `/ws/hospitals/{id}?token=` | `/ws` plus both of his paths (the mock sends every event on all of them and does not check the token) |
@@ -146,8 +146,36 @@ The mock server (`mock-server/compat.js`) now speaks Daksh's names **next to** o
 
 **Not aligned yet (decisions needed):**
 - `POST /reports` (his) vs `POST /patients/:id/reports` (ours); no file-upload shape in his contract.
-- Hospitals: his `capabilities` is an object (`emergency`, `cath_lab`, ...) with an `availability` object; ours is a list. The patient app does not use it.
+- Hospitals: **aligned in Phase 7.** `capabilities` is an object (`cath_lab`, `stroke_unit`, `icu`, `emergency`) and `availability` is `{ beds_free, icu_free, cath_lab_ready, stroke_unit_ready }` (the portal's names; Daksh v0.6.1 names `icu_beds`, `cath_lab_open`, `stroke_unit_open` are also read by the portal). Open: agree one set of availability names.
 - Our Phase 6 endpoints are not in his contract: baseline, contacts, reminders, preferences, alert summary and past emergencies, `/demo/speed`, `GET /emergencies/:id/reasons`, `UNKNOWN` type and `source`. They need to be added to the real backend or dropped.
 - Validation status: his `422` for a non-boolean consent, ours `400`.
-- His open decision: the backend moves `EMERGENCY_DETECTED` to `SOS_SENT` when the cancel countdown ends. The app currently sends `POST /emergencies/:id/sos` itself.
+- His open decision: the backend moves `EMERGENCY_DETECTED` to `SOS_SENT` when the cancel countdown ends. The app currently sends `POST /emergencies/:id/sos` itself. **Phase 7:** this mock matches that effect for hospital listeners: nothing is broadcast before the SOS and `emergency.created` is sent at SOS with state `SOS_SENT`. The REST state is still `EMERGENCY_DETECTED` until the SOS call. The decision (who moves the state, app or backend) is still open.
 - His `/insights` (wellbeing notes) has no screen in the patient app.
+
+## Phase 7: what the hospital portal gets
+
+**Order at SOS (nothing is broadcast before it; cancelling inside the countdown sends the hospital nothing):**
+`emergency.created` (state `SOS_SENT`) -> `emergency.sos_sent` -> `hospital.alerted`. Set `ALERT_AT=detected` to get the old thin `created` at `EMERGENCY_DETECTED` as well.
+
+**`emergency.created` payload.** Always: `type`, `severity`, `symptoms` (readable English labels, e.g. "Chest pain"; a safety check-in alert says "No symptoms reported (safety check-in)"), `symptom_ids` (app IDs), `source`, `patient_id`, `patient_summary { name, age, blood_group }`, `patient { id, name, age, sex }`, `created_at`, `reasons`, `consents`, `hospital { id, name, distance_km, rank }`, `simulated: true`. Only with consent: `vitals { heart_rate, spo2, bp, bp_sys, bp_dia, glucose, resp_rate }` (vitals), `location { lat, lng, accuracy }` (location and a known position), `patient.blood_group/allergies/conditions/medications` (history). A field that is not shared is **left out, never null**.
+
+**`hospital.alerted` payload:** `hospital_id`, `rank` (1 = best match) and the old `hospital { id, name, distance_km }`.
+
+**Hospitals** (`GET /hospitals`, sorted by distance): `{ id, portal_id, name, address, lat, lng, phone, verified, capabilities {cath_lab, stroke_unit, icu, emergency}, availability {...}, distance_km, simulated }`. Ranking: a hospital with the needed unit present **and ready** first (heart: cath lab; stroke: stroke unit; asthma: ICU; diabetic and unknown: emergency), then nearest. Data copied from the portal's seed (see `_comment` in `mock-server/data/hospitals.json`). Demo location: Ahmedabad 23.0225, 72.5714 (same in the portal, the mock and the app).
+
+**Manual hospital mode (`HOSPITAL_MODE=manual`, default `auto`).** After `hospital.alerted` the mock waits. Staff (`HOSPITAL_STAFF` or `ADMIN` token; a patient token gets 403):
+
+| Call | Moves to | Event |
+|---|---|---|
+| `POST /emergencies/:id/ack` | `HOSPITAL_ACKNOWLEDGED` | `hospital.acknowledged` |
+| `POST /emergencies/:id/dispatch { ambulance_id }` | `AMBULANCE_DISPATCHED` | `ambulance.dispatched`, then `ambulance.location` ticks from the mock until the portal posts positions itself |
+| `POST /emergencies/:id/status { state }` | `EN_ROUTE`, `ARRIVED`, `HANDOVER_DONE` | `ambulance.location`, `emergency.arrived`, `emergency.handover_done` |
+| `POST /ambulances/:id/location { emergency_id, lat, lng, eta_seconds, ... }` | (state `EN_ROUTE`) | `ambulance.location` relayed to everyone |
+
+An invalid move answers `409 { error, detail: "Invalid transition", from, to }`. In manual mode `POST /emergencies/:id/cancel` is refused (409) from `AMBULANCE_DISPATCHED` on (Daksh's table). The same endpoints also work in auto mode.
+
+**Lists for the portal:** `GET /emergencies?status=active` (SOS sent, not finished or cancelled) and `?status=finished` (handed over or cancelled), each item with `emergency_id`, `created_at`, `status_events` and the created fields. `GET /ambulances` -> `[ { id, portal_id, call_sign, crew, base_hospital_id, lat, lng, status } ]`.
+
+**Portal logins:** `staff@demo` / `admin@demo` with password `demo123` (answer has lowercase role `staff` / `admin` and `hospital_id`), next to the existing logins.
+
+**Not in the mock (the portal keeps these local):** notes, chat, checklist ticks, hospital onboarding and edits, availability updates, responders, AED. Ids and the realistic-name choice: see the IDs row above.

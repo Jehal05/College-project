@@ -5,7 +5,7 @@ const { rankHospitals, DEMO_LOCATION } = require('./helpers');
 const { buildCreatedPayload } = require('./alertPayload');
 const { getSpeed } = require('./demoState');
 const { evaluate } = require('./rules');
-const { currentVitals } = require('./vitals');
+const { sharedVitals, VITAL_KEYS } = require('./vitals');
 
 let wss = null; // set by server.js
 const timers = new Map(); // emergency id -> list of timeouts
@@ -42,14 +42,6 @@ function stopTimers(id) {
 }
 
 function stopAll() { [...timers.keys()].forEach(stopTimers); }
-
-// The readings the rules engine and the summary use. Only when the patient shares vitals.
-const VITAL_KEYS = ['heart_rate', 'spo2', 'bp_sys', 'bp_dia', 'glucose', 'resp_rate'];
-function sharedVitals(consents) {
-  if (consents && consents.vitals === false) return null;
-  const reading = currentVitals();
-  return { ...Object.fromEntries(VITAL_KEYS.map((k) => [k, reading[k]])), timestamp: reading.timestamp };
-}
 
 const alertAt = () => (process.env.ALERT_AT === 'detected' ? 'detected' : 'sos');
 const hospitalMode = () => (process.env.HOSPITAL_MODE === 'manual' ? 'manual' : 'auto');
@@ -137,23 +129,9 @@ function sendSos(emergency, location) {
   return emergency;
 }
 
-// Manual mode, after the portal dispatches: the mock moves the ambulance until the desk presses the next status button
-// or the portal starts posting positions itself (emergency.portal_moves).
-function startManualTicks(emergency, amb) {
-  const from = store.hospitals.find((x) => x.id === amb.base_hospital_id) || amb;
-  const where = emergency.location || DEMO_LOCATION;
-  for (let n = 1; n <= 30; n += 1) {
-    later(emergency, n * 2000, () => {
-      if (emergency.portal_moves || !['AMBULANCE_DISPATCHED', 'EN_ROUTE'].includes(emergency.state)) return;
-      const progress = Math.min(1, n / 30); const eta = Math.round(60 * (1 - progress));
-      emit(emergency, 'ambulance.location', 'EN_ROUTE', { ambulance_id: amb.id, lat: from.lat + (where.lat - from.lat) * progress,
-        lng: from.lng + (where.lng - from.lng) * progress, eta_seconds: eta, progress }, { eta_seconds: eta });
-    });
-  }
-}
-
 // Used by hospitalMode.js: a state change driven by the portal.
 function manualEmit(emergency, type, state, payload = {}, patch = {}) { emit(emergency, type, state, payload, patch); }
+const manualLater = (emergency, ms, fn) => later(emergency, ms, fn);
 
 function cancelEmergency(emergency) {
   stopTimers(emergency.id);
@@ -161,4 +139,4 @@ function cancelEmergency(emergency) {
   return emergency;
 }
 
-module.exports = { setServer, manualEmit, startManualTicks, broadcast, createEmergency, sendSos, cancelEmergency, stopAll };
+module.exports = { setServer, manualEmit, manualLater, broadcast, createEmergency, sendSos, cancelEmergency, stopAll };

@@ -3,7 +3,7 @@
 const express = require('express');
 const store = require('./store');
 const simulator = require('./simulator');
-const { requireAuth } = require('./helpers');
+const { requireAuth, DEMO_LOCATION } = require('./helpers');
 
 const mode = () => (process.env.HOSPITAL_MODE === 'manual' ? 'manual' : 'auto');
 const STAFF = ['HOSPITAL_STAFF', 'ADMIN'];
@@ -30,6 +30,21 @@ function staffOnly(req, res, next) {
   next();
 }
 
+// Manual mode, after the portal dispatches: the mock moves the ambulance until the desk presses the next status button
+// or the portal starts posting positions itself (emergency.portal_moves).
+function startManualTicks(emergency, amb) {
+  const from = store.hospitals.find((x) => x.id === amb.base_hospital_id) || amb;
+  const where = emergency.location || DEMO_LOCATION;
+  for (let n = 1; n <= 30; n += 1) {
+    simulator.manualLater(emergency, n * 2000, () => {
+      if (emergency.portal_moves || !['AMBULANCE_DISPATCHED', 'EN_ROUTE'].includes(emergency.state)) return;
+      const progress = Math.min(1, n / 30); const eta = Math.round(60 * (1 - progress));
+      simulator.manualEmit(emergency, 'ambulance.location', 'EN_ROUTE', { ambulance_id: amb.id, lat: from.lat + (where.lat - from.lat) * progress,
+        lng: from.lng + (where.lng - from.lng) * progress, eta_seconds: eta, progress }, { eta_seconds: eta });
+    });
+  }
+}
+
 const router = express.Router();
 const find = (req, res) => { const e = store.emergencies.get(req.params.id); if (!e) res.status(404).json({ error: 'Emergency not found' }); return e; };
 const move = (e, to, payload, res) => {
@@ -52,7 +67,7 @@ router.post('/emergencies/:id/dispatch', requireAuth, staffOnly, (req, res) => {
   amb.status = 'dispatched';
   e.ambulance = { id: amb.id, call_sign: amb.call_sign };
   move(e, 'AMBULANCE_DISPATCHED', { ambulance_id: amb.id }, res);
-  simulator.startManualTicks(e, amb);
+  startManualTicks(e, amb);
 });
 router.post('/emergencies/:id/status', requireAuth, staffOnly, (req, res) => {
   const e = find(req, res); if (!e) return;
@@ -60,6 +75,16 @@ router.post('/emergencies/:id/status', requireAuth, staffOnly, (req, res) => {
   if (to === 'EN_ROUTE') return move(e, to, { ambulance_id: e.ambulance && e.ambulance.id }, res);
   move(e, to, to === 'ARRIVED' ? { ambulance_id: e.ambulance && e.ambulance.id } : {}, res);
 });
+// The portal's lists: ?status=active (not finished or cancelled) or ?status=finished.
+router.get('/emergencies', requireAuth, (req, res) => {
+  const done = (e) => ['HANDOVER_DONE', 'CANCELLED'].includes(e.state);
+  const want = req.query.status;
+  const all = [...store.emergencies.values()].filter((e) => e.state !== 'EMERGENCY_DETECTED' || process.env.ALERT_AT === 'detected');
+  const list = want === 'active' ? all.filter((e) => !done(e)) : want === 'finished' ? all.filter(done) : all;
+  res.json(list.map((e) => ({ ...e, emergency_id: e.id, created_at: e.status_events[0].timestamp, simulated: true,
+    ...(e.consents && e.consents.location && e.location ? {} : { location: undefined }) })));
+});
+
 router.get('/ambulances', requireAuth, (req, res) => res.json(store.ambulances));
 // The portal's own simulator posts the ambulance position; the mock relays it as ambulance.location.
 router.post('/ambulances/:id/location', requireAuth, (req, res) => {

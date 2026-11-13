@@ -1,4 +1,4 @@
-# HealthTwin AI - Patient App (Phase 6)
+# HealthTwin AI - Patient App (Phase 7)
 
 Simulated emergency-response prototype for a college project. **Not a medical device. It never diagnoses.**
 Every screen shows: "Simulated event. Not a medical diagnosis."
@@ -180,6 +180,17 @@ Phase 6 adds a "Why this alert" card, vitals trends, a safety check-in, a demo p
 4. Switch "No data connection" on and start an emergency: SMS card, tel:112 first, no health data in the text.
 5. Reminders: add one for the next minute (keep the app open): banner appears.
 6. After an alert ends: open the record, Copy, Download.
+
+## Phase 7: made for the hospital portal
+
+The mock now behaves the way Puneet's portal expects: the hospital hears nothing until the SOS, then gets one rich `emergency.created` (patient summary, readable symptoms, vitals and location only with consent), five Ahmedabad hospitals with capability and availability objects, and `HOSPITAL_MODE=manual` so the portal's Acknowledge / Dispatch / status buttons drive the emergency. IDs and names are realistic-looking but fictional. Details: `docs/API_CONTRACT.md` (Phase 7), `mock-server/README.md`, and the real-portal rehearsal in `docs/JOINT_REHEARSAL.md` (`node scripts/joint-rehearsal.mjs`). Review packs for the people who must still sign off: `docs/review/`.
+
+### Manual test checklist (Phase 7)
+1. Open the mock's `GET /hospitals` (with a token): five hospitals, `capabilities` is an object.
+2. Start an emergency and cancel it inside the 10 s countdown: a connected WebSocket client sees no emergency event.
+3. Let it send: `emergency.created` (state `SOS_SENT`), `emergency.sos_sent`, `hospital.alerted` with `hospital_id` and `rank`.
+4. Switch `vitals` consent off and send again: no `vitals` in the created payload.
+5. Run the joint rehearsal (or by hand, see `docs/JOINT_REHEARSAL.md`).
 
 ## Phase 5: health passport, integration and release
 

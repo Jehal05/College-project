@@ -1,5 +1,11 @@
 # Changelog
 
+## Phase 7: made for the hospital portal
+- `emergency.created` is now sent at SOS (state `SOS_SENT`), not when the emergency is created, and carries patient summary, readable symptoms, `symptom_ids`, vitals and location (consent decides, omitted not null). `hospital.alerted` has `hospital_id` and `rank`.
+- Hospitals H1-H5 style data copied from the portal's seed (Ahmedabad), with capability and availability objects; ambulances too. Realistic-looking fictional IDs and names everywhere (`PT-2026-0417`, `EM-YYYYMMDD-nnnn`, `HSP-AMD-001`, `AMB-AMD-01`, Sunita Mehta, Metformin 500 mg). Demo location moved to Ahmedabad.
+- `HOSPITAL_MODE=manual`: the portal's Acknowledge, Dispatch and status buttons drive the emergency (403 for a patient token, 409 for an invalid move). New: `GET /emergencies?status=`, `GET /ambulances`, `POST /ambulances/:id/location`, portal logins `staff@demo` / `admin@demo`.
+- `scripts/joint-rehearsal.mjs`: runs the real portal from `origin/Puneet` with the patient app (17 checks). Review packs for the doctor, the language reviewers and the real-device test (`docs/review/`).
+
 All changes are to a SIMULATED prototype. It is not a medical device and never diagnoses.
 
 ## Contract alignment with Daksh v0.6 (mock server and app, no merge)

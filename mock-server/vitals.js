@@ -61,4 +61,13 @@ function applyChange(body) {
 const reset = () => { state.profile = 'normal'; state.overrides = {}; last = null; };
 const snapshot = () => ({ profile: state.profile, overrides: { ...state.overrides }, profiles: Object.keys(PROFILES) });
 
-module.exports = { currentVitals, applyChange, reset, snapshot, PROFILES, VITALS, LIMITS };
+
+// The readings the rules engine and the summary use. Only when the patient shares vitals.
+const VITAL_KEYS = ['heart_rate', 'spo2', 'bp_sys', 'bp_dia', 'glucose', 'resp_rate'];
+function sharedVitals(consents) {
+  if (consents && consents.vitals === false) return null;
+  const reading = currentVitals();
+  return { ...Object.fromEntries(VITAL_KEYS.map((k) => [k, reading[k]])), timestamp: reading.timestamp };
+}
+
+module.exports = { sharedVitals, VITAL_KEYS, currentVitals, applyChange, reset, snapshot, PROFILES, VITALS, LIMITS };

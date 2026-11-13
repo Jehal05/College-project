@@ -58,3 +58,7 @@ Build with `VITE_DEMO_TOOLS=true` (always on in `npm run dev`); a normal build h
 | 5:50 | Close | What is real and what is not (README "Known limits") |
 
 If something goes wrong: **Reset demo** (also clears the in-memory trend, notifications and pending items), and switch **Server errors (simulated)** off.
+
+## Phase 7: joint demo with the hospital portal (5 minutes)
+
+Two windows: the patient phone view and the hospital desk (Puneet's portal). Start the mock with `HOSPITAL_MODE=manual DEMO_SPEED=5`. The minute-by-minute table, what to say, and what to do if something fails are in `docs/JOINT_REHEARSAL.md`. Say clearly: no real hospital or ambulance is contacted; the patient app says "notification sent" until the desk dispatches.
