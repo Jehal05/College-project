@@ -1,0 +1,33 @@
+{
+  "_note": "SAMPLE content for the prototype. Every item must be reviewed by a doctor or medical teacher before the jury demo.",
+  "HEART": [
+    { "id": "heart-1", "text": "Inform the on-call cardiology team" },
+    { "id": "heart-2", "text": "Confirm the cath lab is free and staffed" },
+    { "id": "heart-3", "text": "ECG machine ready at the arrival bay" },
+    { "id": "heart-4", "text": "Defibrillator and monitor ready at the bay" },
+    { "id": "heart-5", "text": "Read allergies and current medicines from the health passport" },
+    { "id": "heart-6", "text": "Reserve a monitored bed" }
+  ],
+  "STROKE": [
+    { "id": "stroke-1", "text": "Inform the stroke team" },
+    { "id": "stroke-2", "text": "Reserve the CT scanner" },
+    { "id": "stroke-3", "text": "Note the symptom start time from the alert" },
+    { "id": "stroke-4", "text": "Stroke bay and monitor ready" },
+    { "id": "stroke-5", "text": "Read blood-thinning medicines from the health passport" },
+    { "id": "stroke-6", "text": "Blood glucose meter ready at the bay" }
+  ],
+  "DIABETIC": [
+    { "id": "diabetic-1", "text": "Inform the duty physician" },
+    { "id": "diabetic-2", "text": "Blood glucose meter ready at the bay" },
+    { "id": "diabetic-3", "text": "IV access kit ready" },
+    { "id": "diabetic-4", "text": "Read diabetes medicines from the health passport" },
+    { "id": "diabetic-5", "text": "Reserve an observation bed" }
+  ],
+  "ASTHMA": [
+    { "id": "asthma-1", "text": "Inform the duty physician" },
+    { "id": "asthma-2", "text": "Oxygen and nebuliser ready at the bay" },
+    { "id": "asthma-3", "text": "Pulse oximeter ready" },
+    { "id": "asthma-4", "text": "Read allergies and inhaler medicines from the health passport" },
+    { "id": "asthma-5", "text": "Confirm an ICU bed is available if needed" }
+  ]
+}

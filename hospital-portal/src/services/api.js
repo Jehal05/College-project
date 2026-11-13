@@ -10,8 +10,6 @@ import { hasCapabilities } from './contract.js';
 
 export { USE_MOCK, API_BASE_URL };
 
-const mockDelay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
-
 function authHeader() {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -38,8 +36,7 @@ export async function request(method, path, body) {
 export async function getHospitals({ lat = DEMO_LOCATION.lat, lng = DEMO_LOCATION.lng, type } = {}) {
   let list;
   if (USE_MOCK) {
-    await mockDelay();
-    list = hospitalsSeed;
+    list = await mock.listHospitals();
   } else {
     try {
       const q = new URLSearchParams({ lat, lng, ...(type ? { type } : {}) });
@@ -55,12 +52,9 @@ export async function getHospitals({ lat = DEMO_LOCATION.lat, lng = DEMO_LOCATIO
   }));
 }
 
-/** PATCH /hospitals/{id}/availability (UI comes in feature #42). */
+/** PATCH /hospitals/{id}/availability  body: { beds_free, icu_free, cath_lab_ready, stroke_unit_ready } */
 export async function updateAvailability(id, availability) {
-  if (USE_MOCK) {
-    await mockDelay();
-    return { id, availability };
-  }
+  if (USE_MOCK) return mock.patchAvailability(id, availability);
   return request('PATCH', `/hospitals/${id}/availability`, availability);
 }
 
@@ -100,7 +94,18 @@ export async function updateStatus(id, state) {
   return request('POST', `/emergencies/${id}/status`, { state });
 }
 
+/**
+ * Tick or untick one pre-arrival checklist item (feature #26).
+ * PROPOSED endpoint, not in the contract yet. Agree it with Daksh:
+ * PATCH /emergencies/{id}/checklist  body: { item_id, done }  ->  { checklist }
+ */
+export async function setChecklistItem(id, itemId, done) {
+  if (USE_MOCK) return mock.setChecklistItem(id, itemId, done, actor());
+  return request('PATCH', `/emergencies/${id}/checklist`, { item_id: itemId, done });
+}
+
 // Mock-only helpers for testing without the patient app.
+export const mockEscalate = (id) => mock.escalate(id);
 export const mockPatientCancel = (id) => mock.patientCancel(id);
 export const mockCreateEmergency = (type) => mock.createEmergency(type);
 

@@ -1,4 +1,7 @@
 import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract.js';
+import { nextHospital } from '../services/escalation.js';
+import { useRanking } from './useRanking.js';
+import EscalationCountdown from './EscalationCountdown.jsx';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -10,6 +13,9 @@ export function formatTime(iso) {
  */
 export default function AlertCard({ alert, selected, onSelect }) {
   const { emergency_id, patient_id, type, severity, symptoms = [], vitals = {}, location, created_at, state } = alert;
+  const ranking = useRanking(type, location);
+  const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
+  const unread = !alert._read && state !== 'CANCELLED' && state !== 'HANDOVER_DONE';
   const cancelled = state === 'CANCELLED';
   const finished = state === 'HANDOVER_DONE';
   // Flash only alerts that arrived live in the last few seconds (not on every page visit).
@@ -23,13 +29,17 @@ export default function AlertCard({ alert, selected, onSelect }) {
       data-testid="alert-card"
       data-id={emergency_id}
       data-state={state}
+      data-unread={unread ? 'true' : 'false'}
       onClick={() => onSelect?.(alert)}
       className={`w-full rounded-2xl border-l-8 bg-white p-4 text-left shadow transition hover:shadow-md ${border} ${
         selected ? 'ring-4 ring-sky-400' : ''
       } ${cancelled || finished ? 'opacity-70' : ''} ${flash ? 'ht-flash' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className={`text-xl font-bold ${cancelled ? 'line-through' : ''}`}>{TYPE_LABELS[type] || type}</span>
+        <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
+          {unread && <span title="Not opened yet" className="h-3.5 w-3.5 shrink-0 rounded-full bg-sky-500" />}
+          {TYPE_LABELS[type] || type}
+        </span>
         {cancelled ? (
           <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">CANCELLED</span>
         ) : (
@@ -50,6 +60,9 @@ export default function AlertCard({ alert, selected, onSelect }) {
       </div>
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
         {STATE_LABELS[state] || state}
+      </div>
+      <div className="mt-2 empty:hidden">
+        <EscalationCountdown emergency={alert} hasNext={hasNext} />
       </div>
     </button>
   );

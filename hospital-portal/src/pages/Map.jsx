@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet';
 import L from 'leaflet';
-import { getHospitals } from '../services/api.js';
-import { DEMO_LOCATION, ASSUMED_SPEED_KMH } from '../services/geo.js';
+import { DEMO_LOCATION, ASSUMED_SPEED_KMH, withDistance } from '../services/geo.js';
+import { useHospitals } from '../components/HospitalProvider.jsx';
+import { useRanking } from '../components/useRanking.js';
+import RankingTable from '../components/RankingTable.jsx';
+import { useAuth } from '../components/AuthProvider.jsx';
 import { EMERGENCY_TYPES, TYPE_LABELS, hasCapabilities } from '../services/contract.js';
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
@@ -10,7 +13,7 @@ import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { patientIcon } from '../components/mapIcons.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
-function hospitalIcon(h, selected) {
+function hospitalIcon(h, selected, isTop) {
   // green = has the capabilities for the chosen emergency, grey = missing, blue = no type chosen
   const color = h.capability_match === null ? '#0284c7' : h.capability_match ? '#059669' : '#94a3b8';
   const badges = [h.capabilities.cath_lab && 'CL', h.capabilities.stroke_unit && 'SU', h.capabilities.icu && 'ICU']
@@ -24,38 +27,26 @@ function hospitalIcon(h, selected) {
       <div style="display:flex;flex-direction:column;align-items:center">
         <div style="width:${selected ? 44 : 38}px;height:${selected ? 44 : 38}px;border-radius:50%;
           background:${color};color:#fff;font-weight:800;font-size:18px;display:grid;place-items:center;
-          border:3px solid ${selected ? '#0f172a' : '#fff'};box-shadow:0 2px 6px rgba(0,0,0,.35)">H</div>
+          border:${isTop ? 5 : 3}px solid ${isTop ? '#facc15' : selected ? '#0f172a' : '#fff'};box-shadow:0 2px 6px rgba(0,0,0,.35)">${isTop ? '1' : 'H'}</div>
         <div style="margin-top:2px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;
-          padding:1px 5px;border-radius:4px;white-space:nowrap">${badges || 'ER only'}</div>
+          padding:1px 5px;border-radius:4px;white-space:nowrap">${isTop ? 'TOP RANKED · ' : ''}${badges || 'ER only'}</div>
       </div>`,
   });
 }
 
 export default function MapPage() {
-  const [loaded, setLoaded] = useState([]);
+  const { hospitals: stored, loading, error } = useHospitals();
+  const { session } = useAuth();
   const [type, setType] = useState('');
   const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    getHospitals({ lat: DEMO_LOCATION.lat, lng: DEMO_LOCATION.lng, type: type || undefined })
-      .then((list) => alive && setLoaded(list))
-      .catch((e) => alive && setError(e.message))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [type]);
-
-  // Capability match is worked out here from the chosen type, so the colours and the
-  // details panel change at once and never show a stale value while the list reloads.
+  // Distance and capability match are worked out here, so colours and details change at once.
   const hospitals = useMemo(
-    () => loaded.map((h) => ({ ...h, capability_match: type ? hasCapabilities(h, type) : null })),
-    [loaded, type],
+    () => withDistance(stored, DEMO_LOCATION).map((h) => ({ ...h, capability_match: type ? hasCapabilities(h, type) : null })),
+    [stored, type],
   );
+  const ranking = useRanking(type, DEMO_LOCATION);
+  const topId = ranking?.ranked[0]?.hospital.id || null;
   const selected = hospitals.find((h) => h.id === selectedId) || null;
   const byDistance = useMemo(() => [...hospitals].sort((a, b) => a.distance_km - b.distance_km), [hospitals]);
 
@@ -105,7 +96,7 @@ export default function MapPage() {
               <Marker
                 key={h.id}
                 position={[h.lat, h.lng]}
-                icon={hospitalIcon(h, h.id === selectedId)}
+                icon={hospitalIcon(h, h.id === selectedId, h.id === topId)}
                 eventHandlers={{ click: () => setSelectedId(h.id) }}
               >
                 <Tooltip direction="top" offset={[0, -44]}>
@@ -120,6 +111,7 @@ export default function MapPage() {
           <span><b className="text-sky-600">●</b> Hospital</span>
           <span><b className="text-emerald-600">●</b> Has needed capability</span>
           <span><b className="text-slate-400">●</b> Missing a needed capability</span>
+          <span><b className="text-yellow-500">●</b> Top ranked (yellow ring)</span>
           <span><b className="text-red-600">●</b> Patient (demo location)</span>
           <span>CL = Cath Lab · SU = Stroke Unit</span>
         </div>
@@ -128,32 +120,39 @@ export default function MapPage() {
       <aside className="space-y-4">
         <HospitalDetails hospital={selected} type={type} onClose={() => setSelectedId(null)} />
 
-        <div className="rounded-2xl bg-white p-4 shadow">
-          <h2 className="text-lg font-bold">All hospitals by distance</h2>
-          <p className="mb-3 text-sm text-slate-500">
-            Distance only, not a recommendation. Ranking by capability comes in feature #15.
-          </p>
-          <ul className="space-y-2">
-            {byDistance.map((h) => (
-              <li key={h.id}>
-                <button
-                  onClick={() => setSelectedId(h.id)}
-                  className={`w-full rounded-xl border p-3 text-left hover:bg-slate-50 ${
-                    h.id === selectedId ? 'border-sky-500 bg-sky-50' : 'border-slate-200'
-                  } ${h.capability_match === false ? 'opacity-60' : ''}`}
-                >
-                  <div className="flex justify-between font-semibold">
-                    <span>{h.name}</span>
-                    <span>{h.distance_km} km · {h.eta_min} min</span>
-                  </div>
-                  <div className="mt-1">
-                    <CapabilityBadges capabilities={h.capabilities} size="sm" />
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {ranking ? (
+          <div className="rounded-2xl bg-white p-4 shadow">
+            <h2 className="mb-2 text-lg font-bold">Ranking for: {TYPE_LABELS[type]}</h2>
+            <RankingTable ranking={ranking} ownHospitalId={session?.hospital_id} onSelect={(h) => setSelectedId(h.id)} />
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-white p-4 shadow">
+            <h2 className="text-lg font-bold">All hospitals by distance</h2>
+            <p className="mb-3 text-sm text-slate-500">
+              Distance only, not a recommendation. Choose an emergency type to see the ranking.
+            </p>
+            <ul className="space-y-2">
+              {byDistance.map((h) => (
+                <li key={h.id}>
+                  <button
+                    onClick={() => setSelectedId(h.id)}
+                    className={`w-full rounded-xl border p-3 text-left hover:bg-slate-50 ${
+                      h.id === selectedId ? 'border-sky-500 bg-sky-50' : 'border-slate-200'
+                    } ${h.capability_match === false ? 'opacity-60' : ''}`}
+                  >
+                    <div className="flex justify-between font-semibold">
+                      <span>{h.name}</span>
+                      <span>{h.distance_km} km · {h.eta_min} min</span>
+                    </div>
+                    <div className="mt-1">
+                      <CapabilityBadges capabilities={h.capabilities} size="sm" />
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </aside>
     </div>
   );

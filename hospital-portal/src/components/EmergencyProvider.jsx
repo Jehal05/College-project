@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import * as api from '../services/api.js';
 import { subscribe, onStatus, getStatus } from '../services/socket.js';
-import { emergencyReducer, sortForQueue } from '../services/emergencyReducer.js';
+import { emergencyReducer, sortForQueue, countUnread } from '../services/emergencyReducer.js';
 import { canTransition, whyNot } from '../services/stateMachine.js';
 import { playAlertSound } from '../services/sound.js';
 import { useAuth } from './AuthProvider.jsx';
@@ -42,9 +42,9 @@ export function EmergencyProvider({ children }) {
   useEffect(() => {
     if (!isLoggedIn) return undefined;
     return subscribe('*', (msg) => {
-      if (msg.event === 'emergency.created' && !listRef.current.some((e) => e.emergency_id === msg.emergency_id)) {
-        playAlertSound();
-      }
+      // Sound only for new EMERGENCY-level alerts (feature #59), so it keeps its meaning.
+      const isNew = msg.event === 'emergency.created' && !listRef.current.some((e) => e.emergency_id === msg.emergency_id);
+      if (isNew && msg.payload?.severity === 'EMERGENCY') playAlertSound();
       send({ type: 'event', msg });
     });
   }, [isLoggedIn]);
@@ -95,9 +95,20 @@ export function EmergencyProvider({ children }) {
     }
   }, []);
 
+  /** Mark an alert as opened (clears its unread dot). */
+  const markRead = useCallback((id) => send({ type: 'read', id }), []);
+
+  /** Tick or untick a pre-arrival checklist item. Throws if the save fails. */
+  const tick = useCallback(async (id, itemId, done) => {
+    const res = await api.setChecklistItem(id, itemId, done);
+    const current = listRef.current.find((e) => e.emergency_id === id);
+    const fallback = { ...current?.checklist, [itemId]: { done, by: session?.name || 'Hospital staff', at: new Date().toISOString() } };
+    send({ type: 'checklist', id, checklist: res?.checklist || fallback });
+  }, [session?.name]);
+
   const value = useMemo(
-    () => ({ emergencies: sortForQueue(list), loading, error, act, refresh, reload }),
-    [list, loading, error, act, refresh, reload],
+    () => ({ emergencies: sortForQueue(list), unreadCount: countUnread(list), loading, error, act, refresh, reload, markRead, tick }),
+    [list, loading, error, act, refresh, reload, markRead, tick],
   );
 
   return <EmergencyContext.Provider value={value}>{children}</EmergencyContext.Provider>;

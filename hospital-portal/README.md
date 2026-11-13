@@ -1,4 +1,4 @@
-# HealthTwin AI – Hospital Portal (Phases 1 and 2)
+# HealthTwin AI – Hospital Portal (Phases 1 to 3)
 
 Puneet's section: hospital dashboard, map and ambulance.
 **Simulated prototype. No real hospital, ambulance or emergency service is contacted.**
@@ -38,8 +38,7 @@ Restart `npm run dev` after changing `.env`.
 | Feature #7 Nearby hospital map | `src/pages/Map.jsx`, `src/services/geo.js`, `src/components/HospitalDetails.jsx` |
 | Feature #9 Dashboard shell | `src/pages/Dashboard.jsx`, `src/components/AlertCard.jsx`, `src/data/mock-alerts.json` |
 
-Placeholders for later phases: `Fleet`, `Analytics`, `Admin` pages; `Checklist`, `RankingTable`
-components; `sim/ambulance-route.js`; `data/aed.json`; `data/routes.json`.
+Placeholders for later phases: `Fleet`, `Analytics`, `Admin` pages; `sim/ambulance-route.js`; `data/aed.json`; `data/routes.json`.
 
 ## Test checklist
 
@@ -121,6 +120,96 @@ Copy `src/components/Timeline.jsx`. It needs only React and Tailwind classes.
 10. **Cancel window.** The portal assumes the patient can cancel only before Dispatch.
 11. **WebSocket login.** The token is sent as `?token=...` on the WebSocket URL.
 
+## What is in Phase 3 (smart hospital selection, all Tier 2)
+
+| Task | Where |
+|---|---|
+| Feature #15 Hospital ranking | `src/services/ranking.js`, `src/components/RankingTable.jsx`, `src/components/useRanking.js`, `src/data/ranking-config.json` |
+| Feature #42 Bed and ICU availability | `src/components/AvailabilityForm.jsx`, `src/components/HospitalProvider.jsx` (shared hospital store) |
+| Feature #43 Auto-escalation | `src/services/escalation.js`, `src/components/EscalationCountdown.jsx`, scheduler in `src/services/mockBackend.js` |
+| Feature #59 Priority alert queue | `sortForQueue` and `countUnread` in `src/services/emergencyReducer.js`, `AlertCard.jsx`, `Dashboard.jsx` |
+| Feature #26 Pre-arrival checklist | `src/components/Checklist.jsx`, `src/data/checklists.json` |
+| Unit tests | `src/services/ranking.test.js` (ranking and escalation), `emergencyReducer.test.js` |
+
+Changed from Phase 2: `mockBackend.js` (hospitals, escalation timer, checklist ticks), `api.js`
+(hospital calls go through the mock backend; new `setChecklistItem`, `mockEscalate`),
+`emergencyReducer.js` (escalation events, priority order, read marks), `EmergencyProvider.jsx`
+(sound only for EMERGENCY, `markRead`, `tick`), `EmergencyDetail.jsx`, `AlertCard.jsx`, `Timeline.jsx`
+(optional `note` line), `Map.jsx` (reads the hospital store, shows the ranking, highlights the top
+hospital), `auth.js` (demo accounts now belong to hospital H2).
+
+### How the ranking works
+
+1. **Filter.** Unverified hospitals and hospitals without a required capability are ruled out
+   and listed with the reason. Distance can never bring them back.
+2. **Score** each remaining hospital out of 100. The weights are in `ranking-config.json`.
+
+| Part | Weight | Scores 100 when |
+|---|---|---|
+| Capability | 0.5 | every required unit is marked ready (cath lab ready, stroke unit ready, ICU bed free) |
+| Travel time | 0.3 | the simulated ETA is 0 minutes; scores 0 at 30 minutes or more |
+| Availability | 0.2 | 10 or more beds free and 3 or more ICU beds free (half each) |
+
+The points shown on each row add up to the total.
+
+### How escalation works
+
+- An alert in `SOS_SENT` or `ESCALATED` shows "Escalates in N s" (30 seconds, from `ranking-config.json`).
+- On `hospital.escalated` the alert becomes `ESCALATED`, an orange banner names the next hospital,
+  the timeline gets an entry, and the countdown restarts for that hospital.
+- The fallback list is the ranking with a status on each row: Alerted now, Next if no answer,
+  After that, Alerted · no answer, Responding, Not needed.
+- When the list is used up, the last hospital keeps the alert.
+- In mock mode a timer in `mockBackend.js` plays the part of Daksh's scheduler.
+  "Mock: escalate now" skips the wait.
+
+### Phase 3 test checklist
+
+- [ ] A stroke alert ranks a stroke-unit hospital first; the nearest hospital is under "Ruled out" with "No stroke unit"
+- [ ] The three point values on a row add up to its total
+- [ ] "Update beds and ICU": set beds and ICU to 0, untick "Stroke unit ready", save. The stroke ranking changes at once
+- [ ] Negative or decimal bed numbers cannot be saved
+- [ ] Leave an alert alone for 30 seconds: it escalates, the banner and timeline show it
+- [ ] An escalated alert can still be acknowledged, and the countdown then stops
+- [ ] "+ Simulate new alert" three times: alerts sort by severity, then oldest first
+- [ ] The sound plays for EMERGENCY alerts only (heart, stroke), not for URGENT ones
+- [ ] Unopened alerts show a blue dot and the header shows the unread count
+- [ ] The checklist changes with the emergency type; ticks stay when you come back; cancelled alerts are read-only
+- [ ] On the Map page, choosing a type shows the ranking and a yellow ring on the top hospital
+
+### Running with the real backend (`VITE_USE_MOCK=false`)
+
+1. Set `VITE_USE_MOCK=false`, `VITE_API_BASE_URL` and `VITE_WS_URL` in `.env`, then restart `npm run dev`.
+2. Log in with a real staff account. The badge should say **Live**.
+3. Dashboard: the queue loads, and the hospital name in the top bar is your hospital.
+4. Map: all hospitals appear. If none do, check `GET /hospitals`.
+5. Trigger an emergency from the patient app: the card appears in under 1 second.
+6. Save availability, then reload the page: the numbers must still be there.
+7. Leave an alert unacknowledged for 30 seconds: the backend must send `hospital.escalated`.
+8. Tick a checklist item, reload: the tick must still be there.
+
+Still mock-only (nothing to switch): the "Simulate new alert", "patient presses I'm OK" and
+"escalate now" buttons (hidden with the real backend), the demo logins, and
+`src/data/hospitals.json` (used only as a fallback when `GET /hospitals` fails).
+Not from the backend in either mode: `checklists.json` and `ranking-config.json` are files in the portal.
+
+### Fields to confirm with Daksh for Phase 3
+
+1. **Who ranks?** The portal ranks for display. If the backend chooses the hospital to alert, both
+   must use the same weights and rules, or the backend should send its ranking. Share `ranking-config.json`.
+2. **`GET /hospitals`.** The portal calls it without `type` so it can show ruled-out hospitals. Each item:
+   `id, name, lat, lng, address, phone, verified, capabilities{cath_lab, stroke_unit, icu, emergency}, availability{beds_free, icu_free, cath_lab_ready, stroke_unit_ready}`.
+3. **`PATCH /hospitals/{id}/availability`.** Body is the four availability fields. Response `{ id, availability }`.
+   Staff may only change their own hospital.
+4. **Emergency fields added.** `alerted_hospital_id`, `alerted_ids[]` (hospitals that did not answer), `escalation_level`, `checklist`.
+5. **`hospital.alerted` payload.** `{ hospital_id }`.
+6. **`hospital.escalated` payload.** `{ from_hospital_id, to_hospital_id, to_hospital_name, escalation_level }`, with `state: "ESCALATED"`.
+7. **Escalation timing.** 30 seconds from the last alert or escalation; the countdown uses the event timestamps, so server and laptop clocks must agree.
+8. **Checklist ticks (new endpoint, not in the contract).** Proposed: `PATCH /emergencies/{id}/checklist`,
+   body `{ item_id, done }`, response `{ checklist: { [item_id]: { done, by, at } } }`. `GET /emergencies/{id}` returns the same `checklist`.
+9. **Which alerts does a hospital see?** The mock dashboard shows every alert. Should the real list
+   contain only alerts sent to the logged-in hospital?
+
 ## Suggested Git branches and commits
 
 | Branch | Commit message |
@@ -132,6 +221,11 @@ Copy `src/components/Timeline.jsx`. It needs only React and Tailwind classes.
 | `feat-09-live-dashboard` | `feat-09: live alert queue with shared store, mock event engine, sound and connection badge` |
 | `feat-10-ack-status` | `feat-10: state machine and Acknowledge, Dispatch, En route, Arrived, Handed over buttons` |
 | `feat-19-response-timeline` | `feat-19: response timeline with elapsed times and live counter` |
+| `feat-15-hospital-ranking` | `feat-15: capability-first hospital ranking with score breakdown and ruled-out list` |
+| `feat-42-availability` | `feat-42: bed and ICU availability form with shared hospital store` |
+| `feat-43-auto-escalation` | `feat-43: escalation countdown, banner, fallback list and mock scheduler` |
+| `feat-59-priority-queue` | `feat-59: priority queue by severity then age, emergency-only sound, unread badge` |
+| `feat-26-prearrival-checklist` | `feat-26: pre-arrival checklist per emergency type with saved ticks` |
 
 ## Notes
 
@@ -143,4 +237,5 @@ Copy `src/components/Timeline.jsx`. It needs only React and Tailwind classes.
 - The map tiles load from OpenStreetMap, so the map needs internet.
 - Browsers allow sound only after a click on the page. After a reload, click once before expecting the alert sound.
 - Mock data lives in memory, so a page reload resets the mock alerts.
-- Symptom text in the mock data is sample content. A doctor must review real wording.
+- Symptom text in the mock data and every item in `checklists.json` are sample content. A doctor must review them before the demo.
+- The demo accounts belong to hospital H2 (Navrangpura), which has a cath lab and a stroke unit.

@@ -87,7 +87,7 @@ export const EVENT_FOR_STATE = {
 // is dispatched until the operator has clicked Dispatch.
 export const STATE_LABELS = {
   SOS_SENT: 'New alert · notification received, not acknowledged yet',
-  ESCALATED: 'Escalated from another hospital',
+  ESCALATED: 'Escalated to the next hospital · not acknowledged yet',
   HOSPITAL_ACKNOWLEDGED: 'Acknowledged · no ambulance dispatched yet',
   AMBULANCE_DISPATCHED: 'Ambulance dispatched (simulated)',
   EN_ROUTE: 'Ambulance en route (simulated)',

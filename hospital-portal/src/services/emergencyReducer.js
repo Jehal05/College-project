@@ -1,6 +1,9 @@
 // Pure functions that keep the list of emergencies up to date.
 // No React in here, so it is easy to test (see emergencyReducer.test.js).
 import { isFinal } from './stateMachine.js';
+import { canEscalate } from './escalation.js';
+
+const SEVERITY_ORDER = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
 
 /** Make sure every emergency has a status_events list (the timeline data). */
 export function normalise(e) {
@@ -10,6 +13,9 @@ export function normalise(e) {
     ...e,
     created_at,
     state: e.state || 'SOS_SENT',
+    alerted_ids: e.alerted_ids || [], // hospitals that were alerted and did not answer
+    escalation_level: e.escalation_level || 0,
+    checklist: e.checklist || {}, // { [item_id]: { done, by, at } }
     status_events: events ? [...events] : [{ state: 'SOS_SENT', timestamp: created_at, actor: 'Patient app' }],
   };
 }
@@ -29,8 +35,43 @@ export function applyEvent(list, msg) {
     return [created, ...list];
   }
 
-  if (idx < 0 || !state) return list; // unknown emergency, or an event without a state
+  if (idx < 0) return list; // unknown emergency
   const current = list[idx];
+  const replace = (updated) => list.map((e, i) => (i === idx ? updated : e));
+
+  // Which hospital has the alert now (no state change).
+  if (event === 'hospital.alerted') {
+    const hospitalId = payload.hospital_id;
+    if (!hospitalId || hospitalId === current.alerted_hospital_id) return list;
+    return replace({ ...current, alerted_hospital_id: hospitalId });
+  }
+
+  // No acknowledgement in time: the alert moved to the next hospital. Can happen more than once.
+  if (event === 'hospital.escalated') {
+    if (!canEscalate(current.state)) return list; // already acknowledged, cancelled or finished
+    const level = payload.escalation_level ?? (current.state === 'ESCALATED' ? current.escalation_level : current.escalation_level + 1);
+    if (level <= current.escalation_level) return list; // duplicate
+    const from = payload.from_hospital_id || current.alerted_hospital_id;
+    return replace({
+      ...current,
+      state: 'ESCALATED',
+      escalation_level: level,
+      alerted_ids: from && !current.alerted_ids.includes(from) ? [...current.alerted_ids, from] : current.alerted_ids,
+      alerted_hospital_id: payload.to_hospital_id || current.alerted_hospital_id,
+      escalated_to_name: payload.to_hospital_name || null,
+      status_events: [
+        ...current.status_events,
+        {
+          state: 'ESCALATED',
+          timestamp: timestamp || new Date().toISOString(),
+          actor: payload.actor || 'System',
+          note: payload.to_hospital_name ? `Now alerting ${payload.to_hospital_name}` : null,
+        },
+      ],
+    });
+  }
+
+  if (!state) return list; // an event without a state
   if (current.state === state) return list; // duplicate (e.g. our own click echoed back)
   if (isFinal(current.state)) return list; // a finished or cancelled emergency never changes
 
@@ -42,7 +83,7 @@ export function applyEvent(list, msg) {
       { state, timestamp: timestamp || new Date().toISOString(), actor: payload.actor || null },
     ],
   };
-  return list.map((e, i) => (i === idx ? updated : e));
+  return replace(updated);
 }
 
 /** Merge fresh details from GET /emergencies/{id}. */
@@ -50,24 +91,45 @@ export function mergeDetails(list, detail) {
   return list.map((e) => {
     if (e.emergency_id !== detail?.emergency_id) return e;
     const merged = normalise({ ...e, ...detail, status_events: detail.status_events || detail.timeline || e.status_events });
-    return { ...merged, _new: e._new };
+    return { ...merged, _new: e._new, _read: e._read };
   });
 }
 
-/** Queue order: open alerts first (newest on top), then cancelled and finished ones. */
+/**
+ * Priority queue (feature #59).
+ * Open alerts first: by severity (EMERGENCY, URGENT, WATCH, NONE), then oldest first,
+ * because the one waiting longest is the most overdue. Cancelled and finished alerts
+ * go to the bottom, newest first. Nothing is ever hidden.
+ */
 export function sortForQueue(list) {
   const time = (e) => new Date(e.created_at).getTime();
+  const severity = (e) => {
+    const i = SEVERITY_ORDER.indexOf(e.severity);
+    return i < 0 ? SEVERITY_ORDER.length : i;
+  };
   return [...list].sort((a, b) => {
     const closedA = isFinal(a.state) ? 1 : 0;
     const closedB = isFinal(b.state) ? 1 : 0;
-    return closedA - closedB || time(b) - time(a);
+    if (closedA !== closedB) return closedA - closedB;
+    if (closedA) return time(b) - time(a);
+    return severity(a) - severity(b) || time(a) - time(b) || String(a.emergency_id).localeCompare(String(b.emergency_id));
   });
 }
 
+/** Open alerts nobody has opened yet. */
+export const countUnread = (list) => list.filter((e) => !e._read && !isFinal(e.state)).length;
+
 export function emergencyReducer(list, action) {
   switch (action.type) {
-    case 'load':
-      return action.list.map(normalise);
+    case 'load': {
+      // Keep the read marks when the list is reloaded (for example after a reconnect).
+      const read = new Set(list.filter((e) => e._read).map((e) => e.emergency_id));
+      return action.list.map((e) => ({ ...normalise(e), _read: read.has(e.emergency_id) }));
+    }
+    case 'read':
+      return list.map((e) => (e.emergency_id === action.id && !e._read ? { ...e, _read: true } : e));
+    case 'checklist':
+      return list.map((e) => (e.emergency_id === action.id ? { ...e, checklist: action.checklist } : e));
     case 'event':
       return applyEvent(list, action.msg);
     case 'merge':

@@ -6,8 +6,8 @@ import { getSession, saveSession, clearSession, getToken } from './session.js';
 
 // Demo accounts (mock mode only).
 const MOCK_USERS = {
-  'staff@demo': { password: 'demo123', role: 'staff', name: 'Desk Staff (Demo)', hospital_id: 'H1' },
-  'admin@demo': { password: 'demo123', role: 'admin', name: 'Admin (Demo)', hospital_id: 'H1' },
+  'staff@demo': { password: 'demo123', role: 'staff', name: 'Desk Staff (Demo)', hospital_id: 'H2' },
+  'admin@demo': { password: 'demo123', role: 'admin', name: 'Admin (Demo)', hospital_id: 'H2' },
 };
 
 export async function login(email, password) {

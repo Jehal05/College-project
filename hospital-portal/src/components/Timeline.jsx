@@ -2,6 +2,7 @@
 // Shared component: it needs only React and two props, so the patient app can use the same file.
 //   events    – status_events array: [{ state, timestamp, actor }]
 //   createdAt – ISO time of the alert (falls back to the first event)
+// An event may also carry an optional `note` (used for "Now alerting <hospital>").
 import { useEffect, useState } from 'react';
 
 const STAGES = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE', 'ARRIVED', 'HANDOVER_DONE'];
@@ -78,6 +79,7 @@ export default function Timeline({ events = [], createdAt }) {
                   {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} since alert
                   {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} after previous step`}
                 </div>
+                {e.note && <div className="font-semibold text-orange-700">{e.note}</div>}
                 {e.actor && <div className="text-sm text-slate-500">By {e.actor}</div>}
               </div>
             </li>

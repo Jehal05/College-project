@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract.js';
 import { canCancel } from '../services/stateMachine.js';
-import { USE_MOCK, mockPatientCancel } from '../services/api.js';
+import { canEscalate, fallbackStatuses, nextHospital } from '../services/escalation.js';
+import { USE_MOCK, mockPatientCancel, mockEscalate } from '../services/api.js';
+import { useAuth } from './AuthProvider.jsx';
+import { useHospitals } from './HospitalProvider.jsx';
+import { useRanking } from './useRanking.js';
+import RankingTable from './RankingTable.jsx';
+import Checklist from './Checklist.jsx';
+import EscalationCountdown from './EscalationCountdown.jsx';
 import { formatTime } from './AlertCard.jsx';
 import ActionButtons from './ActionButtons.jsx';
 import PatientMiniMap from './PatientMiniMap.jsx';
@@ -10,7 +17,22 @@ import Timeline from './Timeline.jsx';
 /** Right-hand panel of the dashboard: patient summary, map, actions and timeline. */
 export default function EmergencyDetail({ emergency }) {
   const [cancelError, setCancelError] = useState('');
+  const { session } = useAuth();
+  const { hospitals } = useHospitals();
   const e = emergency;
+  const ranking = useRanking(e.type, e.location);
+  const statuses = ranking ? fallbackStatuses(ranking.ranked, e) : {};
+  const next = ranking ? nextHospital(ranking.ranked, e) : null;
+  const escalatedTo = e.escalated_to_name || hospitals.find((h) => h.id === e.alerted_hospital_id)?.name;
+
+  async function escalateNow() {
+    setCancelError('');
+    try {
+      await mockEscalate(e.emergency_id);
+    } catch (err) {
+      setCancelError(err.message);
+    }
+  }
   const last = e.status_events[e.status_events.length - 1];
   const cancelled = e.state === 'CANCELLED';
 
@@ -36,6 +58,13 @@ export default function EmergencyDetail({ emergency }) {
       {cancelled && (
         <p className="rounded-xl bg-slate-800 p-4 text-lg font-semibold text-white">
           The patient cancelled this alert (false alarm). No ambulance may be dispatched.
+        </p>
+      )}
+
+      {e.state === 'ESCALATED' && (
+        <p data-testid="escalation-banner" className="rounded-xl bg-orange-500 p-4 text-lg font-bold text-white">
+          Escalated to the next hospital: {escalatedTo || 'next on the list'}. No acknowledgement was given in time.
+          It can still be acknowledged.
         </p>
       )}
 
@@ -88,6 +117,9 @@ export default function EmergencyDetail({ emergency }) {
           <div>
             <h3 className="mb-2 font-semibold">Actions</h3>
             <ActionButtons emergency={e} />
+            <div className="mt-3 empty:hidden">
+              <EscalationCountdown emergency={e} hasNext={Boolean(next)} large />
+            </div>
             {last && (
               <p data-testid="last-action" className="mt-3 text-slate-600">
                 Last update: <b>{STATE_LABELS[last.state] || last.state}</b>
@@ -103,6 +135,15 @@ export default function EmergencyDetail({ emergency }) {
                 Mock: patient presses “I’m OK” (cancel)
               </button>
             )}
+            {USE_MOCK && canEscalate(e.state) && next && (
+              <button
+                data-testid="mock-escalate"
+                onClick={escalateNow}
+                className="ml-0 mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-4 py-2 font-semibold text-amber-900 hover:bg-amber-100 sm:ml-3"
+              >
+                Mock: escalate now
+              </button>
+            )}
             {cancelError && <p role="alert" className="mt-2 rounded-lg bg-red-100 p-3 font-semibold text-red-800">{cancelError}</p>}
           </div>
 
@@ -110,6 +151,17 @@ export default function EmergencyDetail({ emergency }) {
             <h3 className="mb-2 font-semibold">Response timeline</h3>
             <Timeline events={e.status_events} createdAt={e.created_at} />
           </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div>
+          <h3 className="mb-2 text-xl font-bold">Pre-arrival checklist</h3>
+          <Checklist emergency={e} />
+        </div>
+        <div>
+          <h3 className="mb-2 text-xl font-bold">Hospital ranking and fallback order</h3>
+          <RankingTable ranking={ranking} statuses={statuses} ownHospitalId={session?.hospital_id} />
         </div>
       </div>
     </div>
