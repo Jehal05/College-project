@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Large, readable base size: the dashboard is shown to a jury from a distance. */
+html { font-size: 18px; }
+body { @apply bg-slate-100 text-slate-900 antialiased; }
+
+/* Leaflet divIcon wrapper: remove the default white square. */
+.ht-marker { background: transparent; border: none; }

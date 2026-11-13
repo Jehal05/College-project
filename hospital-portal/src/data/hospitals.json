@@ -1,0 +1,57 @@
+[
+  {
+    "id": "H1",
+    "name": "Sabarmati City Hospital (Sample)",
+    "lat": 23.0300,
+    "lng": 72.5650,
+    "address": "Sample address, Ashram Road area, Ahmedabad",
+    "phone": "+91-79-0000-0001",
+    "verified": true,
+    "capabilities": { "cath_lab": false, "stroke_unit": false, "icu": true, "emergency": true },
+    "availability": { "beds_free": 12, "icu_free": 2, "cath_lab_ready": false, "stroke_unit_ready": false }
+  },
+  {
+    "id": "H2",
+    "name": "Navrangpura Heart & Stroke Centre (Sample)",
+    "lat": 23.0370,
+    "lng": 72.5500,
+    "address": "Sample address, Navrangpura area, Ahmedabad",
+    "phone": "+91-79-0000-0002",
+    "verified": true,
+    "capabilities": { "cath_lab": true, "stroke_unit": true, "icu": true, "emergency": true },
+    "availability": { "beds_free": 6, "icu_free": 1, "cath_lab_ready": true, "stroke_unit_ready": true }
+  },
+  {
+    "id": "H3",
+    "name": "Maninagar General Hospital (Sample)",
+    "lat": 22.9970,
+    "lng": 72.6030,
+    "address": "Sample address, Maninagar area, Ahmedabad",
+    "phone": "+91-79-0000-0003",
+    "verified": true,
+    "capabilities": { "cath_lab": true, "stroke_unit": false, "icu": true, "emergency": true },
+    "availability": { "beds_free": 20, "icu_free": 4, "cath_lab_ready": true, "stroke_unit_ready": false }
+  },
+  {
+    "id": "H4",
+    "name": "Vastrapur Neuro Care (Sample)",
+    "lat": 23.0380,
+    "lng": 72.5280,
+    "address": "Sample address, Vastrapur area, Ahmedabad",
+    "phone": "+91-79-0000-0004",
+    "verified": true,
+    "capabilities": { "cath_lab": false, "stroke_unit": true, "icu": true, "emergency": true },
+    "availability": { "beds_free": 8, "icu_free": 0, "cath_lab_ready": false, "stroke_unit_ready": true }
+  },
+  {
+    "id": "H5",
+    "name": "Naroda Community Hospital (Sample)",
+    "lat": 23.0700,
+    "lng": 72.6550,
+    "address": "Sample address, Naroda area, Ahmedabad",
+    "phone": "+91-79-0000-0005",
+    "verified": true,
+    "capabilities": { "cath_lab": false, "stroke_unit": false, "icu": false, "emergency": true },
+    "availability": { "beds_free": 15, "icu_free": 0, "cath_lab_ready": false, "stroke_unit_ready": false }
+  }
+]

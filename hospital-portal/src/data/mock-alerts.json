@@ -1,0 +1,35 @@
+[
+  {
+    "emergency_id": "E-1001",
+    "patient_id": "P-204",
+    "type": "HEART",
+    "severity": "EMERGENCY",
+    "state": "SOS_SENT",
+    "symptoms": ["Chest pain", "Pain spreading to left arm", "Sweating"],
+    "vitals": { "heart_rate": 118, "spo2": 94, "bp": "150/95" },
+    "location": { "lat": 23.0225, "lng": 72.5714, "accuracy_m": 15 },
+    "created_at": "2026-11-13T08:05:12Z"
+  },
+  {
+    "emergency_id": "E-1002",
+    "patient_id": "P-117",
+    "type": "STROKE",
+    "severity": "EMERGENCY",
+    "state": "SOS_SENT",
+    "symptoms": ["Face drooping", "Arm weakness", "Slurred speech"],
+    "vitals": { "heart_rate": 92, "spo2": 97, "bp": "170/100" },
+    "location": { "lat": 23.0410, "lng": 72.5600, "accuracy_m": 25 },
+    "created_at": "2026-11-13T08:06:40Z"
+  },
+  {
+    "emergency_id": "E-1003",
+    "patient_id": "P-332",
+    "type": "ASTHMA",
+    "severity": "URGENT",
+    "state": "SOS_SENT",
+    "symptoms": ["Severe breathlessness", "Wheezing", "Cannot finish sentences"],
+    "vitals": { "heart_rate": 110, "spo2": 90, "bp": "130/85" },
+    "location": { "lat": 23.0050, "lng": 72.5900, "accuracy_m": 30 },
+    "created_at": "2026-11-13T08:07:55Z"
+  }
+]

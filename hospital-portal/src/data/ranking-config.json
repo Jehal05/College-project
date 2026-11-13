@@ -1,0 +1,12 @@
+{
+  "_note": "Ranking config for feature #15. Shared with Daksh. Hospitals missing a required capability are filtered out FIRST, then scored.",
+  "weights": { "capability": 0.5, "travel_time": 0.3, "availability": 0.2 },
+  "required_capabilities": {
+    "HEART": ["cath_lab", "emergency"],
+    "STROKE": ["stroke_unit", "emergency"],
+    "DIABETIC": ["emergency"],
+    "ASTHMA": ["icu", "emergency"]
+  },
+  "availability_fields": ["beds_free", "icu_free", "cath_lab_ready", "stroke_unit_ready"],
+  "only_verified_hospitals": true
+}
