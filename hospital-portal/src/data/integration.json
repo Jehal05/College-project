@@ -17,7 +17,8 @@
       "method": "PATCH",
       "path": "/hospitals/{id}/availability",
       "used_for": "Beds, ICU, cath lab, stroke unit form",
-      "status": "agreed"
+      "status": "agreed",
+      "mock": "Jehal Phase 9: staff own hospital only (403), both key name sets accepted"
     },
     {
       "method": "GET",
@@ -121,21 +122,24 @@
       "path": "/auth/login (hospital_id in the answer)",
       "used_for": "Which hospital this staff user works for. Today the answer has none",
       "status": "proposed",
-      "fallback": "The desk picks a hospital from a list after login (first verified one by default)."
+      "fallback": "The desk picks a hospital from a list after login (first verified one by default).",
+      "mock": "Jehal Phase 9: staff@demo returns hospital_id HSP-AMD-002"
     },
     {
       "method": "GET",
       "path": "/passport/{patient_id}",
       "used_for": "Open passport button on the readiness card (once per click, staff login)",
       "status": "agreed",
-      "fallback": "Plain message: login expired (401), not allowed (403), no passport found (404). Nothing else on the screen changes."
+      "fallback": "Plain message: login expired (401), not allowed (403), no passport found (404). Nothing else on the screen changes.",
+      "mock": "Jehal Phase 9: staff token, 401/403/404, fields \"Not shared\" without consent"
     },
     {
       "method": "GET",
       "path": "/audit?page&page_size",
       "used_for": "Admin-only server audit log section on the Activity page",
       "status": "agreed",
-      "fallback": "Message: The backend has no audit log yet. (404/405/501), or Only an admin can read it (403). The staff activity list on this screen is unaffected."
+      "fallback": "Message: The backend has no audit log yet. (404/405/501), or Only an admin can read it (403). The staff activity list on this screen is unaffected.",
+      "mock": "Jehal Phase 9: admin only"
     }
   ],
   "events": [
@@ -157,7 +161,8 @@
     {
       "name": "hospital.escalated",
       "used_for": "Alert moved to the next hospital",
-      "status": "agreed"
+      "status": "agreed",
+      "mock": "Jehal Phase 9: about 30 s without acknowledgement, then hospital.alerted"
     },
     {
       "name": "ambulance.dispatched",
@@ -200,13 +205,21 @@
       "used_for": "Which hospital holds the alert (hospital_id, or hospital {id, name, distance_km})",
       "status": "proposed",
       "fallback": "Hospital name is read from GET /emergencies/{id} instead."
+    },
+    {
+      "name": "hospital.availability_updated",
+      "used_for": "Another desk changed beds or units: map and ranking update live (payload hospital_id, availability)",
+      "status": "proposed",
+      "mock": "Jehal Phase 9",
+      "fallback": "Numbers refresh on the next hospital reload."
     }
   ],
   "other": [
     {
       "name": "WebSocket ?token=",
       "used_for": "Token passed in the WebSocket address",
-      "status": "proposed"
+      "status": "proposed",
+      "mock": "Jehal Phase 9: wrong token closes with 1008; no token must send auth within 5 s"
     },
     {
       "name": "type UNKNOWN + source FALL_CHECK | INACTIVITY_CHECK",
@@ -224,7 +237,8 @@
       "used_for": "Keeps the token out of the address (VITE_WS_AUTH=message)",
       "status": "proposed",
       "fallback": "Portal keeps using ?token= in the address (default)",
-      "name": "WebSocket first-message auth {\"type\":\"auth\",\"token\"}"
+      "name": "WebSocket first-message auth {\"type\":\"auth\",\"token\"}",
+      "mock": "Jehal Phase 9: wrong token closes with 1008; no token must send auth within 5 s"
     },
     {
       "used_for": "Who moves the simulated ambulance: auto | true | false",

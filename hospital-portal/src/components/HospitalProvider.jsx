@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import * as api from '../services/api.js';
 import { useAuth } from './AuthProvider.jsx';
 import { defaultHospitalId } from '../services/adapters.js';
+import { subscribe } from '../services/socket.js';
+import { applyAvailabilityUpdate } from '../services/hospitalEvents.js';
 
 const HospitalContext = createContext(null);
 
@@ -34,6 +36,12 @@ export function HospitalProvider({ children }) {
   useEffect(() => {
     if (isLoggedIn && !session?.hospital_id && hospitals.length) chooseHospital(defaultHospitalId(hospitals, null));
   }, [isLoggedIn, session?.hospital_id, hospitals, chooseHospital]);
+
+  // Another desk (or the backend) changed a hospital's beds or units: the map and ranking follow at once.
+  useEffect(() => {
+    if (!isLoggedIn) return undefined;
+    return subscribe('hospital.availability_updated', (msg) => setHospitals((list) => applyAvailabilityUpdate(list, msg.payload)));
+  }, [isLoggedIn]);
 
   /** Save beds / ICU / unit readiness for one hospital. Throws if the save fails. */
   const saveAvailability = useCallback(async (id, availability) => {

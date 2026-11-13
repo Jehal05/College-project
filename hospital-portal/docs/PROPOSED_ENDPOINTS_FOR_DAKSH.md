@@ -54,6 +54,7 @@ Envelope: `{ event, emergency_id, state, timestamp, payload }`. The name may be 
 | `hospital.alerted` | `hospital_id` **or** `hospital { id, name, distance_km }` | **proposed** | The hospital name is read from `GET /emergencies/{id}` instead. |
 | `hospital.acknowledged` | `hospital_id`, `acknowledged_by` | agreed | – |
 | `hospital.escalated` | `from_hospital_id, to_hospital_id, to_hospital_name, escalation_level` | agreed | – |
+| `hospital.availability_updated` | `hospital_id, availability` (our key names or yours; only the sent keys change) | **proposed** | Numbers refresh on the next hospital reload. Jehal's mock already sends it. |
 | `ambulance.dispatched` | `ambulance_id, eta_seconds` | agreed | – |
 | `ambulance.location` | `ambulance_id, lat, lng, eta_seconds` (state `EN_ROUTE`). **`heading` and `progress` are optional**: the portal works them out itself | agreed | – |
 | `emergency.arrived`, `emergency.handover_done`, `emergency.cancelled` | – | agreed | – |
@@ -81,3 +82,7 @@ Ignored without error: `vitals.update`, `contacts.notified`, any unknown event.
 - `ESCALATED` followed by `SOS_SENT` (your table) vs the portal's single `ESCALATED` state: the portal accepts both orders.
 - A second `ambulance.location` stream is sent by the portal itself (its simulated trip). If your backend also simulates the ambulance, tell us which one should win; only one should run in the demo. The portal's `VITE_PORTAL_SIMULATES_AMBULANCE=auto` already handles both: it stops its own trip as soon as it sees a position that it did not send. Set it to `false` once you confirm the backend simulates the trip.
 - **WebSocket first-message auth.** Today the portal connects to `ws://…/ws?token=<jwt>`. Tokens in addresses can leak into logs. Can the socket also accept the token as the **first message**, `{"type":"auth","token":"<jwt>"}`, and close with an error if none arrives in a few seconds? The portal already supports it: set `VITE_WS_AUTH=message` (default `query`). **If you say no:** nothing changes, the portal keeps using `?token=`.
+
+## Mock status (Jehal Phase 9, commit bd7d8aa)
+
+Jehal's mock now implements: `GET /passport/{patient_id}` (staff), `GET /audit` (admin), `PATCH /hospitals/{id}/availability` (staff own hospital only, both name sets), `hospital.escalated` after about 30 s without acknowledgement, `hospital.availability_updated`, WebSocket login by `?token=` or first message, and `hospital_id` in the staff login answer. This only means the mock accepts them. Daksh still decides which availability names win and whether his backend does the same. Notes and chat are not built yet.

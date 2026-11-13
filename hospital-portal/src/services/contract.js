@@ -80,7 +80,7 @@ export function hasCapabilities(hospital, type) {
 //   emergency.note  payload { note_id, kind, note, actor, fields }  a timeline note with no state change
 //                   (kind: pickup | corridor | assignment)
 //   chat.message    payload { message_id, sender_role: 'desk' | 'crew', sender_name, text }
-export const PROPOSED_EVENTS = ['emergency.note', 'chat.message'];
+export const PROPOSED_EVENTS = ['emergency.note', 'chat.message', 'hospital.availability_updated'];
 
 // Specialty that fits each emergency type (used to suggest who to assign).
 export const SPECIALTY_FOR_TYPE = {
