@@ -91,10 +91,11 @@ function HospitalForm({ editing, onDone }) {
 }
 
 function Integration() {
-  const Row = ({ a, b, c, status }) => (
+  const Row = ({ a, b, fallback, status }) => (
     <tr className="border-t border-slate-200" data-status={status}>
       <td className="px-3 py-2 font-mono text-base">{a}</td><td className="px-3 py-2 text-base">{b}</td>
       <td className="px-3 py-2"><span className={`rounded-full px-3 py-0.5 text-sm font-bold ${status === 'agreed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{status === 'agreed' ? 'Agreed' : 'Proposed, confirm with Daksh'}</span></td>
+      <td className="px-3 py-2 text-sm text-slate-600">{status === 'agreed' && !fallback ? '' : fallback || ''}</td>
     </tr>
   );
   return (
@@ -104,11 +105,11 @@ function Integration() {
         Mode: <b>{USE_MOCK ? 'Mock (no backend, simulated data)' : `Real backend at ${API_BASE_URL}`}</b>
       </p>
       <p className="text-slate-600">To switch, set <code className="rounded bg-slate-100 px-1">VITE_USE_MOCK=false</code> in <code className="rounded bg-slate-100 px-1">.env</code> (and the two address settings), then restart <code className="rounded bg-slate-100 px-1">npm run dev</code>.</p>
-      <div className="overflow-x-auto"><table className="w-full text-left"><thead className="text-sm uppercase text-slate-500"><tr><th className="px-3 py-2">Endpoint or event</th><th className="px-3 py-2">Used for</th><th className="px-3 py-2">Status</th></tr></thead>
+      <div className="overflow-x-auto"><table className="w-full text-left"><thead className="text-sm uppercase text-slate-500"><tr><th className="px-3 py-2">Endpoint or event</th><th className="px-3 py-2">Used for</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">If the backend says no</th></tr></thead>
         <tbody>
-          {integration.rest.map((r) => <Row key={r.method + r.path} a={`${r.method} ${r.path}`} b={r.used_for} status={r.status} />)}
-          {integration.events.map((r) => <Row key={r.name} a={r.name} b={r.used_for} status={r.status} />)}
-          {integration.other.map((r) => <Row key={r.name} a={r.name} b={r.used_for} status={r.status} />)}
+          {integration.rest.map((r) => <Row key={r.method + r.path} a={`${r.method} ${r.path}`} b={r.used_for} fallback={r.fallback} status={r.status} />)}
+          {integration.events.map((r) => <Row key={r.name} a={r.name} b={r.used_for} fallback={r.fallback} status={r.status} />)}
+          {integration.other.map((r) => <Row key={r.name} a={r.name} b={r.used_for} fallback={r.fallback} status={r.status} />)}
         </tbody></table></div>
     </section>
   );

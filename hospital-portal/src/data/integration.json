@@ -1,37 +1,210 @@
 {
-  "_note": "Every endpoint and WebSocket event the hospital portal uses. 'agreed' = in the team plan PDF. 'proposed' = added by Puneet, must be confirmed with Daksh before the demo.",
+  "_note": "Every endpoint and WebSocket event the hospital portal uses. 'agreed' = in Daksh's backend/CONTRACT.md v0.6.1 or the team plan. 'proposed' = added by Puneet or Jehal, must be confirmed with Daksh. 'fallback' = what the portal does if Daksh says no. Full wording: docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md.",
   "rest": [
-    { "method": "POST", "path": "/auth/login", "used_for": "Log in, returns token and role", "status": "agreed" },
-    { "method": "GET", "path": "/hospitals?lat&lng&type", "used_for": "Hospital list for the map and ranking", "status": "agreed" },
-    { "method": "PATCH", "path": "/hospitals/{id}/availability", "used_for": "Beds, ICU, cath lab, stroke unit form", "status": "agreed" },
-    { "method": "GET", "path": "/emergencies/{id}", "used_for": "Details and timeline", "status": "agreed" },
-    { "method": "POST", "path": "/emergencies/{id}/ack", "used_for": "Acknowledge an alert", "status": "agreed" },
-    { "method": "POST", "path": "/emergencies/{id}/dispatch", "used_for": "Dispatch an ambulance (body: ambulance_id)", "status": "agreed" },
-    { "method": "POST", "path": "/emergencies/{id}/status", "used_for": "EN_ROUTE, ARRIVED, HANDOVER_DONE", "status": "agreed" },
-    { "method": "POST", "path": "/ambulances/{id}/location", "used_for": "Ambulance position and ETA each second", "status": "agreed" },
-    { "method": "GET", "path": "/emergencies?status=active", "used_for": "Alert queue on login", "status": "proposed" },
-    { "method": "GET", "path": "/emergencies?status=finished", "used_for": "Case history and analytics (must include status_events)", "status": "proposed" },
-    { "method": "PATCH", "path": "/emergencies/{id}/checklist", "used_for": "Tick a pre-arrival checklist item", "status": "proposed" },
-    { "method": "GET", "path": "/ambulances", "used_for": "Fleet list", "status": "proposed" },
-    { "method": "POST", "path": "/emergencies/{id}/notes", "used_for": "Timeline notes: assignment, corridor, pickup, responder alert", "status": "proposed" },
-    { "method": "POST", "path": "/emergencies/{id}/chat", "used_for": "Desk and crew chat", "status": "proposed" },
-    { "method": "POST", "path": "/hospitals", "used_for": "Onboard a hospital (saved unverified)", "status": "proposed" },
-    { "method": "PUT", "path": "/hospitals/{id}", "used_for": "Edit hospital details", "status": "proposed" },
-    { "method": "PATCH", "path": "/hospitals/{id}/verify", "used_for": "Admin verifies a hospital (body: verified)", "status": "proposed" }
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "used_for": "Log in, returns token and role",
+      "status": "agreed"
+    },
+    {
+      "method": "GET",
+      "path": "/hospitals?lat&lng&type",
+      "used_for": "Hospital list for the map and ranking",
+      "status": "agreed"
+    },
+    {
+      "method": "PATCH",
+      "path": "/hospitals/{id}/availability",
+      "used_for": "Beds, ICU, cath lab, stroke unit form",
+      "status": "agreed"
+    },
+    {
+      "method": "GET",
+      "path": "/emergencies/{id}",
+      "used_for": "Details and timeline",
+      "status": "agreed"
+    },
+    {
+      "method": "POST",
+      "path": "/emergencies/{id}/ack",
+      "used_for": "Acknowledge an alert",
+      "status": "agreed",
+      "fallback": "If the call fails with 404, the step is applied on this screen only and the desk is told."
+    },
+    {
+      "method": "POST",
+      "path": "/emergencies/{id}/dispatch",
+      "used_for": "Dispatch an ambulance (body: ambulance_id)",
+      "status": "agreed",
+      "fallback": "If the call fails with 404, the step is applied on this screen only and the desk is told."
+    },
+    {
+      "method": "POST",
+      "path": "/emergencies/{id}/status",
+      "used_for": "EN_ROUTE, ARRIVED, HANDOVER_DONE",
+      "status": "agreed",
+      "fallback": "If the call fails with 404, the step is applied on this screen only and the desk is told."
+    },
+    {
+      "method": "POST",
+      "path": "/ambulances/{id}/location",
+      "used_for": "Ambulance position and ETA each second",
+      "status": "agreed",
+      "fallback": "If the call fails with 404, the step is applied on this screen only and the desk is told."
+    },
+    {
+      "method": "GET",
+      "path": "/emergencies?status=active",
+      "used_for": "Alert queue on login",
+      "status": "proposed",
+      "fallback": "Queue starts empty with a message; new alerts still arrive live by WebSocket."
+    },
+    {
+      "method": "GET",
+      "path": "/emergencies?status=finished",
+      "used_for": "Case history and analytics (must include status_events)",
+      "status": "proposed",
+      "fallback": "History shows live cases only, with a note."
+    },
+    {
+      "method": "PATCH",
+      "path": "/emergencies/{id}/checklist",
+      "used_for": "Tick a pre-arrival checklist item",
+      "status": "proposed",
+      "fallback": "Ticks stay on this screen only."
+    },
+    {
+      "method": "GET",
+      "path": "/ambulances",
+      "used_for": "Fleet list",
+      "status": "proposed",
+      "fallback": "A sample fleet is shown, marked as not real."
+    },
+    {
+      "method": "POST",
+      "path": "/emergencies/{id}/notes",
+      "used_for": "Timeline notes: assignment, corridor, pickup, responder alert",
+      "status": "proposed",
+      "fallback": "Notes stay on this screen only."
+    },
+    {
+      "method": "POST",
+      "path": "/emergencies/{id}/chat",
+      "used_for": "Desk and crew chat",
+      "status": "proposed",
+      "fallback": "Chat stays on this screen only."
+    },
+    {
+      "method": "POST",
+      "path": "/hospitals",
+      "used_for": "Onboard a hospital (saved unverified)",
+      "status": "proposed",
+      "fallback": "Add hospital shows 'the backend has no POST /hospitals yet'."
+    },
+    {
+      "method": "PUT",
+      "path": "/hospitals/{id}",
+      "used_for": "Edit hospital details",
+      "status": "proposed",
+      "fallback": "Edit shows a clear message; nothing is lost."
+    },
+    {
+      "method": "PATCH",
+      "path": "/hospitals/{id}/verify",
+      "used_for": "Admin verifies a hospital (body: verified)",
+      "status": "proposed",
+      "fallback": "Verify shows a clear message; the list is unchanged."
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login (hospital_id in the answer)",
+      "used_for": "Which hospital this staff user works for. Today the answer has none",
+      "status": "proposed",
+      "fallback": "The desk picks a hospital from a list after login (first verified one by default)."
+    }
   ],
   "events": [
-    { "name": "emergency.created", "used_for": "New alert in the queue", "status": "agreed" },
-    { "name": "emergency.cancelled", "used_for": "Patient pressed I'm OK", "status": "agreed" },
-    { "name": "hospital.acknowledged", "used_for": "Alert acknowledged", "status": "agreed" },
-    { "name": "hospital.escalated", "used_for": "Alert moved to the next hospital", "status": "agreed" },
-    { "name": "ambulance.dispatched", "used_for": "Ambulance sent", "status": "agreed" },
-    { "name": "ambulance.location", "used_for": "Moving marker; state EN_ROUTE on the first one", "status": "agreed" },
-    { "name": "emergency.arrived", "used_for": "Ambulance arrived", "status": "agreed" },
-    { "name": "emergency.handover_done", "used_for": "Handed over", "status": "agreed" },
-    { "name": "emergency.note", "used_for": "Timeline note and extra fields", "status": "proposed" },
-    { "name": "chat.message", "used_for": "Desk and crew chat message", "status": "proposed" }
+    {
+      "name": "emergency.created",
+      "used_for": "New alert in the queue",
+      "status": "agreed"
+    },
+    {
+      "name": "emergency.cancelled",
+      "used_for": "Patient pressed I'm OK",
+      "status": "agreed"
+    },
+    {
+      "name": "hospital.acknowledged",
+      "used_for": "Alert acknowledged",
+      "status": "agreed"
+    },
+    {
+      "name": "hospital.escalated",
+      "used_for": "Alert moved to the next hospital",
+      "status": "agreed"
+    },
+    {
+      "name": "ambulance.dispatched",
+      "used_for": "Ambulance sent",
+      "status": "agreed"
+    },
+    {
+      "name": "ambulance.location",
+      "used_for": "Moving marker; state EN_ROUTE on the first one",
+      "status": "agreed"
+    },
+    {
+      "name": "emergency.arrived",
+      "used_for": "Ambulance arrived",
+      "status": "agreed"
+    },
+    {
+      "name": "emergency.handover_done",
+      "used_for": "Handed over",
+      "status": "agreed"
+    },
+    {
+      "name": "emergency.note",
+      "used_for": "Timeline note and extra fields",
+      "status": "proposed"
+    },
+    {
+      "name": "chat.message",
+      "used_for": "Desk and crew chat message",
+      "status": "proposed"
+    },
+    {
+      "name": "emergency.sos_sent",
+      "used_for": "Early notice becomes a real SOS (state SOS_SENT)",
+      "status": "proposed",
+      "fallback": "If the alert is created straight at SOS_SENT this event is never needed."
+    },
+    {
+      "name": "hospital.alerted",
+      "used_for": "Which hospital holds the alert (hospital_id, or hospital {id, name, distance_km})",
+      "status": "proposed",
+      "fallback": "Hospital name is read from GET /emergencies/{id} instead."
+    }
   ],
   "other": [
-    { "name": "WebSocket ?token=", "used_for": "Token passed in the WebSocket address", "status": "proposed" }
+    {
+      "name": "WebSocket ?token=",
+      "used_for": "Token passed in the WebSocket address",
+      "status": "proposed"
+    },
+    {
+      "name": "type UNKNOWN + source FALL_CHECK | INACTIVITY_CHECK",
+      "used_for": "Safety check-in alert with no symptoms",
+      "status": "proposed",
+      "fallback": "Shown as a normal alert with 'No symptoms reported'; ranking uses the emergency department only."
+    },
+    {
+      "name": "EMERGENCY_DETECTED visible to hospitals",
+      "used_for": "Early notice before the patient confirms SOS (no sound, no Acknowledge)",
+      "status": "agreed",
+      "fallback": "If alerts are created at SOS_SENT, they behave as normal alerts."
+    }
   ]
 }

@@ -285,6 +285,20 @@ Every page shows "Simulated" in the top bar. Sample content (symptoms, checklist
 ### Jury demo script (about 5 minutes) and backup video
 See [DEMO.md](DEMO.md).
 
+## Run together with the patient app and the backend (integration)
+
+The portal now works with Jehal's patient app (his mock server) and is ready for Daksh's backend.
+Step by step guide, logins and a 9-step rehearsal checklist: [docs/RUN_BOTH_APPS.md](docs/RUN_BOTH_APPS.md).
+Everything we ask Daksh for, with what happens if he says no: [docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md](docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md).
+
+What the portal does, in short:
+- **Login** sends `username` in real mode (email in mock mode). `HOSPITAL_STAFF` is shown as staff. No hospital in the login answer? The desk picks one in the top bar.
+- **One adapter file**, `src/services/adapters.js`, turns every shape from Jehal and Daksh into the shape the screens use (symptom IDs to words, missing patient, location or vitals to "Not shared", `event` or `type`, capabilities as list or object, `hospital.alerted` in both shapes, heading and progress worked out locally). The screens never read raw backend data.
+- **Safety check-in** alerts (no symptoms, type UNKNOWN) show "No symptoms reported … Simulated", can be acknowledged, dispatched and reported. Ranking for them needs only an emergency department.
+- **Early alerts** (state `EMERGENCY_DETECTED`) are a quiet grey notice: no sound, no flashing, no Acknowledge until `SOS_SENT`. A cancelled early alert shows as cancelled. Works the same if the backend creates alerts at `SOS_SENT`.
+- **Missing endpoints** never break the portal: the one feature is limited and the screen says why.
+- Tests: `npm test` includes `integration.test.js`, which runs a real saved output of Jehal's mock through the reducer, ranking and report.
+
 ## Suggested Git branches and commits
 
 | Branch | Commit message |
