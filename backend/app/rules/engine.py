@@ -39,6 +39,7 @@ TYPE_PRIORITY = [
     EmergencyType.STROKE,
     EmergencyType.DIABETIC,
     EmergencyType.ASTHMA,
+    EmergencyType.UNKNOWN,
 ]
 
 # Safety floor, independent of the YAML file.

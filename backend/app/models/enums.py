@@ -12,6 +12,9 @@ class EmergencyType(str, Enum):
     STROKE = "STROKE"
     DIABETIC = "DIABETIC"
     ASTHMA = "ASTHMA"
+    # Safety check-in with no reply (fall or inactivity check). The patient app and the portal already use it.
+    # Not part of the day-1 contract: pending agreement with Jehal and Puneet.
+    UNKNOWN = "UNKNOWN"
 
 
 class Severity(str, Enum):

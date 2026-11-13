@@ -262,7 +262,7 @@ def test_every_rule_is_marked_pending_doctor_review():
     assert rules and all(r.review_status == "pending doctor review" for r in rules)
 
 
-def test_rule_ids_are_unique_and_all_four_types_are_covered():
+def test_rule_ids_are_unique_and_every_emergency_type_is_covered():
     rules = load_rules()
     assert len({r.id for r in rules}) == len(rules)
     assert {r.type for r in rules} == set(EmergencyType)

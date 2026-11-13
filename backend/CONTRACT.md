@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.6.1 | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.6.2 | Owner: Daksh (backend) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -22,6 +22,8 @@ Extra states: `CANCELLED`, `ESCALATED`.
 ### 1.2 Emergency types
 
 `HEART`, `STROKE`, `DIABETIC`, `ASTHMA`
+
+Also `UNKNOWN`, used **only** for a safety check-in alert (a fall or inactivity check that got no reply, with no symptoms). The patient app and the hospital portal already use it. **Pending agreement with Jehal and Puneet.**
 
 ### 1.3 Severity
 
@@ -47,7 +49,11 @@ Extra states: `CANCELLED`, `ESCALATED`.
 ```
 `type` is `null` when severity is `NONE`.
 
-**Symptom names** the engine understands: `chest_pain`, `breathlessness`, `sweating`, `left_arm_pain`, `face_drooping`, `arm_weakness`, `slurred_speech`, `confusion`, `wheeze`, `low_glucose`. Vital names: `heart_rate`, `spo2`, `bp_sys`, `bp_dia`, `glucose`, `resp_rate`. Unknown names are ignored.
+**Symptom names** the engine understands: `chest_pain`, `breathlessness`, `sweating`, `left_arm_pain`, `face_drooping`, `arm_weakness`, `slurred_speech`, `confusion`, `wheeze`, `low_glucose`, and (draft, added 2026-11-13) `nausea`, `fainting`, `diabetic_fainting`, `severe_headache`, `sudden_confusion`, `shaking`, `cannot_speak_sentences`, `blue_lips`, `checkin_no_reply`. Vital names: `heart_rate`, `spo2`, `bp_sys`, `bp_dia`, `glucose`, `resp_rate`. Unknown names are ignored by the engine.
+
+**Draft rules added 2026-11-13 (0.6.2).** Twelve rules cover the seven patient-app symptoms that had no rule (`NAUSEA`, `FAINTING`, `SEVERE_HEADACHE`, `DIA_SHAKING`, `DIA_FAINTING`, `CANNOT_SPEAK_SENTENCES`, `BLUE_LIPS`), the stroke "sudden confusion" sign, and a safety check-in with no reply (draft EMERGENCY, type `UNKNOWN`). They were **written by an AI assistant from public first-aid guidance and accepted for the prototype by Daksh. A doctor has NOT reviewed them.** They carry `review_status: pending doctor review` like every other rule. The review sheet is `docs/review/DOCTOR_REVIEW_NEW_RULES.md`. Every one of the 20 patient-app symptoms now maps to a rule, so no symptom a patient taps can give "no indicators".
+
+**Patient-app symptom ids** (`CHEST_PAIN`, `BLUE_LIPS`, ...) are translated to engine names in one place, `app/rules/symptom_map.py`. An id the table does not know is returned as `unmapped` (to be stored and shown to Daksh and the doctor), never silently dropped, and never lowers a severity. A `source` of `FALL_CHECK` or `INACTIVITY_CHECK` adds `checkin_no_reply`.
 
 ### 1.4 Roles
 
@@ -484,3 +490,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.5 | Added GET /audit, audit rules, passport access rules and error codes (features 11, 50) |
 | 13 Nov 2026 | 0.6 | Added GET /patients/{id}/insights, fixed wording rules, family-access TODO (feature 54) |
 | 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
+| 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |

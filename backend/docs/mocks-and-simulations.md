@@ -17,6 +17,7 @@ Rule: nothing real is ever contacted, and every fake is labelled where a person 
 | What | Label | Note |
 |---|---|---|
 | Rule table (symptoms, thresholds) | `review_status`: "pending doctor review" in every decision | No doctor has approved it. Do not say otherwise. |
+| 12 draft rules added 2026-11-13 (7 symptoms, sudden confusion, safety check-in) | same label, plus `origin`: "AI-written draft ... NOT reviewed by a doctor" | Accepted for the prototype by Daksh. Not a doctor's approval. Sheet: `docs/review/DOCTOR_REVIEW_NEW_RULES.md`. |
 | Insights wording, bands and thresholds | `wording_review`: "pending doctor review" | Same. |
 
 ## Not built yet: the label is REQUIRED when it is built

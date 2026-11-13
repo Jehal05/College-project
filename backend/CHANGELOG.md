@@ -3,6 +3,12 @@
 All numbers are real runs of `python -m pytest`. Dates are 13 November 2026 (the plan's date).
 The contract version lives at the top of `CONTRACT.md`.
 
+## 0.6.2: draft rules for unmapped symptoms (pending doctor review)
+- 12 new rules: the 7 patient-app symptoms that had no rule (they gave "no indicators"), sudden confusion as a stroke sign, and a safety check-in with no reply (EMERGENCY, type `UNKNOWN`).
+- Written by an AI assistant from public first-aid guidance and accepted for the prototype by Daksh. **A doctor has not reviewed them.** Sheet: `docs/review/DOCTOR_REVIEW_NEW_RULES.md`.
+- `app/rules/symptom_map.py`: all 20 patient-app symptoms map to a rule; unknown ids are reported, not dropped.
+- New emergency type `UNKNOWN` (pending agreement with Jehal and Puneet).
+
 ## 0.6.1: contract housekeeping
 - Documented the existing `GET /health`. No behaviour change.
 - Pinned all dependencies (`requirements.txt` exact, `requirements.lock.txt` full).
