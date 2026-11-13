@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet'
 import L from 'leaflet';
 import { getHospitals } from '../services/api.js';
 import { DEMO_LOCATION, ASSUMED_SPEED_KMH } from '../services/geo.js';
-import { EMERGENCY_TYPES, TYPE_LABELS } from '../services/contract.js';
+import { EMERGENCY_TYPES, TYPE_LABELS, hasCapabilities } from '../services/contract.js';
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
@@ -39,7 +39,7 @@ const patientIcon = L.divIcon({
 });
 
 export default function MapPage() {
-  const [hospitals, setHospitals] = useState([]);
+  const [loaded, setLoaded] = useState([]);
   const [type, setType] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +49,7 @@ export default function MapPage() {
     let alive = true;
     setLoading(true);
     getHospitals({ lat: DEMO_LOCATION.lat, lng: DEMO_LOCATION.lng, type: type || undefined })
-      .then((list) => alive && setHospitals(list))
+      .then((list) => alive && setLoaded(list))
       .catch((e) => alive && setError(e.message))
       .finally(() => alive && setLoading(false));
     return () => {
@@ -57,6 +57,12 @@ export default function MapPage() {
     };
   }, [type]);
 
+  // Capability match is worked out here from the chosen type, so the colours and the
+  // details panel change at once and never show a stale value while the list reloads.
+  const hospitals = useMemo(
+    () => loaded.map((h) => ({ ...h, capability_match: type ? hasCapabilities(h, type) : null })),
+    [loaded, type],
+  );
   const selected = hospitals.find((h) => h.id === selectedId) || null;
   const byDistance = useMemo(() => [...hospitals].sort((a, b) => a.distance_km - b.distance_km), [hospitals]);
 
