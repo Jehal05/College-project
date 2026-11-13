@@ -50,7 +50,7 @@ async function request(path, { method = 'GET', body } = {}) {
       method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined,
     });
     const data = await response.json().catch(() => ({}));
-    if (method === 'GET') saveCopy(path, data);
+    if (method === 'GET' && getToken()) saveCopy(path, data); // not after sign out: a late answer must not leave data behind
     return data;
   } catch (err) {
     const copy = method === 'GET' && err.code === 'NETWORK' ? readCopy(path) : undefined;
