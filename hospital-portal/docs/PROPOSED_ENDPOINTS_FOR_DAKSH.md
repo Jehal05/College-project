@@ -19,6 +19,7 @@ Please answer each item with **Yes / Yes with changes / No**. Reply in the group
 | `POST /emergencies/{id}/dispatch` | `{ hospital_id, ambulance_id }` (**`ambulance_id` is an extra field**, see item 7) | any 2xx |
 | `POST /emergencies/{id}/status` | `{ state }` (EN_ROUTE, ARRIVED, HANDOVER_DONE) | any 2xx |
 | `POST /ambulances/{id}/location` | `{ emergency_id, lat, lng, eta_seconds }` plus optional `heading, remaining_km, progress, leg` | any 2xx |
+| `GET /passport/{patient_id}` | nothing, **only when staff press "Open passport"** (once per click; never automatically, never polled), with the staff login token | `name, age, blood_group, conditions, allergies, contacts, reports`. Fields left out by the patient's consent read **Not shared**. `401` → "log in again", `403` → "not allowed", `404` → "no passport found". Your audit log records each view. |
 | WebSocket | `ws://…/ws?token=<jwt>` (one socket, all events) | see section C |
 
 **Question W:** the portal opens **one** socket with `?token=`. Your contract has `/ws/hospitals/{id}?token=`. The portal can use that path once login or `GET /hospitals` tells it the hospital id: please say which you prefer.

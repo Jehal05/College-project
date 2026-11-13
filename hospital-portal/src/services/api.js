@@ -218,5 +218,15 @@ export async function sendChat(id, { text, sender_role, sender_name }) {
   return request('POST', `/emergencies/${id}/chat`, { text, sender_role, sender_name });
 }
 
+/**
+ * Health passport (C3). GET /passport/{patient_id} as logged-in staff. Returns only what the patient consented to share
+ * (other fields are left out). The backend records every view, so this is called ONLY when staff press "Open passport".
+ * Errors keep their HTTP status: 401 login, 403 not allowed, 404 no such patient or no endpoint.
+ */
+export async function getPassport(patientId) {
+  if (USE_MOCK) return mock.getPassport(patientId);
+  return request('GET', `/passport/${encodeURIComponent(patientId)}`);
+}
+
 export const mockCrewReply = (id) => mock.crewReply(id);
 export const CANNED_CREW_REPLIES = mock.CANNED_CREW_REPLIES;

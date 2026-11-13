@@ -251,6 +251,28 @@ export async function addNote(id, { kind, note, fields = {} }, actor) {
   return { emergency_id: id, note_id, kind, note, fields, timestamp, actor };
 }
 
+// ---------- Health passport (C3) ----------
+// SAMPLE passport so the button works in mock mode. Real mode calls GET /passport/{patient_id}.
+export async function getPassport(patientId) {
+  seed();
+  await delay(150);
+  if (!patientId) {
+    const err = new Error('No patient ID');
+    err.status = 404;
+    throw err;
+  }
+  return {
+    patient_id: patientId,
+    name: 'Sample Patient (simulated)',
+    age: 58,
+    blood_group: 'B+',
+    conditions: ['hypertension'],
+    allergies: ['penicillin'],
+    shared_fields: ['history'],
+    simulated: true,
+  };
+}
+
 // ---------- Desk and crew chat (feature #49) ----------
 // BroadcastChannel carries messages between browser tabs, so a desk tab and a crew tab can talk
 // without a backend. Messages are not stored: a tab only sees messages sent while it is open.

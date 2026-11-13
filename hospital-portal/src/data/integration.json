@@ -122,6 +122,13 @@
       "used_for": "Which hospital this staff user works for. Today the answer has none",
       "status": "proposed",
       "fallback": "The desk picks a hospital from a list after login (first verified one by default)."
+    },
+    {
+      "method": "GET",
+      "path": "/passport/{patient_id}",
+      "used_for": "Open passport button on the readiness card (once per click, staff login)",
+      "status": "agreed",
+      "fallback": "Plain message: login expired (401), not allowed (403), no passport found (404). Nothing else on the screen changes."
     }
   ],
   "events": [

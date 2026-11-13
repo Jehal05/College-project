@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { isFinal } from '../services/stateMachine.js';
+import { isFinal, isEarly } from '../services/stateMachine.js';
 import { fallbackStatuses, nextHospital } from '../services/escalation.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
@@ -19,6 +19,7 @@ import VitalsGrid from './detail/VitalsGrid.jsx';
 import ActionsPanel from './detail/ActionsPanel.jsx';
 import NotesPanel from './NotesPanel.jsx';
 import ReadinessWarning from './detail/ReadinessWarning.jsx';
+import ReadinessCard from './detail/ReadinessCard.jsx';
 
 /** Right-hand panel of the dashboard: patient summary, map, actions and timeline. The parts live in ./detail/. */
 export default function EmergencyDetail({ emergency }) {
@@ -82,6 +83,8 @@ export default function EmergencyDetail({ emergency }) {
           </div>
         </div>
       )}
+
+      {!isFinal(e.state) && !isEarly(e.state) && <ReadinessCard key={e.emergency_id} emergency={e} />}
 
       {isFinal(e.state) && (
         <Link data-testid="open-report" to={`/report/${e.emergency_id}?t=${encodeURIComponent(e.created_at)}`} className="inline-block rounded-lg bg-slate-800 px-5 py-3 text-lg font-bold text-white hover:bg-slate-900">

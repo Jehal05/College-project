@@ -40,6 +40,14 @@ Everything about the ambulance is **simulated**. Only one side should move it, o
 
 The screen always says which: "Ambulance movement: simulated by the portal" or "… by the backend". The portal ignores the echo of its own positions, so it does not mistake them for the backend.
 
+### Pre-arrival readiness card
+
+Each open alert shows a card with the ambulance ETA (simulated), what the patient app already shared (symptoms, vitals, location, or **Not shared**), checklist progress and the assigned team. The **Open passport** button calls `GET /passport/{patient_id}` **once per click** (the backend records every view; the portal never opens it by itself). It shows only what the patient agreed to share, and plain messages for 401, 403 and 404. Mock mode shows a clearly labelled sample.
+
+### Handover and desk notes
+
+Staff can add a **handover note** (for the next shift) or a **desk note** (500 characters at most, with a counter). They appear in the detail, the timeline, the post-event report ("Shift handover") and the text report. They use `POST /emergencies/{id}/notes` with kind `handover` or `desk`. If the backend has no such endpoint, the note stays on this screen and is marked "saved on this screen only".
+
 ### Known limitations (honest list)
 
 - **The login token is kept in the browser.** It is in `sessionStorage` (gone when the tab is closed), not `localStorage`. A script running on the page could still read it. This is a prototype; a real product would use short-lived tokens in an HttpOnly cookie.
