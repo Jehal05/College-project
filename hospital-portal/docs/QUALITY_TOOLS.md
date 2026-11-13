@@ -1,29 +1,25 @@
 # Lint and end-to-end tests: one-time setup on your laptop
 
 The portal has an ESLint setup (`npm run lint`) and a Playwright browser test suite (`npm run e2e`).
-The config files and tests are already in the repo. The packages are **not** yet in `package.json`, because adding them
-without updating `package-lock.json` would make `npm ci` fail on GitHub. The two CI jobs (`lint`, `e2e`) are skipped
-(not red) until the packages are there.
+**Status (13 Nov 2026): set up.** The packages are in `package.json` with the lock file (commit `quality-deps`), and the `lint` and `e2e` jobs now run on GitHub for every push.
 
-## Do this once (about 5 minutes)
+## If you ever need to set it up again on a new laptop
 
 ```bash
 cd hospital-portal
-npm install --save-dev eslint@^9 @eslint/js@^9 globals@^15 eslint-plugin-react@^7 eslint-plugin-react-hooks@^5 @playwright/test@^1
+npm ci
 npx playwright install chromium
-npm run lint        # fix or report anything it finds
+npm run lint        # 0 errors expected; 9 react-hooks warnings are known and harmless
 npm test            # unit tests
 npm run e2e         # builds in mock mode, starts the preview server, runs the browser tests
-git add package.json package-lock.json
-git commit -m "quality-deps: add eslint and playwright dev dependencies"
-git push
 ```
 
-**Commit `package-lock.json` together with `package.json`.** If only one of them is committed, `npm ci` fails in CI.
-After the push, GitHub Actions turns on the `lint` and `e2e` jobs by itself.
+When you add or change a package, **commit `package-lock.json` together with `package.json`**, or `npm ci` fails in CI.
 
-## What was and was not run before this was handed over
+## What has been run (real tools, on the laptop, 13 Nov 2026)
 
-- Unit tests (`npm test`): run, all green.
-- The browser tests in `e2e/` were run in a sandbox with a small stand-in for the `@playwright/test` API against a build of the portal made without Vite. They have **not** yet been run with the real `@playwright/test` and `vite preview`. The first real run is yours (or CI after you push). If one fails there, it is most likely a selector or timing detail, not a design problem.
-- ESLint: run with ESLint 10 and the core recommended rules plus small stand-ins for `react/jsx-uses-vars`, `react/no-unescaped-entities` and `react/jsx-key`. The real `eslint-plugin-react` and `eslint-plugin-react-hooks` rules (especially `react-hooks/rules-of-hooks` and `react-hooks/exhaustive-deps`) were **not** run. Expect a few new findings the first time; `exhaustive-deps` is set to a warning.
+- Unit tests: all pass.
+- `npm run e2e` with the real `@playwright/test` and a real Vite build: 8 of 8 passed.
+- `npm run lint` with the real React and react-hooks plugins: 0 errors, 9 `exhaustive-deps` warnings (intended patterns such as `Boolean(x)` dependencies).
+- `npm audit`: 0 vulnerabilities after the react-router 7 upgrade.
+- The larger browser checks written during development (alert flow, ambulance tracking, admin, scope, activity log, offline banner, languages) ran in a sandbox harness that is **not** in this repo. Only the 8 tests in `e2e/portal.spec.js` are repeatable by anyone else.
