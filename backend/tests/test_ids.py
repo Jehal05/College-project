@@ -77,6 +77,6 @@ def test_many_threads_at_once_never_get_the_same_number(tmp_path):
 
 
 def test_random_ids_have_the_prefix_and_are_unique():
-    ids = [new_id("C") for _ in range(2000)]
-    assert all(re.fullmatch(r"C-[0-9A-F]{8}", i) for i in ids)
-    assert len(set(ids)) == 2000
+    ids = [new_id("C") for _ in range(20000)]
+    assert all(re.fullmatch(r"C-[0-9A-F]{16}", i) for i in ids)
+    assert len(set(ids)) == 20000
