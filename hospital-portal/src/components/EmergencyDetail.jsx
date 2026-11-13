@@ -18,6 +18,7 @@ import SymptomList from './detail/SymptomList.jsx';
 import VitalsGrid from './detail/VitalsGrid.jsx';
 import ActionsPanel from './detail/ActionsPanel.jsx';
 import NotesPanel from './NotesPanel.jsx';
+import ReadinessWarning from './detail/ReadinessWarning.jsx';
 
 /** Right-hand panel of the dashboard: patient summary, map, actions and timeline. The parts live in ./detail/. */
 export default function EmergencyDetail({ emergency }) {
@@ -33,6 +34,7 @@ export default function EmergencyDetail({ emergency }) {
   return (
     <div data-testid="detail-panel" className="space-y-6">
       <DetailHeader emergency={e} escalatedTo={escalatedTo} />
+      <ReadinessWarning emergency={e} />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-5">

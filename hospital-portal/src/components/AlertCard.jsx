@@ -6,6 +6,8 @@ import { isEarly } from '../services/stateMachine.js';
 import { NOT_SHARED, originText } from '../services/adapters.js';
 import { shouldFlash, showNewBadge } from '../services/alertFlags.js';
 import { elsewhereLabel } from '../services/queueScope.js';
+import { cardWarning } from '../services/capacity.js';
+import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 
@@ -24,6 +26,8 @@ export default function AlertCard({ alert, selected, onSelect }) {
   const { session } = useAuth();
   const { hospitals } = useHospitals();
   const elsewhere = elsewhereLabel(alert, session?.hospital_id, hospitals);
+  const ownHospital = hospitals.find((h) => h.id === String(session?.hospital_id));
+  const warning = !elsewhere && !isFinal(state) ? cardWarning(alert, ownHospital) : null;
   const fromCheckIn = originText(alert);
   const ranking = useRanking(type, location);
   const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
@@ -77,6 +81,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
         {STATE_LABELS[state] || state}
       </div>
+      {warning && <div data-testid="card-warning" className="mt-2 rounded bg-red-50 px-2 py-1 text-sm font-bold text-red-800">Warning: your {warning}</div>}
       {elsewhere && <div data-testid="elsewhere" className="mt-2 text-sm font-semibold text-slate-600">{elsewhere}</div>}
       {fromCheckIn && !early && !cancelled && (
         <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">Safety check-in alert. Simulated.</div>

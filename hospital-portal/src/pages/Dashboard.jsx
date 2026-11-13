@@ -11,6 +11,7 @@ import ConnectionBadge from '../components/ConnectionBadge.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import AvailabilityForm from '../components/AvailabilityForm.jsx';
+import OwnCapacity from '../components/OwnCapacity.jsx';
 
 export default function Dashboard() {
   const { session } = useAuth();
@@ -87,6 +88,8 @@ export default function Dashboard() {
           </>
         )}
       </div>
+
+      <OwnCapacity />
 
       {showAvailability && (
         <div className="border-b border-slate-300 bg-slate-50 px-6 py-4">
