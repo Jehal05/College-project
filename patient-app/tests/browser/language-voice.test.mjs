@@ -27,7 +27,10 @@ for (const code of ['hi', 'gu']) {
   for (const [path, name] of screens) {
     await p.goto(BASE + path); await sleep(1500);
     if (name === 'symptoms') await p.locator('[role=radio]').first().click();
-    const body = await p.innerText('body'); const left = latinWords(body); const raw = body.match(RAW_KEY) || [];
+    const body = await p.innerText('body');
+    // A medicine reminder that is due shows the name and dose note written by the server (data, not app text), so it depends on the time of day: leave it out.
+    const left = latinWords(await p.evaluate("(() => { document.querySelectorAll('[aria-label][role=status]').forEach((e) => { e.style.display = 'none'; }); return document.body.innerText; })()"));
+    const raw = body.match(RAW_KEY) || [];
     check(`L4 [${code}] ${name}: translated, banner, lang attr`, !left.length && !raw.length && body.includes(BANNERS[code]) && (await lang()) === code, [left.slice(0, 8), raw.slice(0, 3)]);
   }
   await p.goto(BASE + '/'); await p.reload(); await sleep(600); check(`L5 [${code}] persists after reload`, (await lang()) === code);
@@ -77,7 +80,7 @@ const cases = [['hi', 'मुझे सीने में दर्द है �
   ['gu', 'મને છાતીમાં દુખાવો છે અને પરસેવો થાય છે', ['છાતીમાં દુખાવો અથવા દબાણ', 'પરસેવો થવો']], ['gu', 'મારા હોઠ ભૂરા છે અને સિસોટી જેવો અવાજ આવે છે', ['હોઠ ભૂરા થવા', 'સિસોટી જેવો અવાજ સાથે શ્વાસ']]];
 for (const [code, spoken, ids] of cases) {
   await api('PATCH', '/patients/PT-2026-0417', tok, { language: code }); await v.goto(BASE + '/symptoms'); await sleep(900);
-  await speak(spoken); const t = await v.innerText('section[aria-label]'); check(`V11 [${code}] "${spoken.slice(0, 12)}..." suggests the right symptoms`, ids.every((i) => t.includes(i)));
+  await speak(spoken); const t = await v.innerText('section[aria-label]:not([role=status])'); check(`V11 [${code}] "${spoken.slice(0, 12)}..." suggests the right symptoms`, ids.every((i) => t.includes(i)));
 }
 const uctx = await phone(browser); await uctx.addInitScript('delete window.SpeechRecognition; delete window.webkitSpeechRecognition;');
 const u = await newPage(uctx); await login(u); await u.goto(BASE + '/symptoms');
