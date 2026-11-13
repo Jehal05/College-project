@@ -20,11 +20,13 @@ import ActionsPanel from './detail/ActionsPanel.jsx';
 import NotesPanel from './NotesPanel.jsx';
 import ReadinessWarning from './detail/ReadinessWarning.jsx';
 import ReadinessCard from './detail/ReadinessCard.jsx';
+import { useT } from '../i18n/index.js';
 
 /** Right-hand panel of the dashboard: patient summary, map, actions and timeline. The parts live in ./detail/. */
 export default function EmergencyDetail({ emergency }) {
   const { session } = useAuth();
   const { hospitals } = useHospitals();
+  const t = useT();
   const e = emergency;
   const ranking = useRanking(e.type, e.location);
   const statuses = ranking ? fallbackStatuses(ranking.ranked, e) : {};
@@ -45,13 +47,13 @@ export default function EmergencyDetail({ emergency }) {
 
           {!hasAmbulance && (
             <div>
-              <h3 className="mb-2 font-semibold">Patient location</h3>
+              <h3 className="mb-2 font-semibold">{t('sec.patientLocation')}</h3>
               <PatientMiniMap location={e.location} />
             </div>
           )}
 
           <div>
-            <h3 className="mb-2 font-semibold">On-call team</h3>
+            <h3 className="mb-2 font-semibold">{t('sec.team')}</h3>
             <TeamAssignment emergency={e} />
           </div>
         </div>
@@ -60,12 +62,12 @@ export default function EmergencyDetail({ emergency }) {
           <ActionsPanel emergency={e} next={next} />
 
           <div>
-            <h3 className="mb-2 font-semibold">Response timeline</h3>
-            <Timeline events={e.status_events} createdAt={e.created_at} />
+            <h3 className="mb-2 font-semibold">{t('sec.timeline')}</h3>
+            <Timeline events={e.status_events} createdAt={e.created_at} t={t} />
           </div>
 
           <div>
-            <h3 className="mb-2 font-semibold">Handover and desk notes</h3>
+            <h3 className="mb-2 font-semibold">{t('sec.notes')}</h3>
             <NotesPanel emergency={e} />
           </div>
         </div>
@@ -74,11 +76,11 @@ export default function EmergencyDetail({ emergency }) {
       {hasAmbulance && (
         <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
           <div>
-            <h3 className="mb-2 text-xl font-bold">Ambulance tracking</h3>
+            <h3 className="mb-2 text-xl font-bold">{t('sec.tracking')}</h3>
             <TrackingMap emergency={e} />
           </div>
           <div>
-            <h3 className="mb-2 text-xl font-bold">Desk and crew chat</h3>
+            <h3 className="mb-2 text-xl font-bold">{t('sec.chat')}</h3>
             <ChatPanel emergencyId={e.emergency_id} role="desk" senderName={session?.name || 'Hospital desk'} />
           </div>
         </div>
@@ -93,17 +95,17 @@ export default function EmergencyDetail({ emergency }) {
       )}
 
       <div>
-        <h3 className="mb-2 text-xl font-bold">Nearby help</h3>
+        <h3 className="mb-2 text-xl font-bold">{t('sec.nearby')}</h3>
         <NearbyHelp emergency={e} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div>
-          <h3 className="mb-2 text-xl font-bold">Pre-arrival checklist</h3>
+          <h3 className="mb-2 text-xl font-bold">{t('sec.checklist')}</h3>
           <Checklist emergency={e} />
         </div>
         <div>
-          <h3 className="mb-2 text-xl font-bold">Hospital ranking and fallback order</h3>
+          <h3 className="mb-2 text-xl font-bold">{t('sec.ranking')}</h3>
           <RankingTable ranking={ranking} statuses={statuses} ownHospitalId={session?.hospital_id} />
         </div>
       </div>

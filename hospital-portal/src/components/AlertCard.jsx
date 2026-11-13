@@ -1,15 +1,17 @@
-import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract.js';
+import { SEVERITY_STYLES, TYPE_LABELS } from '../services/contract.js';
 import { nextHospital } from '../services/escalation.js';
 import { useRanking } from './useRanking.js';
 import EscalationCountdown from './EscalationCountdown.jsx';
 import { isEarly } from '../services/stateMachine.js';
-import { NOT_SHARED, originText } from '../services/adapters.js';
+import { originText } from '../services/adapters.js';
 import { shouldFlash, showNewBadge } from '../services/alertFlags.js';
 import { elsewhereLabel } from '../services/queueScope.js';
 import { cardWarning } from '../services/capacity.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
+import { useT } from '../i18n/index.js';
+import { stateText } from '../i18n/phrases.js';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -22,6 +24,7 @@ export function formatTime(iso) {
 export default function AlertCard({ alert, selected, onSelect }) {
   const { emergency_id, patient_id, type, severity, symptoms, location, created_at, state } = alert;
   const vitals = alert.vitals || {};
+  const t = useT();
   const early = isEarly(state);
   const { session } = useAuth();
   const { hospitals } = useHospitals();
@@ -56,35 +59,35 @@ export default function AlertCard({ alert, selected, onSelect }) {
     >
       <div className="flex items-center justify-between gap-2">
         <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
-          {unread && <span title="Not opened yet" className="h-3.5 w-3.5 shrink-0 rounded-full bg-sky-500" />}
+          {unread && <span title={t('card.notOpened')} className="h-3.5 w-3.5 shrink-0 rounded-full bg-sky-500" />}
           {TYPE_LABELS[type] || type}
-          {isNew && <span data-testid="new-badge" className="rounded bg-sky-600 px-1.5 py-0.5 text-xs font-bold text-white">NEW</span>}
+          {isNew && <span data-testid="new-badge" className="rounded bg-sky-600 px-1.5 py-0.5 text-xs font-bold text-white">{t('card.new')}</span>}
         </span>
         {cancelled ? (
-          <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">CANCELLED</span>
+          <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">{t('card.cancelled')}</span>
         ) : (
           <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${SEVERITY_STYLES[severity] || SEVERITY_STYLES.NONE}`}>{severity}</span>
         )}
       </div>
       <div className="mt-1 text-slate-600">
-        Patient <b>{patient_id ?? NOT_SHARED}</b> · {emergency_id} · {formatTime(created_at)}
+        {t('card.patient')} <b>{patient_id ?? t('common.notShared')}</b> · {emergency_id} · {formatTime(created_at)}
       </div>
-      <div className="mt-2 text-slate-800" data-testid="card-symptoms">{fromCheckIn || (symptoms || []).join(', ') || NOT_SHARED}</div>
+      <div className="mt-2 text-slate-800" data-testid="card-symptoms">{fromCheckIn || (symptoms || []).join(', ') || t('common.notShared')}</div>
       <div className="mt-2 flex flex-wrap gap-x-4 text-slate-600">
         <span>HR {vitals.heart_rate ?? '–'}</span>
         <span>SpO₂ {vitals.spo2 ?? '–'}%</span>
         <span>BP {vitals.bp ?? '–'}</span>
         <span className="ml-auto text-sm text-slate-500">
-          {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : `Location ${NOT_SHARED.toLowerCase()}`}
+          {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : t('card.locationNotShared')}
         </span>
       </div>
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
-        {STATE_LABELS[state] || state}
+        {stateText(t, state)}
       </div>
       {warning && <div data-testid="card-warning" className="mt-2 rounded bg-red-50 px-2 py-1 text-sm font-bold text-red-800">Warning: your {warning}</div>}
       {elsewhere && <div data-testid="elsewhere" className="mt-2 text-sm font-semibold text-slate-600">{elsewhere}</div>}
       {fromCheckIn && !early && !cancelled && (
-        <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">Safety check-in alert. Simulated.</div>
+        <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">{t('card.checkin')}</div>
       )}
       <div className="mt-2 empty:hidden">
         <EscalationCountdown emergency={alert} hasNext={hasNext} />

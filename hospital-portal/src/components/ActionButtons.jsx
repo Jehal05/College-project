@@ -3,6 +3,8 @@ import { ACTIONS, canTransition, whyNot } from '../services/stateMachine.js';
 import { USE_MOCK } from '../services/config.js';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { useAmbulances } from './AmbulanceProvider.jsx';
+import { useT } from '../i18n/index.js';
+import { actionText } from '../i18n/phrases.js';
 
 // With mock data the ambulance simulator sets En route and Arrived by itself, so those two
 // buttons are hidden. With the real backend they stay as a manual fallback.
@@ -15,6 +17,7 @@ const SIMULATOR_DRIVEN = ['EN_ROUTE', 'ARRIVED'];
  */
 export default function ActionButtons({ emergency }) {
   const { act } = useEmergencies();
+  const t = useT();
   const { availableFor, requestTrip } = useAmbulances();
   const [busy, setBusy] = useState(null); // target state being sent
   const [error, setError] = useState('');
@@ -70,7 +73,7 @@ export default function ActionButtons({ emergency }) {
                   : 'cursor-not-allowed bg-slate-200 text-slate-400'
               }`}
             >
-              {sending ? `${action.label}…` : action.label}
+              {sending ? `${actionText(t, action.target, action.label)}…` : actionText(t, action.target, action.label)}
             </button>
           );
         })}
@@ -88,19 +91,18 @@ export default function ActionButtons({ emergency }) {
       {confirming && (
         <div className="fixed inset-0 z-[2000] grid place-items-center bg-black/50 p-6" role="dialog" aria-modal="true">
           <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-2xl font-bold">Dispatch an ambulance?</h3>
+            <h3 className="text-2xl font-bold">{t('dispatch.title')}</h3>
             <p className="mt-2 text-slate-600">
-              Emergency <b>{id}</b>, patient <b>{emergency.patient_id}</b>. This is a simulated dispatch. No real
-              ambulance is contacted.
+              {t('dispatch.emergency')} <b>{id}</b>, {t('dispatch.patientWord')} <b>{emergency.patient_id}</b>. {t('dispatch.simNote')}
             </p>
 
             {available.length === 0 ? (
               <p data-testid="no-units" role="alert" className="mt-4 rounded-xl bg-red-100 p-4 text-lg font-semibold text-red-800">
-                No ambulance is available right now. Every unit is on another emergency. Dispatch is blocked until one is free.
+                {t('dispatch.none')}
               </p>
             ) : (
               <fieldset className="mt-4 space-y-2">
-                <legend className="mb-1 font-semibold">Choose the unit to send (nearest first)</legend>
+                <legend className="mb-1 font-semibold">{t('dispatch.choose')}</legend>
                 {available.map((u, i) => (
                   <label
                     key={u.id}
@@ -111,8 +113,8 @@ export default function ActionButtons({ emergency }) {
                     <input type="radio" name="unit" className="h-6 w-6" checked={unitId === u.id} onChange={() => setUnitId(u.id)} />
                     <span className="flex-1">
                       <span className="text-lg font-bold">{u.call_sign}</span> <span className="text-slate-500">({u.id})</span>
-                      {i === 0 && <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-sm font-semibold text-emerald-800">Nearest</span>}
-                      <span className="block text-sm text-slate-600">Crew: {u.crew?.driver}, {u.crew?.paramedic}</span>
+                      {i === 0 && <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-sm font-semibold text-emerald-800">{t('dispatch.nearest')}</span>}
+                      <span className="block text-sm text-slate-600">{t('dispatch.crew')} {u.crew?.driver}, {u.crew?.paramedic}</span>
                     </span>
                     <span className="text-lg font-semibold tabular-nums">{u.distance_km} km</span>
                   </label>
@@ -122,7 +124,7 @@ export default function ActionButtons({ emergency }) {
 
             <div className="mt-5 flex justify-end gap-3">
               <button onClick={() => setConfirming(null)} className="rounded-lg bg-slate-200 px-5 py-2.5 text-lg font-semibold">
-                Not yet
+                {t('dispatch.no')}
               </button>
               <button
                 data-testid="confirm-dispatch"
@@ -130,7 +132,7 @@ export default function ActionButtons({ emergency }) {
                 onClick={() => run(confirming, { ambulanceId: unitId })}
                 className="rounded-lg bg-red-600 px-5 py-2.5 text-lg font-bold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                Yes, dispatch
+                {t('dispatch.yes')}
               </button>
             </div>
           </div>

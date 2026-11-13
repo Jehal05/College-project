@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { secondsLeft } from '../services/escalation.js';
 import { ESCALATION_SECONDS } from './useRanking.js';
+import { useT } from '../i18n/index.js';
 
 /**
  * "Escalates in 12 s" for an alert nobody has acknowledged yet (feature #43).
@@ -9,6 +10,7 @@ import { ESCALATION_SECONDS } from './useRanking.js';
  */
 export default function EscalationCountdown({ emergency, hasNext = true, large = false }) {
   const [now, setNow] = useState(Date.now());
+  const t = useT();
   const left = secondsLeft(emergency, now, ESCALATION_SECONDS);
   const active = left !== null && hasNext;
 
@@ -23,7 +25,7 @@ export default function EscalationCountdown({ emergency, hasNext = true, large =
   if (!hasNext) {
     return (
       <span data-testid="countdown" data-left="" className={`inline-block rounded-lg bg-slate-200 font-semibold text-slate-700 ${size}`}>
-        Last hospital on the list · no further escalation
+        {t('countdown.last')}
       </span>
     );
   }
@@ -33,7 +35,7 @@ export default function EscalationCountdown({ emergency, hasNext = true, large =
       data-left={left}
       className={`inline-block rounded-lg font-bold tabular-nums ${size} ${left <= 10 ? 'bg-red-600 text-white' : 'bg-amber-200 text-amber-900'}`}
     >
-      {left > 0 ? `Escalates in ${left} s` : 'Escalating to the next hospital…'}
+      {left > 0 ? t('countdown.in', { n: left }) : t('countdown.now')}
     </span>
   );
 }

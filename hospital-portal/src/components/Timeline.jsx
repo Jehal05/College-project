@@ -32,7 +32,13 @@ export function formatDuration(totalSeconds) {
 }
 const clock = (ms) => new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-export default function Timeline({ events = [], createdAt }) {
+//   t         – optional translate function (from useT). Without it every label stays English, so the patient app is unaffected.
+export default function Timeline({ events = [], createdAt, t }) {
+  const L = (key, english, vars) => {
+    if (!t) return english;
+    const v = t(key, vars);
+    return v === key ? english : v;
+  };
   const sorted = [...events]
     .map((e) => ({ ...e, ms: new Date(e.timestamp).getTime() }))
     .filter((e) => !Number.isNaN(e.ms))
@@ -58,11 +64,11 @@ export default function Timeline({ events = [], createdAt }) {
   return (
     <div data-testid="timeline">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
-        <span className="text-sm text-slate-500">{finalEvent ? 'Total time' : 'Time since alert'}</span>
+        <span className="text-sm text-slate-500">{finalEvent ? L('tl.total', 'Total time') : L('tl.timeSince', 'Time since alert')}</span>
         <span data-testid="timeline-counter" className={`text-3xl font-bold tabular-nums ${finalEvent ? 'text-slate-700' : 'text-red-600'}`}>
           {formatDuration(elapsed)}
         </span>
-        {finalEvent && <span className="text-sm font-semibold text-slate-500">(stopped)</span>}
+        {finalEvent && <span className="text-sm font-semibold text-slate-500">{L('tl.stopped', '(stopped)')}</span>}
       </div>
 
       <ol className="space-y-0">
@@ -79,15 +85,15 @@ export default function Timeline({ events = [], createdAt }) {
               <div>
                 <div className={`text-lg font-bold ${text}`}>
                   {isNote(e) && NOTE_KIND_LABELS[e.kind] && <span data-testid="timeline-note-kind" className="mr-2 rounded bg-sky-100 px-1.5 py-0.5 text-sm font-semibold text-sky-900">{NOTE_KIND_LABELS[e.kind]}</span>}
-                  {isNote(e) ? e.note : LABELS[e.state] || e.state}
+                  {isNote(e) ? e.note : L(`tl.${e.state}`, LABELS[e.state] || e.state)}
                 </div>
-                {isNote(e) && e.local_only && <div className="text-sm font-semibold text-amber-800">Saved on this screen only</div>}
+                {isNote(e) && e.local_only && <div className="text-sm font-semibold text-amber-800">{L('tl.localOnly', 'Saved on this screen only')}</div>}
                 <div className="text-slate-600">
-                  {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} since alert
-                  {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} after previous step`}
+                  {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} {L('tl.sinceAlert', 'since alert')}
+                  {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} ${L('tl.afterPrev', 'after previous step')}`}
                 </div>
                 {e.note && !isNote(e) && <div className="font-semibold text-orange-700">{e.note}</div>}
-                {e.actor && <div className="text-sm text-slate-500">By {e.actor}</div>}
+                {e.actor && <div className="text-sm text-slate-500">{L('tl.by', 'By')} {e.actor}</div>}
               </div>
             </li>
           );
@@ -99,8 +105,8 @@ export default function Timeline({ events = [], createdAt }) {
               {i < pending.length - 1 && <span className="w-0.5 flex-1 bg-slate-200" />}
             </div>
             <div>
-              <div className="text-lg font-semibold">{LABELS[state]}</div>
-              <div className="text-sm">Not reached yet</div>
+              <div className="text-lg font-semibold">{L(`tl.${state}`, LABELS[state])}</div>
+              <div className="text-sm">{L('tl.notReached', 'Not reached yet')}</div>
             </div>
           </li>
         ))}
