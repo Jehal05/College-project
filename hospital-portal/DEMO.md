@@ -28,3 +28,12 @@ If something fails on stage: click **Reset demo**, then continue from the next r
 - [ ] Watch it once: text readable, no real names, "Simulated" visible in the top bar.
 - [ ] Export as MP4, name it `healthtwin-hospital-portal-backup.mp4`, copy it to a USB stick and a cloud folder.
 - [ ] Also keep the screenshots of Dashboard, Tracking, Report, Analytics.
+
+## Demo assets in `docs/demo/` (recorded in a sandbox, mock mode)
+Numbered screenshots (`01-login.png` ... ) and `hospital-portal-demo.webm` (about 4 MB) follow the script above: login, three alerts, Heart attack detail, Acknowledge, Dispatch confirm, Handed over, post-event report, History, Activity log, Analytics, Hindi, Gujarati and Reset demo.
+
+**Honest limits of these files**
+- They were recorded in a sandbox with no internet, so the map pictures are **not** included, and in the video any frame with a map (tracking, Map page) shows an empty box: the map styles and tiles did not load there. Record the map parts again on the laptop, with internet, before showing the jury. The screenshots of Map and Tracking are left out on purpose.
+- The recording runs the script faster than a person would talk, with no voice. It is a visual reference, not the final backup video.
+- Everything shown is simulated mock data.
+- The `.webm` plays in Chrome and VLC. The checklist below still asks for an MP4 recorded on the laptop.
