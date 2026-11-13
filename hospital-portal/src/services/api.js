@@ -156,6 +156,8 @@ export async function setChecklistItem(id, itemId, done) {
 // Mock-only helpers for testing without the patient app.
 export const mockEscalate = (id) => mock.escalate(id);
 export const mockPatientCancel = (id) => mock.patientCancel(id);
+export const mockCreateEarlyNotice = (type) => mock.createEmergency(type, true);
+export const mockConfirmSos = (id) => mock.confirmSos(id);
 export const mockCreateEmergency = (type) => mock.createEmergency(type);
 
 // ---------- Ambulances ----------

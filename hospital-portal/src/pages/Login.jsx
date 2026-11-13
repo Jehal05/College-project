@@ -60,7 +60,7 @@ export default function Login() {
           />
         </label>
 
-        {error && <p className="rounded-lg bg-red-100 p-3 font-medium text-red-700">{error}</p>}
+        {error && <p role="alert" data-testid="login-error" className="rounded-lg bg-red-100 p-3 font-medium text-red-700">{error}</p>}
 
         <button
           disabled={busy}
@@ -71,7 +71,7 @@ export default function Login() {
 
         {USE_MOCK && (
           <p className="text-sm text-slate-500">
-            Mock mode demo accounts: <b>staff@demo</b> or <b>admin@demo</b>, password <b>demo123</b>. Jehal's logins also work: <b>staff@demo.test</b> / <b>demo1234</b> and <b>staff1</b> / <b>demo-password</b>.
+            Mock mode demo accounts: <b>staff@demo</b> or <b>admin@demo</b>, password <b>demo123</b>. Jehal&apos;s logins also work: <b>staff@demo.test</b> / <b>demo1234</b> and <b>staff1</b> / <b>demo-password</b>.
           </p>
         )}
       </form>

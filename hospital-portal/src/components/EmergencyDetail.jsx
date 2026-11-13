@@ -3,7 +3,7 @@ import { SEVERITY_STYLES, STATE_LABELS, TYPE_LABELS } from '../services/contract
 import { canCancel, isEarly } from '../services/stateMachine.js';
 import { NOT_SHARED, originText } from '../services/adapters.js';
 import { canEscalate, fallbackStatuses, nextHospital } from '../services/escalation.js';
-import { USE_MOCK, mockPatientCancel, mockEscalate } from '../services/api.js';
+import { USE_MOCK, mockPatientCancel, mockEscalate, mockConfirmSos } from '../services/api.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useRanking } from './useRanking.js';
@@ -165,6 +165,15 @@ export default function EmergencyDetail({ emergency }) {
                 className="mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-4 py-2 font-semibold text-amber-900 hover:bg-amber-100"
               >
                 Mock: patient presses “I’m OK” (cancel)
+              </button>
+            )}
+            {USE_MOCK && isEarly(e.state) && (
+              <button
+                data-testid="mock-confirm-sos"
+                onClick={() => mockConfirmSos(e.emergency_id)}
+                className="mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-4 py-2 font-semibold text-amber-900 hover:bg-amber-100"
+              >
+                Mock: patient confirms the SOS
               </button>
             )}
             {USE_MOCK && canEscalate(e.state) && next && (

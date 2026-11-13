@@ -29,3 +29,58 @@ jobs:
       - run: npm run build
         env:
           VITE_USE_MOCK: 'true'
+
+  # ---- Quality jobs: lint and end-to-end tests ----
+  # They switch on by themselves once these are in hospital-portal/package.json devDependencies:
+  #   eslint (lint job) and @playwright/test (e2e job).
+  # Until then they are skipped (shown as "skipped", not red), so a missing package-lock.json update can never break `npm ci`.
+  # Laptop steps are in hospital-portal/docs/QUALITY_TOOLS.md.
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hospital-portal
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          if grep -q '"eslint"' package.json; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; echo "::notice::Lint skipped: eslint is not in package.json yet (see docs/QUALITY_TOOLS.md)"; fi
+      - if: steps.detect.outputs.enabled == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hospital-portal/package-lock.json
+      - if: steps.detect.outputs.enabled == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.enabled == 'true'
+        run: npm run lint
+
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hospital-portal
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          if grep -q '"@playwright/test"' package.json; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; echo "::notice::E2E skipped: @playwright/test is not in package.json yet (see docs/QUALITY_TOOLS.md)"; fi
+      - if: steps.detect.outputs.enabled == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hospital-portal/package-lock.json
+      - if: steps.detect.outputs.enabled == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.enabled == 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.detect.outputs.enabled == 'true'
+        run: npm run e2e
+      - if: steps.detect.outputs.enabled == 'true' && failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: hospital-portal/playwright-report
+          retention-days: 7

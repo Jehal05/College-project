@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { getScope, setScope, setSelectedId as publishSelected, subscribeUi } from '../services/uiStore.js';
 import { hiddenCount } from '../services/queueScope.js';
-import { USE_MOCK, mockCreateEmergency } from '../services/api.js';
+import { USE_MOCK, mockCreateEmergency, mockCreateEarlyNotice } from '../services/api.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from '../components/AuthProvider.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
@@ -69,12 +69,22 @@ export default function Dashboard() {
           {showAvailability ? 'Hide beds and ICU' : 'Update beds and ICU'}
         </button>
         {USE_MOCK && (
-          <button
-            onClick={() => mockCreateEmergency()}
-            className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-white hover:bg-slate-700"
-          >
-            + Simulate new alert
-          </button>
+          <>
+            <button
+              data-testid="mock-new-alert"
+              onClick={() => mockCreateEmergency()}
+              className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-white hover:bg-slate-700"
+            >
+              + Simulate new alert
+            </button>
+            <button
+              data-testid="mock-early"
+              onClick={() => mockCreateEarlyNotice('HEART')}
+              className="rounded-lg border-2 border-slate-700 px-4 py-2 font-semibold text-slate-800 hover:bg-slate-100"
+            >
+              + Simulate early notice
+            </button>
+          </>
         )}
       </div>
 

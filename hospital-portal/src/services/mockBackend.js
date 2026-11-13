@@ -8,7 +8,7 @@ import rankingConfig from '../data/ranking-config.json';
 import { rankHospitals } from './ranking.js';
 import { canEscalate, lastAlertTime, nextHospital } from './escalation.js';
 import { emitMock } from './socket.js';
-import { canTransition, canCancel, isFinal } from './stateMachine.js';
+import { canTransition, canCancel, isFinal, isEarly } from './stateMachine.js';
 import { EVENT_FOR_STATE } from './contract.js';
 import { MOCK_HOSPITALS_KEY } from './demoReset.js';
 
@@ -300,7 +300,7 @@ const SAMPLES = {
 };
 
 /** Pretend a patient app sent a new SOS (emergency.created). Random type unless one is given. */
-export function createEmergency(type) {
+export function createEmergency(type, early = false) {
   seed();
   const types = Object.keys(SAMPLES);
   const chosen = SAMPLES[type] ? type : types[Math.floor(Math.random() * types.length)];
@@ -317,17 +317,33 @@ export function createEmergency(type) {
     },
   };
   data.alerted_hospital_id = rankFor(data)[0]?.hospital.id || null;
+  // An early notice (patient has not confirmed yet) is quiet until confirmSos().
+  const state = early ? 'EMERGENCY_DETECTED' : 'SOS_SENT';
   records.set(emergency_id, {
     emergency_id,
-    state: 'SOS_SENT',
+    state,
     created_at,
     ...data,
     alerted_ids: [],
     escalation_level: 0,
     checklist: {},
-    status_events: [{ state: 'SOS_SENT', timestamp: created_at, actor: 'Patient app' }],
+    status_events: [{ state, timestamp: created_at, actor: 'Patient app' }],
   });
-  emitMock('emergency.created', { emergency_id, state: 'SOS_SENT', timestamp: created_at, payload: data });
-  scheduleEscalation(emergency_id);
+  emitMock('emergency.created', { emergency_id, state, timestamp: created_at, payload: data });
+  if (!early) scheduleEscalation(emergency_id);
   return emergency_id;
+}
+
+/** Pretend the patient confirmed the SOS after an early notice (emergency.sos_sent). */
+export function confirmSos(id) {
+  seed();
+  const rec = records.get(id);
+  if (!rec) throw new Error(`Emergency ${id} not found`);
+  if (!isEarly(rec.state)) throw new Error(`Already past the early notice: state is ${rec.state}`);
+  const timestamp = new Date().toISOString();
+  rec.state = 'SOS_SENT';
+  rec.status_events.push({ state: 'SOS_SENT', timestamp, actor: 'Patient (simulated)' });
+  emitMock('emergency.sos_sent', { emergency_id: id, state: 'SOS_SENT', timestamp, payload: { actor: 'Patient (simulated)' } });
+  scheduleEscalation(id);
+  return id;
 }
