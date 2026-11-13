@@ -14,9 +14,10 @@ const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 /** Is a required unit usable right now? */
 function isReady(hospital, capability) {
   const a = hospital.availability || {};
+  if (a.ready === false) return false; // the hospital says it is not accepting patients
   if (capability === 'cath_lab') return Boolean(a.cath_lab_ready);
   if (capability === 'stroke_unit') return Boolean(a.stroke_unit_ready);
-  if (capability === 'icu') return (a.icu_free || 0) > 0;
+  if (capability === 'icu') return a.icu_free == null ? a.ready !== false : a.icu_free > 0; // count not shared: trust the open/closed flag
   return true; // emergency department: open if the hospital has one
 }
 
@@ -79,7 +80,7 @@ export function rankHospitals(hospitals, emergencyType, patientLocation, config)
     const why = [
       readiness,
       eta_min === null ? 'travel time unknown' : `${eta_min} min away (simulated)`,
-      `${a.beds_free || 0} beds and ${a.icu_free || 0} ICU beds free`,
+      a.beds_free == null && a.icu_free == null ? 'bed numbers not shared' : `${a.beds_free || 0} beds and ${a.icu_free || 0} ICU beds free`,
     ].join(' · ');
 
     ranked.push({

@@ -19,7 +19,12 @@ function readSaved() {
 
 export async function loadHistory() {
   if (USE_MOCK) return [...sample, ...readSaved()];
-  return api.getHistory();
+  try {
+    return await api.getHistory();
+  } catch (err) {
+    if (!api.isMissingEndpoint(err)) throw err;
+    return []; // no history endpoint yet: the History page shows the live cases only, with a note
+  }
 }
 
 /** Mock mode: remember finished cases so they are still there after a page reload. */

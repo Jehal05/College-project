@@ -1,0 +1,778 @@
+{
+ "_note": "Real output of Jehal's mock server (branch Jehal, mock-server, DEMO_SPEED=1) captured by the integration task. Used by integration.test.js.",
+ "ids": {
+  "heart": "em_001",
+  "fallCancelled": "em_002",
+  "inactivitySos": "em_003"
+ },
+ "events": [
+  {
+   "event": "emergency.created",
+   "type": "emergency.created",
+   "emergency_id": "em_001",
+   "state": "EMERGENCY_DETECTED",
+   "timestamp": "2026-11-13T14:57:21.130Z",
+   "payload": {
+    "type": "HEART",
+    "severity": "EMERGENCY",
+    "symptoms": [
+     "CHEST_PAIN",
+     "SHORT_BREATH",
+     "SWEATING"
+    ],
+    "source": "MANUAL",
+    "reasons": {
+     "severity": "EMERGENCY",
+     "type": "HEART",
+     "matched_rules": [
+      {
+       "id": "HEART_BREATHLESSNESS_WITH_SWEATING",
+       "type": "HEART",
+       "severity": "EMERGENCY",
+       "reason": "Breathlessness together with sweating",
+       "reviewed": false
+      },
+      {
+       "id": "HEART_CHEST_PAIN",
+       "type": "HEART",
+       "severity": "EMERGENCY",
+       "reason": "Chest pain is a red-flag symptom",
+       "reviewed": false
+      },
+      {
+       "id": "HEART_BREATHLESSNESS",
+       "type": "HEART",
+       "severity": "URGENT",
+       "reason": "Breathlessness reported",
+       "reviewed": false
+      },
+      {
+       "id": "ASTHMA_BREATHLESSNESS",
+       "type": "ASTHMA",
+       "severity": "URGENT",
+       "reason": "Breathlessness reported",
+       "reviewed": false
+      },
+      {
+       "id": "HEART_SWEATING",
+       "type": "HEART",
+       "severity": "WATCH",
+       "reason": "Unexplained sweating reported",
+       "reviewed": false
+      }
+     ],
+     "reviewed": false,
+     "inputs": {
+      "symptoms": [
+       "CHEST_PAIN",
+       "SHORT_BREATH",
+       "SWEATING"
+      ],
+      "vitals": {
+       "heart_rate": 73,
+       "spo2": 97,
+       "bp_sys": 120,
+       "bp_dia": 78,
+       "glucose": 103,
+       "resp_rate": 17
+      },
+      "vitals_at": "2026-11-13T14:57:21.130Z"
+     },
+     "simulated": true
+    }
+   }
+  },
+  {
+   "event": "emergency.sos_sent",
+   "type": "emergency.sos_sent",
+   "emergency_id": "em_001",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:21.130Z",
+   "payload": {}
+  },
+  {
+   "event": "emergency.created",
+   "type": "emergency.created",
+   "emergency_id": "em_002",
+   "state": "EMERGENCY_DETECTED",
+   "timestamp": "2026-11-13T14:57:21.458Z",
+   "payload": {
+    "type": "UNKNOWN",
+    "severity": "EMERGENCY",
+    "symptoms": [],
+    "source": "FALL_CHECK",
+    "reasons": {
+     "severity": "NONE",
+     "type": null,
+     "matched_rules": [],
+     "reviewed": false,
+     "inputs": {
+      "symptoms": [],
+      "vitals": {
+       "heart_rate": 76,
+       "spo2": 98,
+       "bp_sys": 118,
+       "bp_dia": 79,
+       "glucose": 106,
+       "resp_rate": 16
+      },
+      "vitals_at": "2026-11-13T14:57:21.457Z"
+     },
+     "simulated": true
+    }
+   }
+  },
+  {
+   "event": "hospital.alerted",
+   "type": "hospital.alerted",
+   "emergency_id": "em_001",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:22.131Z",
+   "payload": {
+    "hospital": {
+     "id": "hosp_001",
+     "name": "Demo Heart Care Hospital",
+     "distance_km": 0
+    }
+   }
+  },
+  {
+   "event": "emergency.cancelled",
+   "type": "emergency.cancelled",
+   "emergency_id": "em_002",
+   "state": "CANCELLED",
+   "timestamp": "2026-11-13T14:57:22.315Z",
+   "payload": {}
+  },
+  {
+   "event": "emergency.created",
+   "type": "emergency.created",
+   "emergency_id": "em_003",
+   "state": "EMERGENCY_DETECTED",
+   "timestamp": "2026-11-13T14:57:22.639Z",
+   "payload": {
+    "type": "UNKNOWN",
+    "severity": "EMERGENCY",
+    "symptoms": [],
+    "source": "INACTIVITY_CHECK",
+    "reasons": {
+     "severity": "NONE",
+     "type": null,
+     "matched_rules": [],
+     "reviewed": false,
+     "inputs": {
+      "symptoms": [],
+      "vitals": {
+       "heart_rate": 73,
+       "spo2": 99,
+       "bp_sys": 122,
+       "bp_dia": 79,
+       "glucose": 102,
+       "resp_rate": 17
+      },
+      "vitals_at": "2026-11-13T14:57:22.639Z"
+     },
+     "simulated": true
+    }
+   }
+  },
+  {
+   "event": "contacts.notified",
+   "type": "contacts.notified",
+   "emergency_id": "em_001",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:23.130Z",
+   "payload": {
+    "contacts": [
+     {
+      "id": "C-1",
+      "name": "Asha Demo",
+      "relation": "Mother"
+     },
+     {
+      "id": "C-2",
+      "name": "Ravi Demo",
+      "relation": "Friend"
+     }
+    ]
+   }
+  },
+  {
+   "event": "emergency.sos_sent",
+   "type": "emergency.sos_sent",
+   "emergency_id": "em_003",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:23.499Z",
+   "payload": {}
+  },
+  {
+   "event": "hospital.alerted",
+   "type": "hospital.alerted",
+   "emergency_id": "em_003",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:24.500Z",
+   "payload": {
+    "hospital": {
+     "id": "hosp_001",
+     "name": "Demo Heart Care Hospital",
+     "distance_km": 0.12
+    }
+   }
+  },
+  {
+   "event": "hospital.acknowledged",
+   "type": "hospital.acknowledged",
+   "emergency_id": "em_001",
+   "state": "HOSPITAL_ACKNOWLEDGED",
+   "timestamp": "2026-11-13T14:57:25.131Z",
+   "payload": {
+    "hospital_id": "hosp_001",
+    "acknowledged_by": "Demo ER desk"
+   }
+  },
+  {
+   "event": "contacts.notified",
+   "type": "contacts.notified",
+   "emergency_id": "em_003",
+   "state": "SOS_SENT",
+   "timestamp": "2026-11-13T14:57:25.500Z",
+   "payload": {
+    "contacts": [
+     {
+      "id": "C-1",
+      "name": "Asha Demo",
+      "relation": "Mother"
+     },
+     {
+      "id": "C-2",
+      "name": "Ravi Demo",
+      "relation": "Friend"
+     }
+    ]
+   }
+  },
+  {
+   "event": "hospital.acknowledged",
+   "type": "hospital.acknowledged",
+   "emergency_id": "em_003",
+   "state": "HOSPITAL_ACKNOWLEDGED",
+   "timestamp": "2026-11-13T14:57:27.500Z",
+   "payload": {
+    "hospital_id": "hosp_001",
+    "acknowledged_by": "Demo ER desk"
+   }
+  },
+  {
+   "event": "ambulance.dispatched",
+   "type": "ambulance.dispatched",
+   "emergency_id": "em_001",
+   "state": "AMBULANCE_DISPATCHED",
+   "timestamp": "2026-11-13T14:57:29.132Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "eta_seconds": 60
+   }
+  },
+  {
+   "event": "ambulance.location",
+   "type": "ambulance.location",
+   "emergency_id": "em_001",
+   "state": "EN_ROUTE",
+   "timestamp": "2026-11-13T14:57:31.131Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "lat": 21.1702,
+    "lng": 72.8311,
+    "eta_seconds": 56
+   }
+  },
+  {
+   "event": "ambulance.dispatched",
+   "type": "ambulance.dispatched",
+   "emergency_id": "em_003",
+   "state": "AMBULANCE_DISPATCHED",
+   "timestamp": "2026-11-13T14:57:31.500Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "eta_seconds": 60
+   }
+  },
+  {
+   "event": "ambulance.location",
+   "type": "ambulance.location",
+   "emergency_id": "em_001",
+   "state": "EN_ROUTE",
+   "timestamp": "2026-11-13T14:57:33.131Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "lat": 21.1702,
+    "lng": 72.8311,
+    "eta_seconds": 53
+   }
+  },
+  {
+   "event": "ambulance.location",
+   "type": "ambulance.location",
+   "emergency_id": "em_003",
+   "state": "EN_ROUTE",
+   "timestamp": "2026-11-13T14:57:33.499Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "lat": 21.1702,
+    "lng": 72.8311,
+    "eta_seconds": 56
+   }
+  },
+  {
+   "event": "ambulance.location",
+   "type": "ambulance.location",
+   "emergency_id": "em_001",
+   "state": "EN_ROUTE",
+   "timestamp": "2026-11-13T14:57:35.131Z",
+   "payload": {
+    "ambulance_id": "amb_001",
+    "lat": 21.1702,
+    "lng": 72.8311,
+    "eta_seconds": 49
+   }
+  }
+ ],
+ "details": {
+  "em_001": {
+   "id": "em_001",
+   "patient_id": "pat_001",
+   "type": "HEART",
+   "symptoms": [
+    "CHEST_PAIN",
+    "SHORT_BREATH",
+    "SWEATING"
+   ],
+   "consents": {
+    "location": true,
+    "history": true,
+    "vitals": true,
+    "reports": true
+   },
+   "location": {
+    "lat": 21.1702,
+    "lng": 72.8311,
+    "accuracy": 50,
+    "source": "demo"
+   },
+   "source": "MANUAL",
+   "reasons": {
+    "severity": "EMERGENCY",
+    "type": "HEART",
+    "matched_rules": [
+     {
+      "id": "HEART_BREATHLESSNESS_WITH_SWEATING",
+      "type": "HEART",
+      "severity": "EMERGENCY",
+      "reason": "Breathlessness together with sweating",
+      "reviewed": false
+     },
+     {
+      "id": "HEART_CHEST_PAIN",
+      "type": "HEART",
+      "severity": "EMERGENCY",
+      "reason": "Chest pain is a red-flag symptom",
+      "reviewed": false
+     },
+     {
+      "id": "HEART_BREATHLESSNESS",
+      "type": "HEART",
+      "severity": "URGENT",
+      "reason": "Breathlessness reported",
+      "reviewed": false
+     },
+     {
+      "id": "ASTHMA_BREATHLESSNESS",
+      "type": "ASTHMA",
+      "severity": "URGENT",
+      "reason": "Breathlessness reported",
+      "reviewed": false
+     },
+     {
+      "id": "HEART_SWEATING",
+      "type": "HEART",
+      "severity": "WATCH",
+      "reason": "Unexplained sweating reported",
+      "reviewed": false
+     }
+    ],
+    "reviewed": false,
+    "inputs": {
+     "symptoms": [
+      "CHEST_PAIN",
+      "SHORT_BREATH",
+      "SWEATING"
+     ],
+     "vitals": {
+      "heart_rate": 73,
+      "spo2": 97,
+      "bp_sys": 120,
+      "bp_dia": 78,
+      "glucose": 103,
+      "resp_rate": 17
+     },
+     "vitals_at": "2026-11-13T14:57:21.130Z"
+    },
+    "simulated": true
+   },
+   "vitals_at_alert": {
+    "heart_rate": 73,
+    "spo2": 97,
+    "bp_sys": 120,
+    "bp_dia": 78,
+    "glucose": 103,
+    "resp_rate": 17,
+    "timestamp": "2026-11-13T14:57:21.130Z"
+   },
+   "state": "EN_ROUTE",
+   "severity": "EMERGENCY",
+   "hospital": {
+    "id": "hosp_001",
+    "name": "Demo Heart Care Hospital",
+    "distance_km": 0
+   },
+   "ambulance": {
+    "id": "amb_001"
+   },
+   "eta_seconds": 23,
+   "status_events": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:21.130Z"
+    },
+    {
+     "state": "SOS_SENT",
+     "timestamp": "2026-11-13T14:57:21.130Z"
+    },
+    {
+     "state": "HOSPITAL_ACKNOWLEDGED",
+     "timestamp": "2026-11-13T14:57:25.131Z"
+    },
+    {
+     "state": "AMBULANCE_DISPATCHED",
+     "timestamp": "2026-11-13T14:57:29.132Z"
+    },
+    {
+     "state": "EN_ROUTE",
+     "timestamp": "2026-11-13T14:57:31.131Z"
+    }
+   ],
+   "contacts_notified": [
+    {
+     "id": "C-1",
+     "name": "Asha Demo",
+     "relation": "Mother"
+    },
+    {
+     "id": "C-2",
+     "name": "Ravi Demo",
+     "relation": "Friend"
+    }
+   ],
+   "simulated": true,
+   "timeline": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:21.130Z",
+     "actor": "system",
+     "seconds_since_start": 0
+    },
+    {
+     "state": "SOS_SENT",
+     "timestamp": "2026-11-13T14:57:21.130Z",
+     "actor": "system",
+     "seconds_since_start": 0
+    },
+    {
+     "state": "HOSPITAL_ACKNOWLEDGED",
+     "timestamp": "2026-11-13T14:57:25.131Z",
+     "actor": "system",
+     "seconds_since_start": 4
+    },
+    {
+     "state": "AMBULANCE_DISPATCHED",
+     "timestamp": "2026-11-13T14:57:29.132Z",
+     "actor": "system",
+     "seconds_since_start": 8
+    },
+    {
+     "state": "EN_ROUTE",
+     "timestamp": "2026-11-13T14:57:31.131Z",
+     "actor": "system",
+     "seconds_since_start": 10
+    }
+   ]
+  },
+  "em_002": {
+   "id": "em_002",
+   "patient_id": "pat_001",
+   "type": "UNKNOWN",
+   "symptoms": [],
+   "consents": {
+    "location": true,
+    "history": true,
+    "vitals": true,
+    "reports": true
+   },
+   "location": null,
+   "source": "FALL_CHECK",
+   "reasons": {
+    "severity": "NONE",
+    "type": null,
+    "matched_rules": [],
+    "reviewed": false,
+    "inputs": {
+     "symptoms": [],
+     "vitals": {
+      "heart_rate": 76,
+      "spo2": 98,
+      "bp_sys": 118,
+      "bp_dia": 79,
+      "glucose": 106,
+      "resp_rate": 16
+     },
+     "vitals_at": "2026-11-13T14:57:21.457Z"
+    },
+    "simulated": true
+   },
+   "vitals_at_alert": {
+    "heart_rate": 76,
+    "spo2": 98,
+    "bp_sys": 118,
+    "bp_dia": 79,
+    "glucose": 106,
+    "resp_rate": 16,
+    "timestamp": "2026-11-13T14:57:21.457Z"
+   },
+   "state": "CANCELLED",
+   "severity": "EMERGENCY",
+   "hospital": null,
+   "ambulance": null,
+   "eta_seconds": null,
+   "status_events": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:21.458Z"
+    },
+    {
+     "state": "CANCELLED",
+     "timestamp": "2026-11-13T14:57:22.315Z"
+    }
+   ],
+   "simulated": true,
+   "timeline": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:21.458Z",
+     "actor": "system",
+     "seconds_since_start": 0
+    },
+    {
+     "state": "CANCELLED",
+     "timestamp": "2026-11-13T14:57:22.315Z",
+     "actor": "system",
+     "seconds_since_start": 1
+    }
+   ]
+  },
+  "em_003": {
+   "id": "em_003",
+   "patient_id": "pat_001",
+   "type": "UNKNOWN",
+   "symptoms": [],
+   "consents": {
+    "location": true,
+    "history": true,
+    "vitals": true,
+    "reports": true
+   },
+   "location": {
+    "lat": 21.17,
+    "lng": 72.83,
+    "accuracy": 30,
+    "source": "gps"
+   },
+   "source": "INACTIVITY_CHECK",
+   "reasons": {
+    "severity": "NONE",
+    "type": null,
+    "matched_rules": [],
+    "reviewed": false,
+    "inputs": {
+     "symptoms": [],
+     "vitals": {
+      "heart_rate": 73,
+      "spo2": 99,
+      "bp_sys": 122,
+      "bp_dia": 79,
+      "glucose": 102,
+      "resp_rate": 17
+     },
+     "vitals_at": "2026-11-13T14:57:22.639Z"
+    },
+    "simulated": true
+   },
+   "vitals_at_alert": {
+    "heart_rate": 73,
+    "spo2": 99,
+    "bp_sys": 122,
+    "bp_dia": 79,
+    "glucose": 102,
+    "resp_rate": 17,
+    "timestamp": "2026-11-13T14:57:22.639Z"
+   },
+   "state": "EN_ROUTE",
+   "severity": "EMERGENCY",
+   "hospital": {
+    "id": "hosp_001",
+    "name": "Demo Heart Care Hospital",
+    "distance_km": 0.12
+   },
+   "ambulance": {
+    "id": "amb_001"
+   },
+   "eta_seconds": 26,
+   "status_events": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:22.639Z"
+    },
+    {
+     "state": "SOS_SENT",
+     "timestamp": "2026-11-13T14:57:23.499Z"
+    },
+    {
+     "state": "HOSPITAL_ACKNOWLEDGED",
+     "timestamp": "2026-11-13T14:57:27.500Z"
+    },
+    {
+     "state": "AMBULANCE_DISPATCHED",
+     "timestamp": "2026-11-13T14:57:31.500Z"
+    },
+    {
+     "state": "EN_ROUTE",
+     "timestamp": "2026-11-13T14:57:33.499Z"
+    }
+   ],
+   "contacts_notified": [
+    {
+     "id": "C-1",
+     "name": "Asha Demo",
+     "relation": "Mother"
+    },
+    {
+     "id": "C-2",
+     "name": "Ravi Demo",
+     "relation": "Friend"
+    }
+   ],
+   "simulated": true,
+   "timeline": [
+    {
+     "state": "EMERGENCY_DETECTED",
+     "timestamp": "2026-11-13T14:57:22.639Z",
+     "actor": "system",
+     "seconds_since_start": 0
+    },
+    {
+     "state": "SOS_SENT",
+     "timestamp": "2026-11-13T14:57:23.499Z",
+     "actor": "system",
+     "seconds_since_start": 1
+    },
+    {
+     "state": "HOSPITAL_ACKNOWLEDGED",
+     "timestamp": "2026-11-13T14:57:27.500Z",
+     "actor": "system",
+     "seconds_since_start": 5
+    },
+    {
+     "state": "AMBULANCE_DISPATCHED",
+     "timestamp": "2026-11-13T14:57:31.500Z",
+     "actor": "system",
+     "seconds_since_start": 9
+    },
+    {
+     "state": "EN_ROUTE",
+     "timestamp": "2026-11-13T14:57:33.499Z",
+     "actor": "system",
+     "seconds_since_start": 11
+    }
+   ]
+  }
+ },
+ "hospitals": [
+  {
+   "id": "hosp_001",
+   "name": "Demo Heart Care Hospital",
+   "lat": 21.1702,
+   "lng": 72.8311,
+   "capabilities": [
+    "CARDIAC_CATH_LAB",
+    "ICU",
+    "EMERGENCY"
+   ],
+   "available": true,
+   "verified": true,
+   "distance_km": 0
+  },
+  {
+   "id": "hosp_003",
+   "name": "Demo General Hospital",
+   "lat": 21.185,
+   "lng": 72.812,
+   "capabilities": [
+    "EMERGENCY",
+    "ICU"
+   ],
+   "available": true,
+   "verified": true,
+   "distance_km": 2.57
+  },
+  {
+   "id": "hosp_002",
+   "name": "Demo City Stroke and Neuro Centre",
+   "lat": 21.1959,
+   "lng": 72.8302,
+   "capabilities": [
+    "STROKE_UNIT",
+    "CT_SCAN",
+    "ICU",
+    "EMERGENCY"
+   ],
+   "available": true,
+   "verified": true,
+   "distance_km": 2.86
+  },
+  {
+   "id": "hosp_004",
+   "name": "Demo Chest and Respiratory Institute",
+   "lat": 21.15,
+   "lng": 72.85,
+   "capabilities": [
+    "PULMONOLOGY",
+    "ICU",
+    "EMERGENCY"
+   ],
+   "available": false,
+   "verified": true,
+   "distance_km": 2.98
+  },
+  {
+   "id": "hosp_005",
+   "name": "Demo Community Health Centre",
+   "lat": 21.21,
+   "lng": 72.865,
+   "capabilities": [
+    "EMERGENCY"
+   ],
+   "available": true,
+   "verified": false,
+   "distance_km": 5.65
+  }
+ ]
+}

@@ -3,6 +3,7 @@
 // In mock mode no connection is opened; services/mockBackend.js calls emitMock() instead.
 import { USE_MOCK, WS_URL } from './config.js';
 import { WS_EVENTS, PROPOSED_EVENTS } from './contract.js';
+import { normaliseEvent } from './adapters.js';
 
 let ws = null;
 let reconnectTimer = null;
@@ -23,7 +24,9 @@ export function onStatus(callback) {
   return () => statusListeners.delete(callback);
 }
 
-function deliver(message) {
+function deliver(raw) {
+  const message = normaliseEvent(raw); // one adapter for every shape (services/adapters.js)
+  if (!message) return;
   handlers.get(message.event)?.forEach((cb) => cb(message));
   handlers.get('*')?.forEach((cb) => cb(message));
 }

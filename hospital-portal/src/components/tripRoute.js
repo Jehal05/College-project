@@ -2,6 +2,7 @@
 // The trip runner and the tracking map both use this, so they always draw the same path.
 import { buildPath, cumulativeKm } from '../sim/ambulance-route.js';
 import { DEMO_LOCATION } from '../services/geo.js';
+import { originFor } from '../services/adapters.js';
 
 /**
  * @param emergency  needs ambulance_id, location, alerted_hospital_id
@@ -15,7 +16,7 @@ export function routeForEmergency(emergency, units, hospitals, fallbackHospitalI
   const hospital =
     hospitals.find((h) => h.id === emergency?.alerted_hospital_id) || hospitals.find((h) => h.id === fallbackHospitalId) || hospitals[0];
   if (!ambulance || !hospital) return null;
-  const patient = emergency.location?.lat != null ? emergency.location : DEMO_LOCATION;
+  const patient = originFor(emergency, hospitals) || DEMO_LOCATION; // patient's location, else the middle of the hospitals
   const start = ambulance.base || ambulance; // base position, not the live one
   const { points, pickupIndex } = buildPath(start, patient, hospital);
   const cumulative = cumulativeKm(points);

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet';
 import L from 'leaflet';
+import { USE_MOCK } from '../services/config.js';
+import { originFor } from '../services/adapters.js';
 import { DEMO_LOCATION, ASSUMED_SPEED_KMH, withDistance } from '../services/geo.js';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import { useRanking } from '../components/useRanking.js';
@@ -44,18 +46,20 @@ export default function MapPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [showAed, setShowAed] = useState(false);
   const [showResponders, setShowResponders] = useState(false);
+  // Mock mode keeps the sample patient. With a real backend the map starts from the middle of the hospitals, not a fixed city.
+  const origin = useMemo(() => (USE_MOCK ? DEMO_LOCATION : { ...(originFor(null, stored) || DEMO_LOCATION), label: 'Middle of the hospitals (no patient selected)' }), [stored]);
 
   // Distance and capability match are worked out here, so colours and details change at once.
   const hospitals = useMemo(
-    () => withDistance(stored, DEMO_LOCATION).map((h) => ({ ...h, capability_match: type ? hasCapabilities(h, type) : null })),
-    [stored, type],
+    () => withDistance(stored, origin).map((h) => ({ ...h, capability_match: type ? hasCapabilities(h, type) : null })),
+    [stored, type, origin],
   );
-  const ranking = useRanking(type, DEMO_LOCATION);
+  const ranking = useRanking(type, origin);
   const topId = ranking?.ranked[0]?.hospital.id || null;
   const selected = hospitals.find((h) => h.id === selectedId) || null;
-  const aedList = useMemo(() => withDistanceFrom(aedData, DEMO_LOCATION), []);
-  const nearAed = useMemo(() => nearestAeds(aedData, DEMO_LOCATION, 1)[0], []);
-  const nearResponders = useMemo(() => respondersNear(responderData, DEMO_LOCATION), []);
+  const aedList = useMemo(() => withDistanceFrom(aedData, origin), [origin]);
+  const nearAed = useMemo(() => nearestAeds(aedData, origin, 1)[0], [origin]);
+  const nearResponders = useMemo(() => respondersNear(responderData, origin), [origin]);
   const byDistance = useMemo(() => [...hospitals].sort((a, b) => a.distance_km - b.distance_km), [hospitals]);
 
   return (
@@ -95,16 +99,16 @@ export default function MapPage() {
               Loading hospitals…
             </div>
           )}
-          <MapContainer center={[DEMO_LOCATION.lat, DEMO_LOCATION.lng]} zoom={12} className="h-full w-full">
+          <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={12} className="h-full w-full">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <Marker position={[DEMO_LOCATION.lat, DEMO_LOCATION.lng]} icon={patientIcon}>
-              <Tooltip direction="top" offset={[0, -12]}>{DEMO_LOCATION.label} (simulated)</Tooltip>
+            <Marker position={[origin.lat, origin.lng]} icon={patientIcon}>
+              <Tooltip direction="top" offset={[0, -12]}>{origin.label} (simulated)</Tooltip>
             </Marker>
             <Circle
-              center={[DEMO_LOCATION.lat, DEMO_LOCATION.lng]}
+              center={[origin.lat, origin.lng]}
               radius={5000}
               pathOptions={{ color: '#dc2626', weight: 1, fillOpacity: 0.04 }}
             />

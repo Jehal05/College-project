@@ -40,7 +40,8 @@ export default function ActionButtons({ emergency }) {
     setError('');
     setBusy(action.target);
     try {
-      await act(id, action.target, options);
+      const result = await act(id, action.target, options);
+      if (result?.local_only) setError(`${action.label} was applied on this screen only: the backend has no endpoint for it yet.`);
       // The portal that dispatches also runs the simulated trip.
       if (action.target === 'AMBULANCE_DISPATCHED') setTimeout(() => startTrip(id), 0);
     } catch (err) {

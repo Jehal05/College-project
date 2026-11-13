@@ -12,6 +12,7 @@ import { createRouteSimulator } from '../sim/ambulance-route.js';
 import { totalFactor } from '../services/traffic.js';
 import { isFinal } from '../services/stateMachine.js';
 import { haversineKm, DEMO_LOCATION } from '../services/geo.js';
+import { originFor, placeSampleFleet } from '../services/adapters.js';
 import { routeForEmergency } from './tripRoute.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
@@ -25,7 +26,8 @@ export function AmbulanceProvider({ children }) {
   const { isLoggedIn, session } = useAuth();
   const { emergencies, act, addNote } = useEmergencies();
   const { hospitals } = useHospitals();
-  const [units, setUnits] = useState([]);
+  const [rawUnits, setUnits] = useState([]);
+  const units = useMemo(() => placeSampleFleet(rawUnits, hospitals), [rawUnits, hospitals]);
   const [error, setError] = useState('');
   const [traffic, setTraffic] = useState('auto'); // auto | light | moderate | heavy
   const [trips, setTrips] = useState({}); // emergency_id -> 'running' | 'paused'
@@ -49,7 +51,7 @@ export function AmbulanceProvider({ children }) {
       .getAmbulances()
       .then((list) => {
         setUnits(list);
-        setError('');
+        setError(list.some((u) => u.sample) ? 'The backend has no ambulance list yet, so a sample fleet is shown (not real units).' : '');
       })
       .catch((err) => setError(`Could not load ambulances (${err.message}).`));
   }, [isLoggedIn, stopAll]);
@@ -69,13 +71,13 @@ export function AmbulanceProvider({ children }) {
   /** Available units, nearest to the patient first (each with distance_km). */
   const availableFor = useCallback(
     (emergency) => {
-      const patient = emergency?.location?.lat != null ? emergency.location : DEMO_LOCATION;
+      const patient = originFor(emergency, hospitals) || DEMO_LOCATION;
       return ambulances
         .filter((a) => a.status === 'available')
         .map((a) => ({ ...a, distance_km: Math.round(haversineKm(a, patient) * 10) / 10 }))
         .sort((a, b) => a.distance_km - b.distance_km || a.id.localeCompare(b.id));
     },
-    [ambulances],
+    [ambulances, hospitals],
   );
 
   const stopTrip = useCallback((id) => {
