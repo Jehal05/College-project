@@ -10,6 +10,7 @@ import Analytics from './pages/Analytics.jsx';
 import Admin from './pages/Admin.jsx';
 import Crew from './pages/Crew.jsx';
 import History from './pages/History.jsx';
+import Activity from './pages/Activity.jsx';
 import Report from './pages/Report.jsx';
 
 function Shell({ children }) {
@@ -61,6 +62,10 @@ export default function App() {
       <Route
         path="/report/:emergencyId"
         element={<ProtectedRoute roles={staff}><Shell><Report /></Shell></ProtectedRoute>}
+      />
+      <Route
+        path="/activity"
+        element={<ProtectedRoute roles={staff}><Shell><Activity /></Shell></ProtectedRoute>}
       />
       <Route
         path="/analytics"

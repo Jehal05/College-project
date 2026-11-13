@@ -228,5 +228,19 @@ export async function getPassport(patientId) {
   return request('GET', `/passport/${encodeURIComponent(patientId)}`);
 }
 
+/**
+ * Server audit log (C4), admin only. GET /audit?page&page_size. Newest first.
+ * Mock mode has no audit log: it says so, like a backend without the endpoint.
+ */
+export async function getAudit({ page = 1, pageSize = 50 } = {}) {
+  if (USE_MOCK) {
+    const err = new Error('The mock has no audit log.');
+    err.status = 404;
+    err.missing = true;
+    throw err;
+  }
+  return request('GET', `/audit?page=${page}&page_size=${pageSize}`);
+}
+
 export const mockCrewReply = (id) => mock.crewReply(id);
 export const CANNED_CREW_REPLIES = mock.CANNED_CREW_REPLIES;

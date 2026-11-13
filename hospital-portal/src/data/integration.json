@@ -129,6 +129,13 @@
       "used_for": "Open passport button on the readiness card (once per click, staff login)",
       "status": "agreed",
       "fallback": "Plain message: login expired (401), not allowed (403), no passport found (404). Nothing else on the screen changes."
+    },
+    {
+      "method": "GET",
+      "path": "/audit?page&page_size",
+      "used_for": "Admin-only server audit log section on the Activity page",
+      "status": "agreed",
+      "fallback": "Message: The backend has no audit log yet. (404/405/501), or Only an admin can read it (403). The staff activity list on this screen is unaffected."
     }
   ],
   "events": [

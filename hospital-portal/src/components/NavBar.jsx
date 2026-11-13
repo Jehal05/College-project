@@ -11,6 +11,7 @@ const links = [
   { to: '/map', label: 'Map' },
   { to: '/fleet', label: 'Fleet' },
   { to: '/history', label: 'History' },
+  { to: '/activity', label: 'Activity' },
   { to: '/analytics', label: 'Analytics' },
   { to: '/admin', label: 'Admin', adminOnly: true },
 ];
