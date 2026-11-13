@@ -43,5 +43,5 @@ Copy this table, fill it in with real numbers from your own run, and commit it.
 
 | Date | Command | Result (counts by severity) | Action taken |
 |---|---|---|---|
-| | `npm audit --omit=dev` | | |
-| | `npm audit` | | |
+| 2026-11-13 | `npm audit --omit=dev` | 2 moderate, both `react-router` / `react-router-dom` 6.x (open redirect via backslash in `Link`/`useNavigate`; SSR hydration issue). Only fix offered: major upgrade to v7. | Upgraded to `react-router-dom` 7 (tested first on a separate branch). |
+| 2026-11-13 | `npm audit` | Same 2 moderate before the upgrade. After the upgrade: **0 vulnerabilities**. | Checked after the upgrade: build ok, 269 unit tests, lint 0 errors (9 warnings), 8 of 8 e2e tests. `--force` was not used. |
