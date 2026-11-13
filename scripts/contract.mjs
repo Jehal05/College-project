@@ -207,17 +207,17 @@ await test('Phase 7: created event at SOS (patient, location, vitals gated by co
   const active = await call('GET', '/emergencies?status=active'); expectStatus(active, 200); if (!Array.isArray(active.json)) fail('GET /emergencies?status=active should be an array');
   const amb = await call('GET', '/ambulances'); expectStatus(amb, 200); expectShape(amb.json[0], { id: 'string', call_sign: 'string', lat: 'number', lng: 'number', status: 'string' }, 'ambulances[0]');
 });
-await test('hospital steps: 403 for a patient token, 409 for an invalid move, staff can acknowledge (ack, dispatch, status)', async () => {
+await test('hospital steps: 403 for a patient token, 409 for an invalid move (state does not allow it), 400 for an unknown ambulance', async () => {
+  // Deliberately NOT sent to SOS: the state stays EMERGENCY_DETECTED, so the answers do not depend on the demo speed.
   const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN'] } }); expectStatus(made, 201);
-  await call('POST', '/emergencies/' + made.json.id + '/sos', { body: { location: { lat: 23.0225, lng: 72.5714 } } });
   for (const [path, body] of [['/ack', {}], ['/dispatch', { ambulance_id: 'AMB-AMD-02' }], ['/status', { state: 'ARRIVED' }]]) expectStatus(await call('POST', '/emergencies/' + made.json.id + path, { body }), 403);
   const patientToken = token;
   const login = await call('POST', '/auth/login', { auth: false, body: { email: 'staff@demo.test', password: PASSWORD } }); expectStatus(login, 200); token = login.json.token;
   try {
-    const bad = await call('POST', '/emergencies/' + made.json.id + '/status', { body: { state: 'HANDOVER_DONE' } }); expectStatus(bad, 409);
-    if (bad.json.detail !== 'Invalid transition' || bad.json.from !== 'SOS_SENT' || bad.json.to !== 'HANDOVER_DONE') fail('409 body should be { detail: "Invalid transition", from, to }, got ' + bad.text);
+    const bad = await call('POST', '/emergencies/' + made.json.id + '/status', { body: { state: 'ARRIVED' } }); expectStatus(bad, 409);
+    if (bad.json.detail !== 'Invalid transition' || bad.json.error !== 'Invalid transition' || bad.json.from !== 'EMERGENCY_DETECTED' || bad.json.to !== 'ARRIVED') fail('409 body should be { error, detail: "Invalid transition", from, to }, got ' + bad.text);
+    expectStatus(await call('POST', '/emergencies/' + made.json.id + '/ack', { body: {} }), 409);
     expectStatus(await call('POST', '/emergencies/' + made.json.id + '/dispatch', { body: { ambulance_id: 'nope' } }), 400);
-    expectStatus(await call('POST', '/emergencies/' + made.json.id + '/ack', { body: {} }), 200);
   } finally { token = patientToken; await call('POST', '/emergencies/' + made.json.id + '/cancel'); }
 });
 await test('portal logins: staff@demo / demo123 gives role "staff" and a hospital_id', async () => {
