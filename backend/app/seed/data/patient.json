@@ -1,0 +1,43 @@
+{
+  "id": "PT-2026-0417",
+  "name": "Rahul Mehta",
+  "age": 54,
+  "sex": "M",
+  "blood_group": "B+",
+  "blood_group_verified": false,
+  "allergies": [
+    "Penicillin"
+  ],
+  "conditions": [
+    "Hypertension",
+    "Type 2 Diabetes"
+  ],
+  "medications": [
+    "Amlodipine",
+    "Metformin",
+    "Aspirin"
+  ],
+  "language": "en",
+  "contacts": [
+    {
+      "id": "C-1",
+      "name": "Sunita Mehta",
+      "relation": "Mother",
+      "phone": "+91 00000 00001",
+      "is_primary": true
+    },
+    {
+      "id": "C-2",
+      "name": "Karan Mehta",
+      "relation": "Friend",
+      "phone": "+91 00000 00002",
+      "is_primary": false
+    }
+  ],
+  "consents": {
+    "location": true,
+    "history": true,
+    "vitals": true,
+    "reports": true
+  }
+}
