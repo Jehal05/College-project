@@ -59,17 +59,26 @@ def test_the_alert_moves_to_the_next_ranked_hospital_after_the_timeout(demo, eng
     assert seen[1]["audience"] == "hospitals" and seen[1]["payload"]["hospital"]["rank"] == 2
 
 
-def test_it_keeps_going_until_the_ranking_is_used_up_and_then_stops(demo, engine):
+def test_it_keeps_going_through_the_suitable_hospitals_only_and_then_stops(demo, engine):
+    """Found on the laptop (14 Nov): a heart attack was escalated to a hospital without a cath lab."""
+    from app.models.hospitals import Hospital
+    from app.services import hospital_match
     eid = sent(demo)
     with Session(engine) as s:
-        count = len(s.get(Emergency, eid).engine_result["sos"]["ranking"])
+        e = s.get(Emergency, eid)
+        suitable = [h for h in e.engine_result["sos"]["ranking"]
+                    if hospital_match.is_suitable(s.get(Hospital, h), e.type)]
+        count = len(e.engine_result["sos"]["ranking"])
+    assert 1 < len(suitable) < count                        # the demo data has both kinds
     moves = 0
     for step in range(count + 3):
         with Session(engine) as s:
             moves += len(escalation.run_once(s, later(31 * (step + 1))))
-    assert moves == count - 1
+    assert moves == len(suitable) - 1
     with Session(engine) as s:
         assert s.get(Emergency, eid).state == "SOS_SENT"
+        alerted = [a.hospital_id for a in s.query(HospitalAlert).filter(HospitalAlert.emergency_id == eid)]
+        assert all(hospital_match.is_suitable(s.get(Hospital, h), s.get(Emergency, eid).type) for h in alerted[1:])
 
 
 def test_an_acknowledged_alert_is_not_escalated(demo, engine):

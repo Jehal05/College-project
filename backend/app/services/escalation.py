@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models.emergencies import Emergency, HospitalAlert
 from app.models.enums import EmergencyState
 from app.models.hospitals import Hospital
+from app.services import hospital_match
 from app.services import emergencies as emergency_svc
 from app.services import emergency_state, events
 
@@ -50,7 +51,9 @@ def escalate(session: Session, emergency: Emergency) -> bool:
     hospital = None
     for candidate_id in ranking:                    # the next one that was not alerted yet and is still verified
         candidate = session.get(Hospital, candidate_id) if candidate_id not in already else None
-        if candidate is not None and candidate.verified:
+        # Verified AND able to treat this emergency type: a heart attack is never escalated to a hospital without a
+        # cath lab (the portal rules such hospitals out too). The ranking keeps them last as a fallback for the first alert only.
+        if candidate is not None and candidate.verified and hospital_match.is_suitable(candidate, emergency.type):
             hospital = candidate
             break
     if current is None or hospital is None:
