@@ -201,3 +201,20 @@ test.describe('presentation mode', () => {
     expect(await size()).toBe(normal);
   });
 });
+
+test.describe('CSV export', () => {
+  test('the case history downloads a CSV of the cases on screen, and the report a timeline CSV', async ({ page }) => {
+    await login(page);
+    await page.goto('/history');
+    await expect(page.locator('[data-testid=history-row]').first()).toBeVisible();
+    const [download] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid=history-csv]')]);
+    expect(download.suggestedFilename()).toMatch(/^case-history-\d{4}-\d{2}-\d{2}\.csv$/);
+    const rows = await page.locator('[data-testid=history-row]').count();
+    const text = await (await import('node:fs/promises')).readFile(await download.path(), 'utf8');
+    expect(text.split('\r\n').filter(Boolean).length).toBe(rows + 1); // header + one row per case on screen
+    expect(text.startsWith('﻿Case ID,Patient ID')).toBe(true);
+    await page.click('[data-testid=open-report]');
+    const [d2] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid=report-csv]')]);
+    expect(d2.suggestedFilename()).toMatch(/^post-event-timeline-.*\.csv$/);
+  });
+});

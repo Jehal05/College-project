@@ -9,6 +9,8 @@ import { USE_MOCK } from '../services/config.js';
 import { savedCount, clearSaved } from '../services/historyStore.js';
 import { MAX_SAVED } from '../services/historyCap.js';
 import { stepDurations } from '../services/analytics.js';
+import { casesToCsv } from '../services/csv.js';
+import { downloadText } from '../services/download.js';
 import { isFinal } from '../services/stateMachine.js';
 import { formatSeconds } from '../services/report.js';
 import { EMERGENCY_TYPES, SEVERITY, TYPE_LABELS, SEVERITY_STYLES } from '../services/contract.js';
@@ -35,6 +37,7 @@ export default function History() {
         <h1 className="text-3xl font-bold">{t('hist.title')}</h1>
         <SimulatedBadge text={t('hist.badge')} />
         <span data-testid="history-count" className="ml-auto text-xl font-semibold">{t('hist.count', { n: rows.length, total: cases.length })}</span>
+        <button data-testid="history-csv" disabled={rows.length === 0} title={t('hist.csvNote', { n: rows.length })} onClick={() => downloadText(`case-history-${new Date().toISOString().slice(0, 10)}.csv`, casesToCsv(rows, hospitalName), 'text/csv;charset=utf-8')} className="rounded-lg bg-slate-800 px-4 py-2 font-bold text-white hover:bg-slate-900 disabled:opacity-50">{t('hist.csv')}</button>
       </div>
       {USE_MOCK && (
         <div data-testid="history-saved" className="flex flex-wrap items-center gap-3 rounded-xl bg-white p-3 shadow">

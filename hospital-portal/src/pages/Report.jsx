@@ -5,6 +5,8 @@ import { useHistory } from '../components/HistoryProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import { useAmbulances } from '../components/AmbulanceProvider.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
+import { downloadText } from '../services/download.js';
+import { timelineToCsv } from '../services/csv.js';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import checklists from '../data/checklists.json';
 import rankingConfig from '../data/ranking-config.json';
@@ -31,17 +33,8 @@ export default function Report() {
 
   const report = useMemo(() => (found ? buildReport(found, { hospitals, rankingConfig, checklists, ambulances }) : null), [found, hospitals, ambulances]);
 
-  function download() {
-    const blob = new Blob([reportToText(report)], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `post-event-report-${report.emergency_id}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
+  const download = () => downloadText(`post-event-report-${report.emergency_id}.txt`, reportToText(report));
+  const downloadCsv = () => downloadText(`post-event-timeline-${report.emergency_id}.csv`, timelineToCsv(found.status_events), 'text/csv;charset=utf-8');
 
   if (!report) {
     return (
@@ -59,6 +52,7 @@ export default function Report() {
         <Link to="/history" className="font-semibold text-sky-700 underline">← Case history</Link>
         <button data-testid="report-print" onClick={() => window.print()} className="ml-auto rounded-lg bg-sky-600 px-5 py-2.5 text-lg font-bold text-white hover:bg-sky-700">Print</button>
         <button data-testid="report-download" onClick={download} className="rounded-lg bg-slate-800 px-5 py-2.5 text-lg font-bold text-white hover:bg-slate-900">Download (.txt)</button>
+        <button data-testid="report-csv" onClick={downloadCsv} className="rounded-lg bg-slate-800 px-5 py-2.5 text-lg font-bold text-white hover:bg-slate-900">Download timeline (.csv)</button>
       </div>
 
       <article data-testid="report" data-id={r.emergency_id} className="report space-y-5 rounded-2xl bg-white p-8 shadow">
