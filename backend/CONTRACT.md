@@ -96,7 +96,7 @@ Rules:
 
 Emergency records start at `EMERGENCY_DETECTED`. `MONITORING` and `SYMPTOMS_REPORTED` describe the patient state and feed the digital twin bar.
 
-**Open decision (confirm with Jehal on day 1):** who moves `EMERGENCY_DETECTED → SOS_SENT`? Proposal: the backend does it automatically when the cancel countdown ends (`COUNTDOWN_SECONDS`, default 10, set to 0 in the demo panel).
+**Decision (0.7, Jehal; pending confirmation by Daksh and Puneet): who moves `EMERGENCY_DETECTED → SOS_SENT`?** The patient app does, with `POST /emergencies/{id}/sos`, when its own cancel countdown ends (as the mock server already works). The backend has no timer for it. The call is idempotent: a second call, or a call after the hospital answered, returns `200` with the current state and changes nothing. A cancelled emergency answers `409` with `from` and `to`. The earlier proposal (a backend countdown, `COUNTDOWN_SECONDS`) is dropped unless the team decides otherwise.
 
 ---
 
@@ -158,9 +158,13 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /patients/{id}/contacts | Add an emergency contact | PATIENT (own) | Jehal |
 | PUT /patients/{id}/contacts/{contactId} | Change an emergency contact | PATIENT (own) | Jehal |
 | DELETE /patients/{id}/contacts/{contactId} | Remove an emergency contact | PATIENT (own) | Jehal |
-| POST /emergencies | Create an emergency | PATIENT | Jehal |
-| POST /emergencies/{id}/cancel | Cancel a false alarm | PATIENT | Jehal |
-| GET /emergencies/{id} | Details and timeline | all, scoped by role | all |
+| POST /emergencies | Create an emergency (starts at `EMERGENCY_DETECTED`; hospitals hear nothing yet) | PATIENT (own) | Jehal |
+| POST /emergencies/{id}/sos | **Send the SOS**: `EMERGENCY_DETECTED` to `SOS_SENT`, alert the best verified hospital. Sending it twice is harmless | PATIENT (own) | Jehal |
+| POST /emergencies/{id}/cancel | Cancel a false alarm (only before `AMBULANCE_DISPATCHED`) | PATIENT (own) | Jehal |
+| GET /emergencies/{id} | Details and timeline, scoped by role (see 4.3) | PATIENT (own), HOSPITAL_STAFF and ADMIN (after the SOS, audited), linked FAMILY (plain status, audited) | all |
+| GET /emergencies/{id}/reasons | Why the alert fired: symptoms, readings, matched draft rules. Never a diagnosis | PATIENT (own), HOSPITAL_STAFF and ADMIN (after the SOS, audited) | Jehal, Puneet |
+| GET /patients/{id}/emergencies | The patient's past alerts, newest first (last 20) | PATIENT (own) | Jehal |
+| GET /patients/{id}/emergencies/{eid}/summary | Plain record of one alert: timeline, durations, what was shared | PATIENT (own) | Jehal |
 | POST /emergencies/{id}/ack | Hospital acknowledges | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/dispatch | Ambulance dispatched | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/status | Move to EN_ROUTE, ARRIVED or HANDOVER_DONE | HOSPITAL_STAFF | Puneet |
@@ -465,6 +469,34 @@ Rules: an error never repeats what the caller sent (a password in a bad request 
 
 Status codes used: `200`, `201`, `400` (bad input, including every validation error; **there is no 422**), `401` (no login, or a bad or expired one), `403` (login fine but role or data not allowed), `404`, `409` (invalid state change), `429` (too many wrong logins), `500`.
 
+### 4.3 Emergencies (0.7)
+
+**POST /emergencies** (see 4.1 for the body). Extras added in 0.7:
+- `symptoms` are the patient app's ids (`CHEST_PAIN`, `SHORT_BREATH`) or the lowercase engine names. An id nobody knows is stored (`unmapped_symptoms`), never dropped. If **none** is known the answer is `400`. A safety check-in (`source` `FALL_CHECK` or `INACTIVITY_CHECK`) needs no symptoms and no type (type `UNKNOWN`).
+- `source` is `MANUAL` (default), `FALL_CHECK` or `INACTIVITY_CHECK`. `consent` (or `consents`) holds only `location`, `history`, `vitals`, `reports` as true or false; anything else is `400`. The consent used is the ledger as it is now, with these choices on top, and it is kept with the emergency.
+- Location is stored only with the `location` consent, vitals only with the `vitals` consent. The response adds `source` and `reasons` (a list of plain sentences). `patient_id` may be left out; it must be the caller's own, otherwise `403`.
+- The engine's answer is kept as `engine_severity`. At the SOS a milder severity is raised to `EMERGENCY` (`severity_floor_applied`), because the person asked for help.
+
+**POST /emergencies/{id}/sos** body `{ "location": { "lat", "lng", "accuracy", "source" } }` (all optional). Reply `200 { id, state, hospital: { id, name, distance_km } | null, simulated }`. Ranks the **verified** hospitals with an emergency department (one that can do what the type needs and is ready first, then the nearest), writes the `hospital_alerts` row for rank 1 and "notifies" the patient's contacts **by name only** (simulated, no phone number anywhere). Events, sent after the commit: `emergency.created` (state `SOS_SENT`, only what the patient shared), `emergency.sos_sent`, `hospital.alerted`, `contacts.notified`.
+
+**POST /emergencies/{id}/cancel** optional body `{ "reason": "false_alarm" | "pressed_by_mistake" | "feeling_better" | "other" }`. Reply `200 { id, state: "CANCELLED" }`. Cancelling twice is harmless. From `AMBULANCE_DISPATCHED` on: `409 { detail: "Invalid transition", from, to: "CANCELLED" }`.
+
+**GET /emergencies/{id}** returns the contract fields plus `symptoms`, `source`, `eta_seconds`, `consents`, `status_events` (`[{state, timestamp}]`, the patient app's name) and `timeline` (`[{state, timestamp, actor, seconds_since_start}]`). Who sees what:
+
+| Reader | Sees | Audit |
+|---|---|---|
+| PATIENT (own) | everything, including `location`, `vitals_at_alert`, `engine_severity`, `severity_floor_applied` | none |
+| Another patient | `404`, the same as for an id that does not exist | `denied`, `forbidden_role` |
+| HOSPITAL_STAFF, ADMIN | only after the SOS (before it: `404`). `location` only with the location consent, `vitals_at_alert` only with the vitals consent, `passport_available` = history consent. Never a phone number | `allowed` with `fields_released`, or `denied` |
+| FAMILY linked to the patient | `{ id, patient_id, state, started_at, simulated }` after the SOS, nothing about health | `allowed` |
+| FAMILY not linked, RESPONDER | `403` (same answer whether or not the id exists) | `denied`, `forbidden_role` |
+
+**GET /emergencies/{id}/reasons** reply `{ severity, type, reasons, matched_rules: [{ id, type, severity, reason, reviewed }], reviewed, review_status, inputs: { symptoms, vitals, vitals_at }, simulated }`. `reviewed` is `false` and `review_status` is "pending doctor review" while any rule is. `severity` here is the engine's own answer. Same access as the emergency itself, except that a relative gets `403`.
+
+**GET /patients/{id}/emergencies** `[{ id, started_at, final_state, type, source }]`, newest first, at most 20. **GET /patients/{id}/emergencies/{eid}/summary** `{ id, started_at, ended_at, source, final_state, timeline, durations: { to_acknowledged, to_dispatched, to_arrived, to_handover }, shared, symptoms, vitals_at_alert, contacts_notified: [{ name }], hospital: { name } | null, ambulance_id, simulated }`. Durations are seconds from the start, `null` when that step did not happen. A plain record: no cause, no outcome for the person's health.
+
+**Events** are published through `app/services/events.py` (a hook: the WebSocket manager subscribes to it). Every event carries an `audience` (`hospitals`, `patient:<id>`, `family:<id>`, `responders`, `all`) for the manager to filter on, and both `event` and `type` with the same name.
+
 ---
 
 ## 5. WebSocket
@@ -559,3 +591,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.6.1 | Documented the existing GET /health. No behaviour change |
 | 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |
 | 14 Nov 2026 | 0.7 (in progress) | **Patient record, vitals, baseline, contacts (Task 3)**, contacts now need the `history` consent, `sex` is always shown, consent answers carry `changes`. **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |
+| 14 Nov 2026 | 0.7.1 | **Emergency core (J1, Jehal):** `POST /emergencies`, `POST /emergencies/{id}/sos` (new, decision recorded in section 2), `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}`, `GET /emergencies/{id}/reasons`, `GET /patients/{id}/emergencies`, `GET /patients/{id}/emergencies/{eid}/summary`. Section 4.3 added. Event hook `app/services/events.py`. State changes only through `app/services/emergency_state.py` |
