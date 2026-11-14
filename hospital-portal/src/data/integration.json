@@ -85,7 +85,7 @@
     {
       "method": "POST",
       "path": "/emergencies/{id}/notes",
-      "used_for": "Timeline notes: assignment, corridor, pickup, responder alert, shift handover (kind handover) and desk notes (kind desk, 500 characters)",
+      "used_for": "Timeline notes: assignment, corridor, pickup, responder alert, shift handover (kind handover) and desk notes (kind desk, 500 characters); also the take-over note: a desk note with fields taken_over_by and taken_over_from, sent before the desk acts on an alert held by another hospital",
       "status": "proposed",
       "fallback": "Notes stay on this screen only."
     },
@@ -252,6 +252,18 @@
       "status": "portal setting",
       "fallback": "auto: portal moves it unless the backend sends ambulance.location within 3 s",
       "name": "VITE_PORTAL_SIMULATES_AMBULANCE"
+    },
+    {
+      "name": "HTTP 401 on any call except login",
+      "used_for": "The portal clears the login and shows \"Your session expired. Please log in again.\"",
+      "status": "proposed",
+      "fallback": "Without 401, an expired token shows the generic failure text for each call."
+    },
+    {
+      "name": "Error body message / error / detail",
+      "used_for": "Short server message shown to the desk on a failed call (one line, tokens hidden)",
+      "status": "proposed",
+      "fallback": "The generic text \"METHOD /path failed: status\" is shown."
     }
   ]
 }

@@ -3,6 +3,14 @@
 Puneet's section: hospital dashboard, map and ambulance.
 **Simulated prototype. No real hospital, ambulance or emergency service is contacted.**
 
+## 5-minute start
+
+1. Install Node 22 or newer (https://nodejs.org).
+2. In PowerShell: `cd hospital-portal` then `.\scripts\start-demo.ps1` (it installs packages, starts the portal and opens the browser).
+3. Log in with `staff@demo` and `demo123`, then follow the 3-minute walk-through in **[docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)**.
+
+Everything is a simulated sample. For the longer version with Jehal's mock server, see the same file.
+
 ## Run it
 
 ```bash

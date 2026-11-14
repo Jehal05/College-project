@@ -11,9 +11,19 @@ on:
     paths:
       - 'hospital-portal/**'
 
+# The jobs only read the code: no write access to the repository is needed.
+permissions:
+  contents: read
+
+# A new push to the same branch cancels the older run, so the result you see belongs to the latest commit.
+concurrency:
+  group: hospital-portal-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: hospital-portal
@@ -37,6 +47,7 @@ jobs:
   # Laptop steps are in hospital-portal/docs/QUALITY_TOOLS.md.
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: hospital-portal
@@ -58,6 +69,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: hospital-portal

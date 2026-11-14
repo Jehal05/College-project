@@ -14,6 +14,9 @@ Daksh, open items for the hospital portal. Full wording is in `hospital-portal/d
 6. **Hospital mode.** Please make it switchable, and default to manual when the portal is used. If both the backend and the portal drive the states we get 409 errors.
 7. **Login answer.** Please include `role` and `hospital_id`.
 8. **Sex display.** Showing it is a team and clinical decision. The portal shows "Not shared" when the value is missing.
+9. **Errors and expired tokens.** Please answer 401 for a missing or expired token and 403 for "logged in but not allowed". On 401 the portal logs the desk out with "Your session expired". For other errors it shows your short `message`, `error` or `detail` text when the body has one.
+10. **Take over.** A desk that acts on an alert held by another hospital now first sends a `desk` note to `POST /emergencies/{id}/notes` with `fields: { taken_over_by, taken_over_from }` and the reason as text. Please just store `fields` as sent.
+11. **Health check (optional).** The portal sends a tokenless `GET /health` every 15 seconds in real mode. Any answer counts as "up", even 404. Only a network failure shows the red banner "Backend unreachable, using mock data". A plain `200` would be nice.
 
 ## To Jehal
 

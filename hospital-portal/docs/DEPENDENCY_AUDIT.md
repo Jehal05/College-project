@@ -1,7 +1,8 @@
 # Dependency audit (run these on your laptop)
 
-**Status: not run yet.** This file lists the exact commands. No audit result is written here because none was produced:
-the environment this was prepared in cannot reach the npm registry, so `npm audit` could not run. Do not quote a result until you have run it.
+**Status, 2026-11-14:** `npm ci` reports **0 vulnerabilities** on Puneet's laptop (reported by Puneet; the full output was not shown to the assistant) and in GitHub Actions (the log of the run for commit 8569d27 ends with `found 0 vulnerabilities`). That line is the short summary `npm ci` prints. A separate `npm audit` and `npm audit --omit=dev` have **not** been run since the react-router 7 upgrade, so run them once before quoting a full audit.
+
+What was run by the assistant on 2026-11-14 (sandbox without access to the npm registry): `npm test` only. `npm audit`, `npm outdated` and `npm ci` could **not** run there. `package.json` and `package-lock.json` were **not changed** by the Part 1 to Part 4 work (checked with `git diff`), so the 2026-11-13 audit result below still describes the installed packages.
 
 ## 1. Check for known vulnerabilities
 
@@ -45,3 +46,5 @@ Copy this table, fill it in with real numbers from your own run, and commit it.
 |---|---|---|---|
 | 2026-11-13 | `npm audit --omit=dev` | 2 moderate, both `react-router` / `react-router-dom` 6.x (open redirect via backslash in `Link`/`useNavigate`; SSR hydration issue). Only fix offered: major upgrade to v7. | Upgraded to `react-router-dom` 7 (tested first on a separate branch). |
 | 2026-11-13 | `npm audit` | Same 2 moderate before the upgrade. After the upgrade: **0 vulnerabilities**. | Checked after the upgrade: build ok, 269 unit tests, lint 0 errors (9 warnings), 8 of 8 e2e tests. `--force` was not used. |
+| 2026-11-14 | `npm ci` on Puneet's laptop | **0 vulnerabilities** (as reported by Puneet; not seen by the assistant) | None needed. |
+| 2026-11-14 | `npm ci` in GitHub Actions, workflow "Hospital portal checks", commit 8569d27 | `found 0 vulnerabilities` (the summary line of `npm ci`, read from the Actions log). Lint, 367 unit tests, build and 19 e2e tests were green in the same run. | None needed. A full `npm audit --omit=dev` is still to be run by hand. |
