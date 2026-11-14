@@ -36,7 +36,7 @@ Measured from the code on 14 Nov 2026, after merging Daksh's emergency-core comm
 | Family, responder, admin, content, feedback, privacy | **Not built** | **Mocked** | |
 | Notes, chat, checklist saving, hospital add/edit/verify | **Not in the contract** | Not in the mock either | Proposed in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`; the portal shows "saved on this screen only" or "not sent" |
 
-In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 contract endpoints built; his latest commit adds 7 emergency routes after that count. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
+In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 built (older snapshot); CI's contract status after his latest commit says 24 built, 22 not built. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
 
 ## Run the whole demo (Windows PowerShell)
 

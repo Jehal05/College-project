@@ -63,4 +63,4 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 4. The WebSocket and its events (one agreed path).
 5. `POST /ambulances/{id}/location` and `GET /ambulances`.
 
-Daksh's `backend/FREEZE.md` still shows the older count (17 of 42 built); his commit adds 7 emergency routes after it. He says there is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `ack`, `dispatch`, `status`, hospitals and availability, ambulance location, the WebSocket, demo scenario and reset.
+Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); CI's contract status after his latest commit says 24 built, 22 not built. He says there is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `ack`, `dispatch`, `status`, hospitals and availability, ambulance location, the WebSocket, demo scenario and reset.

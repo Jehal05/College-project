@@ -43,7 +43,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 ## Backend (Daksh)
 
 1. **What is real in the backend today?**
-   Login with hashed passwords and a limit on wrong tries, the patient record, vitals, baseline, contacts, consents with a change history, the health passport, the audit log, wellbeing insights, the wearable simulator, the rules engine, and emergency create, SOS, cancel and read. His `FREEZE.md` counts 17 of 42 contract endpoints built, and his latest commit adds seven emergency routes after that count.
+   Login with hashed passwords and a limit on wrong tries, the patient record, vitals, baseline, contacts, consents with a change history, the health passport, the audit log, wellbeing insights, the wearable simulator, the rules engine, and emergency create, SOS, cancel and read. His `FREEZE.md` counts 17 of 42 built (older snapshot); CI's contract status after his latest commit says 24 built, 22 not built.
 2. **What is not built?**
    Acknowledge, dispatch and status, hospitals and availability, ambulance location, demo reset, reports, the WebSocket, and the family, responder and admin endpoints. (Emergency create, SOS, cancel and read were added in his latest commit.)
 3. **How is patient data protected?**
