@@ -134,9 +134,16 @@ def test_unknown_patient_is_404_and_logged(api, engine, full):
 
 
 def test_junk_patient_id_is_logged_as_invalid_id(api, engine, full):
-    assert get(api, patient="x" * 120).status_code == 401
+    # Not shaped like a patient id, so it is treated as a QR link nobody issued: 410, and the junk is never stored.
+    assert get(api, patient="x" * 120).status_code == 410
     [row] = rows(engine)
-    assert row["resource_id"] == "invalid_id" and row["patient_id"] == "invalid_id"
+    assert row["resource_id"] == "invalid_id" and row["patient_id"] is None and row["reason"] == "tampered_token"
+
+
+def test_junk_patient_id_with_a_patient_id_shape_still_needs_a_login(api, engine, full):
+    assert get(api, patient="pat_" + "x" * 120).status_code == 401
+    [row] = rows(engine)
+    assert row["resource_id"] == "invalid_id" and row["patient_id"] == "invalid_id" and row["reason"] == "missing_credentials"
 
 
 def test_a_denied_view_returns_no_patient_data(api, engine, full):

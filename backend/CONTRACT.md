@@ -174,7 +174,17 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
 | GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent, once feature 61 exists | Shagun (feature 67) |
-| POST /reports | Upload a health report | PATIENT | Jehal |
+| POST /reports | Upload a health report for the caller's own record (raw file body, `?name=`; same as the call below) | PATIENT | Jehal |
+| GET, POST /patients/{id}/reports | List the reports (no file bytes) / upload one: raw PDF, JPG or PNG body, file name in `?name=` | PATIENT (own) | Jehal |
+| GET /patients/{id}/reports/{rid}/file | Download one report | PATIENT (own) | Jehal |
+| DELETE /patients/{id}/reports/{rid} | Delete one report | PATIENT (own) | Jehal |
+| GET, POST /patients/{id}/reminders | List / add a medication reminder | PATIENT (own) | Jehal |
+| PUT, DELETE /patients/{id}/reminders/{rid} | Change / delete a reminder | PATIENT (own) | Jehal |
+| POST /patients/{id}/reminders/{rid}/shown, /taken | Log that a dose reminder was shown / marked taken | PATIENT (own) | Jehal |
+| GET /patients/{id}/reminders/log | The last 7 days of the log | PATIENT (own) | Jehal |
+| GET, PUT /patients/{id}/preferences | The safety check-in setting | PATIENT (own) | Jehal |
+| GET, POST, DELETE /patients/{id}/passport | The QR passport link: show again / create / revoke | PATIENT (own) | Jehal |
+| GET /patients/{id}/passport/log | When the QR link was opened (times only) | PATIENT (own) | Jehal |
 | POST /demo/scenario | Run a ready-made emergency for the demo patient and send its SOS (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
 | POST /demo/reset | Reset to start state (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
 | POST /demo/vitals | Switch wearable profile or override vitals | any logged-in user, demo mode only (404 otherwise) | Demo panel |
@@ -509,6 +519,20 @@ Both calls answer `404` for everybody (logged in or not) unless `DEMO_MODE=true`
 
 **POST /demo/reset** empties every table (the append-only ones too: audit log, consent ledger, status timeline), loads the seed data again, sets emergency numbers back to `0001`, puts every simulator back to the normal profile and clears the login limiter. Demo logins keep their ids, so a login issued before the reset still works. Reply `200 { status: "reset", ok: true, seeded: { ... }, simulated: true }` (both `status` and `ok` are sent for the two apps). The append-only protection is back in place afterwards. Other modules that keep demo state in memory register a function with `app.services.demo.register_reset_hook`.
 
+### 4.5 Reports, reminders, preferences and the QR passport link (0.7.3, J3)
+
+All of these are for the **PATIENT, own record only**. Another role or another patient gets `403` (audited), an unknown patient `404`. Health data (file names and bytes, medicine names and notes) is stored encrypted and never written to the audit log.
+
+**Reports.** `POST /patients/{id}/reports?name=ECG.pdf` (or `POST /reports` for the caller's own record) takes the **raw file** as the body with `Content-Type` `application/pdf`, `image/jpeg` or `image/png`. Answers: `201 { id, name, content_type, size, uploaded_at }`; `415` for any other type (checked **before** the body is read); `413` over 2 MB (cut off while arriving); `400` for an empty file or one whose first bytes do not match its type; `409` after 10 reports. The name keeps letters, digits, space, `.`, `-`, `_` (80 characters at most; `report` when nothing is left). `GET .../reports` lists `[{ id, name, content_type, size, uploaded_at }]` (never the bytes); `GET .../reports/{rid}/file` returns the file with its own type (`nosniff`, `no-store`); `DELETE` answers `204`; an unknown report `404`.
+
+**Reminders.** `{ name (1 to 60), dose_note (60 at most, optional), times: ["08:30", ...] (1 to 4, no repeats), days: [0..6] (0 is Sunday, no repeats), paused? }`. `GET` lists, `POST` answers `201` (at most 8, then `409`), `PUT` replaces, `DELETE` answers `200 { ok: true }` and removes the reminder's log; a bad body is `400`, an unknown reminder `404`. `POST .../{rid}/shown { scheduled_for }` answers `201 { reminder_id, scheduled_for, taken_at: null }`; `POST .../{rid}/taken { scheduled_for, at }` answers `200` with `taken_at` set. A slot is one row however often it is mentioned. `GET .../reminders/log` is the last 7 days, **newest first**. The app only **reminds**: nothing here suggests a dose or says what to do about a missed one.
+
+**Preferences.** `GET` answers `{ safety_checkin: { enabled, minutes } }` (default `false`, `15`); `PUT` takes the same shape with `minutes` 5, 15 or 30 (anything else `400`).
+
+**QR passport link.** `POST /patients/{id}/passport { hours }` (1, 24 or 168; default 24; else `400`) answers `201 { token, expires_at }` and **revokes the previous link** (one live link at a time). `GET` answers `{ token, expires_at }` for the live link (`404 No active passport`), so the screen can show the same QR after a reload; the token is kept **encrypted** (the table of hashes still cannot open a passport). `DELETE` revokes and answers `200 { ok: true }`. `GET .../passport/log` is `[{ opened_at }]`, oldest first, for the latest link: times only, no IP address, no device data.
+
+**Opening the link.** `GET /passport/{token}` needs no login. A live link answers `200` with the passport (`shared: { history, reports }`, `shared_fields`, `expires_at`, and only what the patient shares), writes one audit row (role `TOKEN`), logs the time and sends `passport.opened` to the patient. A revoked or expired link, or a token nobody issued, answers **`410`** (`{ error: "This passport is no longer available." }`). The same token also opens `GET /passport/{patient_id}?token=` (and a revoked one answers `410` there too). An address that looks like a patient id (`PT-2026-0417`, `pat_001`) is never treated as a link: it still needs a token or a login (`401` without). New audit reason: `revoked_token`.
+
 ---
 
 ## 5. WebSocket
@@ -551,6 +575,8 @@ Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connect
 ## 6. Data tables
 
 `patients`, `users`, `vitals`, `symptom_reports`, `emergencies`, `status_events`, `hospitals`, `hospital_alerts`, `ambulances`, `emergency_passports`, `reports`, `contacts`, `consents`, `audit_log`
+
+Added in 0.7.3 (J3): `passport_secrets` (the QR link, encrypted), `passport_opens` (when it was opened: times only), `reminders` (names and notes encrypted), `reminder_log`, `patient_preferences`.
 
 ---
 
@@ -605,3 +631,4 @@ Passwords are set in the seed script and are demo values only.
 | 14 Nov 2026 | 0.7 (in progress) | **Patient record, vitals, baseline, contacts (Task 3)**, contacts now need the `history` consent, `sex` is always shown, consent answers carry `changes`. **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |
 | 14 Nov 2026 | 0.7.1 | **Emergency core (J1, Jehal):** `POST /emergencies`, `POST /emergencies/{id}/sos` (new, decision recorded in section 2), `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}`, `GET /emergencies/{id}/reasons`, `GET /patients/{id}/emergencies`, `GET /patients/{id}/emergencies/{eid}/summary`. Section 4.3 added. Event hook `app/services/events.py`. State changes only through `app/services/emergency_state.py` |
 | 14 Nov 2026 | 0.7.2 | **Demo panel (J2, Jehal):** `POST /demo/scenario` (HEART, STROKE, DIABETIC, ASTHMA, FALL), `POST /demo/reset`, `GET /demo/state`, `POST /demo/speed`, section 4.4. New `WearableSimulator.snap()` |
+| 14 Nov 2026 | 0.7.3 | **Patient extras (J3, Jehal):** reports (upload, list, download, delete, and the contract's `POST /reports`), reminders with log, preferences, the QR passport link (create, show again, revoke, open log) and the public `GET /passport/{token}` (`410` when gone). Passport answers now also carry `shared: { history, reports }` and each contact's `relation`. Section 4.5. Five new tables. A token-looking address with no login now answers `410` instead of `401` |
