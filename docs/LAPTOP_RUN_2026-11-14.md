@@ -36,5 +36,5 @@ Seen by Claude in the portal (port 5174, real backend on 8000, staff@demo.test):
 - Not looked at: the map beyond the label, whether Hindi/Gujarati gaps are data or missing text, the patient app's wearable readings.
 
 ## Not done
-- Screens (portal, patient app, sound, map, Hindi/Gujarati) were not looked at.
+- Not looked at: sound (not heard), the map, and who translated the Hindi/Gujarati text.
 - Not tested: running `start-all.ps1` from a normal interactive PowerShell window (it was started hidden by a helper).
