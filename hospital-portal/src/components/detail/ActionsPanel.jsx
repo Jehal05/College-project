@@ -15,7 +15,8 @@ const MOCK_BUTTON = 'mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-
 export default function ActionsPanel({ emergency: e, next }) {
   const [error, setError] = useState('');
   const t = useT();
-  const helpers = USE_MOCK && !usePresenting(); // mock helper buttons are hidden in presentation mode
+  const presenting = usePresenting(); // always called, never behind &&
+  const helpers = USE_MOCK && !presenting; // mock helper buttons are hidden in presentation mode
   const last = e.status_events[e.status_events.length - 1];
 
   async function run(fn) {
