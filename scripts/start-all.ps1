@@ -72,15 +72,15 @@ function Wait-Url($url, $label, $seconds) {
 try {
   $mock = Start-Part "Jehal's mock" $root @{ HOSPITAL_MODE = 'manual'; DEMO_SPEED = "$DemoSpeed"; ALERT_AT = $AlertAt; CORS_ORIGINS = 'http://localhost:5173,http://localhost:5174' } 'run mock'
   $jobs += $mock
-  if (-not (Wait-Url 'http://localhost:4000/health' "Jehal's mock" 40)) { Fail 'The mock did not answer within 40 seconds.' }
+  if (-not (Wait-Url 'http://localhost:4000/health' "Jehal's mock" 120)) { Fail 'The mock did not answer within 120 seconds.' }
 
   $web = Start-Part 'the hospital portal' $portal @{ VITE_USE_MOCK = 'false'; VITE_API_BASE_URL = 'http://localhost:4000'; VITE_WS_URL = 'ws://localhost:4000/ws'; VITE_PORTAL_SIMULATES_AMBULANCE = 'false' } 'run dev -- --port 5174 --strictPort'
   $jobs += $web
   $app = Start-Part 'the patient app' $root @{} 'run dev'
   $jobs += $app
 
-  $okPortal = Wait-Url 'http://localhost:5174/' 'The portal' 60
-  $okApp = Wait-Url 'http://localhost:5173/' 'The patient app' 60
+  $okPortal = Wait-Url 'http://localhost:5174/' 'The portal' 120
+  $okApp = Wait-Url 'http://localhost:5173/' 'The patient app' 120
   if (-not ($okPortal -and $okApp)) { Fail 'The portal or the patient app did not answer within 60 seconds.' }
 
   Write-Host ''
