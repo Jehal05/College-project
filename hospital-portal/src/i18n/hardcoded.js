@@ -32,7 +32,7 @@ export function findHardcoded(source) {
   };
 
   // 1. JSX text: after a tag's ">" and before the next "<" or "{". Skip ">" of arrows (=>), comparisons and generics.
-  const textRe = /(?<![=\-])>([^<>{}]+)(?=[<{])/g;
+  const textRe = /(?<![=-])>([^<>{}]+)(?=[<{])/g;
   let m;
   while ((m = textRe.exec(src))) {
     const before = src.slice(Math.max(0, m.index - 200), m.index + 1);
