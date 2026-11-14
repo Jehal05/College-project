@@ -79,3 +79,13 @@ The files are in `patient-app/src/config/` and `patient-app/src/i18n/`:
 ### 3. Symptom mapping used by the rules engine
 
 The app sends UPPER_SNAKE_CASE IDs (for example `CHEST_PAIN`); the rules use lower-case names (`chest_pain`). The only translation is in `mock-server/adapters.js` (and `patient-app/src/utils/adapters.js`). It is a first guess. App symptoms with no counterpart in the rules table are ignored by the engine: `NAUSEA`, `FAINTING`, `SEVERE_HEADACHE`, `DIA_SHAKING`, `DIA_FAINTING`, `CANNOT_SPEAK_SENTENCES`, `BLUE_LIPS`. A doctor (with Daksh) should decide whether rules are missing for them, and whether the other mappings (for example `ARM_JAW_PAIN` to `left_arm_pain`, `LIMB_WEAKNESS` to `arm_weakness`, `SHORT_BREATH` to `breathlessness`) are right.
+
+### 4. Disease Intelligence and Live Monitoring (UI phase 1d)
+
+A doctor should check these before anyone outside the team sees them:
+
+- Observation wording (`dis.obs.*`): "within your own usual range" / "outside your usual range. This is an observation, not a diagnosis." No risk score, no named condition.
+- Data-quality levels (`dis.quality.*`, `dis.confidence.*`, `dis.reason.*`): low / medium / good come from how many readings were shared (10 and 30 are the cut-offs), whether a usual range is set, and whether a report or condition is linked. The cut-offs are a first guess.
+- "General next steps to discuss with a doctor" (`dis.steps.<area>.1-3`): 18 general lines, for example keeping a blood-pressure log or keeping reports together. They are not advice for a case and need a doctor's review (or removal).
+- Neurological, kidney and liver areas have no live readings in this prototype; the screen says so instead of showing numbers.
+- The monitoring trace is a made-up wave drawn from the heart rate. It is labelled "Simulated ... not a real ECG" and must stay labelled.

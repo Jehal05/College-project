@@ -699,6 +699,86 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` i
 | `admin.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
 | `login.volunteer` | Become a volunteer responder | आपातकालीन स्वयंसेवक बनें | કટોકટી સ્વયંસેવક બનો | [ ] |
 
+## Disease Intelligence and Live Monitoring screens (UI phase 1d)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `dis.intro` | Six health areas, each with a plain observation about your readings and how much data it is based on. | छह स्वास्थ्य क्षेत्र, हर एक में आपकी रीडिंग पर सरल अवलोकन और यह कि वह कितने डेटा पर आधारित है। | છ આરોગ્ય વિભાગ, દરેકમાં તમારી રીડિંગ પર સરળ અવલોકન અને તે કેટલા ડેટા પર આધારિત છે. | [ ] |
+| `dis.rules` | Observations come from simple rules that compare your readings with your own usual ranges. There is no risk score and no diagnosis. | ये अवलोकन सरल नियमों से बनते हैं जो आपकी रीडिंग की तुलना आपकी अपनी सामान्य सीमा से करते हैं। इसमें कोई जोखिम स्कोर या निदान नहीं है। | આ અવલોકનો સરળ નિયમોથી બને છે જે તમારી રીડિંગની સરખામણી તમારી પોતાની સામાન્ય શ્રેણી સાથે કરે છે. તેમાં કોઈ જોખમ સ્કોર કે નિદાન નથી. | [ ] |
+| `dis.open` | Open details | विवरण खोलें | વિગતો ખોલો | [ ] |
+| `dis.back` | Back to all areas | सभी क्षेत्रों पर वापस | બધા વિભાગો પર પાછા | [ ] |
+| `dis.status.within` | Within your usual range | आपकी सामान्य सीमा में | તમારી સામાન્ય શ્રેણીમાં | [ ] |
+| `dis.status.different` | Different from usual | सामान्य से अलग | સામાન્યથી અલગ | [ ] |
+| `dis.status.nodata` | No live readings | कोई लाइव रीडिंग नहीं | કોઈ લાઇવ રીડિંગ નથી | [ ] |
+| `dis.status.waiting` | Waiting for readings | रीडिंग का इंतज़ार | રીડિંગની રાહ | [ ] |
+| `dis.quality.title` | Data quality and confidence | डेटा की गुणवत्ता और भरोसा | ડેટાની ગુણવત્તા અને વિશ્વાસ | [ ] |
+| `dis.quality.low` | Data quality: low | डेटा गुणवत्ता: कम | ડેટા ગુણવત્તા: ઓછી | [ ] |
+| `dis.quality.medium` | Data quality: medium | डेटा गुणवत्ता: मध्यम | ડેટા ગુણવત્તા: મધ્યમ | [ ] |
+| `dis.quality.good` | Data quality: good | डेटा गुणवत्ता: अच्छी | ડેટા ગુણવત્તા: સારી | [ ] |
+| `dis.confidence.low` | Confidence is low: there is too little data to say much. | भरोसा कम है: ज़्यादा कुछ कहने के लिए डेटा बहुत कम है। | વિશ્વાસ ઓછો છે: વધુ કહેવા માટે ડેટા બહુ ઓછો છે. | [ ] |
+| `dis.confidence.medium` | Confidence is medium: some data is available, more would help. | भरोसा मध्यम है: कुछ डेटा है, और होता तो बेहतर होता। | વિશ્વાસ મધ્યમ છે: થોડો ડેટા છે, વધુ હોય તો સારું. | [ ] |
+| `dis.confidence.good` | Confidence is better here, but this is still an estimate and not a diagnosis. | यहाँ भरोसा बेहतर है, फिर भी यह अनुमान है, निदान नहीं। | અહીં વિશ્વાસ વધુ સારો છે, છતાં આ અંદાજ છે, નિદાન નથી. | [ ] |
+| `dis.reason.noLive` | This prototype has no live readings for this area. | इस प्रोटोटाइप में इस क्षेत्र की कोई लाइव रीडिंग नहीं है। | આ પ્રોટોટાઇપમાં આ વિભાગની કોઈ લાઇવ રીડિંગ નથી. | [ ] |
+| `dis.reason.fewReadings` | Fewer than 10 readings have been shared so far. | अब तक 10 से कम रीडिंग साझा हुई हैं। | હજુ સુધી 10 થી ઓછી રીડિંગ શેર થઈ છે. | [ ] |
+| `dis.reason.noBaseline` | Your usual range is not set yet. | आपकी सामान्य सीमा अभी तय नहीं है। | તમારી સામાન્ય શ્રેણી હજુ નક્કી નથી. | [ ] |
+| `dis.reason.noReports` | No related report is uploaded. | कोई संबंधित रिपोर्ट अपलोड नहीं है। | કોઈ સંબંધિત રિપોર્ટ અપલોડ નથી. | [ ] |
+| `dis.obs.title` | Automatic observation (rules, not a doctor) | स्वचालित अवलोकन (नियम, डॉक्टर नहीं) | સ્વચાલિત અવલોકન (નિયમો, ડૉક્ટર નહીં) | [ ] |
+| `dis.obs.within` | Your {{name}} readings are within your own usual range. | आपकी {{name}} रीडिंग आपकी अपनी सामान्य सीमा में हैं। | તમારી {{name}} રીડિંગ તમારી પોતાની સામાન્ય શ્રેણીમાં છે. | [ ] |
+| `dis.obs.different` | One or more readings are outside your usual range. This is an observation, not a diagnosis. Please talk to a doctor if you are worried. | एक या अधिक रीडिंग आपकी सामान्य सीमा से बाहर हैं। यह अवलोकन है, निदान नहीं। चिंता हो तो डॉक्टर से बात करें। | એક કે વધુ રીડિંગ તમારી સામાન્ય શ્રેણીની બહાર છે. આ અવલોકન છે, નિદાન નથી. ચિંતા હોય તો ડૉક્ટર સાથે વાત કરો. | [ ] |
+| `dis.obs.nodata` | No live readings exist for this area in the prototype, so nothing can be observed. | इस प्रोटोटाइप में इस क्षेत्र की कोई लाइव रीडिंग नहीं है, इसलिए कुछ देखा नहीं जा सकता। | આ પ્રોટોટાઇપમાં આ વિભાગની કોઈ લાઇવ રીડિંગ નથી, તેથી કંઈ જોઈ શકાતું નથી. | [ ] |
+| `dis.obs.waiting` | Waiting for the first readings to compare. | तुलना के लिए पहली रीडिंग का इंतज़ार। | સરખામણી માટે પહેલી રીડિંગની રાહ. | [ ] |
+| `dis.steps.title` | General next steps to discuss with a doctor | डॉक्टर से चर्चा के लिए सामान्य अगले कदम | ડૉક્ટર સાથે ચર્ચા માટે સામાન્ય આગળનાં પગલાં | [ ] |
+| `dis.steps.note` | General suggestions only. They are not advice for your case. | केवल सामान्य सुझाव। ये आपके मामले की सलाह नहीं हैं। | ફક્ત સામાન્ય સૂચનો. તે તમારા કેસની સલાહ નથી. | [ ] |
+| `mon.intro` | Live readings from the simulated wearable, as they arrive. | सिमुलेटेड वियरेबल की लाइव रीडिंग, जैसे-जैसे आती हैं। | સિમ્યુલેટેડ વેરેબલની લાઇવ રીડિંગ, જેમ આવે તેમ. | [ ] |
+| `mon.ecg.title` | Heart rhythm trace | हृदय लय की रेखा | હૃદય લયની રેખા | [ ] |
+| `mon.ecg.label` | Simulated heart rhythm trace at {{bpm}} beats per minute | {{bpm}} धड़कन प्रति मिनट पर सिमुलेटेड हृदय लय रेखा | {{bpm}} ધબકારા પ્રતિ મિનિટે સિમ્યુલેટેડ હૃદય લય રેખા | [ ] |
+| `mon.ecg.note` | Simulated: a made-up trace drawn on your device from the heart rate. It is not a recording and not a real ECG. | सिमुलेटेड: हृदय गति से आपके डिवाइस पर बनाई गई काल्पनिक रेखा। यह रिकॉर्डिंग नहीं है और असली ECG नहीं है। | સિમ્યુલેટેડ: હૃદય ગતિ પરથી તમારા ડિવાઇસ પર દોરેલી કાલ્પનિક રેખા. તે રેકોર્ડિંગ નથી અને સાચો ECG નથી. | [ ] |
+| `mon.conn.on` | Wearable connected | वियरेबल जुड़ा है | વેરેબલ જોડાયેલું છે | [ ] |
+| `mon.conn.off` | Wearable not connected | वियरेबल जुड़ा नहीं है | વેરેબલ જોડાયેલું નથી | [ ] |
+| `mon.latest` | Heart rate {{bpm}} bpm | हृदय गति {{bpm}} bpm | હૃદય ગતિ {{bpm}} bpm | [ ] |
+| `mon.waiting` | Waiting for a reading | रीडिंग का इंतज़ार | રીડિંગની રાહ | [ ] |
+| `mon.ago` | {{s}} s ago | {{s}} सेकंड पहले | {{s}} સેકન્ડ પહેલાં | [ ] |
+| `mon.noShare` | Vitals sharing is off, so the trends stay empty. Turn it on in Consent to see them. | वाइटल्स साझा करना बंद है, इसलिए ट्रेंड खाली रहेंगे। देखने के लिए सहमति में इसे चालू करें। | વાઇટલ્સ શેરિંગ બંધ છે, તેથી ટ્રેન્ડ ખાલી રહેશે. જોવા માટે સંમતિમાં તેને ચાલુ કરો. | [ ] |
+| `mon.events.title` | Recent events | हाल की घटनाएँ | તાજેતરની ઘટનાઓ | [ ] |
+| `mon.events.empty` | No changes yet. Events appear when a reading leaves or returns to your usual range, or the connection changes. | अभी कोई बदलाव नहीं। जब रीडिंग सामान्य सीमा से बाहर जाए या लौटे, या कनेक्शन बदले, तब घटनाएँ दिखेंगी। | હજુ કોઈ ફેરફાર નથી. રીડિંગ સામાન્ય શ્રેણીની બહાર જાય કે પાછી આવે, અથવા કનેક્શન બદલાય ત્યારે ઘટનાઓ દેખાશે. | [ ] |
+| `mon.events.note` | Kept only in this page, not saved. | केवल इसी पेज पर रखा गया, सहेजा नहीं गया। | ફક્ત આ પેજ પર રખાય છે, સાચવાતું નથી. | [ ] |
+| `mon.event.left` | {{name}} left your usual range | {{name}} आपकी सामान्य सीमा से बाहर गया | {{name}} તમારી સામાન્ય શ્રેણીની બહાર ગયું | [ ] |
+| `mon.event.back` | {{name}} is back in your usual range | {{name}} फिर सामान्य सीमा में है | {{name}} ફરી સામાન્ય શ્રેણીમાં છે | [ ] |
+| `mon.event.connected` | Wearable connected | वियरेबल जुड़ गया | વેરેબલ જોડાયું | [ ] |
+| `mon.event.disconnected` | Wearable connection lost | वियरेबल का कनेक्शन टूटा | વેરેબલનું કનેક્શન તૂટ્યું | [ ] |
+| `dis.mod.cardiac.name` | Cardiac | हृदय | હૃદય | [ ] |
+| `dis.mod.cardiac.about` | Heart rate and blood pressure compared with your usual ranges. | हृदय गति और रक्तचाप की तुलना आपकी सामान्य सीमा से। | હૃદય ગતિ અને બ્લડ પ્રેશરની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.cardiac.1` | Keep a regular log of blood pressure readings to show your doctor. | डॉक्टर को दिखाने के लिए रक्तचाप की रीडिंग का नियमित रिकॉर्ड रखें। | ડૉક્ટરને બતાવવા માટે બ્લડ પ્રેશર રીડિંગનો નિયમિત રેકોર્ડ રાખો. | [ ] |
+| `dis.steps.cardiac.2` | Ask your doctor how often your heart should be checked. | डॉक्टर से पूछें कि हृदय की जाँच कितनी बार होनी चाहिए। | ડૉક્ટરને પૂછો કે હૃદયની તપાસ કેટલી વાર કરવી. | [ ] |
+| `dis.steps.cardiac.3` | Bring your medicine list to every visit. | हर विज़िट पर अपनी दवाओं की सूची साथ ले जाएँ। | દરેક મુલાકાતે તમારી દવાઓની યાદી સાથે રાખો. | [ ] |
+| `dis.mod.neuro.name` | Neurological | तंत्रिका | ચેતાતંત્ર | [ ] |
+| `dis.mod.neuro.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.neuro.1` | Note any new headaches, weakness or speech changes and when they happened. | नया सिरदर्द, कमज़ोरी या बोलने में बदलाव कब हुआ, लिख लें। | નવો માથાનો દુખાવો, નબળાઈ કે બોલવામાં ફેરફાર ક્યારે થયો તે લખો. | [ ] |
+| `dis.steps.neuro.2` | Ask your doctor which scans or tests suit you. | डॉक्टर से पूछें कि कौन-सी स्कैन या जाँच आपके लिए ठीक है। | ડૉક્ટરને પૂછો કે કયા સ્કેન કે ટેસ્ટ તમારા માટે યોગ્ય છે. | [ ] |
+| `dis.steps.neuro.3` | Keep past scan reports together. | पुरानी स्कैन रिपोर्ट एक जगह रखें। | જૂના સ્કેન રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.mod.respiratory.name` | Respiratory | श्वसन | શ્વસન | [ ] |
+| `dis.mod.respiratory.about` | Oxygen level (SpO2) compared with your usual range. | ऑक्सीजन स्तर (SpO2) की तुलना आपकी सामान्य सीमा से। | ઓક્સિજન સ્તર (SpO2) ની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.respiratory.1` | Note when breathing feels harder and what you were doing. | लिख लें कि साँस कब भारी लगी और तब आप क्या कर रहे थे। | શ્વાસ ક્યારે ભારે લાગ્યો અને ત્યારે તમે શું કરતા હતા તે લખો. | [ ] |
+| `dis.steps.respiratory.2` | Ask your doctor about a lung check if you have a cough that lasts. | लंबी खाँसी हो तो डॉक्टर से फेफड़ों की जाँच के बारे में पूछें। | લાંબી ઉધરસ હોય તો ડૉક્ટરને ફેફસાંની તપાસ વિશે પૂછો. | [ ] |
+| `dis.steps.respiratory.3` | Keep your inhaler or medicines where you can reach them. | इनहेलर या दवाएँ ऐसी जगह रखें जहाँ आप पहुँच सकें। | ઇન્હેલર કે દવાઓ પહોંચી શકાય તેવી જગ્યાએ રાખો. | [ ] |
+| `dis.mod.diabetes.name` | Diabetes | मधुमेह | ડાયાબિટીસ | [ ] |
+| `dis.mod.diabetes.about` | Glucose readings compared with your usual range. | ग्लूकोज़ रीडिंग की तुलना आपकी सामान्य सीमा से। | ગ્લુકોઝ રીડિંગની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.diabetes.1` | Note glucose readings with meal times to share with your doctor. | डॉक्टर को दिखाने के लिए ग्लूकोज़ रीडिंग खाने के समय के साथ लिखें। | ડૉક્ટરને બતાવવા ગ્લુકોઝ રીડિંગ જમવાના સમય સાથે લખો. | [ ] |
+| `dis.steps.diabetes.2` | Ask your doctor how often to test and what range is right for you. | डॉक्टर से पूछें कि कितनी बार जाँच करें और आपके लिए सही सीमा क्या है। | ડૉક્ટરને પૂછો કે કેટલી વાર તપાસ કરવી અને તમારા માટે યોગ્ય શ્રેણી શું છે. | [ ] |
+| `dis.steps.diabetes.3` | Keep your HbA1c reports together. | HbA1c रिपोर्ट एक जगह रखें। | HbA1c રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.mod.kidney.name` | Kidney | गुर्दा | કિડની | [ ] |
+| `dis.mod.kidney.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.kidney.1` | Keep recent kidney test reports (creatinine, eGFR) together. | हाल की गुर्दा जाँच रिपोर्ट (क्रिएटिनिन, eGFR) एक जगह रखें। | તાજેતરના કિડની ટેસ્ટ રિપોર્ટ (ક્રિએટિનિન, eGFR) એક જગ્યાએ રાખો. | [ ] |
+| `dis.steps.kidney.2` | Ask your doctor how often these tests are needed. | डॉक्टर से पूछें कि ये जाँच कितनी बार चाहिए। | ડૉક્ટરને પૂછો કે આ ટેસ્ટ કેટલી વાર જોઈએ. | [ ] |
+| `dis.steps.kidney.3` | Tell every doctor about all medicines you take. | हर डॉक्टर को अपनी सभी दवाओं के बारे में बताएँ। | દરેક ડૉક્ટરને તમારી બધી દવાઓ વિશે જણાવો. | [ ] |
+| `dis.mod.liver.name` | Liver | लिवर | લિવર | [ ] |
+| `dis.mod.liver.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.liver.1` | Keep recent liver test reports together. | हाल की लिवर जाँच रिपोर्ट एक जगह रखें। | તાજેતરના લિવર ટેસ્ટ રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.steps.liver.2` | Ask your doctor how often these tests are needed. | डॉक्टर से पूछें कि ये जाँच कितनी बार चाहिए। | ડૉક્ટરને પૂછો કે આ ટેસ્ટ કેટલી વાર જોઈએ. | [ ] |
+| `dis.steps.liver.3` | Tell every doctor about all medicines and supplements you take. | हर डॉक्टर को अपनी सभी दवाओं और सप्लीमेंट के बारे में बताएँ। | દરેક ડૉક્ટરને તમારી બધી દવાઓ અને સપ્લિમેન્ટ વિશે જણાવો. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.
