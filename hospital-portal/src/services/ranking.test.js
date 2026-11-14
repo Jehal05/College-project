@@ -120,3 +120,19 @@ test('fallback list: no next hospital when the list is used up', () => {
   const [a, b] = ids(ranked);
   assert.equal(nextHospital(ranked, em({ state: 'ESCALATED', alerted_ids: [a], alerted_hospital_id: b })), null);
 });
+
+test('a type with an empty capability list does not divide by zero (needs only an emergency department)', async () => {
+  const { rankHospitals: rank } = await import('./ranking.js');
+  const hospitals = [{ id: 'A', name: 'A', verified: true, lat: 23, lng: 72.5, capabilities: { emergency: true }, availability: { beds_free: 5, icu_free: 1 } }];
+  const config = { weights: { capability: 0.5, travel_time: 0.3, availability: 0.2 }, only_verified_hospitals: true, required_capabilities: { HEART: [] } };
+  const out = rank(hospitals, 'HEART', { lat: 23, lng: 72.5 }, config);
+  assert.deepEqual(out.required, ['emergency']);
+  assert.equal(out.ranked.length, 1);
+  assert.ok(Number.isFinite(out.ranked[0].total));
+});
+test('a type missing from the config also needs only an emergency department', async () => {
+  const { rankHospitals: rank } = await import('./ranking.js');
+  const hospitals = [{ id: 'A', verified: true, capabilities: { emergency: true }, availability: {} }];
+  const out = rank(hospitals, 'NOPE', { lat: 1, lng: 1 }, { weights: { capability: 0.5, travel_time: 0.3, availability: 0.2 }, required_capabilities: {} });
+  assert.ok(Number.isFinite(out.ranked[0].total));
+});

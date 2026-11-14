@@ -67,7 +67,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
         {cancelled ? (
           <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">{t('card.cancelled')}</span>
         ) : (
-          <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${SEVERITY_STYLES[severity] || SEVERITY_STYLES.NONE}`}>{severity}</span>
+          <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${SEVERITY_STYLES[severity] || SEVERITY_STYLES.NONE}`}>{severity}{alert.severity_missing ? '?' : ''}</span>
         )}
       </div>
       <div className="mt-1 text-slate-600">
@@ -85,6 +85,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
       <div className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-700">
         {stateText(t, state)}
       </div>
+      {alert.severity_missing && !cancelled && <div data-testid="severity-missing" className="mt-2 rounded bg-amber-100 px-2 py-1 text-sm font-bold text-amber-900">{t('severity.missing')}</div>}
       {warning && <div data-testid="card-warning" className="mt-2 rounded bg-red-50 px-2 py-1 text-sm font-bold text-red-800">Warning: your {warning}</div>}
       {elsewhere && <div data-testid="elsewhere" className="mt-2 text-sm font-semibold text-slate-600">{elsewhere}</div>}
       {fromCheckIn && !early && !cancelled && (

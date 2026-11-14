@@ -202,3 +202,16 @@ test('sample fleet is placed at the hospitals (verified first) only for sample u
   assert.equal(placed[1].base_hospital_id, 'h1');
   assert.deepEqual([placed[2].lat, placed[2].lng], [5, 5]);
 });
+
+test('a missing severity is marked so the screens can warn; a sent severity is not marked', () => {
+  const missing = normaliseEmergency({ emergency_id: 'x' });
+  assert.equal(missing.severity, 'URGENT');
+  assert.equal(missing.severity_missing, true);
+  const sent = normaliseEmergency({ emergency_id: 'x', severity: 'WATCH' });
+  assert.equal(sent.severity, 'WATCH');
+  assert.equal('severity_missing' in sent, false);
+});
+test('the mark travels with an emergency.created event', () => {
+  const ev = normaliseEvent({ event: 'emergency.created', emergency_id: 'E9', payload: { type: 'HEART' } });
+  assert.equal(ev.payload.severity_missing, true);
+});

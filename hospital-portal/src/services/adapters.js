@@ -190,6 +190,8 @@ export function normaliseEmergency(src = {}) {
     type: type || 'UNKNOWN',
     source: src.source || 'MANUAL',
     severity: src.severity || 'URGENT',
+    // The backend did not send a severity: URGENT is only an assumption, and the screens say so.
+    ...(src.severity ? {} : { severity_missing: true }),
     symptom_ids,
     symptoms: symptomLabels(symptom_ids),
     patient_id: src.patient_id ?? patient?.id ?? null,

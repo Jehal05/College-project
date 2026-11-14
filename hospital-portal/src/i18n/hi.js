@@ -156,4 +156,5 @@ export default {
   'takeover.busy': 'ले रहे हैं…',
   'takeover.failed': 'अलर्ट हाथ में नहीं लिया जा सका: {msg}',
   'takeover.locked': 'पहले इस अलर्ट को अपने हाथ में लें।',
+  'severity.missing': 'गंभीरता नहीं भेजी गई। URGENT दिखाया गया है। मरीज़ की जाँच करें।',
 };

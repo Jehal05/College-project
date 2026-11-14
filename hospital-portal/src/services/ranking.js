@@ -31,7 +31,9 @@ function isReady(hospital, capability) {
 export function rankHospitals(hospitals, emergencyType, patientLocation, config) {
   const weights = config.weights;
   const scoring = { max_travel_minutes: 30, beds_for_full_score: 10, icu_for_full_score: 3, ...config.scoring };
-  const required = config.required_capabilities?.[emergencyType] || ['emergency'];
+  // A type with no (or an empty) capability list needs only an emergency department. This also avoids dividing by zero below.
+  const listed = config.required_capabilities?.[emergencyType];
+  const required = Array.isArray(listed) && listed.length > 0 ? listed : ['emergency'];
   const hasLocation = Number.isFinite(patientLocation?.lat) && Number.isFinite(patientLocation?.lng);
 
   const ranked = [];
@@ -51,8 +53,10 @@ export function rankHospitals(hospitals, emergencyType, patientLocation, config)
 
     // ---- Step 2: score (each part 0 to 100)
     const a = hospital.availability || {};
-    const distance_km = hasLocation ? round1(haversineKm(patientLocation, hospital)) : null;
-    const eta_min = hasLocation ? simulatedTravelMinutes(distance_km) : null;
+    // A hospital with no coordinates has an unknown travel time (never NaN).
+    const canMeasure = hasLocation && Number.isFinite(hospital.lat) && Number.isFinite(hospital.lng);
+    const distance_km = canMeasure ? round1(haversineKm(patientLocation, hospital)) : null;
+    const eta_min = canMeasure ? simulatedTravelMinutes(distance_km) : null;
 
     const readyCount = required.filter((cap) => isReady(hospital, cap)).length;
     const capability = (readyCount / required.length) * 100;

@@ -61,7 +61,7 @@ test.describe('acknowledge and cancel', () => {
     await takeOverIfAsked(page);
     await page.click('[data-action=HOSPITAL_ACKNOWLEDGED]');
     await expect(cardById(page, id)).toHaveAttribute('data-state', 'HOSPITAL_ACKNOWLEDGED');
-    await expect(page.locator('[data-testid=timeline] li[data-reached=true]')).toHaveCount(2);
+    await expect(page.locator('[data-testid=timeline] li[data-reached=true]:not([data-stage=NOTE])')).toHaveCount(2); // a take-over note may add a NOTE row
   });
 
   test('a cancelled alert shows CANCELLED and cannot be dispatched', async ({ page }) => {

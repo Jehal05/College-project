@@ -157,4 +157,5 @@ export default {
   'takeover.busy': 'Taking over…',
   'takeover.failed': 'Could not take over: {msg}',
   'takeover.locked': 'Take over this alert first.',
+  'severity.missing': 'Severity was not sent. Shown as URGENT. Check the patient.',
 };

@@ -11,12 +11,19 @@ import { canEscalate } from './escalation.js';
 // More than this many seconds apart = a different alert that happens to reuse the id (clocks and event delays stay well below it).
 export const SAME_ALERT_SECONDS = 5;
 
-/** Is `incomingAt` (ISO time of an emergency.created) clearly a different alert from the one we hold? Missing or bad times never count. */
+/**
+ * Is `incomingAt` (ISO time of an emergency.created) clearly a different alert from the one we hold?
+ * The case counts as the same when the time is close to ANY start time we know of it: when it was created, when the SOS was
+ * confirmed, or when its first steps were logged. (The list and the live event can name slightly different moments.)
+ * Missing or bad times never count as "different".
+ */
 export function isNewCaseWithOldId(existing, incomingAt) {
-  const a = new Date(existing?.created_at).getTime();
   const b = new Date(incomingAt).getTime();
-  if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-  return Math.abs(a - b) > SAME_ALERT_SECONDS * 1000;
+  if (!Number.isFinite(b)) return false;
+  const startSteps = (existing?.status_events || []).filter((s) => s.state === 'SOS_SENT' || isEarly(s.state)).map((s) => s.timestamp);
+  const known = [existing?.created_at, existing?.sos_sent_at, ...startSteps].map((t) => new Date(t).getTime()).filter(Number.isFinite);
+  if (known.length === 0) return false;
+  return known.every((a) => Math.abs(a - b) > SAME_ALERT_SECONDS * 1000);
 }
 
 const SEVERITY_ORDER = ['EMERGENCY', 'URGENT', 'WATCH', 'NONE'];
@@ -171,7 +178,8 @@ export function mergeDetails(list, detail) {
     if (e.emergency_id !== detail?.emergency_id) return e;
     // Fields the detail does not have (null/undefined) never wipe what we already know.
     const known = Object.fromEntries(Object.entries(detail).filter(([, v]) => v !== null && v !== undefined));
-    const merged = normalise({ ...e, ...known, ambulance: e.ambulance || known.ambulance ? { ...e.ambulance, ...known.ambulance } : undefined, status_events: detail.status_events || detail.timeline || e.status_events });
+    // The detail is the newer word on severity: if it sends one, the earlier "missing" mark goes away.
+    const merged = normalise({ ...e, ...known, severity_missing: known.severity_missing || undefined, ambulance: e.ambulance || known.ambulance ? { ...e.ambulance, ...known.ambulance } : undefined, status_events: detail.status_events || detail.timeline || e.status_events });
     return { ...merged, _new: e._new, _read: e._read };
   });
 }

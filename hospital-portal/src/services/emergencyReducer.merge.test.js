@@ -105,3 +105,40 @@ test('a take-over made on this screen is kept after a reload', () => {
   assert.equal(next[0].taken_over_by, 'H2');
   assert.equal(next[0].taken_over_from, 'H1');
 });
+
+// ---- same id again (item 7) ----
+import { isNewCaseWithOldId, SAME_ALERT_SECONDS } from './emergencyReducer.js';
+
+test('same id, time within the window: the same case', () => assert.equal(isNewCaseWithOldId({ created_at: T0 }, at(SAME_ALERT_SECONDS - 1)), false));
+test('same id, time far from every known start: a new case with an old id', () => assert.equal(isNewCaseWithOldId({ created_at: T0 }, at(3600)), true));
+test('an early notice and the later SOS time belong to the same case (no wrong replace)', () => {
+  const existing = { created_at: T0, sos_sent_at: at(40), status_events: [{ state: 'EMERGENCY_DETECTED', timestamp: T0 }, { state: 'SOS_SENT', timestamp: at(40) }] };
+  assert.equal(isNewCaseWithOldId(existing, at(41)), false); // the created event is stamped when the SOS was confirmed
+});
+test('the list can name a start step the live event is close to', () => {
+  const existing = { created_at: at(-60), status_events: [{ state: 'SOS_SENT', timestamp: T0 }] };
+  assert.equal(isNewCaseWithOldId(existing, at(2)), false);
+});
+test('bad or missing times never count as a new case', () => {
+  assert.equal(isNewCaseWithOldId({ created_at: T0 }, undefined), false);
+  assert.equal(isNewCaseWithOldId({ created_at: 'nonsense' }, T0), false);
+  assert.equal(isNewCaseWithOldId({}, T0), false);
+});
+test('a second created event with a skewed time does not replace a card that already progressed', () => {
+  let list = created([], base());
+  list = applyEvent(list, { event: 'emergency.status', emergency_id: 'E1', state: 'HOSPITAL_ACKNOWLEDGED', timestamp: at(8) });
+  const again = applyEvent(list, { event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', timestamp: at(1), payload: { severity: 'EMERGENCY' } });
+  assert.equal(again, list); // ignored as a repeat
+});
+test('a real reset (same id, much later time) still replaces the old card', () => {
+  let list = created([], base());
+  const after = applyEvent(list, { event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', timestamp: at(900), payload: { severity: 'EMERGENCY', created_at: at(900) } });
+  assert.equal(after[0].created_at, at(900));
+});
+import { mergeDetails } from './emergencyReducer.js';
+test('a detail that sends a severity clears the earlier "missing" mark', () => {
+  const list = [{ emergency_id: 'E1', created_at: T0, severity: 'URGENT', severity_missing: true, state: 'SOS_SENT', status_events: [] }];
+  const next = mergeDetails(list, { emergency_id: 'E1', severity: 'EMERGENCY' });
+  assert.equal(next[0].severity, 'EMERGENCY');
+  assert.ok(!next[0].severity_missing);
+});

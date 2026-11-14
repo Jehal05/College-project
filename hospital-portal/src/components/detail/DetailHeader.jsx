@@ -15,11 +15,15 @@ export default function DetailHeader({ emergency: e, escalatedTo }) {
     <>
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-3xl font-bold">{TYPE_LABELS[e.type] || e.type}</h2>
-        <span className={`rounded-full px-3 py-1 font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{e.severity}</span>
+        <span className={`rounded-full px-3 py-1 font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{e.severity}{e.severity_missing ? '?' : ''}</span>
         <span data-testid="detail-state" className={`rounded-lg px-3 py-1 font-semibold ${cancelled ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-700'}`}>
           {stateText(t, e.state)}
         </span>
       </div>
+
+      {e.severity_missing && !cancelled && (
+        <p data-testid="severity-missing-detail" className="rounded-xl bg-amber-100 p-3 text-lg font-semibold text-amber-900">{t('severity.missing')}</p>
+      )}
 
       {cancelled && (
         <p data-testid="cancelled-banner" className="rounded-xl bg-slate-800 p-4 text-lg font-semibold text-white">
