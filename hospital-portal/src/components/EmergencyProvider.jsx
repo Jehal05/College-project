@@ -32,23 +32,33 @@ export function EmergencyProvider({ children }) {
   ctxRef.current = { hospitalId, scope };
 
   const [lastReload, setLastReload] = useState(null); // { at, count } of the latest successful load
+  const reloadSeq = useRef(0);
   const reload = useCallback(async () => {
+    // Only the newest reload may apply its answer: an older, slower one is ignored.
+    const mine = ++reloadSeq.current;
+    const startedAt = Date.now();
     setLoading(true);
     try {
       const loaded = await api.getAlerts();
-      send({ type: 'load', list: loaded });
+      if (mine !== reloadSeq.current) return;
+      send({ type: 'load', list: loaded, startedAt });
       setLastReload({ at: Date.now(), count: Array.isArray(loaded) ? loaded.length : 0 });
       setError('');
     } catch (err) {
+      if (mine !== reloadSeq.current) return;
       setError(`Could not load the alert list: ${err.message} New alerts will still appear live.`);
     } finally {
-      setLoading(false);
+      if (mine === reloadSeq.current) setLoading(false);
     }
   }, []);
 
   // Load on login, clear on logout.
   useEffect(() => {
-    if (!isLoggedIn) return send({ type: 'clear' });
+    if (!isLoggedIn) {
+      reloadSeq.current += 1; // an answer that arrives after logout must not refill the list
+      setLoading(false);
+      return send({ type: 'clear' });
+    }
     reload();
   }, [isLoggedIn, reload]);
 

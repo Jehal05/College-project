@@ -230,13 +230,94 @@ export function shouldAlertSound(list, msg, ctx = {}) {
   return msg.state === 'SOS_SENT' && isEarly(known.state);
 }
 
+// ---------- Reload without losing what arrived meanwhile ----------
+
+const ms = (t) => new Date(t).getTime();
+const lastEventMs = (e) => (e.status_events || []).reduce((m, ev) => (Number.isFinite(ms(ev.timestamp)) ? Math.max(m, ms(ev.timestamp)) : m), 0);
+const SAME_EVENT_MS = 5000; // the same step reported by the list and by the live feed can differ by a few seconds
+
+/** Are these two timeline entries the same thing? Notes match by id; steps match by state and time. */
+function sameEvent(a, b) {
+  if (a.state === 'NOTE' || b.state === 'NOTE') {
+    if (a.state !== b.state) return false;
+    return a.note_id && b.note_id ? a.note_id === b.note_id : a.note === b.note && Math.abs(ms(a.timestamp) - ms(b.timestamp)) <= SAME_EVENT_MS;
+  }
+  return a.state === b.state && Math.abs(ms(a.timestamp) - ms(b.timestamp)) <= SAME_EVENT_MS;
+}
+
+/** Timeline of the server list plus the entries only this screen has (live events, local notes), oldest first. */
+export function mergeTimelines(serverEvents = [], localEvents = []) {
+  const merged = [...serverEvents];
+  for (const ev of localEvents) if (!merged.some((m) => sameEvent(m, ev))) merged.push(ev);
+  return merged
+    .map((ev, i) => ({ ev, i }))
+    .sort((x, y) => (ms(x.ev.timestamp) || 0) - (ms(y.ev.timestamp) || 0) || x.i - y.i)
+    .map((x) => x.ev);
+}
+
+/** Checklist: per item, the newer tick wins. */
+function mergeChecklists(server = {}, local = {}) {
+  const out = { ...server };
+  for (const [id, item] of Object.entries(local)) {
+    const other = out[id];
+    if (!other || (ms(item?.at) || 0) > (ms(other?.at) || 0)) out[id] = item;
+  }
+  return out;
+}
+
+/**
+ * Combine a freshly loaded list with what this screen already holds.
+ * A load that was in flight while live events arrived must not undo them:
+ *   - the same case: timeline entries, notes and checklist ticks of both are kept; if this screen has a NEWER step, its state wins
+ *   - a case that only this screen has: kept when it was updated since the load began (it arrived live), else dropped (finished meanwhile)
+ *   - the same id but a clearly different alert time = a new case with a reused id: the loaded one replaces the old one
+ *   - read marks, NEW marks and flash times are kept
+ */
+export function mergeLoaded(list, loaded, startedAt = 0) {
+  const known = new Map(list.map((e) => [e.emergency_id, e]));
+  const out = (loaded || []).map((raw) => {
+    const fresh = normalise(raw);
+    const local = known.get(fresh.emergency_id);
+    known.delete(fresh.emergency_id);
+    if (!local || isNewCaseWithOldId(local, fresh.created_at)) return { ...fresh, _read: Boolean(local?._read && !isNewCaseWithOldId(local, fresh.created_at)) };
+    const localNewer = lastEventMs(local) > lastEventMs(fresh);
+    const base = localNewer ? { ...fresh, ...pickLive(local) } : fresh;
+    return {
+      ...base,
+      status_events: mergeTimelines(fresh.status_events, local.status_events),
+      checklist: mergeChecklists(fresh.checklist, local.checklist),
+      alerted_ids: [...new Set([...(fresh.alerted_ids || []), ...(local.alerted_ids || [])])],
+      _read: Boolean(local._read),
+      _new: local._new ?? fresh._new,
+      ...(local.flash_from != null ? { flash_from: local.flash_from } : {}),
+      ...(local.sos_sent_at && !fresh.sos_sent_at ? { sos_sent_at: local.sos_sent_at } : {}),
+    };
+  });
+  // Cases only this screen has: keep the ones that arrived live while the load was running.
+  for (const local of known.values()) {
+    const touched = Math.max(lastEventMs(local), Number.isFinite(local.flash_from) ? local.flash_from : 0);
+    if (startedAt && touched >= startedAt - 1000) out.push(local);
+  }
+  return out;
+}
+
+// The fields a live event changes. Used when this screen is ahead of the loaded list.
+const pickLive = (e) => ({
+  state: e.state,
+  escalation_level: e.escalation_level,
+  alerted_hospital_id: e.alerted_hospital_id,
+  alerted_hospital_name: e.alerted_hospital_name,
+  escalated_to_name: e.escalated_to_name,
+  escalated_at: e.escalated_at,
+  ambulance_id: e.ambulance_id,
+  ambulance: e.ambulance,
+});
+
 export function emergencyReducer(list, action) {
   switch (action.type) {
-    case 'load': {
-      // Keep the read marks when the list is reloaded (for example after a reconnect).
-      const read = new Set(list.filter((e) => e._read).map((e) => e.emergency_id));
-      return action.list.map((e) => ({ ...normalise(e), _read: read.has(e.emergency_id) }));
-    }
+    case 'load':
+      // Keeps read marks, notes, ticks and live events that arrived while the list was loading (see mergeLoaded).
+      return mergeLoaded(list, action.list, action.startedAt);
     case 'read':
       return list.map((e) => (e.emergency_id === action.id && !e._read ? { ...e, _read: true } : e));
     case 'checklist':
