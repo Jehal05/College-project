@@ -48,3 +48,9 @@ test('a list item with one event or none needs the full details', () => {
   assert.equal(needsDetails({}), true);
   assert.equal(needsDetails({ status_events: [ev('SOS_SENT', '00'), ev('HOSPITAL_ACKNOWLEDGED', '01')] }), false);
 });
+
+test('each case keeps the raw type code so the page can translate the name', () => {
+  const sheet = handoverSheet([mk('A', 'HOSPITAL_ACKNOWLEDGED', 'EMERGENCY', [ev('SOS_SENT', '00')])]);
+  assert.equal(sheet.cases[0].type, 'HEART');
+  assert.equal(sheet.cases[0].type_label, 'Heart attack');
+});

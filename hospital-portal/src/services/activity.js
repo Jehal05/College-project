@@ -27,7 +27,7 @@ export function actorGroup(actor) {
 export function buildActivity(cases = [], checklists = {}) {
   const out = [];
   for (const e of cases) {
-    const base = { emergency_id: e.emergency_id, type_label: TYPE_LABELS[e.type] || e.type || 'Alert', case_key: caseKey(e) };
+    const base = { emergency_id: e.emergency_id, type: e.type ?? null, type_label: TYPE_LABELS[e.type] || e.type || 'Alert', case_key: caseKey(e) };
     (e.status_events || []).forEach((ev, i) => {
       const ts = ev.timestamp;
       if (!Number.isFinite(Date.parse(ts))) return;

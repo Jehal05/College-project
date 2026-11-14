@@ -1,8 +1,8 @@
-import { SEVERITY_STYLES, TYPE_LABELS } from '../../services/contract.js';
+import { SEVERITY_STYLES } from '../../services/contract.js';
 import { isEarly } from '../../services/stateMachine.js';
 import { originText } from '../../services/adapters.js';
 import { useT } from '../../i18n/index.js';
-import { stateText, severityText } from '../../i18n/phrases.js';
+import { stateText, severityText, typeText } from '../../i18n/phrases.js';
 
 /** Title row and the banners that explain the state (cancelled, early notice, safety check-in, escalated). */
 export default function DetailHeader({ emergency: e, escalatedTo }) {
@@ -14,7 +14,7 @@ export default function DetailHeader({ emergency: e, escalatedTo }) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-3xl font-bold">{TYPE_LABELS[e.type] || e.type}</h2>
+        <h2 className="text-3xl font-bold">{typeText(t, e.type)}</h2>
         <span className={`rounded-full px-3 py-1 font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, e.severity)}{e.severity_missing ? '?' : ''}</span>
         <span data-testid="detail-state" className={`rounded-lg px-3 py-1 font-semibold ${cancelled ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-700'}`}>
           {stateText(t, e.state)}

@@ -4,7 +4,7 @@ import { useEmergencies } from '../components/EmergencyProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
-import { stateText, severityText } from '../i18n/phrases.js';
+import { stateText, severityText, typeText } from '../i18n/phrases.js';
 import { handoverSheet, needsDetails } from '../services/handoverSheet.js';
 import { getScope, subscribeUi } from '../services/uiStore.js';
 import { SEVERITY_STYLES } from '../services/contract.js';
@@ -46,7 +46,7 @@ export default function Handover() {
           <li key={c.emergency_id} data-testid="handover-case" data-id={c.emergency_id} className="report break-inside-avoid rounded-2xl border-2 border-slate-300 bg-white p-4 shadow">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <b className="text-xl">{c.emergency_id}</b>
-              <span>{c.type_label}</span>
+              <span>{c.type ? typeText(t, c.type) : c.type_label}</span>
               {c.severity && <span className={`rounded-full px-3 py-0.5 text-base font-bold ${SEVERITY_STYLES[c.severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, c.severity)}</span>}
               <span>{t('handover.patient', { id: c.patient_id ?? t('handover.notShared') })}</span>
               <span className="text-slate-600">{stateText(t, c.state).split(' · ')[0]}</span>

@@ -77,3 +77,9 @@ test('audit errors: missing, forbidden, login, other', () => {
   assert.equal(auditError({ status: 401 }).kind, 'login');
   assert.match(auditError({ status: 500, message: 'boom' }).text, /boom/);
 });
+
+test('activity rows keep the raw type code so the page can translate the name', () => {
+  const rows = buildActivity([{ emergency_id: 'E9', type: 'STROKE', status_events: [{ state: 'SOS_SENT', timestamp: '2026-11-14T10:00:00.000Z', actor: 'Patient app' }] }], {});
+  assert.equal(rows[0].type, 'STROKE');
+  assert.equal(rows[0].type_label, 'Stroke');
+});

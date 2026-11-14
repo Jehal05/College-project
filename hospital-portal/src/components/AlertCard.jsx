@@ -1,4 +1,4 @@
-import { SEVERITY_STYLES, TYPE_LABELS } from '../services/contract.js';
+import { SEVERITY_STYLES } from '../services/contract.js';
 import { nextHospital } from '../services/escalation.js';
 import { useRanking } from './useRanking.js';
 import EscalationCountdown from './EscalationCountdown.jsx';
@@ -11,7 +11,7 @@ import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
-import { stateText, severityText } from '../i18n/phrases.js';
+import { stateText, severityText, typeText } from '../i18n/phrases.js';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -61,7 +61,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
       <div className="flex items-center justify-between gap-2">
         <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
           {unread && <span title={t('card.notOpened')} className="h-3.5 w-3.5 shrink-0 rounded-full bg-sky-500" />}
-          {TYPE_LABELS[type] || type}
+          {typeText(t, type)}
           {isNew && <span data-testid="new-badge" className="rounded bg-sky-600 px-1.5 py-0.5 text-xs font-bold text-white">{t('card.new')}</span>}
         </span>
         {cancelled ? (

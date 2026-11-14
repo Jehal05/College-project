@@ -8,6 +8,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
 import { useHistory } from '../components/HistoryProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
+import { typeText } from '../i18n/phrases.js';
 import { buildActivity, filterActivity, auditRows, auditError, KINDS, WHO } from '../services/activity.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
@@ -96,7 +97,7 @@ export default function Activity() {
             <li key={x.id} data-kind={x.kind} data-who={x.who} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 p-3">
               <time dateTime={x.ts} className="w-44 shrink-0 font-semibold tabular-nums text-slate-700">{when(x.ts)}</time>
               <Link to={`/report/${x.emergency_id}?t=${encodeURIComponent(x.case_key.split('|')[1] || '')}`} className="font-bold text-sky-800 underline">{x.emergency_id}</Link>
-              <span className="text-sm text-slate-500">{x.type_label}</span>
+              <span className="text-sm text-slate-500">{x.type ? typeText(t, x.type) : x.type_label}</span>
               <span data-testid="activity-text" className="text-lg">{x.text}</span>
               <span className="ml-auto text-slate-600">{x.actor || t('act.system')} <span className="text-sm">({t(`act.w.${x.who}`)})</span></span>
               {x.local_only && <span className="text-sm font-semibold text-amber-800">{t('act.localOnly')}</span>}

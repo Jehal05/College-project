@@ -14,6 +14,7 @@ export function handoverSheet(emergencies, hospitalName = (id) => id) {
     .map((e) => ({
       emergency_id: e.emergency_id,
       patient_id: e.patient_id ?? null,
+      type: e.type ?? null,
       type_label: TYPE_LABELS[e.type] || e.type || '',
       severity: e.severity ?? null,
       state: e.state,
