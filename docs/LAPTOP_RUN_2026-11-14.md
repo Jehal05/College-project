@@ -26,11 +26,15 @@ Seen by Claude in the portal (port 5174, real backend on 8000, staff@demo.test):
 - **Handover note, desk chat message and one checklist tick** (1 of 6) worked and showed at once.
 - **Ambulance does not move by itself** on the real backend: with `VITE_PORTAL_SIMULATES_AMBULANCE=false` the tracking panel said "simulated by the backend", the ETA stayed empty and the ambulance stayed "about to leave" until the buttons were pressed. **With `true` it works:** after Dispatch the portal moved the ambulance, the ETA counted down (5 min 54 s to 3 min 12 s in about 25 s at 9x speed) and the panel said "simulated by the portal". Whether the backend should move it instead is Daksh's decision.
 - **Label fix checked live (second run, 23:2x):** laptop updated with `git pull` (it fast-forwarded to aed4280). A fresh SOS (EM-20261114-0003) was held by Vastrapur Neuro & Trauma Centre; after take-over (reason "Demo or training") and Acknowledge the old "now at" label went away, and after Dispatch the tracking said "Alpha 1 (AMB-AMD-01) → Navrangpura Heart & Stroke Institute".
-- **Escalation fix is not running on the laptop yet:** that fresh heart-attack SOS was still escalated to Vastrapur, which has no cath lab. The running backend process was started before the pull and has the old code; it must be restarted to pick up 6dbc911. Not re-checked after a restart.
+- **Escalation fix checked after a backend restart (23:33):** the backend was restarted from the pulled code (aed4280) and a fresh heart-attack SOS was sent (EM-20261114-0004). It escalated **once**, at 30 s, to Maninagar General Hospital (has a cath lab), and stayed there for the 2+ minutes watched. The old run went through hospitals with no cath lab four times. Only the final holder was read from the API; the first hospital was not read from the data.
+- **Live updates between two tabs:** with the portal open in two Chrome tabs, taking over and acknowledging EM-20261114-0004 in tab B showed in tab A ("Acknowledged · no ambulance dispatched yet") without a reload.
+- **Patient app on the real backend** (`VITE_API_URL=http://localhost:8000`): login as the demo patient worked, a Heart-or-chest SOS (EM-20261114-0005) was created, counted down 5 s, showed "SOS sent" and "Hospital: Navrangpura Heart & Stroke Institute", and appeared in the portal (tab A) without a reload. The home screen showed heart rate "--" ("Waiting for readings"); the wearable readings were not checked.
+- **Sound:** the portal shows "Sound on" and "Test sound". Not heard by Claude; listen yourself.
+- **Languages:** Hindi and Gujarati switch the menus and headings. About 129 words stayed in English in both (for example "Heart attack: Arrived at hospital", "Simulated"). Not checked whether those are data or missing translations. No one has reviewed the translations.
+- **npm audit:** see `docs/NPM_AUDIT_2026-11-14.md` (mock-server 0; patient-app 14, including 2 critical in test tooling).
 - **Ranking differs:** the portal lists Maninagar General first (93.0) and Navrangpura second (84.3); the backend's own ranking for the SOS put HSP-AMD-002 (Navrangpura) first. Not resolved; it is a team decision.
-- Not looked at: WebSocket live push from another client, the patient app on the real backend, sound, the map beyond the label, Hindi/Gujarati.
+- Not looked at: the map beyond the label, whether Hindi/Gujarati gaps are data or missing text, the patient app's wearable readings.
 
 ## Not done
-- The patient app against the real backend.
 - Screens (portal, patient app, sound, map, Hindi/Gujarati) were not looked at.
 - Not tested: running `start-all.ps1` from a normal interactive PowerShell window (it was started hidden by a helper).
