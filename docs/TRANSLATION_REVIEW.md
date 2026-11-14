@@ -779,6 +779,53 @@ Drafts, not yet checked by a native speaker.
 | `dis.steps.liver.2` | Ask your doctor how often these tests are needed. | डॉक्टर से पूछें कि ये जाँच कितनी बार चाहिए। | ડૉક્ટરને પૂછો કે આ ટેસ્ટ કેટલી વાર જોઈએ. | [ ] |
 | `dis.steps.liver.3` | Tell every doctor about all medicines and supplements you take. | हर डॉक्टर को अपनी सभी दवाओं और सप्लीमेंट के बारे में बताएँ। | દરેક ડૉક્ટરને તમારી બધી દવાઓ અને સપ્લિમેન્ટ વિશે જણાવો. | [ ] |
 
+## Emergency Response Center (UI phase 1e)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `emc.intro` | See what the alert flow is doing, who would be told and what would be shared. | देखें कि अलर्ट प्रक्रिया क्या कर रही है, किसे बताया जाएगा और क्या साझा होगा। | જુઓ કે એલર્ટ પ્રક્રિયા શું કરી રહી છે, કોને જણાવાશે અને શું શેર થશે. | [ ] |
+| `emc.sim` | SIMULATION: no real ambulance, hospital or person is contacted by this prototype. In a real emergency call 112 / 108. | सिमुलेशन: यह प्रोटोटाइप किसी असली एम्बुलेंस, अस्पताल या व्यक्ति से संपर्क नहीं करता। असली आपात स्थिति में 112 / 108 पर कॉल करें। | સિમ્યુલેશન: આ પ્રોટોટાઇપ કોઈ સાચી એમ્બ્યુલન્સ, હોસ્પિટલ કે વ્યક્તિનો સંપર્ક કરતું નથી. સાચી કટોકટીમાં 112 / 108 પર કૉલ કરો. | [ ] |
+| `emc.status` | Current emergency | मौजूदा आपातकाल | હાલની કટોકટી | [ ] |
+| `emc.none` | No emergency is running. | कोई आपातकाल चल नहीं रहा। | કોઈ કટોકટી ચાલુ નથી. | [ ] |
+| `emc.start` | Report symptoms | लक्षण बताएँ | લક્ષણો જણાવો | [ ] |
+| `emc.open` | Open the full emergency screen | पूरी आपातकालीन स्क्रीन खोलें | પૂરી કટોકટી સ્ક્રીન ખોલો | [ ] |
+| `emc.loading` | Loading… | लोड हो रहा है… | લોડ થઈ રહ્યું છે… | [ ] |
+| `emc.loadError` | Could not load this emergency. Please try again. | यह आपातकाल लोड नहीं हो सका। कृपया फिर कोशिश करें। | આ કટોકટી લોડ થઈ શકી નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `emc.live` | Live updates on | लाइव अपडेट चालू | લાઇવ અપડેટ ચાલુ | [ ] |
+| `emc.offline` | Live updates paused | लाइव अपडेट रुके हैं | લાઇવ અપડેટ અટક્યા છે | [ ] |
+| `emc.stages` | Steps of the alert | अलर्ट के चरण | એલર્ટનાં પગલાં | [ ] |
+| `emc.notYet` | not happened yet | अभी हुआ नहीं | હજી થયું નથી | [ ] |
+| `emc.stage.detected` | Emergency detected | आपातकाल पहचाना गया | કટોકટી ઓળખાઈ | [ ] |
+| `emc.stage.sos` | Alert sent (simulated) | अलर्ट भेजा गया (सिमुलेटेड) | એલર્ટ મોકલાયું (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.ack` | Hospital acknowledged (simulated) | अस्पताल ने स्वीकार किया (सिमुलेटेड) | હોસ્પિટલે સ્વીકાર્યું (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.dispatched` | Ambulance dispatched (simulated) | एम्बुलेंस भेजी गई (सिमुलेटेड) | એમ્બ્યુલન્સ મોકલાઈ (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.enroute` | En route | रास्ते में | રસ્તામાં | [ ] |
+| `emc.stage.arrived` | Arrived | पहुँच गई | પહોંચી | [ ] |
+| `emc.stage.handover` | Handover done | हस्तांतरण पूरा | હસ્તાંતરણ પૂર્ણ | [ ] |
+| `emc.hospital` | Hospital chosen: {{name}} | चुना गया अस्पताल: {{name}} | પસંદ કરેલી હોસ્પિટલ: {{name}} | [ ] |
+| `emc.eta` | Estimated arrival (simulated): about {{min}} min | अनुमानित पहुँच (सिमुलेटेड): लगभग {{min}} मिनट | અંદાજિત પહોંચ (સિમ્યુલેટેડ): લગભગ {{min}} મિનિટ | [ ] |
+| `emc.sentHospital` | Hospital notification: sent. | अस्पताल को सूचना: भेजी गई। | હોસ્પિટલને સૂચના: મોકલાઈ. | [ ] |
+| `emc.notSentHospital` | Hospital notification: not sent yet. | अस्पताल को सूचना: अभी भेजी नहीं गई। | હોસ્પિટલને સૂચના: હજી મોકલાઈ નથી. | [ ] |
+| `emc.ackHospital` | Hospital acknowledgement: received. | अस्पताल की स्वीकृति: मिल गई। | હોસ્પિટલની સ્વીકૃતિ: મળી. | [ ] |
+| `emc.notAckHospital` | Hospital acknowledgement: not received yet. | अस्पताल की स्वीकृति: अभी नहीं मिली। | હોસ્પિટલની સ્વીકૃતિ: હજી મળી નથી. | [ ] |
+| `emc.sentContacts` | Contacts notification sent to: {{names}}. | संपर्कों को सूचना भेजी गई: {{names}}। | સંપર્કોને સૂચના મોકલાઈ: {{names}}. | [ ] |
+| `emc.notSentContacts` | Contacts notification: not sent. | संपर्कों को सूचना: भेजी नहीं गई। | સંપર્કોને સૂચના: મોકલાઈ નથી. | [ ] |
+| `emc.ackContacts` | Contact acknowledgement: not tracked in this prototype. | संपर्क की स्वीकृति: इस प्रोटोटाइप में ट्रैक नहीं होती। | સંપર્કની સ્વીકૃતિ: આ પ્રોટોટાઇપમાં ટ્રેક થતી નથી. | [ ] |
+| `emc.share` | What would be shared | क्या साझा होगा | શું શેર થશે | [ ] |
+| `emc.shareHelp` | Only what you allow is sent with an alert. | अलर्ट के साथ केवल वही भेजा जाता है जिसकी आप अनुमति देते हैं। | એલર્ટ સાથે ફક્ત તમે મંજૂર કરેલું જ મોકલાય છે. | [ ] |
+| `emc.on` | Allowed | अनुमति है | મંજૂર | [ ] |
+| `emc.off` | Not shared | साझा नहीं | શેર નથી | [ ] |
+| `emc.changeShare` | Change sharing | साझा करना बदलें | શેરિંગ બદલો | [ ] |
+| `emc.contacts` | Your emergency contacts | आपके आपातकालीन संपर्क | તમારા કટોકટી સંપર્કો | [ ] |
+| `emc.noContacts` | No contacts yet. Add someone who should be told. | अभी कोई संपर्क नहीं। जिसे बताया जाना चाहिए उसे जोड़ें। | હજી કોઈ સંપર્ક નથી. જેને જણાવવું જોઈએ તેને ઉમેરો. | [ ] |
+| `emc.manageContacts` | Manage contacts | संपर्क प्रबंधित करें | સંપર્કો મેનેજ કરો | [ ] |
+| `emc.history` | Recent alerts | हाल के अलर्ट | તાજેતરના એલર્ટ | [ ] |
+| `emc.noHistory` | No earlier alerts. | पहले कोई अलर्ट नहीं। | અગાઉ કોઈ એલર્ટ નથી. | [ ] |
+| `emc.record` | View record | रिकॉर्ड देखें | રેકોર્ડ જુઓ | [ ] |
+| `emc.notService` | HealthTwin AI is a student prototype. It is not an emergency service and not a medical device. | HealthTwin AI एक छात्र प्रोटोटाइप है। यह आपातकालीन सेवा नहीं है और चिकित्सा उपकरण नहीं है। | HealthTwin AI વિદ્યાર્થી પ્રોટોટાઇપ છે. તે કટોકટી સેવા નથી અને તબીબી ઉપકરણ નથી. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

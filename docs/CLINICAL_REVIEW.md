@@ -89,3 +89,10 @@ A doctor should check these before anyone outside the team sees them:
 - "General next steps to discuss with a doctor" (`dis.steps.<area>.1-3`): 18 general lines, for example keeping a blood-pressure log or keeping reports together. They are not advice for a case and need a doctor's review (or removal).
 - Neurological, kidney and liver areas have no live readings in this prototype; the screen says so instead of showing numbers.
 - The monitoring trace is a made-up wave drawn from the heart rate. It is labelled "Simulated ... not a real ECG" and must stay labelled.
+
+### 5. Emergency Response Center (UI phase 1e)
+
+- Every screen says SIMULATION: "no real ambulance, hospital or person is contacted by this prototype. In a real emergency call 112 / 108."
+- A step is shown as done only if its exact status event exists (an EN_ROUTE event never makes "Ambulance dispatched" appear). The ETA shows only after the dispatch event.
+- "Notification sent" and "acknowledged" are separate lines. Contact acknowledgement is stated as not tracked, because the backend has no such event (listed in docs/BACKEND_GAPS.md).
+- A doctor or emergency-services adviser should check the wording of the step names and the 112 / 108 line.

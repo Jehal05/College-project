@@ -62,3 +62,11 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 3. Still open: a desk taking over an alert held by another hospital is refused (403) by the backend; `vitals.update` is not streamed once a second; `replay_since` is ignored; the WebSocket path is not agreed with Daksh and Jehal.
 
 Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local contract status now says 76 built, 0 not built (FREEZE READY). The WebSocket and the once-a-second vitals stream exist. Still not built: `family.status` and `responder.alert` pushes, WebSocket replay and `POST /demo/fail`. The real contract script passes 24 of 27 core checks (see `backend/FREEZE.md` for the 3 that do not, and why).
+
+## Needed by the new UI screens (phases 1d and 1e)
+
+| Need | Used by | Today |
+|---|---|---|
+| A "contact acknowledged" status event for family members told about an alert | Emergency Center (shows "not tracked in this prototype") | missing |
+| Live readings for brain, kidney and liver areas (for example lab values over time) | Disease Intelligence (these areas show "no live readings") | missing; reports and notes only |
+| Server-side vitals history (the screens keep the last 60 readings in memory only) | Overview, Twin, Monitor, Disease Intelligence | missing; lost on page close |
