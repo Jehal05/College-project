@@ -90,7 +90,7 @@ export default function ActionButtons({ emergency }) {
         })}
       </div>
       {USE_MOCK && (
-        <p className="mt-2 text-sm text-slate-500">After Dispatch, the simulated ambulance sets “En route” and “Arrived” by itself.</p>
+        <p className="mt-2 text-sm text-slate-500">{t('ctl.afterDispatch')}</p>
       )}
 
       {error && (

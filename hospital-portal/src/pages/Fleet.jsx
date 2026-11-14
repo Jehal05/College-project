@@ -36,7 +36,7 @@ export default function Fleet() {
         </span>
       </div>
       <p data-testid="fleet-movement" className="text-slate-600">
-        {movementText(movementMode === 'true' ? 'portal' : movementMode === 'false' ? 'backend' : USE_MOCK ? 'portal' : 'auto')}
+        {movementText(movementMode === 'true' ? 'portal' : movementMode === 'false' ? 'backend' : USE_MOCK ? 'portal' : 'auto', t)}
       </p>
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
 

@@ -7,9 +7,11 @@ import responders from '../data/responders.json';
 import { nearestAeds, respondersNear, RESPONDER_RADIUS_KM } from '../services/nearby.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useEmergencies } from './EmergencyProvider.jsx';
+import { useT } from '../i18n/index.js';
 
 export default function NearbyHelp({ emergency }) {
   const { addNote } = useEmergencies();
+  const t = useT();
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState('');
   const e = emergency;
@@ -37,18 +39,18 @@ export default function NearbyHelp({ emergency }) {
 
   return (
     <div data-testid="nearby-help" className="space-y-4">
-      <p className="text-sm font-semibold text-slate-500">Sample data. Locations are made up for the demo.</p>
+      <p className="text-sm font-semibold text-slate-500">{t('nb.sample')}</p>
 
       <div>
-        <h4 className="mb-1 font-semibold">Nearest AED</h4>
+        <h4 className="mb-1 font-semibold">{t('nb.nearestAed')}</h4>
         {nearAeds.length === 0 ? (
-          <p className="text-slate-500">No patient location, so no AED can be found.</p>
+          <p className="text-slate-500">{t('nb.noLocation')}</p>
         ) : (
           <ul className="space-y-1">
             {nearAeds.map((a, i) => (
               <li key={a.id} data-testid="aed-row" data-id={a.id} className={`rounded-lg p-2 ${i === 0 ? 'bg-emerald-50 font-semibold' : 'bg-slate-50'}`}>
-                {i === 0 && <span className="mr-2 rounded-full bg-emerald-600 px-2 py-0.5 text-sm text-white">Nearest</span>}
-                {a.name}: <b>{a.distance_km} km</b> · about {a.walk_min} min on foot (simulated)
+                {i === 0 && <span className="mr-2 rounded-full bg-emerald-600 px-2 py-0.5 text-sm text-white">{t('nb.nearest')}</span>}
+                {a.name}: <b>{a.distance_km} km</b> · {t('nb.walk', { min: a.walk_min })}
                 <span className="block text-sm font-normal text-slate-500">{a.note}</span>
               </li>
             ))}
@@ -57,9 +59,9 @@ export default function NearbyHelp({ emergency }) {
       </div>
 
       <div>
-        <h4 className="mb-1 font-semibold">Community responders within {RESPONDER_RADIUS_KM} km</h4>
+        <h4 className="mb-1 font-semibold">{t('nb.responders', { km: RESPONDER_RADIUS_KM })}</h4>
         {people.length === 0 ? (
-          <p data-testid="no-responders" className="text-slate-500">No sample responder is near this patient.</p>
+          <p data-testid="no-responders" className="text-slate-500">{t('nb.noResponders')}</p>
         ) : (
           <ul className="space-y-1">
             {people.map((p) => {
@@ -73,14 +75,14 @@ export default function NearbyHelp({ emergency }) {
                     onClick={() => notify(p)}
                     className="rounded-lg bg-purple-700 px-3 py-1.5 font-bold text-white hover:bg-purple-800 disabled:bg-slate-300 disabled:text-slate-500"
                   >
-                    {sent ? 'Alert sent (simulated)' : 'Notify responder (simulated)'}
+                    {sent ? t('nb.sent') : t('nb.notify')}
                   </button>
                 </li>
               );
             })}
           </ul>
         )}
-        <p className="mt-1 text-sm text-slate-500">A simulated alert is only a note on the timeline. It does not confirm that anyone will respond.</p>
+        <p className="mt-1 text-sm text-slate-500">{t('nb.simNote')}</p>
       </div>
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
     </div>

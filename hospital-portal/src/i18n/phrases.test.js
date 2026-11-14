@@ -55,3 +55,19 @@ test('durations: English matches formatSeconds, Hindi and Gujarati use their own
   assert.equal(durationText(tr('gu'), 125), '2 મિનિટ 5 સેકન્ડ');
   assert.equal(durationText(tr('hi'), 3660), '1 घंटा 1 मिनट');
 });
+
+test('detail panel, ranking, nearby help and hospital panel strings are translated in Hindi and Gujarati', async () => {
+  const DICTS = { en: (await import('./en.js')).default, hi: (await import('./hi.js')).default, gu: (await import('./gu.js')).default };
+  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.'];
+  const keys = Object.keys(DICTS.en).filter((k) => prefixes.some((p) => k.startsWith(p)));
+  assert.ok(keys.length >= 50, `expected many keys, got ${keys.length}`);
+  for (const k of keys) {
+    for (const lang of ['hi', 'gu']) {
+      assert.ok(DICTS[lang][k], `${lang} is missing ${k}`);
+      assert.notEqual(DICTS[lang][k], DICTS.en[k], `${lang} ${k} is still English`);
+      // placeholders must survive translation
+      const ph = (s) => (s.match(/\{\w+\}/g) || []).sort().join();
+      assert.equal(ph(DICTS[lang][k]), ph(DICTS.en[k]), `${lang} ${k} changed its placeholders`);
+    }
+  }
+});

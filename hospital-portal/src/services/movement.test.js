@@ -46,3 +46,15 @@ test('classifyLocationEvent: local, echo of our own post, or backend', () => {
   assert.equal(classifyLocationEvent({ event: 'ambulance.location', payload: { actor: 'Ambulance' } }, posts, now), 'ignore'); // no coordinates
   assert.equal(classifyLocationEvent(loc(null, null), posts, now), 'ignore');
 });
+
+test('movementText: English without t, translated with t, English if a key is missing', async () => {
+  const { translate } = await import('../i18n/translate.js');
+  const tr = (lang) => (key, vars) => translate(lang, key, vars);
+  for (const src of ['portal', 'backend', 'auto']) {
+    assert.equal(movementText(src, tr('en')), movementText(src));
+    assert.notEqual(movementText(src, tr('hi')), movementText(src));
+    assert.notEqual(movementText(src, tr('gu')), movementText(src));
+    assert.ok(movementText(src, tr('hi')).includes('simulated') || src === 'auto');
+  }
+  assert.equal(movementText('portal', (k) => k), 'Ambulance movement: simulated by the portal');
+});

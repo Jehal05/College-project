@@ -30,10 +30,18 @@ export function movementSource({ mode, useMock, portalTripRunning, backendSeen }
   return portalTripRunning ? 'portal' : 'auto';
 }
 
-export const movementText = (source) =>
-  source === 'portal' ? 'Ambulance movement: simulated by the portal'
-    : source === 'backend' ? 'Ambulance movement: simulated by the backend'
-    : 'Ambulance movement: the portal moves it unless the backend sends positions';
+const MOVEMENT_ENGLISH = {
+  portal: 'Ambulance movement: simulated by the portal',
+  backend: 'Ambulance movement: simulated by the backend',
+  auto: 'Ambulance movement: the portal moves it unless the backend sends positions',
+};
+/** @param t optional translate function (from useT). Without it the text is English. */
+export const movementText = (source, t) => {
+  const key = source === 'portal' ? 'portal' : source === 'backend' ? 'backend' : 'auto';
+  if (!t) return MOVEMENT_ENGLISH[key];
+  const v = t(`mv.${key}`);
+  return v === `mv.${key}` ? MOVEMENT_ENGLISH[key] : v;
+};
 
 /**
  * Is an incoming ambulance.location a real backend event?

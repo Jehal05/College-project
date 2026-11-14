@@ -5,6 +5,7 @@
 //   onSelect       – optional, called with the hospital when a row is clicked
 import rankingConfig from '../data/ranking-config.json';
 import SimulatedBadge from './SimulatedBadge.jsx';
+import { useT } from '../i18n/index.js';
 
 const PARTS = [
   ['capability', 'Capability', 'bg-emerald-500'],
@@ -22,6 +23,7 @@ const STATUS = {
 const ORDINAL = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 
 export default function RankingTable({ ranking, statuses, ownHospitalId, onSelect }) {
+  const t = useT();
   if (!ranking) return null;
   const { ranked, ruledOut } = ranking;
   const w = rankingConfig.weights;
@@ -29,14 +31,13 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
   return (
     <div data-testid="ranking">
       <p className="mb-3 text-sm text-slate-500">
-        Hospitals without the needed capability are ruled out first. The rest are scored out of 100: capability{' '}
-        {w.capability * 100}%, travel time {w.travel_time * 100}%, availability {w.availability * 100}%.{' '}
-        <SimulatedBadge text="Simulated travel time" className="!text-xs" />
+        {t('rk.intro', { c: w.capability * 100, tt: w.travel_time * 100, a: w.availability * 100 })}{' '}
+        <SimulatedBadge text={t('rk.simTravel')} className="!text-xs" />
       </p>
 
       {ranked.length === 0 && (
         <p className="rounded-xl bg-red-100 p-4 text-lg font-semibold text-red-800">
-          No verified hospital has the capability this emergency needs.
+          {t('rk.none')}
         </p>
       )}
 
@@ -44,6 +45,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
         {ranked.map((row) => {
           const status = statuses?.[row.hospital.id];
           const [statusLabel, statusStyle] = STATUS[status] || [];
+          const statusText = statusLabel ? t(`rk.s.${status}`) : null;
           const Tag = onSelect ? 'button' : 'div';
           return (
             <li key={row.hospital.id}>
@@ -62,9 +64,9 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                   <span className="text-2xl font-bold text-slate-500">{ORDINAL[row.rank - 1] || `${row.rank}th`}</span>
                   <span className="text-xl font-bold">{row.hospital.name}</span>
                   {row.hospital.id === ownHospitalId && (
-                    <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-sm font-semibold text-sky-800">This hospital</span>
+                    <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-sm font-semibold text-sky-800">{t('rk.thisHospital')}</span>
                   )}
-                  {statusLabel && <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${statusStyle}`}>{statusLabel}</span>}
+                  {statusText && <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${statusStyle}`}>{statusText}</span>}
                   <span className="ml-auto text-3xl font-bold tabular-nums">
                     {row.total.toFixed(1)}
                     <span className="text-base font-normal text-slate-500"> / 100</span>
@@ -72,9 +74,9 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                 </div>
 
                 <div className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-3">
-                  {PARTS.map(([key, label, color]) => (
+                  {PARTS.map(([key, , color]) => (
                     <div key={key} data-part={key} data-points={row.points[key]}>
-                      <div className="text-sm font-semibold">{label}</div>
+                      <div className="text-sm font-semibold">{t(`rk.${key}`)}</div>
                       <div className="text-sm tabular-nums text-slate-600">
                         {row.parts[key].toFixed(0)}/100 → <b className="text-slate-900">{row.points[key].toFixed(1)} pts</b>
                       </div>
@@ -86,7 +88,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                 </div>
 
                 <p className="mt-3 text-slate-700">
-                  <b>Why:</b> {row.why}
+                  <b>{t('rk.why')}</b> {row.why}
                   {row.distance_km !== null && <span className="text-slate-500"> · {row.distance_km} km</span>}
                 </p>
               </Tag>
@@ -97,7 +99,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
 
       {ruledOut.length > 0 && (
         <div className="mt-4">
-          <h4 className="mb-2 font-semibold text-slate-600">Ruled out ({ruledOut.length})</h4>
+          <h4 className="mb-2 font-semibold text-slate-600">{t('rk.ruledOut', { n: ruledOut.length })}</h4>
           <ul className="space-y-1.5">
             {ruledOut.map(({ hospital, reason }) => (
               <li

@@ -43,17 +43,17 @@ export default function ActionsPanel({ emergency: e, next }) {
       )}
       {helpers && canCancel(e.state) && (
         <button data-testid="mock-cancel" onClick={() => run(() => mockPatientCancel(e.emergency_id))} className={MOCK_BUTTON}>
-          Mock: patient presses “I’m OK” (cancel)
+          {t('ctl.mockCancel')}
         </button>
       )}
       {helpers && isEarly(e.state) && (
         <button data-testid="mock-confirm-sos" onClick={() => run(() => mockConfirmSos(e.emergency_id))} className={MOCK_BUTTON}>
-          Mock: patient confirms the SOS
+          {t('ctl.mockConfirm')}
         </button>
       )}
       {helpers && canEscalate(e.state) && next && (
         <button data-testid="mock-escalate" onClick={() => run(() => mockEscalate(e.emergency_id))} className={`${MOCK_BUTTON} ml-0 sm:ml-3`}>
-          Mock: escalate now
+          {t('ctl.mockEscalate')}
         </button>
       )}
       {error && <p role="alert" className="mt-2 rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}

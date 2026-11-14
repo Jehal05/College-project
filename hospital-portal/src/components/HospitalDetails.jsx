@@ -1,13 +1,15 @@
 import CapabilityBadges from './CapabilityBadges.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
-import { TYPE_LABELS } from '../services/contract.js';
+import { useT } from '../i18n/index.js';
+import { typeText } from '../i18n/phrases.js';
 
 /** Side panel shown when a hospital marker is clicked. */
 export default function HospitalDetails({ hospital, type, onClose }) {
+  const t = useT();
   if (!hospital) {
     return (
       <div className="rounded-2xl bg-white p-6 text-slate-500 shadow">
-        Click a hospital marker to see its details.
+        {t('hd.hint')}
       </div>
     );
   }
@@ -46,8 +48,8 @@ export default function HospitalDetails({ hospital, type, onClose }) {
           }`}
         >
           {hospital.capability_match
-            ? `Has the capabilities needed for: ${TYPE_LABELS[type]}`
-            : `Missing a capability needed for: ${TYPE_LABELS[type]}`}
+            ? t('hd.match', { type: typeText(t, type) })
+            : t('hd.miss', { type: typeText(t, type) })}
         </div>
       )}
 
