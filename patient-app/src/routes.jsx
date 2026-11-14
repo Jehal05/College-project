@@ -29,6 +29,7 @@ const Family = screen(() => import('./screens/Family'));
 const Responder = screen(() => import('./screens/Responder'));
 const Volunteer = screen(() => import('./screens/Volunteer'));
 const Admin = screen(() => import('./screens/Admin'));
+const Design = DEMO_ENABLED ? screen(() => import('./screens/Design')) : null; // developer page, left out of normal builds
 const DemoTools = DEMO_ENABLED ? screen(() => import('./screens/DemoTools')) : null; // left out of normal builds
 
 function Waiting() {
@@ -40,6 +41,7 @@ function Waiting() {
   );
 }
 import NotFound from './screens/NotFound';
+import ComingSoon from './screens/ComingSoon';
 
 // Patient screens. Anyone else who signs in goes to their own screen and cannot open patient screens.
 function Protected({ children }) {
@@ -76,6 +78,10 @@ export default function AppRoutes() {
       <Route path="/cancelled" element={<Protected><Cancelled /></Protected>} />
       <Route path="/reminders" element={<Protected><Reminders /></Protected>} />
       <Route path="/summary/:id" element={<Protected><Summary /></Protected>} />
+      {[['twin', '/twin'], ['diseases', '/diseases'], ['monitor', '/monitor'], ['emergency', '/emergency-center'], ['simulator', '/simulator'], ['care', '/care-circle'], ['hospitals', '/hospitals']].map(([page, path]) => (
+        <Route key={path} path={path} element={<Protected><ComingSoon page={page} /></Protected>} />
+      ))}
+      {DEMO_ENABLED && <Route path="/design" element={<Protected><Design /></Protected>} />}
       {DEMO_ENABLED && <Route path="/demo" element={<Protected><DemoTools /></Protected>} />}
       <Route path="*" element={<NotFound />} />
     </Routes>

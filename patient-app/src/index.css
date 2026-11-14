@@ -13,7 +13,41 @@
   --emergency: #b91c1c;
 }
 
-html { -webkit-text-size-adjust: 100%; }
+/* ---- HealthTwin theme tokens (Phase 0). Space-separated RGB so Tailwind can add opacity. Dark is the main look. ---- */
+:root, [data-theme='dark'] {
+  --ht-bg: 8 19 33;          /* #081321 main background */
+  --ht-sidebar: 13 27 42;    /* #0D1B2A */
+  --ht-card: 18 38 58;       /* #12263A */
+  --ht-line: 44 70 96;       /* card borders */
+  --ht-accent: 32 199 232;   /* #20C7E8 primary */
+  --ht-accent2: 33 214 163;  /* #21D6A3 healthy */
+  --ht-warning: 245 185 66;  /* #F5B942 */
+  --ht-emergency: 240 68 82; /* #F04452 emergency only: fills, borders, icons */
+  --ht-emergencytext: 255 128 138; /* lighter red for emergency TEXT (the main red is too dark to read on cards) */
+  --ht-text: 244 248 252;    /* #F4F8FC */
+  --ht-muted: 169 188 207;   /* secondary text */
+  --ht-onaccent: 8 19 33;    /* text on an accent-coloured button */
+}
+[data-theme='light'] {
+  --ht-bg: 244 247 251;
+  --ht-sidebar: 255 255 255;
+  --ht-card: 255 255 255;
+  --ht-line: 205 217 230;
+  --ht-accent: 8 120 150;    /* darker so it passes contrast on white */
+  --ht-accent2: 13 125 94;
+  --ht-warning: 146 90 0;
+  --ht-emergency: 185 28 28;
+  --ht-emergencytext: 185 28 28;
+  --ht-text: 15 23 42;
+  --ht-muted: 71 85 105;
+  --ht-onaccent: 255 255 255;
+}
+html { -webkit-text-size-adjust: 100%; color-scheme: light; }
+html[data-theme='dark'] { color-scheme: dark; }
+/* Themed screens use the focus ring colour of the theme; old screens keep the teal ring. */
+.ht-themed :focus-visible { outline-color: rgb(var(--ht-accent)); }
+/* Old screens always sit on a light surface, even when the theme is dark. */
+.ht-legacy { color: #0f172a; }
 body {
   background: #e2e8f0; color: var(--ink); font-size: 1rem; line-height: 1.5;
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Gujarati', sans-serif;

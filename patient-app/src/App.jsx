@@ -9,7 +9,10 @@ import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ReminderBanner from './components/ReminderBanner';
 import SafetyCheckInHost from './components/SafetyCheckInHost';
+import DesktopShell from './components/shell/DesktopShell';
 import AppRoutes from './routes';
+import useIsDesktop from './hooks/useIsDesktop';
+import { isThemed } from './config/navigation';
 import useAuth from './hooks/useAuth';
 import useLanguageSync from './hooks/useLanguageSync';
 import useRouteFocus from './hooks/useRouteFocus';
@@ -24,18 +27,28 @@ export default function App() {
   useAutoSend(); // send an unsent emergency when the connection returns
   useNotificationFeed(); // turn live events into bell notifications
   useRouteFocus(pathname); // move focus to the heading after a page change
-  const showNav = isPatient && !pathname.startsWith('/emergency') && !pathname.startsWith('/p/');
+  const desktop = useIsDesktop();
+  const themed = isThemed(pathname);
+  const plain = pathname.startsWith('/emergency/') || pathname.startsWith('/p/') || pathname === '/login';
+  const showNav = isPatient && !pathname.startsWith('/emergency/') && !pathname.startsWith('/p/');
+  const content = <ErrorBoundary key={pathname}><AppRoutes /></ErrorBoundary>;
+  if (desktop && isPatient && !plain) {
+    return (
+      <>
+        <DesktopShell reminder={<ReminderBanner />}>{content}</DesktopShell>
+        <SafetyCheckInHost />
+      </>
+    );
+  }
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-lift">
+    <div className={'mx-auto flex min-h-screen max-w-md flex-col shadow-lift ' + (themed ? 'ht-themed bg-ht-bg text-ht-text' : 'bg-slate-50')}>
       <SkipLink />
       <SimulatedBanner />
       {!pathname.startsWith('/emergency') && !pathname.startsWith('/p/') && <AppHeader />}
       <main id="main" tabIndex={-1} className="flex-1 p-4">
         <OfflineBanner />
         {isPatient && !pathname.startsWith('/p/') && <ReminderBanner />}
-        <ErrorBoundary key={pathname}>
-          <AppRoutes />
-        </ErrorBoundary>
+        {content}
       </main>
       {showNav && <BottomNav />}
       {isPatient && <SafetyCheckInHost />}
