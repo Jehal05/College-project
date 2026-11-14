@@ -7,11 +7,13 @@ Rules kept here:
   the hospital has one.
 - An error text never repeats what the caller sent.
 """
+import os
 import re
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
+from app.config import truthy
 from app.models.enums import EmergencyType
 from app.models.hospitals import Ambulance, Hospital
 from app.services import hospital_match
@@ -82,6 +84,13 @@ def list_hospitals(session: Session, *, verified_only: bool, where: Optional[Dic
     views = [hospital_view(h, where, emergency_type) for h in rows]
     views.sort(key=lambda v: (not v.get("suitable", True), v["distance_km"], v["id"]))
     return views
+
+
+def own_ambulance_only() -> bool:
+    """PROPOSED, not agreed: DISPATCH_OWN_AMBULANCE_ONLY=true lets a desk dispatch only ambulances based at its own
+    hospital. Off by default (the old behaviour: any available ambulance). Hospital staff only dispatch, so there is
+    no admin override to write."""
+    return truthy(os.environ.get("DISPATCH_OWN_AMBULANCE_ONLY", ""))
 
 
 def ambulance_view(amb: Ambulance) -> dict:

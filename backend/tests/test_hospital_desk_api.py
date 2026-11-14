@@ -295,3 +295,80 @@ def test_a_bad_status_filter_is_400(demo):
 
 def test_the_list_needs_a_login(demo):
     assert demo.get("/emergencies").status_code == 401
+
+
+# ------------------------------------------------------------ PROPOSED rule: dispatch only your own ambulance
+
+def test_by_default_any_available_ambulance_can_be_dispatched(demo, engine):
+    eid = acked(demo, engine)
+    assert post(demo, eid, "dispatch", {"ambulance_id": "AMB-AMD-01"}).status_code == 200    # based at HSP-AMD-001
+
+
+def test_with_the_proposed_rule_on_another_hospitals_ambulance_is_refused(demo, engine, monkeypatch):
+    monkeypatch.setenv("DISPATCH_OWN_AMBULANCE_ONLY", "true")
+    eid = acked(demo, engine)
+    r = post(demo, eid, "dispatch", {"ambulance_id": "AMB-AMD-01"})
+    assert r.status_code == 403 and state(engine, eid) == "HOSPITAL_ACKNOWLEDGED"
+    with Session(engine) as s:
+        assert s.get(Ambulance, "AMB-AMD-01").status == "available"
+    assert denied(engine, "emergency.dispatch", "forbidden_role") == 1
+
+
+def test_with_the_proposed_rule_on_the_own_ambulance_still_works(demo, engine, monkeypatch):
+    monkeypatch.setenv("DISPATCH_OWN_AMBULANCE_ONLY", "true")
+    eid = acked(demo, engine)
+    assert post(demo, eid, "dispatch", {"ambulance_id": "AMB-AMD-02"}).status_code == 200      # based at HSP-AMD-002
+
+
+# ------------------------------------------------------------ a late acknowledge after the alert moved on (kept, documented)
+
+def test_the_first_hospital_may_still_acknowledge_late_until_another_one_has(demo, engine):
+    """Kept on purpose: a desk that is answering should not be turned away because a timer ran out a second ago.
+    Once another hospital has acknowledged, the state table answers 409."""
+    from datetime import datetime, timedelta, timezone
+    from app.services import escalation
+    eid = demo.post("/emergencies", json=CHEST, headers=demo.headers(*PATIENT)).json()["id"]
+    demo.post(f"/emergencies/{eid}/sos", json={}, headers=demo.headers(*PATIENT))
+    with Session(engine) as s:
+        first = s.get(Emergency, eid).hospital_id
+        s.query(HospitalAlert).filter(HospitalAlert.emergency_id == eid).update({"hospital_id": DEMO_HOSPITAL_ID})
+        s.get(Emergency, eid).hospital_id = DEMO_HOSPITAL_ID
+        s.commit()
+    with Session(engine) as s:
+        assert escalation.run_once(s, datetime.now(timezone.utc) + timedelta(seconds=31)) == [eid]
+        assert s.get(Emergency, eid).hospital_id != DEMO_HOSPITAL_ID                      # it moved away from the desk
+    assert post(demo, eid, "ack").status_code == 200                                       # the late desk is still heard
+    assert state(engine, eid) == "HOSPITAL_ACKNOWLEDGED"
+    with Session(engine) as s:
+        assert s.get(Emergency, eid).hospital_id == DEMO_HOSPITAL_ID
+
+
+def test_a_late_acknowledge_after_another_hospital_acknowledged_is_a_409(demo, engine):
+    eid = new_alert(demo, engine)
+    with Session(engine) as s:
+        e = s.get(Emergency, eid)
+        e.state, e.hospital_id = "HOSPITAL_ACKNOWLEDGED", OTHER_HOSPITAL
+        s.add(HospitalAlert(emergency_id=eid, hospital_id=OTHER_HOSPITAL, rank=2, status="ACKNOWLEDGED"))
+        s.commit()
+    r = post(demo, eid, "ack")
+    assert r.status_code == 409 and state(engine, eid) == "HOSPITAL_ACKNOWLEDGED"
+
+
+# ------------------------------------------------------------ the list: same answer, one query for the desk entries
+
+def test_the_list_gives_the_same_answer_as_each_emergencys_own_desk_and_reads_desk_entries_once(demo, engine):
+    from sqlalchemy import event
+    ids = [acked(demo, engine) for _ in range(3)]
+    for n, eid in enumerate(ids):
+        assert post(demo, eid, "notes", {"kind": "desk", "note": f"note {n}"}).status_code == 201
+        assert post(demo, eid, "chat", {"text": f"hello {n}"}).status_code == 201
+        assert demo.patch(f"/emergencies/{eid}/checklist", json={"item_id": "call_cath_lab", "done": True},
+                          headers=demo.headers(*STAFF)).status_code == 200
+    seen_sql = []
+    event.listen(engine, "before_cursor_execute", lambda c, cur, stmt, *a: seen_sql.append(stmt))
+    rows = demo.get("/emergencies?status=active", headers=demo.headers(*STAFF)).json()
+    assert sorted(r["emergency_id"] for r in rows) == sorted(ids)
+    assert sum("FROM desk_entries" in s for s in seen_sql) == 1
+    for r in rows:
+        own = demo.get(f"/emergencies/{r['emergency_id']}/desk", headers=demo.headers(*STAFF)).json()
+        assert {k: r[k] for k in ("checklist", "notes", "chat")} == own

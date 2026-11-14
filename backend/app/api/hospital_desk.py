@@ -139,6 +139,9 @@ def dispatch(emergency_id: str, body: Dict[str, Any], actor: Actor = Depends(get
         raise HTTPException(status_code=400, detail="Unknown ambulance_id")
     if amb.status != "available":
         raise HTTPException(status_code=409, detail="That ambulance is not available")
+    if hospital_svc.own_ambulance_only() and amb.base_hospital_id != actor.hospital_id:   # PROPOSED rule, off by default
+        _deny(db, actor, action, emergency.id, "forbidden_role", 403,
+              "That ambulance belongs to another hospital", emergency.patient_id)
     emergency_state.transition(db, emergency, S.AMBULANCE_DISPATCHED, actor,
                                payload={"ambulance_id": amb.id, "eta_seconds": eta})
     amb.status, emergency.ambulance_id = "dispatched", amb.id
@@ -277,16 +280,21 @@ def list_for_desk(status: Optional[str] = None, actor: Actor = Depends(get_curre
         raise HTTPException(status_code=400, detail="status must be active or finished")
     rows = db.query(Emergency).filter(Emergency.sos_at.isnot(None)).order_by(Emergency.created_at.desc()).all()
     if actor.role == "HOSPITAL_STAFF":
-        rows = [e for e in rows if actor.hospital_id and _alerted(db, e, actor.hospital_id)]
+        alerted = set()
+        if actor.hospital_id:                               # one query for every alert of this hospital
+            alerted = {a for (a,) in db.query(HospitalAlert.emergency_id)
+                       .filter(HospitalAlert.hospital_id == actor.hospital_id).all()}
+        rows = [e for e in rows if actor.hospital_id and (e.hospital_id == actor.hospital_id or e.id in alerted)]
     if status == "active":
         rows = [e for e in rows if e.state not in _FINISHED]
     elif status == "finished":
         rows = [e for e in rows if e.state in _FINISHED]
     out, released = [], set()
+    desks = desk.desk_views(db, rows)                       # one query for all notes, chat and ticks
     for emergency in rows:
         body = svc.view(db, emergency, "staff")
         released.update(svc.released_fields(body))
-        out.append({**body, "emergency_id": emergency.id, **desk.desk_view(db, emergency)})
+        out.append({**body, "emergency_id": emergency.id, **desks[emergency.id]})
     audit.record(db, action=action, resource_type="emergency", resource_id=None, outcome="allowed", actor=actor,
                  fields_released=sorted(released))
     return out
