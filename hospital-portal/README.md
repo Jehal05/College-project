@@ -25,6 +25,7 @@ Log in with `staff@demo` or `admin@demo`, password `demo123` (mock mode only).
 
 | `VITE_PORTAL_SIMULATES_AMBULANCE` | `auto` (default), `true` or `false`. Who moves the (simulated) ambulance on the map. See below. |
 | `VITE_WS_AUTH` | `query` (default, token in the WebSocket address) or `message` (safer for a real backend: token sent as the first message, needs Daksh's OK). |
+| `VITE_MOCK_SEED` | Optional number (mock mode). Makes "Simulate new alert" repeat the same cases in the same order every run. Empty = random. |
 
 Restart `npm run dev` after changing `.env`.
 

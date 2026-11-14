@@ -5,6 +5,9 @@ import { useHistory } from '../components/HistoryProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { filterCases } from '../services/cases.js';
+import { USE_MOCK } from '../services/config.js';
+import { savedCount, clearSaved } from '../services/historyStore.js';
+import { MAX_SAVED } from '../services/historyCap.js';
 import { stepDurations } from '../services/analytics.js';
 import { isFinal } from '../services/stateMachine.js';
 import { formatSeconds } from '../services/report.js';
@@ -16,7 +19,9 @@ const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
 
 export default function History() {
   const t = useT();
-  const { cases, loading, error } = useHistory();
+  const { cases, loading, error, reload } = useHistory();
+  const [asking, setAsking] = useState(false);
+  const saved = savedCount();
   const { hospitals } = useHospitals();
   const [f, setF] = useState({ text: '', type: '', severity: '', state: 'finished', from: '', to: '', hospital: '' });
   const set = (k) => (e) => setF((old) => ({ ...old, [k]: e.target.value }));
@@ -31,6 +36,19 @@ export default function History() {
         <SimulatedBadge text={t('hist.badge')} />
         <span data-testid="history-count" className="ml-auto text-xl font-semibold">{t('hist.count', { n: rows.length, total: cases.length })}</span>
       </div>
+      {USE_MOCK && (
+        <div data-testid="history-saved" className="flex flex-wrap items-center gap-3 rounded-xl bg-white p-3 shadow">
+          <span className="text-slate-700">{t('hist.savedNote', { n: saved, max: MAX_SAVED })}</span>
+          {!asking && <button data-testid="history-clear-saved" disabled={saved === 0} onClick={() => setAsking(true)} className="rounded-lg border-2 border-slate-300 px-3 py-1.5 font-semibold hover:bg-slate-50 disabled:opacity-50">{t('hist.clearSaved')}</button>}
+          {asking && (
+            <span data-testid="history-clear-confirm" className="flex flex-wrap items-center gap-2 rounded-lg bg-amber-100 px-3 py-1">
+              {t('hist.clearAsk', { n: saved })}
+              <button data-testid="history-clear-yes" onClick={() => { clearSaved(); setAsking(false); reload(); }} className="rounded bg-red-600 px-3 py-1 font-bold text-white">{t('hist.clearYes')}</button>
+              <button data-testid="history-clear-no" onClick={() => setAsking(false)} className="rounded bg-slate-300 px-3 py-1 font-semibold">{t('hist.clearNo')}</button>
+            </span>
+          )}
+        </div>
+      )}
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
 
       <div className="grid gap-3 rounded-2xl bg-white p-4 shadow md:grid-cols-2 xl:grid-cols-4">

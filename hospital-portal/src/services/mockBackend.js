@@ -11,6 +11,10 @@ import { emitMock } from './socket.js';
 import { canTransition, canCancel, isFinal, isEarly } from './stateMachine.js';
 import { EVENT_FOR_STATE } from './contract.js';
 import { MOCK_HOSPITALS_KEY } from './demoReset.js';
+import { MOCK_SEED } from './config.js';
+import { makeRandom } from './seededRandom.js';
+
+const random = makeRandom(MOCK_SEED); // repeatable when VITE_MOCK_SEED is set
 
 const records = new Map(); // emergency_id -> emergency with status_events
 // Hospital changes (availability, new hospitals, verification) are kept in the browser so a page
@@ -325,16 +329,16 @@ const SAMPLES = {
 export function createEmergency(type, early = false) {
   seed();
   const types = Object.keys(SAMPLES);
-  const chosen = SAMPLES[type] ? type : types[Math.floor(Math.random() * types.length)];
+  const chosen = SAMPLES[type] ? type : types[Math.floor(random() * types.length)];
   const emergency_id = `E-${++counter}`;
   const created_at = new Date().toISOString();
   const data = {
-    patient_id: `P-${Math.floor(100 + Math.random() * 900)}`,
+    patient_id: `P-${Math.floor(100 + random() * 900)}`,
     type: chosen,
     ...SAMPLES[chosen],
     location: {
-      lat: +(23.0225 + (Math.random() - 0.5) * 0.06).toFixed(4),
-      lng: +(72.5714 + (Math.random() - 0.5) * 0.06).toFixed(4),
+      lat: +(23.0225 + (random() - 0.5) * 0.06).toFixed(4),
+      lng: +(72.5714 + (random() - 0.5) * 0.06).toFixed(4),
       accuracy_m: 20,
     },
   };

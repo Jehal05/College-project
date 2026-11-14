@@ -403,4 +403,9 @@ export default {
   'access.body': 'Your role ({role}) cannot open this page.',
   'access.back': 'Back to the alert queue',
   'access.logout': 'Log out',
+  'hist.savedNote': 'This browser has saved {n} finished cases (the newest {max} are kept).',
+  'hist.clearSaved': 'Clear history',
+  'hist.clearAsk': 'Delete the {n} cases saved in this browser? The sample past cases stay.',
+  'hist.clearYes': 'Yes, clear',
+  'hist.clearNo': 'No, keep',
 };

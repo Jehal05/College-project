@@ -157,3 +157,24 @@ test.describe('accessibility basics', () => {
     await expect(page.locator('input[type=password]')).toBeVisible();
   });
 });
+
+test.describe('saved mock history', () => {
+  test('the saved count shows, "Clear history" asks first, and then forgets only the saved cases', async ({ page }) => {
+    await page.goto('/login');
+    await page.evaluate(() => {
+      const mk = (n) => ({ emergency_id: `E-SAVED-${n}`, patient_id: 'P-1', type: 'HEART', severity: 'EMERGENCY', state: 'HANDOVER_DONE', created_at: `2026-01-0${n}T10:00:00.000Z`, status_events: [{ state: 'SOS_SENT', timestamp: `2026-01-0${n}T10:00:00.000Z` }, { state: 'HANDOVER_DONE', timestamp: `2026-01-0${n}T10:20:00.000Z` }] });
+      localStorage.setItem('ht_mock_history', JSON.stringify([mk(1), mk(2)]));
+    });
+    await login(page);
+    await page.goto('/history');
+    await expect(page.locator('[data-testid=history-saved]')).toContainText('2');
+    await page.click('[data-testid=history-clear-saved]');
+    await page.click('[data-testid=history-clear-no]'); // "no" keeps everything
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ht_mock_history')).length)).toBe(2);
+    await page.click('[data-testid=history-clear-saved]');
+    await page.click('[data-testid=history-clear-yes]');
+    await expect(page.locator('[data-testid=history-clear-saved]')).toBeDisabled();
+    expect(await page.evaluate(() => localStorage.getItem('ht_mock_history'))).toBe(null);
+    await expect(page.locator('[data-testid=history-row]').first()).toBeVisible(); // the sample past cases are still there
+  });
+});

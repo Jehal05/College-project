@@ -8,6 +8,7 @@ import { USE_MOCK } from './config.js';
 import { HISTORY_KEY } from './demoReset.js';
 import { isFinal } from './stateMachine.js';
 import { caseKey } from './cases.js';
+import { capSaved } from './historyCap.js';
 
 function readSaved() {
   try {
@@ -37,8 +38,20 @@ export function saveFinished(live) {
   const add = finished.filter((e) => !keys.has(caseKey(e))).map(({ _new, _read, ambulance: _ambulance, ...rest }) => rest);
   if (add.length === 0) return;
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify([...saved, ...add]));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(capSaved([...saved, ...add]))); // only the newest ~200 are kept
   } catch {
     /* storage full or blocked: history just will not survive a reload */
+  }
+}
+
+/** Mock mode: how many finished cases this browser has saved. */
+export const savedCount = () => (USE_MOCK ? readSaved().length : 0);
+
+/** Mock mode: forget the cases this browser saved (the sample past cases stay). */
+export function clearSaved() {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {
+    /* storage blocked: nothing was saved anyway */
   }
 }
