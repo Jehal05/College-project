@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
 import { isHospitalFallback, onHospitalFallback } from '../services/hospitalSource.js';
+import { isBackendDown, onBackendDown } from '../services/backendHealth.js';
 
 /** Shown when the backend could not give the hospital list and the saved sample list is used instead. */
 export default function HospitalFallbackBanner() {
@@ -9,7 +10,9 @@ export default function HospitalFallbackBanner() {
   const { reload, loading } = useHospitals();
   const [on, setOn] = useState(isHospitalFallback());
   useEffect(() => onHospitalFallback(setOn), []);
-  if (!on) return null;
+  const [down, setDown] = useState(isBackendDown());
+  useEffect(() => onBackendDown(setDown), []);
+  if (!on || down) return null; // when the backend is down, the red banner already says it
   return (
     <div role="alert" data-testid="hospital-fallback-banner" className="flex flex-wrap items-center gap-3 border-b-2 border-amber-600 bg-amber-50 px-6 py-2 text-lg font-semibold text-amber-900">
       <span>{t('hospitals.fallback')}</span>

@@ -140,6 +140,13 @@
       "status": "agreed",
       "fallback": "Message: The backend has no audit log yet. (404/405/501), or Only an admin can read it (403). The staff activity list on this screen is unaffected.",
       "mock": "Jehal Phase 9: admin only"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "used_for": "Optional reachability check every 15 s (any answer, even 404, counts as reachable; no token is sent)",
+      "status": "proposed",
+      "fallback": "Nothing needed. If it does not exist, the 404 still shows the server is up. Only a network failure shows the red banner."
     }
   ],
   "events": [

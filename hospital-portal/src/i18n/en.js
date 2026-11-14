@@ -412,4 +412,5 @@ export default {
   'present.on': 'Presentation mode: on',
   'present.hint': 'Bigger text, no demo helper buttons, language fixed',
   'present.langLocked': 'The language is fixed in presentation mode. Turn the mode off to change it.',
+  'backend.down': 'Backend unreachable, using mock data. Beds and units shown may be old samples.',
 };

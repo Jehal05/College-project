@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AlertAnnouncer from './components/AlertAnnouncer.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
+import BackendHealthBanner from './components/BackendHealthBanner.jsx';
 import HospitalFallbackBanner from './components/HospitalFallbackBanner.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -51,6 +52,7 @@ function Shell({ children }) {
       )}
       <AlertAnnouncer />
       <NavBar />
+      <BackendHealthBanner />
       <OfflineBanner />
       <HospitalFallbackBanner />
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
