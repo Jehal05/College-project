@@ -35,6 +35,8 @@ I would be grateful if you could look at one file: `DOCTOR_REVIEW_SHEET.html` (o
 
 For each line, please tick **OK**, write the change under **Change to**, or tick **Remove**. At the end please add your name, the date and your signature. Thank you!
 
+Optional: `DOCTOR_QUESTIONS.md` has a short list of prompts you can hand over with the sheet. It is notes from an AI, not a review.
+
 ## After the doctor has signed
 
 1. Read the signed sheet. If the doctor changed or removed a line, make that change in the data first (the clinical wording is the doctor's, not ours), then run `npm run review-sheet`.
