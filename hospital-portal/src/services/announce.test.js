@@ -78,3 +78,41 @@ test('sound and unread count follow the scope', () => {
   assert.equal(countUnread(list, { ...ctx, scope: 'all' }), 2);
   assert.equal(shouldAlertSound([], created('E1', 'EMERGENCY_DETECTED'), ctx), false);
 });
+
+// ---- translated announcements (ctx.t) ----
+import { translate } from '../i18n/translate.js';
+const withLang = (lang) => ({ ...ctx, t: (key, vars) => translate(lang, key, vars) });
+
+test('with English t the spoken text is exactly the same as without t', () => {
+  for (const state of ['SOS_SENT', 'EMERGENCY_DETECTED']) {
+    assert.deepEqual(announcementFor([], created('E1', state), withLang('en')), announcementFor([], created('E1', state), ctx));
+  }
+  const list = [{ emergency_id: 'E1', type: 'HEART', state: 'SOS_SENT', patient_id: 'pat_001', alerted_hospital_id: 'h1', severity: 'EMERGENCY' }];
+  const ack = { event: 'status.changed', emergency_id: 'E1', state: 'HOSPITAL_ACKNOWLEDGED', payload: {} };
+  assert.deepEqual(announcementFor(list, ack, withLang('en')), announcementFor(list, ack, ctx));
+});
+
+test('Hindi and Gujarati announcements use the translated type name, not the English one', () => {
+  for (const lang of ['hi', 'gu']) {
+    const a = announcementFor([], created('E1', 'SOS_SENT'), withLang(lang));
+    assert.equal(a.politeness, 'assertive');
+    assert.ok(!a.text.includes('Heart attack'), a.text);
+    assert.ok(!a.text.includes('New emergency alert'), a.text);
+    assert.ok(a.text.includes('pat_001') && a.text.includes('simulated'), a.text);
+  }
+});
+
+test('translated state changes use the translated state word', () => {
+  const list = [{ emergency_id: 'E1', type: 'HEART', state: 'SOS_SENT', patient_id: 'pat_001', alerted_hospital_id: 'h1', severity: 'EMERGENCY' }];
+  const msg = { event: 'status.changed', emergency_id: 'E1', state: 'AMBULANCE_DISPATCHED', payload: {} };
+  const en = announcementFor(list, msg, ctx).text;
+  const hi = announcementFor(list, msg, withLang('hi')).text;
+  assert.notEqual(hi, en);
+  assert.ok(hi.includes('simulated') && !hi.includes('Ambulance dispatched'));
+});
+
+test('an unknown type and a missing patient fall back safely when translated', () => {
+  const a = announcementFor([], created('E1', 'SOS_SENT', { type: 'NEW_TYPE', patient_id: null }), withLang('hi'));
+  assert.ok(a.text.includes('NEW_TYPE'), a.text);
+  assert.ok(!a.text.includes('null') && !a.text.includes('undefined'), a.text);
+});

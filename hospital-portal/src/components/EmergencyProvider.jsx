@@ -12,6 +12,8 @@ import { useAuth } from './AuthProvider.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { getScope, getSelectedId, subscribeUi } from '../services/uiStore.js';
 import { announcementFor } from '../services/announce.js';
+import { getLang } from '../i18n/index.js';
+import { translate } from '../i18n/translate.js';
 import { scopeList } from '../services/queueScope.js';
 import { needsTakeOver } from '../services/takeOver.js';
 
@@ -70,7 +72,7 @@ export function EmergencyProvider({ children }) {
       // Sound only for new EMERGENCY-level alerts (feature #59), so it keeps its meaning.
       const ctx = ctxRef.current;
       if (shouldAlertSound(listRef.current, msg, ctx)) playAlertSound();
-      const said = announcementFor(listRef.current, msg, { ...ctx, selectedId: getSelectedId() });
+      const said = announcementFor(listRef.current, msg, { ...ctx, selectedId: getSelectedId(), t: (key, vars) => translate(getLang(), key, vars) });
       if (said) setAnnouncement({ ...said, id: `${Date.now()}-${Math.random()}` });
       send({ type: 'event', msg });
       // A real backend's created event may lack patient, location and hospital: fetch the full record once.
