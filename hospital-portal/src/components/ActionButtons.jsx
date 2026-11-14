@@ -42,10 +42,11 @@ export default function ActionButtons({ emergency }) {
     setConfirming(null);
   }, [id]);
 
-  // Preselect the nearest available unit when the dialog opens.
-  useEffect(() => {
-    if (confirming) setUnitId(availableFor(emergency)[0]?.id || '');
-  }, [Boolean(confirming)]);
+  // Opening the dialog preselects the nearest available unit. Done here, in the click, so no effect has to watch for it.
+  function askToConfirm(action) {
+    setUnitId(availableFor(emergency)[0]?.id || '');
+    setConfirming(action);
+  }
 
   async function run(action, options = {}) {
     setConfirming(null);
@@ -76,7 +77,7 @@ export default function ActionButtons({ emergency }) {
               data-action={action.target}
               disabled={!allowed || busy !== null || locked}
               title={locked ? t('takeover.locked') : allowed ? '' : whyNot(emergency.state, action.target)}
-              onClick={() => (action.confirm ? setConfirming(action) : run(action))}
+              onClick={() => (action.confirm ? askToConfirm(action) : run(action))}
               className={`rounded-lg px-5 py-3 text-lg font-bold ${
                 allowed
                   ? 'bg-sky-600 text-white shadow hover:bg-sky-700 disabled:opacity-60'

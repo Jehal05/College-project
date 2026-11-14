@@ -1,30 +1,33 @@
 // Bed and ICU availability form (feature #42). Staff update their own hospital;
 // the ranking reads these values, so a change here re-ranks at once.
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
 
 const isWholeNumber = (v) => /^\d+$/.test(String(v).trim());
 
+const startForm = (hospital) => {
+  const a = hospital.availability || {};
+  return {
+    beds_free: String(a.beds_free ?? 0),
+    icu_free: String(a.icu_free ?? 0),
+    cath_lab_ready: Boolean(a.cath_lab_ready),
+    stroke_unit_ready: Boolean(a.stroke_unit_ready),
+  };
+};
+
+// A different hospital starts a fresh form (key), and a later update of the same hospital never overwrites what the desk is typing.
 export default function AvailabilityForm({ hospital }) {
+  if (!hospital) return null;
+  return <AvailabilityFormBody key={hospital.id} hospital={hospital} />;
+}
+
+function AvailabilityFormBody({ hospital }) {
   const { saveAvailability } = useHospitals();
   const t = useT();
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState(() => startForm(hospital));
   const [status, setStatus] = useState({ kind: 'idle', text: '' }); // idle | saving | saved | error
 
-  // Fill the form when the hospital loads or another hospital is shown.
-  useEffect(() => {
-    if (!hospital) return;
-    const a = hospital.availability || {};
-    setForm({
-      beds_free: String(a.beds_free ?? 0),
-      icu_free: String(a.icu_free ?? 0),
-      cath_lab_ready: Boolean(a.cath_lab_ready),
-      stroke_unit_ready: Boolean(a.stroke_unit_ready),
-    });
-  }, [hospital?.id]);
-
-  if (!hospital || !form) return null;
   const set = (key, value) => {
     setForm((f) => ({ ...f, [key]: value }));
     setStatus({ kind: 'idle', text: '' });

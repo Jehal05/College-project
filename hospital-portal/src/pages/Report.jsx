@@ -24,9 +24,10 @@ export default function Report() {
   const found = cases.find((c) => c.emergency_id === emergencyId && (!wanted || c.created_at === wanted)) || cases.find((c) => c.emergency_id === emergencyId);
 
   // Real backend: the list has no timeline, so ask for the full details once.
+  const needsDetails = Boolean(found) && (found.status_events || []).length <= 1;
   useEffect(() => {
-    if (found && (found.status_events || []).length <= 1) refresh(emergencyId);
-  }, [emergencyId, Boolean(found)]);
+    if (needsDetails) refresh(emergencyId);
+  }, [needsDetails, emergencyId, refresh]);
 
   const report = useMemo(() => (found ? buildReport(found, { hospitals, rankingConfig, checklists, ambulances }) : null), [found, hospitals, ambulances]);
 

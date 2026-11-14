@@ -49,11 +49,12 @@ export default function Timeline({ events = [], createdAt, t }) {
 
   // Live counter: ticks every second and stops at HANDOVER_DONE or CANCELLED.
   const [now, setNow] = useState(Date.now());
+  const finished = Boolean(finalEvent);
   useEffect(() => {
-    if (finalEvent) return undefined;
+    if (finished) return undefined;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [Boolean(finalEvent)]);
+  }, [finished]);
 
   if (!startMs) return <p className="text-slate-500">No timeline yet.</p>;
 

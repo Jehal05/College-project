@@ -1,17 +1,21 @@
 // Team assignment (feature #46): assign an on-call doctor or team from the hospital's roster.
 // The choice is stored on the emergency and shown on the timeline.
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import roster from '../data/roster.json';
 import { SPECIALTY_FOR_TYPE } from '../services/contract.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { useT } from '../i18n/index.js';
 
+// The choice starts from the current assignment (or the suggested specialty) and starts again when the case or the assignment changes (key).
 export default function TeamAssignment({ emergency }) {
+  return <TeamAssignmentBody key={`${emergency.emergency_id}|${emergency.assigned_team?.id || ''}`} emergency={emergency} />;
+}
+
+function TeamAssignmentBody({ emergency }) {
   const t = useT();
   const { session } = useAuth();
   const { addNote } = useEmergencies();
-  const [choice, setChoice] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const e = emergency;
@@ -21,12 +25,9 @@ export default function TeamAssignment({ emergency }) {
   );
   const current = e.assigned_team || null;
   const readOnly = e.state === 'CANCELLED' || e.state === 'HANDOVER_DONE';
-
   // Preselect the current assignment, or the first person with the fitting specialty.
-  useEffect(() => {
-    setChoice(current?.id || staff.find((s) => s.specialty === suggested)?.id || staff[0]?.id || '');
-    setError('');
-  }, [e.emergency_id, current?.id]);
+  const [choice, setChoice] = useState(() => current?.id || staff.find((s) => s.specialty === suggested)?.id || staff[0]?.id || '');
+
 
   async function assign() {
     const person = staff.find((s) => s.id === choice);

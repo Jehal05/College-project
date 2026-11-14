@@ -9,6 +9,7 @@ import { splitPath } from '../sim/ambulance-route.js';
 import { resolveLevel } from '../services/traffic.js';
 import { isFinal } from '../services/stateMachine.js';
 import { routeForEmergency } from './tripRoute.js';
+import { pickLocation } from '../services/adapters.js';
 import { patientIcon, hospitalPinIcon, ambulanceIcon } from './mapIcons.js';
 import { movementText } from '../services/movement.js';
 import { useAmbulances } from './AmbulanceProvider.jsx';
@@ -31,9 +32,15 @@ export default function TrackingMap({ emergency, compact = false }) {
   const e = emergency;
   const id = e.emergency_id;
 
+  // The route needs only these three fields, so a new vitals reading or ambulance move does not rebuild it.
+  const { ambulance_id: ambulanceId, alerted_hospital_id: alertedId } = e;
+  const where = pickLocation(e); // the patient's point from any of the shapes the backend may send
+  const lat = where?.lat;
+  const lng = where?.lng;
+  const ownHospitalId = session?.hospital_id;
   const route = useMemo(
-    () => routeForEmergency(e, units, hospitals, session?.hospital_id),
-    [e.ambulance_id, e.alerted_hospital_id, e.location?.lat, e.location?.lng, units, hospitals, session?.hospital_id],
+    () => routeForEmergency({ ambulance_id: ambulanceId, alerted_hospital_id: alertedId, location: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined }, units, hospitals, ownHospitalId),
+    [ambulanceId, alertedId, lat, lng, units, hospitals, ownHospitalId],
   );
   if (!route) return <p className="rounded-xl bg-slate-100 p-4 text-slate-500">Waiting for ambulance details…</p>;
 
