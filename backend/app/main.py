@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (audit, auth, consents, contacts, demo_panel, demo_vitals, emergencies, hospital_desk, hospitals,
-                     insights, passport, patients)
+                     insights, passport, passport_links, patients, reminders, reports)
 from app.config import demo_mode, parse_cors_origins
 from app.db import get_session_factory, init_db
 from app.errors import install_error_handlers
@@ -67,6 +67,9 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
     application.include_router(emergencies.router)
     application.include_router(hospital_desk.router)
     application.include_router(hospitals.router)
+    application.include_router(reports.router)
+    application.include_router(reminders.router)
+    application.include_router(passport_links.router)
 
     @application.get("/health", tags=["system"])
     def health() -> dict:

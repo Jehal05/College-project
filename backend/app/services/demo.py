@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.config import demo_mode
 from app.db import Base
-from app.models import accounts, audit, consent, emergencies, hospitals, patient_data  # noqa: F401  (fill Base.metadata)
+from app.models import accounts, audit, consent, emergencies, extras, hospitals, patient_data  # noqa: F401  (fill Base.metadata)
 from app.models.append_only import reset_table
 from app.models.enums import EmergencyType
 from app.models.patient_data import Patient
