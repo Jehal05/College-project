@@ -24,6 +24,12 @@ Phase 5 added the passport, responder page and notification strings (`passport.*
 | Consent | सहमति | સંમતિ |
 | Emergency contacts | आपातकालीन संपर्क | કટોકટીના સંપર્કો |
 | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ |
+| Volunteer responder | आपातकालीन स्वयंसेवक | કટોકટી સ્વયંસેવક |
+| Volunteer | स्वयंसेवक | સ્વયંસેવક |
+| Approve (admin) | मंज़ूर | મંજૂર |
+| Accept (alert) | स्वीकार करें | સ્વીકારો |
+| Invite code | आमंत्रण कोड | આમંત્રણ કોડ |
+| Disabled (account) | निष्क्रिय | નિષ્ક્રિય |
 
 ## High priority (191 strings)
 
@@ -161,7 +167,13 @@ Phase 5 added the passport, responder page and notification strings (`passport.*
 | `error.text` | The app had a problem. If this is an emergency, call now. | ऐप में समस्या आई। यदि यह आपातकाल है, तो अभी कॉल करें। | એપમાં સમસ્યા આવી. જો આ કટોકટી હોય, તો હમણાં કૉલ કરો. | [ ] |
 | `error.reload` | Reload the app | ऐप फिर से खोलें | એપ ફરી ખોલો | [ ] |
 | `login.expired` | Your session ended. Please sign in again. | आपका सत्र समाप्त हो गया। कृपया दोबारा साइन इन करें। | તમારું સત્ર પૂરું થયું. કૃપા કરીને ફરી સાઇન ઇન કરો. | [ ] |
-| `passport.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ | [ ] |
+| `passport.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ |
+| Volunteer responder | आपातकालीन स्वयंसेवक | કટોકટી સ્વયંસેવક |
+| Volunteer | स्वयंसेवक | સ્વયંસેવક |
+| Approve (admin) | मंज़ूर | મંજૂર |
+| Accept (alert) | स्वीकार करें | સ્વીકારો |
+| Invite code | आमंत्रण कोड | આમંત્રણ કોડ |
+| Disabled (account) | निष्क्रिय | નિષ્ક્રિય | [ ] |
 | `passport.intro` | Show this QR code to a responder or doctor. It opens a page with the details you chose to share. The code itself holds no health data. | यह QR कोड किसी सहायक या डॉक्टर को दिखाएँ। इससे एक पेज खुलता है जिसमें वही जानकारी होती है जो आपने साझा करने के लिए चुनी है। कोड में स्वयं कोई स्वास्थ्य जानकारी नहीं होती। | આ QR કોડ કોઈ સહાયક અથવા ડૉક્ટરને બતાવો. તેનાથી એક પેજ ખુલે છે જેમાં તમે શેર કરવા માટે પસંદ કરેલી માહિતી હોય છે. કોડમાં પોતે કોઈ આરોગ્ય માહિતી નથી. | [ ] |
 | `passport.validity` | How long should it work? | यह कितने समय तक चले? | તે કેટલો સમય ચાલે? | [ ] |
 | `passport.hours1` | 1 hour | 1 घंटा | 1 કલાક | [ ] |
@@ -191,7 +203,13 @@ Phase 5 added the passport, responder page and notification strings (`passport.*
 | `passport.loadError` | Could not load your passport. | आपका पासपोर्ट लोड नहीं हो सका। | તમારો પાસપોર્ટ લોડ થઈ શક્યો નથી. | [ ] |
 | `passport.createError` | Could not create the passport. Please try again. | पासपोर्ट नहीं बन सका। कृपया दोबारा कोशिश करें। | પાસપોર્ટ બની શક્યો નથી. કૃપા કરીને ફરી પ્રયાસ કરો. | [ ] |
 | `passport.revokeError` | Could not revoke the passport. Please try again. | पासपोर्ट रद्द नहीं हो सका। कृपया दोबारा कोशिश करें। | પાસપોર્ટ રદ થઈ શક્યો નથી. કૃપા કરીને ફરી પ્રયાસ કરો. | [ ] |
-| `view.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ | [ ] |
+| `view.title` | Health passport | स्वास्थ्य पासपोर्ट | આરોગ્ય પાસપોર્ટ |
+| Volunteer responder | आपातकालीन स्वयंसेवक | કટોકટી સ્વયંસેવક |
+| Volunteer | स्वयंसेवक | સ્વયંસેવક |
+| Approve (admin) | मंज़ूर | મંજૂર |
+| Accept (alert) | स्वीकार करें | સ્વીકારો |
+| Invite code | आमंत्रण कोड | આમંત્રણ કોડ |
+| Disabled (account) | निष्क्रिय | નિષ્ક્રિય | [ ] |
 | `view.preparedBy` | Prepared by the patient. Not verified by a doctor. | मरीज़ द्वारा तैयार किया गया। डॉक्टर द्वारा सत्यापित नहीं। | દર્દી દ્વારા તૈયાર કરેલું. ડૉક્ટર દ્વારા ચકાસાયેલું નથી. | [ ] |
 | `view.patient` | Patient | मरीज़ | દર્દી | [ ] |
 | `view.age` | Age: {{age}} years | आयु: {{age}} वर्ष | ઉંમર: {{age}} વર્ષ | [ ] |
@@ -560,14 +578,14 @@ Demo panel and rehearsal checklist text (only visible in demo builds) and small 
 | `rehearsal.reminder` | Show the medicine reminders screen | दवा के रिमाइंडर की स्क्रीन दिखाएँ | દવાના રિમાઇન્ડરની સ્ક્રીન બતાવો | [ ] |
 | `screen.needsConnection` | This screen needs an internet connection the first time you open it. Go back, or call 112 / 108 if you need help now. | यह स्क्रीन पहली बार खोलने पर इंटरनेट माँगती है। वापस जाएँ, या अभी मदद चाहिए तो 112 / 108 पर कॉल करें। | આ સ્ક્રીન પહેલી વાર ખોલતી વખતે ઇન્ટરનેટ માંગે છે. પાછા જાઓ, અથવા હમણાં મદદ જોઈએ તો 112 / 108 પર કૉલ કરો. | [ ] |
 
-## Family screen and invite (Phase 10, AI-written, not reviewed)
+## Family screen and invite (Phase 10, AI-written, AI-reviewed once, not human-reviewed)
 
-The texts of the family screen live in `src/i18n/family.*.json` (loaded with the screen); the invite and sign-in texts are in the main files.
+The texts of the family screen live in `src/i18n/family.*.json` (loaded with the screen); the invite and sign-in texts are in the main files. An AI review (acting as doctor and Hindi/Gujarati reviewer) was applied on 14 Nov: neutral wording for check-ins, "आपातकाल" and "હોસ્પિટલ" as in the glossary, "आपातकालीन स्वयंसेवक" instead of "उत्तरदाता", "मंज़ूर" (approve) apart from "स्वीकार" (accept). Still open for a human: `responder.intro` has no "do not put yourself in danger" line (needs a doctor's decision); "vitals" and "health history" wording (doctor); whether Western digits ("24") are fine.
 
 | Key | English | Hindi | Gujarati | OK |
 |---|---|---|---|---|
 | `family.title` | Family | परिवार | પરિવાર | [ ] |
-| `family.intro` | See how the people who shared their safety with you are doing. You only see what they chose to share. | जिन लोगों ने अपनी सुरक्षा आपके साथ साझा की है, उनकी स्थिति देखें। आपको केवल वही दिखता है जो उन्होंने साझा करना चुना है। | જેમણે પોતાની સુરક્ષા તમારી સાથે વહેંચી છે તેમની સ્થિતિ જુઓ. તમને ફક્ત તે જ દેખાય છે જે તેમણે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
+| `family.intro` | See how the people who shared their safety information with you are doing. You only see what they chose to share. | जिन लोगों ने आपके साथ अपनी सुरक्षा की जानकारी साझा की है, उनकी स्थिति देखें। आपको केवल वही दिखता है जो उन्होंने साझा करना चुना है। | જેમણે તમારી સાથે પોતાની સુરક્ષાની માહિતી વહેંચી છે તેમની સ્થિતિ જુઓ. તમને ફક્ત તે જ દેખાય છે જે તેમણે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
 | `family.linkTitle` | Link a person | किसी व्यक्ति को जोड़ें | વ્યક્તિને જોડો | [ ] |
 | `family.codeLabel` | Invite code | आमंत्रण कोड | આમંત્રણ કોડ | [ ] |
 | `family.linkButton` | Link | जोड़ें | જોડો | [ ] |
@@ -576,44 +594,44 @@ The texts of the family screen live in `src/i18n/family.*.json` (loaded with the
 | `family.linkError` | Could not link. Please try again. | जोड़ा नहीं जा सका। कृपया दोबारा कोशिश करें। | જોડી શકાયું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
 | `family.empty` | You are not linked to anyone yet. Ask the person for an invite code. | आप अभी किसी से जुड़े नहीं हैं। उस व्यक्ति से आमंत्रण कोड माँगें। | તમે હજી કોઈની સાથે જોડાયેલા નથી. તે વ્યક્તિ પાસેથી આમંત્રણ કોડ માંગો. | [ ] |
 | `family.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
-| `family.shared` | Shared with you | आपके साथ साझा | તમારી સાથે વહેંચાયેલું | [ ] |
-| `family.sharedNone` | Nothing else is shared | और कुछ साझा नहीं है | બીજું કંઈ વહેંચાયેલું નથી | [ ] |
+| `family.shared` | Shared with you | आपके साथ साझा किया गया | તમારી સાથે વહેંચાયેલું | [ ] |
+| `family.sharedNone` | Nothing is shared | कुछ भी साझा नहीं है | કંઈ પણ વહેંચાયેલું નથી | [ ] |
 | `family.share.location` | Location | स्थान | સ્થાન | [ ] |
 | `family.share.history` | Health history | स्वास्थ्य इतिहास | આરોગ્ય ઇતિહાસ | [ ] |
-| `family.share.vitals` | Vitals | महत्वपूर्ण संकेत | મહત્ત્વના સંકેતો | [ ] |
+| `family.share.vitals` | Vitals | महत्त्वपूर्ण संकेत | મહત્ત્વના સંકેતો | [ ] |
 | `family.share.reports` | Reports | रिपोर्ट | રિપોર્ટ | [ ] |
 | `family.vitals` | Latest readings (simulated) | नवीनतम रीडिंग (सिमुलेटेड) | નવીનતમ રીડિંગ (સિમ્યુલેટેડ) | [ ] |
-| `family.hr` | Heart rate | हृदय गति | હૃદય ગતિ | [ ] |
-| `family.spo2` | Oxygen | ऑक्सीजन | ઓક્સિજન | [ ] |
-| `family.noEmergency` | No active emergency. | कोई सक्रिय आपात स्थिति नहीं है। | કોઈ સક્રિય કટોકટી નથી. | [ ] |
-| `family.activeTitle` | Emergency in progress (simulated) | आपात स्थिति जारी है (सिमुलेटेड) | કટોકટી ચાલુ છે (સિમ્યુલેટેડ) | [ ] |
-| `family.state.SOS_SENT` | The alert was sent to a hospital. | अलर्ट अस्पताल को भेजा गया। | ચેતવણી હૉસ્પિટલને મોકલવામાં આવી છે. | [ ] |
-| `family.state.HOSPITAL_ACKNOWLEDGED` | The hospital has seen the alert. | अस्पताल ने अलर्ट देख लिया है। | હૉસ્પિટલે ચેતવણી જોઈ છે. | [ ] |
+| `family.hr` | Heart rate | हृदय गति | હૃદયના ધબકારા | [ ] |
+| `family.spo2` | Oxygen level | ऑक्सीजन स्तर | ઓક્સિજન સ્તર | [ ] |
+| `family.noEmergency` | No active emergency. | कोई सक्रिय आपातकाल नहीं है। | કોઈ સક્રિય કટોકટી નથી. | [ ] |
+| `family.activeTitle` | Emergency in progress (simulated) | आपातकाल जारी है (सिमुलेटेड) | કટોકટી ચાલુ છે (સિમ્યુલેટેડ) | [ ] |
+| `family.state.SOS_SENT` | The alert was sent to a hospital. | अलर्ट अस्पताल को भेजा गया। | ચેતવણી હોસ્પિટલને મોકલવામાં આવી છે. | [ ] |
+| `family.state.HOSPITAL_ACKNOWLEDGED` | The hospital has seen the alert. | अस्पताल ने अलर्ट देख लिया है। | હોસ્પિટલે ચેતવણી જોઈ છે. | [ ] |
 | `family.state.AMBULANCE_DISPATCHED` | An ambulance has been sent. | एम्बुलेंस भेजी गई है। | એમ્બ્યુલન્સ મોકલવામાં આવી છે. | [ ] |
 | `family.state.EN_ROUTE` | The ambulance is on its way. | एम्बुलेंस रास्ते में है। | એમ્બ્યુલન્સ રસ્તામાં છે. | [ ] |
 | `family.state.ARRIVED` | The ambulance has arrived. | एम्बुलेंस पहुँच गई है। | એમ્બ્યુલન્સ પહોંચી ગઈ છે. | [ ] |
-| `family.hospital` | Hospital: {{name}} | अस्पताल: {{name}} | હૉસ્પિટલ: {{name}} | [ ] |
-| `family.eta` | About {{minutes}} min away | लगभग {{minutes}} मिनट दूर | લગભગ {{minutes}} મિનિટ દૂર | [ ] |
+| `family.hospital` | Hospital: {{name}} | अस्पताल: {{name}} | હોસ્પિટલ: {{name}} | [ ] |
+| `family.eta` | About {{minutes}} min away (estimate) | लगभग {{minutes}} मिनट दूर (अनुमान) | લગભગ {{minutes}} મિનિટ દૂર (અંદાજ) | [ ] |
 | `family.checkin.title` | Let them know | उन्हें बताएँ | તેમને જણાવો | [ ] |
-| `family.checkin.ON_MY_WAY` | I'm on my way | मैं आ रहा हूँ | હું આવી રહ્યો છું | [ ] |
-| `family.checkin.CALLING_NOW` | I'm calling them | मैं उन्हें कॉल कर रहा हूँ | હું તેમને કૉલ કરું છું | [ ] |
-| `family.checkin.CANNOT_REACH` | I can't reach them | मैं उनसे संपर्क नहीं कर पा रहा | હું તેમનો સંપર્ક કરી શકતો નથી | [ ] |
+| `family.checkin.ON_MY_WAY` | I'm on my way | मैं रास्ते में हूँ | હું રસ્તામાં છું | [ ] |
+| `family.checkin.CALLING_NOW` | I'm calling them | हम उन्हें कॉल कर रहे हैं | અમે તેમને કૉલ કરી રહ્યા છીએ | [ ] |
+| `family.checkin.CANNOT_REACH` | I can't reach them | उनसे संपर्क नहीं हो पा रहा है | તેમની સાથે સંપર્ક થઈ શકતો નથી | [ ] |
 | `family.checkin.done` | Your message was sent. | आपका संदेश भेज दिया गया। | તમારો સંદેશ મોકલવામાં આવ્યો છે. | [ ] |
 | `family.checkin.error` | Could not send. Please try again. | भेजा नहीं जा सका। कृपया दोबारा कोशिश करें। | મોકલી શકાયું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
-| `login.wrongRole` | This app is for patients, their family, volunteers and admins. Hospital staff should use the hospital portal. | यह ऐप मरीज़ों, उनके परिवार, स्वयंसेवकों और एडमिन के लिए है। अस्पताल स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ, તેમના પરિવાર, સ્વયંસેવકો અને એડમિન માટે છે. હૉસ્પિટલ સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
+| `login.wrongRole` | This app is for patients, their family, volunteers and admins. Hospital staff should use the hospital portal. | यह ऐप मरीज़ों, उनके परिवार, स्वयंसेवकों और एडमिन के लिए है। अस्पताल के कर्मचारी कृपया अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ, તેમના પરિવાર, સ્વયંસેવકો અને એડમિન માટે છે. હોસ્પિટલ સ્ટાફે હોસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
 | `invite.title` | Invite a family member | परिवार के सदस्य को आमंत्रित करें | પરિવારના સભ્યને આમંત્રિત કરો | [ ] |
 | `invite.help` | Create a code and give it to a relative. They sign in to this app with their own account and enter it. They only see what you chose to share. | एक कोड बनाएँ और किसी रिश्तेदार को दें। वे अपने खाते से इस ऐप में साइन इन करके इसे दर्ज करते हैं। उन्हें केवल वही दिखता है जो आपने साझा करना चुना है। | કોડ બનાવો અને સંબંધીને આપો. તેઓ પોતાના ખાતાથી આ એપમાં સાઇન ઇન કરીને તે દાખલ કરે છે. તેમને ફક્ત તે જ દેખાય છે જે તમે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
-| `invite.create` | Create invite code | आमंત्रण कोड बनाएँ | આમંત્રણ કોડ બનાવો | [ ] |
+| `invite.create` | Create invite code | आमंत्रण कोड बनाएँ | આમંત્રણ કોડ બનાવો | [ ] |
 | `invite.valid` | Valid for 24 hours. | 24 घंटे के लिए मान्य। | 24 કલાક માટે માન્ય. | [ ] |
 | `invite.error` | Could not create a code. Please try again. | कोड नहीं बन सका। कृपया दोबारा कोशिश करें। | કોડ બનાવી શકાયો નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
 
-## Volunteer responder and admin screens (Phase 10, AI-written, not reviewed)
+## Volunteer responder and admin screens (Phase 10, AI-written, AI-reviewed once, not human-reviewed)
 
-Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` was reworded too (see the family table).
+Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` is in the table above.
 
 | Key | English | Hindi | Gujarati | OK |
 |---|---|---|---|---|
-| `responder.title` | Volunteer responder | स्वयंसेवी उत्तरदाता | સ્વયંસેવક પ્રતિભાવક | [ ] |
+| `responder.title` | Volunteer responder | आपातकालीन स्वयंसेवक | કટોકટી સ્વયંસેવક | [ ] |
 | `responder.intro` | Someone nearby may need help. Accept an alert to see what the person chose to share. This is a simulation: in a real emergency call 112. | आस-पास किसी को मदद की ज़रूरत हो सकती है। अलर्ट स्वीकार करें और देखें कि उस व्यक्ति ने क्या साझा किया है। यह एक सिमुलेशन है: असली आपात स्थिति में 112 पर कॉल करें। | નજીકમાં કોઈને મદદની જરૂર હોઈ શકે છે. ચેતવણી સ્વીકારો અને જુઓ કે તે વ્યક્તિએ શું વહેંચ્યું છે. આ સિમ્યુલેશન છે: સાચી કટોકટીમાં 112 પર કૉલ કરો. | [ ] |
 | `responder.notVerified` | Your account is waiting for an admin to verify it. You will see alerts after that. | आपका खाता एडमिन के सत्यापन की प्रतीक्षा में है। उसके बाद आपको अलर्ट दिखेंगे। | તમારું ખાતું એડમિન દ્વારા ચકાસણીની રાહ જુએ છે. ત્યાર પછી તમને ચેતવણીઓ દેખાશે. | [ ] |
 | `responder.none` | No alerts right now. | अभी कोई अलर्ट नहीं है। | હાલમાં કોઈ ચેતવણી નથી. | [ ] |
@@ -625,13 +643,13 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` w
 | `responder.location` | Location: {{latitude}}, {{longitude}} | स्थान: {{latitude}}, {{longitude}} | સ્થાન: {{latitude}}, {{longitude}} | [ ] |
 | `responder.noLocation` | Location is not shared. | स्थान साझा नहीं किया गया है। | સ્થાન વહેંચાયેલું નથી. | [ ] |
 | `responder.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
-| `responder.acceptError` | Could not accept. The alert may have ended. | स्वीकार नहीं हो सका। अलर्ट समाप्त हो चुका हो सकता है। | સ્વીકારી શકાયું નથી. ચેતવણી પૂરી થઈ ગઈ હશે. | [ ] |
+| `responder.acceptError` | Could not accept. The alert may have ended. | स्वीकार नहीं हो सका। अलर्ट समाप्त हो चुका हो सकता है। | સ્વીકારી શકાયું નથી. ચેતવણી પૂરી થઈ ગઈ હોઈ શકે છે. | [ ] |
 | `responder.state.SOS_SENT` | Alert sent | अलर्ट भेजा गया | ચેતવણી મોકલાઈ | [ ] |
-| `responder.state.HOSPITAL_ACKNOWLEDGED` | Hospital has seen it | अस्पताल ने देख लिया | હૉસ્પિટલે જોયું | [ ] |
+| `responder.state.HOSPITAL_ACKNOWLEDGED` | Hospital has seen it | अस्पताल ने देख लिया | હોસ્પિટલે જોયું | [ ] |
 | `responder.state.AMBULANCE_DISPATCHED` | Ambulance sent | एम्बुलेंस भेजी गई | એમ્બ્યુલન્સ મોકલાઈ | [ ] |
 | `responder.state.EN_ROUTE` | Ambulance on its way | एम्बुलेंस रास्ते में है | એમ્બ્યુલન્સ રસ્તામાં છે | [ ] |
 | `responder.state.ARRIVED` | Ambulance arrived | एम्बुलेंस पहुँच गई | એમ્બ્યુલન્સ પહોંચી | [ ] |
-| `volunteer.title` | Become a volunteer responder | स्वयंसेवी उत्तरदाता बनें | સ્વયંસેવક પ્રતિભાવક બનો | [ ] |
+| `volunteer.title` | Become a volunteer responder | आपातकालीन स्वयंसेवक बनें | કટોકટી સ્વયંસેવક બનો | [ ] |
 | `volunteer.intro` | Sign up, then an admin checks your account. Until then you will not receive alerts. | साइन अप करें, फिर एडमिन आपका खाता जाँचेगा। तब तक आपको अलर्ट नहीं मिलेंगे। | સાઇન અપ કરો, પછી એડમિન તમારું ખાતું તપાસશે. ત્યાં સુધી તમને ચેતવણીઓ મળશે નહીં. | [ ] |
 | `volunteer.name` | Full name | पूरा नाम | પૂરું નામ | [ ] |
 | `volunteer.email` | Email | ईमेल | ઇમેઇલ | [ ] |
@@ -639,18 +657,18 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` w
 | `volunteer.submit` | Sign up | साइन अप करें | સાઇન અપ કરો | [ ] |
 | `volunteer.done` | Thank you. An admin will verify your account. You can sign in after that. | धन्यवाद। एडमिन आपका खाता सत्यापित करेगा। उसके बाद आप साइन इन कर सकते हैं। | આભાર. એડમિન તમારું ખાતું ચકાસશે. ત્યાર પછી તમે સાઇન ઇન કરી શકશો. | [ ] |
 | `volunteer.exists` | This email is already registered. | यह ईमेल पहले से पंजीकृत है। | આ ઇમેઇલ પહેલેથી નોંધાયેલો છે. | [ ] |
-| `volunteer.invalid` | Please fill in every field. The password needs at least 8 characters. | कृपया हर खाना भरें। पासवर्ड में कम से कम 8 अक्षर होने चाहिए। | કૃપા કરીને દરેક ખાનું ભરો. પાસવર્ડમાં ઓછામાં ઓછા 8 અક્ષર હોવા જોઈએ. | [ ] |
+| `volunteer.invalid` | Please fill in every field. The password needs at least 8 characters. | कृपया सभी जानकारी भरें। पासवर्ड में कम से कम 8 अक्षर होने चाहिए। | કૃપા કરીને બધી વિગતો ભરો. પાસવર્ડમાં ઓછામાં ઓછા 8 અક્ષર હોવા જોઈએ. | [ ] |
 | `volunteer.error` | Could not sign up. Please try again. | साइन अप नहीं हो सका। कृपया दोबारा कोशिश करें। | સાઇન અપ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
 | `volunteer.back` | Back to sign in | साइन इन पर वापस जाएँ | સાઇન ઇન પર પાછા જાઓ | [ ] |
 | `admin.title` | Admin | एडमिन | એડમિન | [ ] |
-| `admin.intro` | Manage accounts, approve texts and read the access log. Simulated data only. | खाते प्रबंधित करें, पाठ स्वीकृत करें और एक्सेस लॉग पढ़ें। केवल सिमुलेटेड डेटा। | ખાતાં સંભાળો, લખાણ મંજૂર કરો અને એક્સેસ લૉગ વાંચો. ફક્ત સિમ્યુલેટેડ ડેટા. | [ ] |
+| `admin.intro` | Manage accounts, approve texts and read the access log. Simulated data only. | खाते प्रबंधित करें, सामग्री मंज़ूर करें और एक्सेस लॉग पढ़ें। केवल सिमुलेटेड डेटा। | ખાતાં સંભાળો, લખાણ મંજૂર કરો અને એક્સેસ લૉગ વાંચો. ફક્ત સિમ્યુલેટેડ ડેટા. | [ ] |
 | `admin.users` | Accounts | खाते | ખાતાં | [ ] |
 | `admin.role.PATIENT` | Patient | मरीज़ | દર્દી | [ ] |
-| `admin.role.HOSPITAL_STAFF` | Hospital staff | अस्पताल स्टाफ़ | હૉસ્પિટલ સ્ટાફ | [ ] |
+| `admin.role.HOSPITAL_STAFF` | Hospital staff | अस्पताल स्टाफ़ | હોસ્પિટલ સ્ટાફ | [ ] |
 | `admin.role.ADMIN` | Admin | एडमिन | એડમિન | [ ] |
 | `admin.role.FAMILY` | Family | परिवार | પરિવાર | [ ] |
-| `admin.role.RESPONDER` | Volunteer | स्वयंसेवी | સ્વયંસેવક | [ ] |
-| `admin.disabled` | Disabled | बंद | બંધ | [ ] |
+| `admin.role.RESPONDER` | Volunteer | स्वयंसेवक | સ્વયંસેવક | [ ] |
+| `admin.disabled` | Disabled | निष्क्रिय | નિષ્ક્રિય | [ ] |
 | `admin.verified` | Verified | सत्यापित | ચકાસાયેલ | [ ] |
 | `admin.notVerified` | Not verified | सत्यापित नहीं | ચકાસાયેલ નથી | [ ] |
 | `admin.disable` | Disable | बंद करें | બંધ કરો | [ ] |
@@ -658,16 +676,16 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` w
 | `admin.verify` | Verify | सत्यापित करें | ચકાસો | [ ] |
 | `admin.userError` | Could not change this account. | यह खाता बदला नहीं जा सका। | આ ખાતું બદલી શકાયું નથી. | [ ] |
 | `admin.ownAccount` | You cannot disable your own account. | आप अपना खाता बंद नहीं कर सकते। | તમે તમારું પોતાનું ખાતું બંધ કરી શકતા નથી. | [ ] |
-| `admin.content` | Texts | पाठ | લખાણ | [ ] |
-| `admin.content.emergency_numbers` | Emergency numbers | आपातकालीन नंबर | કટોકટી નંબર | [ ] |
+| `admin.content` | Texts | सामग्री | લખાણ | [ ] |
+| `admin.content.emergency_numbers` | Emergency numbers | आपातकाल के नंबर | કટોકટી નંબર | [ ] |
 | `admin.content.first_aid_basics` | First-aid basics (not reviewed by a doctor) | प्राथमिक उपचार की बुनियादी बातें (डॉक्टर ने जाँचा नहीं) | પ્રાથમિક સારવારની મૂળભૂત બાબતો (ડૉક્ટરે તપાસી નથી) | [ ] |
 | `admin.version` | Version {{n}} | संस्करण {{n}} | આવૃત્તિ {{n}} | [ ] |
-| `admin.approved` | Approved | स्वीकृत | મંજૂર | [ ] |
-| `admin.notApproved` | Not approved | स्वीकृत नहीं | મંજૂર નથી | [ ] |
+| `admin.approved` | Approved | मंज़ूर | મંજૂર | [ ] |
+| `admin.notApproved` | Not approved | मंज़ूर नहीं | મંજૂર નથી | [ ] |
 | `admin.edit` | Edit | संपादित करें | ફેરફાર કરો | [ ] |
-| `admin.editNote` | A changed text stays hidden from the apps until you approve it. | बदला हुआ पाठ आपके स्वीकृत करने तक ऐप्स से छिपा रहता है। | બદલાયેલું લખાણ તમે મંજૂર કરો ત્યાં સુધી એપ્સમાંથી છુપાયેલું રહે છે. | [ ] |
-| `admin.itemsLabel` | Text (one line per item) | पाठ (प्रति आइटम एक पंक्ति) | લખાણ (દરેક બાબત માટે એક લીટી) | [ ] |
-| `admin.approveBox` | Approve this text | इस पाठ को स्वीकृत करें | આ લખાણ મંજૂર કરો | [ ] |
+| `admin.editNote` | A changed text stays hidden from the apps until you approve it. | बदली हुई सामग्री आपके मंज़ूर करने तक ऐप्स से छिपी रहती है। | બદલાયેલું લખાણ તમે મંજૂર કરો ત્યાં સુધી એપ્સમાંથી છુપાયેલું રહે છે. | [ ] |
+| `admin.itemsLabel` | Text (one line per item) | सामग्री (हर बात के लिए एक पंक्ति) | લખાણ (દરેક બાબત માટે એક લીટી) | [ ] |
+| `admin.approveBox` | Approve this text | इस सामग्री को मंज़ूर करें | આ લખાણ મંજૂર કરો | [ ] |
 | `admin.save` | Save | सहेजें | સાચવો | [ ] |
 | `admin.saved` | Saved. | सहेजा गया। | સાચવ્યું. | [ ] |
 | `admin.saveError` | Could not save. | सहेजा नहीं जा सका। | સાચવી શકાયું નથી. | [ ] |
@@ -679,7 +697,7 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` w
 | `admin.outcome` | Result | परिणाम | પરિણામ | [ ] |
 | `admin.refresh` | Refresh | ताज़ा करें | તાજું કરો | [ ] |
 | `admin.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
-| `login.volunteer` | Become a volunteer responder | स्वयंसेवी उत्तरदाता बनें | સ્વયંસેવક પ્રતિભાવક બનો | [ ] |
+| `login.volunteer` | Become a volunteer responder | आपातकालीन स्वयंसेवक बनें | કટોકટી સ્વયંસેવક બનો | [ ] |
 
 ## Not translated on purpose
 
