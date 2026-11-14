@@ -1,4 +1,6 @@
 // Turns one access-log entry from the server into plain words (no medical meaning is added).
+const isBlocked = (e) => /^den/i.test(String(e.outcome || '')); // server says "denied" (any letter case)
+
 export function describeEntry(t, e) {
   const kind = e.who && e.who.kind;
   const who = kind === 'hospital_desk' && e.who.hospital
@@ -7,10 +9,10 @@ export function describeEntry(t, e) {
   const what = t('access.what.' + (e.what || 'data'));
   const fields = Array.isArray(e.fields) ? e.fields : [];
   let result;
-  if (e.outcome && e.outcome !== 'ALLOWED') result = t('access.blocked');
+  if (isBlocked(e)) result = t('access.blocked');
   else if (fields.length === 0) result = t('access.nothing');
   else result = t('access.shown', { list: fields.map((f) => String(f).replace(/_/g, ' ')).join(', ') });
-  return { who, what, result, blocked: !!e.outcome && e.outcome !== 'ALLOWED' };
+  return { who, what, result, blocked: isBlocked(e) };
 }
 
 // Add live entries on top without duplicates.

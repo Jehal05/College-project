@@ -24,7 +24,7 @@ for (const lang of LANGS) {
   await p.fill('input[type=email]', 'patient@demo.test'); await p.fill('input[type=password]', 'demo1234'); await p.click('button[type=submit]'); await p.waitForURL(APP + '/');
   await p.waitForFunction(() => document.querySelectorAll('svg[role=img][aria-label]').length >= 4, null, { timeout: 15000 }).catch(() => {});
   await shot('02-home', true);
-  for (const [n, path] of [['04-profile', '/profile'], ['05-consent', '/consent'], ['06-contacts', '/contacts'], ['07-reports', '/reports'], ['08-reminders', '/reminders'], ['09-passport', '/passport'], ['10-summary', '/summary/' + done.id]]) {
+  for (const [n, path] of [['04-profile', '/profile'], ['05-consent', '/consent'], ['06-contacts', '/contacts'], ['07-reports', '/reports'], ['08-reminders', '/reminders'], ['09-passport', '/passport'], ['10-summary', '/summary/' + done.id], ['14-access', '/access']]) {
     await p.goto(APP + path); await shot(n, true);
   }
   await p.goto(APP + '/p/' + pass.token); await shot('11-responder', true);

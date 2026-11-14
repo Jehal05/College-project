@@ -5,14 +5,14 @@ const t = (k, o) => k + (o ? JSON.stringify(o) : '');
 
 describe('access log helpers', () => {
   it('describes an allowed read with the fields shown', () => {
-    const d = describeEntry(t, { who: { kind: 'hospital_desk', hospital: 'City Care' }, what: 'passport', outcome: 'ALLOWED', fields: ['blood_group', 'allergies'] });
+    const d = describeEntry(t, { who: { kind: 'hospital_desk', hospital: 'City Care' }, what: 'passport', outcome: 'allowed', fields: ['blood_group', 'allergies'] });
     expect(d.who).toContain('access.who.hospital_named');
     expect(d.what).toBe('access.what.passport');
     expect(d.result).toContain('blood group, allergies');
     expect(d.blocked).toBe(false);
   });
   it('marks blocked and empty reads', () => {
-    expect(describeEntry(t, { who: { kind: 'qr_link' }, what: 'passport', outcome: 'DENIED', fields: [] }).blocked).toBe(true);
+    expect(describeEntry(t, { who: { kind: 'qr_link' }, what: 'passport', outcome: 'denied', fields: [] }).blocked).toBe(true);
     expect(describeEntry(t, { who: { kind: 'relative' }, what: 'status', outcome: 'ALLOWED', fields: [] }).result).toBe('access.nothing');
   });
   it('falls back for unknown kinds', () => {
