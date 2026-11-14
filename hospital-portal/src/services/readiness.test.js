@@ -68,3 +68,35 @@ test('passport errors: 401, 403, 404 and others get plain words', () => {
   assert.match(passportError({ status: 500, message: 'boom' }).text, /Could not open the passport: boom/);
   assert.equal(passportError(null).kind, 'error');
 });
+
+// ---- translated card texts (optional t) ----
+const items = [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }];
+import { translate } from '../i18n/translate.js';
+const trl = (lang) => (key, vars) => translate(lang, key, vars);
+
+test('readinessCard: with the English t every text is exactly the same as without t', () => {
+  const e = { ...base, ambulance_id: 'A1', ambulance: { eta_seconds: 125 }, location: { lat: 1, lng: 2 }, symptoms: ['Chest pain'], vitals: { heart_rate: 100 } };
+  assert.deepEqual(readinessCard(e, items, trl('en')), readinessCard(e, items));
+  const bare = { ...base };
+  assert.deepEqual(readinessCard(bare, [], trl('en')), readinessCard(bare, []));
+});
+
+test('readinessCard: Hindi and Gujarati change the fixed words but never the symptom words', () => {
+  const e = { ...base, symptoms: ['Chest pain'], location: { lat: 1, lng: 2 } };
+  for (const lang of ['hi', 'gu']) {
+    const c = readinessCard(e, items, trl(lang));
+    const en = readinessCard(e, items);
+    assert.notEqual(c.eta.text, en.eta.text);
+    assert.notEqual(c.team.text, en.team.text);
+    assert.notEqual(c.checklist.text, en.checklist.text);
+    assert.ok(/\d/.test(c.checklist.text));
+    assert.equal(c.facts.find((f) => f.key === 'symptoms').value, 'Chest pain');
+    assert.notEqual(c.facts.find((f) => f.key === 'location').value, 'Shared');
+  }
+});
+
+test('readinessCard: an ETA in seconds is translated with the unit words and keeps its numbers', () => {
+  const e = { ...base, ambulance_id: 'A1', ambulance: { eta_seconds: 125 } };
+  assert.equal(readinessCard(e, items, trl('en')).eta.text, '2 min 5 s (simulated)');
+  assert.ok(readinessCard(e, items, trl('hi')).eta.text.includes('2 मिनट 5 सेकंड'));
+});

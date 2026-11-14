@@ -46,4 +46,6 @@ export function useT() {
   const current = useSyncExternalStore(subscribeLang, getLang);
   return (key, vars) => translate(current, key, vars);
 }
+/** The chosen language code ('en' | 'hi' | 'gu'); re-renders when it changes. */
+export const useLang = () => useSyncExternalStore(subscribeLang, getLang);
 export { LANGS };

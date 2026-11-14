@@ -20,7 +20,7 @@ import { useT } from '../i18n/index.js';
 import { typeText } from '../i18n/phrases.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
-function hospitalIcon(h, selected, isTop) {
+function hospitalIcon(h, selected, isTop, t) {
   // green = has the capabilities for the chosen emergency, grey = missing, blue = no type chosen
   const color = h.capability_match === null ? '#0284c7' : h.capability_match ? '#059669' : '#94a3b8';
   const badges = [h.capabilities.cath_lab && 'CL', h.capabilities.stroke_unit && 'SU', h.capabilities.icu && 'ICU']
@@ -36,7 +36,7 @@ function hospitalIcon(h, selected, isTop) {
           background:${color};color:#fff;font-weight:800;font-size:18px;display:grid;place-items:center;
           border:${isTop ? 5 : 3}px solid ${isTop ? '#facc15' : selected ? '#0f172a' : '#fff'};box-shadow:0 2px 6px rgba(0,0,0,.35)">${isTop ? '1' : 'H'}</div>
         <div style="margin-top:2px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;
-          padding:1px 5px;border-radius:4px;white-space:nowrap">${isTop ? 'TOP RANKED · ' : ''}${badges || 'ER only'}</div>
+          padding:1px 5px;border-radius:4px;white-space:nowrap">${isTop ? `${t('map.topRanked')} · ` : ''}${badges || t('map.erOnly')}</div>
       </div>`,
   });
 }
@@ -129,7 +129,7 @@ export default function MapPage() {
               <Marker
                 key={h.id}
                 position={[h.lat, h.lng]}
-                icon={hospitalIcon(h, h.id === selectedId, h.id === topId)}
+                icon={hospitalIcon(h, h.id === selectedId, h.id === topId, t)}
                 eventHandlers={{ click: () => setSelectedId(h.id) }}
               >
                 <Tooltip direction="top" offset={[0, -44]}>

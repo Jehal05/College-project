@@ -58,16 +58,27 @@ test('durations: English matches formatSeconds, Hindi and Gujarati use their own
 
 test('detail panel, ranking, nearby help and hospital panel strings are translated in Hindi and Gujarati', async () => {
   const DICTS = { en: (await import('./en.js')).default, hi: (await import('./hi.js')).default, gu: (await import('./gu.js')).default };
-  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.'];
+  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.', 'tk.', 'rd.', 'map.topRanked', 'map.erOnly'];
+  const sameIsFine = new Set(['tk.unitTip', 'tk.trafficOpt', 'rd.etaSim']); // only placeholders and the word simulated
   const keys = Object.keys(DICTS.en).filter((k) => prefixes.some((p) => k.startsWith(p)));
-  assert.ok(keys.length >= 50, `expected many keys, got ${keys.length}`);
+  assert.ok(keys.length >= 90, `expected many keys, got ${keys.length}`);
   for (const k of keys) {
     for (const lang of ['hi', 'gu']) {
       assert.ok(DICTS[lang][k], `${lang} is missing ${k}`);
-      assert.notEqual(DICTS[lang][k], DICTS.en[k], `${lang} ${k} is still English`);
+      if (!sameIsFine.has(k)) assert.notEqual(DICTS[lang][k], DICTS.en[k], `${lang} ${k} is still English`);
       // placeholders must survive translation
       const ph = (s) => (s.match(/\{\w+\}/g) || []).sort().join();
       assert.equal(ph(DICTS[lang][k]), ph(DICTS.en[k]), `${lang} ${k} changed its placeholders`);
     }
   }
+});
+
+test('formatWhen: English keeps the browser default, Hindi and Gujarati use their own locale', async () => {
+  const { formatWhen } = await import('./phrases.js');
+  const iso = '2026-11-14T06:44:40.000Z';
+  const old = new Date(iso).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  assert.equal(formatWhen(iso, 'en'), old);
+  assert.equal(formatWhen(iso, undefined), old);
+  assert.equal(formatWhen(iso, 'hi'), new Date(iso).toLocaleString('hi-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+  assert.equal(formatWhen(iso, 'gu'), new Date(iso).toLocaleString('gu-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 });

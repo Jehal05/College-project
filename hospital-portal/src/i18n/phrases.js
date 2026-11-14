@@ -20,6 +20,10 @@ const CAP = { Ready: 'cap.ready', 'Not ready': 'cap.notReady', 'Not shared': 'co
 /** Words the capacity strip gets from services/capacity.js. Numbers and unknown words pass through. */
 export const capText = (t, text) => (CAP[text] ? t(CAP[text]) : text);
 
+const DATE_LOCALES = { hi: 'hi-IN', gu: 'gu-IN' };
+/** Date and time for the Activity page in the chosen language. English uses the browser default, as before. */
+export const formatWhen = (iso, lang) => new Date(iso).toLocaleString(DATE_LOCALES[lang] || [], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
 /** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
 export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);
 

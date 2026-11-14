@@ -7,14 +7,14 @@ import * as api from '../services/api.js';
 import { useAuth } from '../components/AuthProvider.jsx';
 import { useHistory } from '../components/HistoryProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
-import { useT } from '../i18n/index.js';
-import { typeText } from '../i18n/phrases.js';
+import { useT, useLang } from '../i18n/index.js';
+import { typeText, formatWhen } from '../i18n/phrases.js';
 import { buildActivity, filterActivity, auditRows, auditError, KINDS, WHO } from '../services/activity.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
-const when = (iso) => new Date(iso).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
 function AuditLog() {
+  const lang = useLang();
+  const when = (iso) => formatWhen(iso, lang);
   const [state, setState] = useState({ status: 'loading', rows: [], error: null });
   const load = useCallback(async () => {
     setState((s) => ({ ...s, status: 'loading' }));
@@ -64,6 +64,8 @@ function AuditLog() {
 
 export default function Activity() {
   const t = useT();
+  const lang = useLang();
+  const when = (iso) => formatWhen(iso, lang);
   const { role } = useAuth();
   const { cases, loading, error } = useHistory();
   const [f, setF] = useState({ kind: 'all', who: 'all', text: '' });

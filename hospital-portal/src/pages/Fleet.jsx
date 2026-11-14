@@ -70,7 +70,7 @@ export default function Fleet() {
                       <>
                         <b>{e.emergency_id}</b> · {typeText(t, e.type)}
                         {a.status === 'en_route' && e.ambulance?.eta_seconds != null && (
-                          <span className="block text-base text-slate-600">{t('fleet.eta', { time: formatEta(e.ambulance.eta_seconds) })}</span>
+                          <span className="block text-base text-slate-600">{t('fleet.eta', { time: formatEta(e.ambulance.eta_seconds, t) })}</span>
                         )}
                       </>
                     ) : (

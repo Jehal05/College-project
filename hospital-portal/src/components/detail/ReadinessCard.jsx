@@ -9,7 +9,7 @@ const FACT_KEY = { patient: 'rc.f.patient', symptoms: 'rc.f.reported', vitals: '
 
 export default function ReadinessCard({ emergency: e }) {
   const t = useT();
-  const card = readinessCard(e, checklists[e.type] || []);
+  const card = readinessCard(e, checklists[e.type] || [], t);
   const [passport, setPassport] = useState(null); // { rows, simulated } | null
   const [state, setState] = useState('idle'); // idle | loading | open | error
   const [error, setError] = useState(null);

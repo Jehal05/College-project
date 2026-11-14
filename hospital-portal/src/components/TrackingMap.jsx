@@ -17,13 +17,13 @@ import { useEmergencies } from './EmergencyProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useAuth } from './AuthProvider.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
+import { useT } from '../i18n/index.js';
+import { formatEta } from '../services/eta.js';
 
-export function formatEta(seconds) {
-  const s = Math.max(0, Math.round(seconds));
-  return s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, '0')} s`;
-}
+export { formatEta };
 
 export default function TrackingMap({ emergency, compact = false }) {
+  const t = useT();
   const { session } = useAuth();
   const { hospitals } = useHospitals();
   const { units, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip, movementFor } = useAmbulances();
@@ -42,7 +42,7 @@ export default function TrackingMap({ emergency, compact = false }) {
     () => routeForEmergency({ ambulance_id: ambulanceId, alerted_hospital_id: alertedId, location: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined }, units, hospitals, ownHospitalId),
     [ambulanceId, alertedId, lat, lng, units, hospitals, ownHospitalId],
   );
-  if (!route) return <p className="rounded-xl bg-slate-100 p-4 text-slate-500">Waiting for ambulance details…</p>;
+  if (!route) return <p className="rounded-xl bg-slate-100 p-4 text-slate-500">{t('tk.waiting')}</p>;
 
   const arrived = e.state === 'ARRIVED' || e.state === 'HANDOVER_DONE';
   const closed = isFinal(e.state);
@@ -60,7 +60,7 @@ export default function TrackingMap({ emergency, compact = false }) {
     try {
       await addNote(id, 'corridor', 'Corridor request logged (simulated)', { corridor_requested: true });
     } catch (err) {
-      setMessage(`Could not log the request: ${err.message}`);
+      setMessage(t('tk.logFail', { msg: err.message }));
     }
   }
 
@@ -72,22 +72,22 @@ export default function TrackingMap({ emergency, compact = false }) {
             {route.ambulance.call_sign} ({route.ambulance.id}) → {route.hospital.name}
           </div>
           <div data-testid="eta" data-seconds={arrived ? 0 : e.ambulance?.eta_seconds ?? ''} className={`text-4xl font-bold tabular-nums ${arrived ? 'text-emerald-600' : 'text-red-600'}`}>
-            {arrived ? 'Arrived' : live ? `ETA ${formatEta(e.ambulance.eta_seconds)}` : 'ETA …'}
+            {arrived ? t('tk.arrived') : live ? t('tk.eta', { time: formatEta(e.ambulance.eta_seconds, t) }) : t('tk.etaWait')}
           </div>
-          <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id))}</div>
+          <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id), t)}</div>
           <div data-testid="trip-leg" className="font-semibold text-slate-700">
             {arrived
-              ? 'Ambulance is at the hospital'
+              ? t('tk.atHospital')
               : !live
-                ? 'Ambulance assigned, about to leave'
+                ? t('tk.assigned')
                 : e.ambulance.leg === 'to_patient'
-                  ? `Heading to the patient · ${e.ambulance.remaining_km} km left in total`
-                  : `Patient on board · heading to the hospital · ${e.ambulance.remaining_km} km left`}
+                  ? t('tk.toPatient', { km: e.ambulance.remaining_km })
+                  : t('tk.onBoard', { km: e.ambulance.remaining_km })}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <SimulatedBadge text="Simulated ambulance and route" />
-          <SimulatedBadge text={`Not a road route · runs ${simConfig.time_scale}× faster than real time`} />
+          <SimulatedBadge text={t('tk.simRoute')} />
+          <SimulatedBadge text={t('tk.notRoad', { n: simConfig.time_scale })} />
         </div>
       </div>
 
@@ -100,34 +100,34 @@ export default function TrackingMap({ emergency, compact = false }) {
           <Polyline positions={done.map(toLatLng)} pathOptions={{ color: '#94a3b8', weight: 6 }} />
           <Polyline positions={remaining.map(toLatLng)} pathOptions={{ color: '#2563eb', weight: 6, dashArray: '2 10' }} />
           <Marker position={toLatLng(route.patient)} icon={patientIcon}>
-            <Tooltip direction="top" offset={[0, -12]}>Patient (simulated)</Tooltip>
+            <Tooltip direction="top" offset={[0, -12]}>{t('tk.patientTip')}</Tooltip>
           </Marker>
           <Marker position={toLatLng(route.hospital)} icon={hospitalPinIcon}>
             <Tooltip direction="top" offset={[0, -16]}>{route.hospital.name}</Tooltip>
           </Marker>
           <Marker position={toLatLng(position)} icon={ambulanceIcon(e.ambulance?.heading || 0, route.ambulance.call_sign)} zIndexOffset={1000}>
-            <Tooltip direction="top" offset={[0, -22]}>{route.ambulance.call_sign} (simulated)</Tooltip>
+            <Tooltip direction="top" offset={[0, -22]}>{t('tk.unitTip', { name: route.ambulance.call_sign })}</Tooltip>
           </Marker>
         </MapContainer>
       </div>
       <div className="mt-1 flex flex-wrap gap-4 text-sm text-slate-600">
-        <span><b className="text-slate-400">━</b> Driven</span>
-        <span><b className="text-blue-600">┅</b> Still to go</span>
-        <span><b className="text-red-600">●</b> Patient</span>
-        <span><b className="text-emerald-600">■</b> Hospital</span>
+        <span><b className="text-slate-400">━</b> {t('tk.driven')}</span>
+        <span><b className="text-blue-600">┅</b> {t('tk.toGo')}</span>
+        <span><b className="text-red-600">●</b> {t('tk.patient')}</span>
+        <span><b className="text-emerald-600">■</b> {t('tk.hospital')}</span>
       </div>
 
       {!compact && (
         <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl bg-slate-50 p-3">
           <label className="flex items-center gap-2">
-            <span className="font-semibold">Traffic</span>
+            <span className="font-semibold">{t('tk.traffic')}</span>
             <select data-testid="traffic" value={traffic} onChange={(ev) => setTraffic(ev.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5">
-              <option value="auto">Auto by time of day ({trafficConfig.levels[resolveLevel(trafficConfig, 'auto')].label})</option>
+              <option value="auto">{t('tk.trafficAuto', { level: t(`tk.lvl.${resolveLevel(trafficConfig, 'auto')}`) })}</option>
               {Object.entries(trafficConfig.levels).map(([key, l]) => (
-                <option key={key} value={key}>{l.label} (×{l.factor})</option>
+                <option key={key} value={key}>{t('tk.trafficOpt', { label: t(`tk.lvl.${key}`), factor: l.factor })}</option>
               ))}
             </select>
-            <SimulatedBadge text={`Simulated traffic: ${trafficConfig.levels[level].label}`} className="!text-xs" />
+            <SimulatedBadge text={t('tk.trafficSim', { level: t(`tk.lvl.${level}`) })} className="!text-xs" />
           </label>
 
           <div className="flex items-center gap-2">
@@ -137,10 +137,10 @@ export default function TrackingMap({ emergency, compact = false }) {
               onClick={requestCorridor}
               className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
             >
-              Request green corridor
+              {t('tk.corridor')}
             </button>
             {e.corridor_requested ? (
-              <SimulatedBadge text="Corridor request logged (simulated)" />
+              <SimulatedBadge text={t('tk.corridorLogged')} />
             ) : (
               <SimulatedBadge text="Simulated" className="!text-xs" />
             )}
@@ -148,20 +148,20 @@ export default function TrackingMap({ emergency, compact = false }) {
 
           {moving && !closed && (
             <div data-testid="sim-controls" data-trip={trip || 'none'} className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-slate-500">Simulation</span>
+              <span className="text-sm font-semibold text-slate-500">{t('tk.simulation')}</span>
               {!trip && (
                 <button data-testid="trip-start" onClick={() => startTrip(id)} className="rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-3 py-1.5 font-semibold text-amber-900">
-                  Start simulated trip
+                  {t('tk.start')}
                 </button>
               )}
               {trip === 'running' && (
-                <button data-testid="trip-pause" onClick={() => pauseTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">Pause</button>
+                <button data-testid="trip-pause" onClick={() => pauseTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">{t('tk.pause')}</button>
               )}
               {trip === 'paused' && (
-                <button data-testid="trip-resume" onClick={() => resumeTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">Resume</button>
+                <button data-testid="trip-resume" onClick={() => resumeTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">{t('tk.resume')}</button>
               )}
               {trip && (
-                <button data-testid="trip-reset" onClick={() => resetTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">Restart route</button>
+                <button data-testid="trip-reset" onClick={() => resetTrip(id)} className="rounded-lg bg-slate-200 px-3 py-1.5 font-semibold">{t('tk.restart')}</button>
               )}
             </div>
           )}
