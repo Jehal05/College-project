@@ -114,3 +114,19 @@ test('ruledOutText: English unchanged, Hindi and Gujarati translate every part, 
   assert.equal(ruledOutText(tr('hi'), 'Some new reason'), 'Some new reason');
   assert.equal(translate('en', 'rk.pts', { n: '50.0' }), '50.0 pts');
 });
+
+import { whyText } from './phrases.js';
+test('the ranking "Why" sentence is the same in English and has Hindi and Gujarati words for every part', () => {
+  const english = 'Cath lab ready · 5 min away (simulated) · 6 beds and 1 ICU beds free';
+  const tr = (lang) => (key, vars) => translate(lang, key, vars);
+  assert.equal(whyText(tr('en'), english), english);
+  assert.equal(whyText(tr('en'), 'Cath lab and ICU not ready right now · travel time unknown · bed numbers not shared'), 'Cath lab and ICU not ready right now · travel time unknown · bed numbers not shared');
+  assert.equal(whyText(tr('en'), 'Has an emergency department'), 'Has an emergency department');
+  for (const l of ['hi', 'gu']) {
+    const out = whyText(tr(l), english);
+    assert.notEqual(out, english);
+    assert.match(out, /[ऀ-ॿ઀-૿]/);
+    assert.ok(out.includes('5') && out.includes('6') && out.includes('1'));
+    assert.equal(whyText(tr(l), 'some new part'), 'some new part');
+  }
+});

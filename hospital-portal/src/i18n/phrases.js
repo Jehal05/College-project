@@ -31,6 +31,23 @@ export const formatCreated = (iso, lang) => new Date(iso).toLocaleString(DATE_LO
 export const ruledOutText = (t, reason) =>
   String(reason ?? '').split(', ').map((part) => (part === 'Not verified' ? withFallback(t, 'rk.notVerified', part) : capText(t, part))).join(', ');
 
+const WHY_UNIT = { 'Cath lab': 'cap.cath', 'Stroke unit': 'cap.stroke', 'Emergency department': 'rk.w.u.emergency' };
+const whyUnits = (t, list) => list.split(' and ').map((u) => (WHY_UNIT[u] ? t(WHY_UNIT[u]) : u)).join(t('rk.w.and'));
+/** The "Why:" sentence of the ranking table (built in English by services/ranking.js), part by part. Unknown parts stay English. */
+export function whyText(t, why) {
+  return String(why ?? '').split(' · ').map((part) => {
+    let m;
+    if ((m = part.match(/^(.+) not ready right now$/))) return t('rk.w.notReady', { u: whyUnits(t, m[1]) });
+    if ((m = part.match(/^(.+) ready$/))) return t('rk.w.ready', { u: whyUnits(t, m[1]) });
+    if (part === 'Has an emergency department') return t('rk.w.ed');
+    if ((m = part.match(/^(\d+(?:\.\d+)?) min away \(simulated\)$/))) return t('rk.w.eta', { n: m[1] });
+    if (part === 'travel time unknown') return t('rk.w.noEta');
+    if ((m = part.match(/^(\d+) beds and (\d+) ICU beds free$/))) return t('rk.w.beds', { b: m[1], i: m[2] });
+    if (part === 'bed numbers not shared') return t('rk.w.noBeds');
+    return part;
+  }).join(' · ');
+}
+
 /** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
 export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);
 
