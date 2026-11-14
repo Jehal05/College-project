@@ -14,7 +14,7 @@ export const toCsv = (rows) => rows.map((r) => r.map(cell).join(',')).join('\r\n
 
 /** CSV text to rows. Handles a leading byte-order mark, quoted cells, "" for a quote, and line breaks inside quotes. */
 export function parseCsv(text) {
-  const src = String(text).replace(/^﻿/, '');
+  const src = String(text).replace(/^\uFEFF/, '');
   const rows = [];
   let row = [];
   let field = '';
@@ -53,7 +53,7 @@ const LANG_OF_COLUMN = { hindi_fixed: 'hi', gujarati_fixed: 'gu' };
 const LANG_NAME = { hi: 'Hindi', gu: 'Gujarati' };
 
 // ---------- source files (src/i18n/hi.js) ----------
-const ENTRY = /^  '((?:[^'\\]|\\.)+)': '((?:[^'\\]|\\.)*)',$/gm;
+const ENTRY = /^ {2}'((?:[^'\\]|\\.)+)': '((?:[^'\\]|\\.)*)',$/gm;
 const unescapeJs = (s) => s.replace(/\\(.)/g, (_, c) => (c === 'n' ? '\n' : c));
 /** A string as it is written between single quotes in the source file. */
 export const escapeJs = (v) => String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -93,7 +93,7 @@ export function buildReviewCsv({ en, hi, gu, pages = {} }) {
   for (const key of Object.keys(en)) {
     rows.push([key, pages[key] || '', isMedical(key, en[key]) ? 'MEDICAL' : '', placeholders(en[key]).join(' '), en[key], hi[key] ?? '', gu[key] ?? '', '', '', '']);
   }
-  return `﻿${toCsv(rows)}`;
+  return `\uFEFF${toCsv(rows)}`;
 }
 
 // ---------- reading the corrections ----------

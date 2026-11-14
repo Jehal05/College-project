@@ -31,7 +31,7 @@ function filled(fixes) {
 
 test('CSV: quotes, commas, line breaks, BOM and Windows line ends round-trip', () => {
   const rows = [['a', 'b,c', 'say "hi"'], ['line\nbreak', ' spaced ', '']];
-  assert.deepEqual(parseCsv(`﻿${toCsv(rows)}`), rows);
+  assert.deepEqual(parseCsv(`\uFEFF${toCsv(rows)}`), rows);
   assert.deepEqual(parseCsv('a,b\r\nc,d\r\n\r\n'), [['a', 'b'], ['c', 'd']]);
   assert.throws(() => parseCsv('a,"open'), /never closed/);
 });
