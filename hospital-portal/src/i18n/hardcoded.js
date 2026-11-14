@@ -19,7 +19,7 @@ const clean = (s) => s.replace(/&[a-z]+;|&#\d+;/g, ' ').replace(/\s+/g, ' ').tri
 
 // A quoted string that looks like something a person reads: starts with a capital, has lowercase letters,
 // is not a CONSTANT_NAME, a path or a CSS class list.
-const PHRASE = /^[A-Z][a-z]{2,}[A-Za-z ,.:;·'’()\-–—…!?/&0-9]*$/;
+const PHRASE = /^[A-Z][a-z]{2,}[A-Za-z ,.:;·'’()–—…!?/&0-9-]*$/;
 const looksLikeUiText = (s) => PHRASE.test(s) && !/^[A-Z][a-z]+[A-Z]/.test(s) && !/\.(js|jsx|json|css)$/.test(s);
 
 /** @returns {{line:number, text:string, kind:'text'|'attr'|'string'}[]} */
