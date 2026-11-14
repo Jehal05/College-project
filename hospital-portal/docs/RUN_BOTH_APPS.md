@@ -144,7 +144,8 @@ The real portal sends a **username** (not an email) to the login call; Jehal's m
 Daksh's `backend/README.md` on branch `Daksh` said earlier that the emergency lifecycle, the WebSocket and hospitals/ambulances were not built. They are now built on that branch (CI run 43601645853) and the socket path is `/ws?token=`, but nobody has run the apps against it on a laptop yet, so the live demo still uses the mock. To try it:
 - Install and start it as his README says (Python 3.12, `.venv`, `.env` with real keys, `uvicorn app.main:app --port 8000`). Health check: http://localhost:8000/health. **CHECK ON LAPTOP.**
 - Portal `.env`: `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000`, `VITE_WS_URL=ws://localhost:8000/ws` (these are the defaults in `.env.example`). His contract names the socket `/ws/hospitals/{hospital_id}`, but the built one is `/ws?token=`; Daksh has not confirmed which stays.
-- Log in as `staff1` / `demo-password` (his seed users).
+- Add `VITE_PORTAL_SIMULATES_AMBULANCE=true`: checked on Puneet's laptop on 14 Nov, the real backend does not move the ambulance by itself, but with `true` the portal moves it (ETA counted down, tracking said "simulated by the portal"). Use `false` only once Daksh's backend simulates the trip.
+- Log in as `staff@demo.test` / `demo1234` (the demo seed users; the field is called Username).
 - Missing endpoints (notes, chat, checklist, hospital add/edit/verify) are listed in `ENDPOINTS_TO_AGREE.md`.
 
 ## Re-capture the real events (for the integration test)
