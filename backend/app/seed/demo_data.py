@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import demo_mode
 from app.models.accounts import User
+from app.models.apps import FamilyInvite, ResponderProfile
 from app.models.consent import CONSENT_FIELDS, ConsentLedger
 from app.models.hospitals import Ambulance, Hospital
 from app.models.patient_data import Contact, Patient
@@ -36,7 +37,10 @@ DEMO_ACCOUNTS = [
     ("usr_008", "admin1", "Admin (Demo)", "demo-password", "ADMIN", None, DEMO_HOSPITAL_ID, None),
     ("usr_009", "family1", "Family (Demo)", "demo-password", "FAMILY", None, None, None),
     ("usr_010", "responder1", "Responder (Demo)", "demo-password", "RESPONDER", None, None, None),
+    ("usr_011", "family@demo.test", "Family (Demo)", "demo1234", "FAMILY", None, None, None),
+    ("usr_012", "responder@demo.test", "Verified Responder (Demo)", "demo1234", "RESPONDER", None, None, None),
 ]
+VERIFIED_RESPONDERS = {"usr_012"}          # every other volunteer account starts unverified, as a real sign-up does
 
 
 class SeedRefused(RuntimeError):
@@ -105,6 +109,15 @@ def seed_demo(session: Session) -> Dict[str, object]:
     for user_id, login, display, password, role, patient_id, hospital_id, label in DEMO_ACCOUNTS:
         session.add(User(id=user_id, login=login.lower(), display_name=display, password_hash=_hash(password),
                          role=role, role_label=label, patient_id=patient_id, hospital_id=hospital_id))
+
+    session.flush()
+    for user_id, _login, _d, _p, role, *_rest in DEMO_ACCOUNTS:
+        if role == "RESPONDER":
+            session.add(ResponderProfile(user_id=user_id, verified=user_id in VERIFIED_RESPONDERS))
+    # The one invite code that never expires, so a demo relative can always link (real invites last 24 hours, once).
+    session.add(FamilyInvite(code="FAM-0417", patient_id=p["id"], expires_at=None, reusable=True))
+    from app.services.content import seed_content
+    seed_content(session)
 
     # The demo patient shares everything, as in the mock server. Written through the append-only ledger.
     for field in CONSENT_FIELDS:

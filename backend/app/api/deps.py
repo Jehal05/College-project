@@ -87,13 +87,13 @@ def require_demo_access(_demo: None = Depends(demo_mode_only), actor: Actor = De
 
 
 def get_family_link_checker() -> Callable[[Session, Actor, str], bool]:
-    """Returns a function that says whether a FAMILY user is linked to a patient.
+    """Returns a function that says whether a FAMILY user is linked to a patient (feature 61).
 
-    TODO(feature 61): the family link table does not exist yet. Until it does,
-    nobody is linked, so family members are refused. Replace this with a real
-    lookup. Tests override this dependency to check the consent rules.
+    A relative links with an invite code the patient made (POST /family/link). Tests override this dependency
+    to check the consent rules without making links.
     """
-    return lambda session, actor, patient_id: False
+    from app.services.family import link_checker
+    return link_checker
 
 
 def get_history_provider() -> Callable[[str], History]:

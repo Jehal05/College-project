@@ -216,7 +216,8 @@ def test_a_symptom_report_is_ciphertext(patients):
 def test_the_patient_baseline_is_ciphertext(patients):
     patients.get(Patient, "pat_001").baseline = {"heart_rate": {"min": 60, "max": 85}}
     patients.commit()
-    assert "60" not in raw(patients, "SELECT baseline FROM patients WHERE id='pat_001'")
+    stored = raw(patients, "SELECT baseline FROM patients WHERE id='pat_001'")
+    assert "heart_rate" not in stored and stored.startswith("gAAAA")      # ("60" can appear in random ciphertext)
     assert patients.get(Patient, "pat_001").baseline["heart_rate"]["max"] == 85
 
 

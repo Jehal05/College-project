@@ -12,11 +12,7 @@ from app.main import app
 from tests.contract_tools import _cell_endpoints, app_endpoints, contract_endpoints
 
 NOT_BUILT_YET = {
-    ("POST", "/reports"), ("POST", "/demo/scenario"), ("POST", "/demo/reset"),
-    ("POST", "/family/link"), ("GET", "/family/patients"), ("POST", "/family/checkin"),
-    ("POST", "/location-shares"), ("GET", "/responders/alerts"), ("POST", "/responders/{}/accept"),
-    ("POST", "/responders/register"), ("GET", "/admin/users"), ("PATCH", "/admin/users"),
-    ("GET", "/content/{}"), ("PUT", "/content/{}"), ("POST", "/feedback"), ("POST", "/privacy-requests"),
+    ("POST", "/location-shares"),
 }
 
 

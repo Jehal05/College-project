@@ -81,6 +81,6 @@ def get_db() -> Iterator[Session]:
 
 def init_db(engine: Optional[Engine] = None) -> None:
     """Create all tables (and the ledger triggers)."""
-    from app.models import accounts, audit, consent, emergencies, hospitals, patient_data  # noqa: F401  (registers the tables)
+    from app.models import accounts, apps, audit, consent, emergencies, extras, hospitals, patient_data  # noqa: F401  (registers the tables)
 
     Base.metadata.create_all(engine or get_engine())

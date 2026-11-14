@@ -78,7 +78,8 @@ def expire_minutes() -> int:
 def create_passport_token(patient_id: str, *, minutes: Optional[int] = None, now: Optional[datetime] = None) -> str:
     issued = now or datetime.now(timezone.utc)
     lifetime = expire_minutes() if minutes is None else minutes
-    claims = {"sub": patient_id, "purpose": PURPOSE, "iat": issued, "exp": issued + timedelta(minutes=lifetime)}
+    claims = {"sub": patient_id, "purpose": PURPOSE, "iat": issued, "exp": issued + timedelta(minutes=lifetime),
+              "jti": secrets.token_urlsafe(8)}   # two links in one second must differ
     return jwt.encode(claims, _secret(), algorithm=ALGORITHM)
 
 

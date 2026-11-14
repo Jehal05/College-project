@@ -50,7 +50,7 @@ Also `npm ci` in your repo reports 14 vulnerabilities (1 high, 2 critical). Plea
 
 **Draft only. Not sent.** Puneet sends it. The full list is `docs/BACKEND_GAPS.md` on branch `integration` (measured from the code on 14 Nov 2026).
 
-Daksh, the portal and the patient app can only run on Jehal's mock because these are not in the backend yet (list measured after your emergency-core commit). The five the demo needs most, in this order:
+Daksh, the portal and the patient app can only run on Jehal's mock because these are not in the backend yet (list measured after your J1 to J4 commits). The five the demo needs most, in this order:
 1. (Done in your latest commit, thank you: create, SOS, cancel and read.) Next: `GET /emergencies?status=active` and `?status=finished`, which the portal's queue and history need.
 2. `POST /emergencies/{id}/ack`, `.../dispatch`, `.../status`.
 3. `GET /hospitals` and `PATCH /hospitals/{id}/availability`.
