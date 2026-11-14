@@ -11,6 +11,8 @@
     "test": "node --test \"src/**/*.test.js\"",
     "lint": "eslint .",
     "review-sheet": "node scripts/make-review-sheet.mjs",
+    "i18n:export": "node scripts/export-translations.mjs",
+    "i18n:import": "node scripts/import-translations.mjs",
     "e2e": "playwright test"
   },
   "dependencies": {

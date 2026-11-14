@@ -25,6 +25,14 @@ These are data or text that comes from the backend or from doctor-reviewed conte
 2. Check each row below. Mark it `ok` or write the better wording, with the reviewer's name and the date.
 3. Edit `src/i18n/hi.js` or `src/i18n/gu.js`. `npm test` checks that the keys and placeholders still match English.
 
+### Quicker: the review CSV (one file for a Hindi reader and a Gujarati reader)
+1. `npm run i18n:export` writes `translations-review.csv` (all strings; opens in Excel or Google Sheets, UTF-8).
+2. Give the same file to a Hindi speaker and a Gujarati speaker. Columns: `key`, `page` (where it shows), `medical` (**MEDICAL** = emergency types, capabilities, severities, warnings and clinical words: take extra care, ask a clinician if unsure), `keep_exactly` (the `{placeholders}` that must stay as written), `english`, `hindi`, `gujarati`, `hindi_fixed`, `gujarati_fixed`, `note`.
+3. The reader types a better wording **only where something is wrong**, in `hindi_fixed` (Hindi reader) or `gujarati_fixed` (Gujarati reader). Everything else stays empty. They send the file back.
+4. `npm run i18n:import -- translations-review.csv --dry-run` shows what would change. Without `--dry-run` it updates `src/i18n/hi.js` and `src/i18n/gu.js`. Then run `npm test` and commit the two files.
+5. Safety rules of the import: empty cells change nothing; a row that changes a `{placeholder}`, drops the word "Simulated", has a line break, or comes from an out-of-date sheet is rejected; if any row is rejected nothing is written (use `--skip-invalid` to apply only the good rows); spaces at the ends of a string are kept as in English; the key lists of English, Hindi and Gujarati stay identical (the import checks this before it writes).
+6. If a test that pins one exact word now fails, update that test to the new word; the reviewer's wording wins.
+
 ## Fonts
 The page asks for Noto Sans (Devanagari, Gujarati), then Nirmala UI, Mangal and Shruti. The sandbox that built this did not have Noto installed, so the screenshots in `docs/i18n/` use a fallback font that still has the glyphs. **Please check on the laptop** that the real Noto or Nirmala UI font shows no empty boxes.
 
