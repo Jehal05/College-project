@@ -51,14 +51,14 @@ if (-not $SkipInstall) {
 # 4. Point the portal at the mock. The values go in the process environment of the portal only; .env is not touched.
 $jobs = @()
 function Start-Part($name, $dir, $envVars, $cmdArgs) {
-  $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = 'npm.cmd'
-  $psi.Arguments = $cmdArgs
-  $psi.WorkingDirectory = $dir
-  $psi.UseShellExecute = $false
-  $psi.CreateNoWindow = $true
-  foreach ($k in $envVars.Keys) { $psi.EnvironmentVariables[$k] = $envVars[$k] }
-  $proc = [System.Diagnostics.Process]::Start($psi)
+  # Start-Process with the settings in the process environment (this form started on Windows when ProcessStartInfo did not).
+  $old = @{}
+  foreach ($k in $envVars.Keys) { $old[$k] = [Environment]::GetEnvironmentVariable($k); [Environment]::SetEnvironmentVariable($k, $envVars[$k]) }
+  try {
+    $proc = Start-Process -FilePath 'npm.cmd' -ArgumentList $cmdArgs -WorkingDirectory $dir -WindowStyle Hidden -PassThru
+  } finally {
+    foreach ($k in $envVars.Keys) { [Environment]::SetEnvironmentVariable($k, $old[$k]) }
+  }
   Say "Started $name (process $($proc.Id))."
   return $proc
 }
