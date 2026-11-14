@@ -7,7 +7,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 1. **How does the portal choose which hospital gets an alert?**
    It first rules out hospitals that are not verified or that lack the unit the emergency needs (for example a cath lab for a heart attack). Then it scores the rest: 50% capability, 30% travel time, 20% availability (`src/data/ranking-config.json`). Distance never brings back a hospital that was ruled out. The reason is shown on screen.
 2. **What happens if nobody answers an alert?**
-   After 30 seconds the alert escalates to the next ranked hospital and the card shows it. The 30-second timer is meant to run in the backend; today it runs in Jehal's mock (and in the portal's own mock mode).
+   After 30 seconds the alert escalates to the next ranked hospital and the card shows it. The 30-second timer now exists in the backend too (tested in CI), but the demo still uses Jehal's mock, where it also runs.
 3. **What if the backend lacks an endpoint?**
    The portal does not crash. A missing call (404, 405 or 501) limits that one feature and says so: for example notes and checklist ticks are "saved on this screen only", and chat shows "not sent". The list is in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`.
 4. **How do you know it works?**
@@ -19,7 +19,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 7. **What does the ambulance on the map do?**
    Everything about the ambulance is simulated. Only one side moves it: with Jehal's mock the mock moves it, otherwise the portal does. The map says which.
 8. **What did you not build?**
-   Real hospital systems, real dispatch, real notifications. Notes, chat, checklist saving and hospital add/edit/verify are not in the backend contract yet.
+   Real hospital systems, real dispatch, real notifications. Notes, chat, checklist saving and hospital add/edit/verify are built in the backend but are marked PROPOSED, not agreed with Daksh in writing.
 
 ## Patient app and mock server (Jehal)
 
