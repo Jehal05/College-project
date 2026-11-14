@@ -133,4 +133,8 @@ export default {
   'tl.CANCELLED': 'Cancelled',
   'tl.ESCALATED': 'Escalated to next hospital',
   'tl.EMERGENCY_DETECTED': 'Emergency detected',
+  'error.title': 'Something went wrong on this screen',
+  'error.body': 'Your alerts are not lost. Reload the page to continue.',
+  'error.reload': 'Reload',
+  'error.retry': 'Try again',
 };

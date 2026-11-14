@@ -132,4 +132,8 @@ export default {
   'tl.CANCELLED': 'रद्द',
   'tl.ESCALATED': 'अगले अस्पताल को भेजा गया',
   'tl.EMERGENCY_DETECTED': 'आपात स्थिति का पता चला',
+  'error.title': 'इस स्क्रीन पर कुछ गड़बड़ हो गई',
+  'error.body': 'आपके अलर्ट खोए नहीं हैं। जारी रखने के लिए पेज दोबारा लोड करें।',
+  'error.reload': 'दोबारा लोड करें',
+  'error.retry': 'फिर कोशिश करें',
 };

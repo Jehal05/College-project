@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 import App from './App.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { EmergencyProvider } from './components/EmergencyProvider.jsx';
@@ -12,6 +13,7 @@ import { HistoryProvider } from './components/HistoryProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
         <HospitalProvider>
@@ -25,5 +27,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </HospitalProvider>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

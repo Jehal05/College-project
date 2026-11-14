@@ -132,4 +132,8 @@ export default {
   'tl.CANCELLED': 'રદ',
   'tl.ESCALATED': 'આગલી હોસ્પિટલને મોકલ્યો',
   'tl.EMERGENCY_DETECTED': 'કટોકટી શોધાઈ',
+  'error.title': 'આ સ્ક્રીન પર કંઈક ખોટું થયું',
+  'error.body': 'તમારા એલર્ટ ગુમ થયા નથી. ચાલુ રાખવા માટે પેજ ફરી લોડ કરો.',
+  'error.reload': 'ફરી લોડ કરો',
+  'error.retry': 'ફરી પ્રયત્ન કરો',
 };
