@@ -86,6 +86,10 @@ npm run dev          # patient app, http://localhost:5173
 No `.env` is needed: the app talks to `http://localhost:4000` by default (`patient-app\.env.example`). Log in as `patient@demo.test` / `demo1234`.
 Alternative: `npm run dev:all` in `jehal-mock` starts the patient app and the mock together, but then use that one window instead of windows 1 and 3, and set the `$env:` lines first.
 
+## Quick API check (optional, after `start-all.ps1` is running)
+
+In a second PowerShell window: `.\scripts\phase1-check.ps1`. It walks create, SOS, acknowledge, dispatch, status and the lists through the API, prints PASS, FAIL or SKIP for each, and writes `phase1-results.txt`. It checks the API only, not the screens. It was written without being run on Windows. Add `-Backend real` to try Daksh's backend on port 8000.
+
 ## Logins at a glance
 
 | Where | Login | Password |
