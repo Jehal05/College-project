@@ -3,7 +3,7 @@
 An emergency in SOS_SENT that nobody acknowledged for ESCALATION_TIMEOUT_SECONDS (default 30) goes
 SOS_SENT -> ESCALATED -> SOS_SENT, and the next hospital in the ranking (the one the SOS stored) is alerted.
 Both moves go through `emergency_state.transition()`. The old alert is marked ESCALATED_AWAY.
-If there is no next hospital the alert simply stays where it is (and is not retried every second).
+If there is no next hospital the alert stays where it is and is looked at again after another timeout (not every second).
 
 Nothing here talks to a socket: events are queued and sent after the commit, like everywhere else.
 """
