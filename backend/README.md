@@ -68,6 +68,7 @@ Then open <http://localhost:8000/docs> for the interactive API page, and <http:/
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login lasts | 480 |
 | `LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS` | Login rate limit (wrong attempts per login, per address, and the window in seconds) | 5, 30, 60 |
 | `PASSPORT_TOKEN_EXPIRE_MINUTES` | How long a passport link lasts | 30 |
+| `ESCALATION_TIMEOUT_SECONDS`, `ESCALATION_SWEEP_SECONDS` | How long an alert may wait for a hospital to acknowledge before it goes to the next hospital, and how often the server checks | 30, 1 |
 
 ## Demo logins (demo mode only, all fictional)
 
@@ -108,6 +109,14 @@ contract is wrong, tell Jehal and Puneet first, change the contract text, then t
 
 `docker compose up` is set up (it reads `.env`), but it has **not yet been built and run on a real machine**.
 Treat it as untested until someone has done it.
+
+## Blocks built by Puneet (P1 to P4)
+
+- **Hospitals** (`app/api/hospitals.py`, `app/services/hospitals.py`): list with distance and a `type` filter, availability updates (staff of that hospital or an admin), and add, edit and verify (admin only; a new hospital starts unverified and is never alerted until verified). The add, edit and verify calls are the portal's proposals, not yet agreed.
+- **Ambulances**: `GET /ambulances` and `POST /ambulances/{id}/location` (staff of the hospital the ambulance belongs to or is working for).
+- **Hospital desk** (`app/api/hospital_desk.py`): acknowledge, dispatch, status and the `GET /emergencies?status=` lists, all through `emergency_state.transition()`. Also the proposed notes, chat and checklist calls and `GET /emergencies/{id}/desk` (new table `desk_entries`).
+- **Live events** (`app/api/ws.py`, `app/services/ws_hub.py`): one WebSocket at `/ws?token=`, filtered by role. **Escalation** (`app/services/escalation.py`): no acknowledgement in time, the next verified hospital is alerted.
+- Not built: a desk taking over another hospital's alert, a once-a-second `vitals.update` stream, WebSocket replay, a Docker build check. The path of the socket is not agreed with Daksh and Jehal.
 
 ## Where things are
 

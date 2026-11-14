@@ -48,11 +48,11 @@ def status(done: bool, note: str = "", partial: bool = False) -> Tuple[str, str]
 # Daksh's 20 features from the plan: number -> (name, tier, status function)
 FEATURES: Dict[int, Tuple[str, str, Callable[[], Tuple[str, str]]]] = {
     2: ("Live vitals service", "T1", lambda: status(
-        has_endpoint("GET", "/patients/{}/vitals") and has_regex(r"\.websocket\(|WebSocketDisconnect"),
-        "GET /patients/{id}/vitals exists, but the one-reading-per-second stream (WebSocket) does not",
+        has_endpoint("GET", "/patients/{}/vitals") and has_regex(r'(publish|queue)\([^)]*"vitals\.update"'),
+        "GET /patients/{id}/vitals exists, and the /ws socket exists, but nothing sends vitals.update once a second yet",
         partial=has_endpoint("GET", "/patients/{}/vitals"))),
     4: ("Rule-based emergency engine", "T1", lambda: status(has_file("app/rules/engine.py"))),
-    8: ("Real-time hospital notification", "T1", lambda: status(has_regex(r"\.websocket\(|WebSocketDisconnect"), "no WebSocket manager yet")),
+    8: ("Real-time hospital notification", "T1", lambda: status(has_regex(r"\.websocket\(|WebSocketDisconnect"), "no WebSocket manager")),
     11: ("Emergency passport", "T1", lambda: status(has_endpoint("GET", "/passport/{}"), "works with a token; staff and patient access wait for login")),
     12: ("QR code", "T1", lambda: status(has_regex(r"import qrcode|from qrcode"), "token exists, no QR image yet")),
     13: ("Wearable simulator", "T2", lambda: status(has_file("app/sim/wearable.py") and has_endpoint("POST", "/demo/vitals"))),
@@ -110,8 +110,12 @@ PHASES = [
     ]),
     Phase("Phase 2: Safety core and Tier 1", "rules, vitals, alerts, passport, demo panel",
           ["app/rules/tests/test_engine.py", "app/rules/tests/test_draft_symptom_rules.py", "tests/test_passport_token.py",
-           "tests/test_emergency_state.py", "tests/test_emergencies_api.py", "tests/test_demo_panel_api.py",
-           "tests/test_patient_extras_api.py", "tests/test_passport_links_api.py", "tests/test_other_apps_api.py"], [4, 20, 8, 2, 11, 12, 57]),
+           "tests/test_emergency_state.py", "tests/test_emergencies_api.py", "tests/test_hospitals_api.py",
+           "tests/test_hospital_desk_api.py", "tests/test_ws_api.py", "tests/test_escalation.py",
+           "tests/test_desk_api.py", "tests/test_heart_attack_flow.py",
+           "tests/test_demo_panel_api.py",
+           "tests/test_patient_extras_api.py", "tests/test_passport_links_api.py",
+           "tests/test_other_apps_api.py"], [4, 20, 8, 2, 11, 12, 57]),
     Phase("Phase 3: Simulators and notifications", "wearable, gateway, family, SMS",
           ["tests/test_wearable.py", "tests/test_demo_vitals_api.py"], [13, 60, 17, 29], [
         ("escalation scheduler", lambda: has_regex(r"escalat\w*_?scheduler|def .*escalat")),

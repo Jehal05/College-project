@@ -6,21 +6,18 @@ A freeze means "the contract is final and we only fix bugs". Declaring it now wo
 most of the contract is not built yet. This file says what must be true before the freeze starts, and the
 rules once it has.
 
-## Where we really are (snapshot, from `python scripts/contract_status.py`)
+## Where we really are (CI run on `integration`, 14 Nov 2026, `python scripts/contract_status.py`)
 
 | | Count |
 |---|---|
-| Endpoints described in CONTRACT.md | 42 |
-| Built in the app | 17 |
-| **Not built yet** | **25** |
-| Served but not documented | 0 |
+| Endpoints described in CONTRACT.md | 75 |
+| Built in the app | 74 |
+| **Not built yet** | **1** (`POST /location-shares`) |
+| Backend tests | 1977 passed |
 
-All 17 built endpoints work with a real login: `GET /health`, login, the patient record (`GET` and `PATCH`), vitals, baseline, the four contact endpoints, the three consent endpoints, the passport, `GET /audit`, insights and `POST /demo/vitals`.
+The older snapshot in this file (17 of 42) is out of date: Daksh's emergency-core and J2 to J4 commits and Puneet's P1 to P4 are in. The numbers above are from a real CI run; the contract status still prints NOT READY TO FREEZE because of the one missing endpoint.
 
-Not built yet: the whole emergency lifecycle (create, cancel, acknowledge,
-dispatch, status), hospitals and availability, ambulance location, demo reset and scenarios, reports, and the
-family, responder, admin, content, feedback and privacy endpoints. Also not built: the WebSocket manager, the
-notification engine, the escalation scheduler and the trend warning, FHIR export and metrics.
+Not run by anyone yet: the contract script (`node scripts/contract.mjs`) against this backend, the two apps in a browser against it, and the Docker build. Not built: a once-a-second `vitals.update` stream, WebSocket replay, a desk taking over another hospital's alert, `POST /location-shares`.
 
 ## Conditions to START the freeze (all must be ticked)
 

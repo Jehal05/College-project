@@ -168,8 +168,17 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /emergencies/{id}/ack | Hospital acknowledges | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/dispatch | Ambulance dispatched | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/status | Move to EN_ROUTE, ARRIVED or HANDOVER_DONE | HOSPITAL_STAFF | Puneet |
+| GET /emergencies?status=active or finished | The desk's lists: emergencies the hospital was alerted for (admin: all sent ones), only after the SOS, audited | HOSPITAL_STAFF, ADMIN | Puneet |
 | GET /hospitals?lat&lng&type | Candidate hospitals with capabilities | HOSPITAL_STAFF, PATIENT, ADMIN | Puneet |
-| PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF | Puneet |
+| PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF (own hospital), ADMIN | Puneet |
+| POST /hospitals | Add a hospital (starts unverified, never alerted until verified). PROPOSED by the portal, not agreed | ADMIN | Puneet |
+| PUT /hospitals/{id} | Edit a hospital; never changes `verified`. PROPOSED, not agreed | ADMIN | Puneet |
+| PATCH /hospitals/{id}/verify | Verify or unverify a hospital. PROPOSED, not agreed | ADMIN | Puneet |
+| GET /ambulances | List ambulances with position and status | HOSPITAL_STAFF, ADMIN | Puneet |
+| PATCH /emergencies/{id}/checklist | Tick or untick a checklist item `{ item_id, done }`; reply `{ checklist }`. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
+| POST /emergencies/{id}/notes | A timeline note `{ kind, note, fields }`; kinds handover, desk, pickup, corridor, assignment, responder. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
+| POST /emergencies/{id}/chat | A chat line `{ text, sender_role: desk or crew, sender_name }`. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
+| GET /emergencies/{id}/desk | Everything the desk wrote: `{ checklist, notes, chat }` | HOSPITAL_STAFF (alerted hospital), ADMIN | Puneet |
 | POST /ambulances/{id}/location | Ambulance position update | HOSPITAL_STAFF | Puneet |
 | GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
@@ -558,6 +567,10 @@ All answers carry `simulated: true`. Errors use the shape of 4.2 (**`400` for ev
 
 Connect to `ws://localhost:8000/ws/hospitals/{hospital_id}?token=<jwt>` for hospital rooms and `ws://localhost:8000/ws/emergencies/{emergency_id}?token=<jwt>` for patient, family and responder views.
 
+**As built (14 Nov 2026, Puneet; the path is proposed, not agreed with Daksh and Jehal):** ONE path, `ws://localhost:8000/ws?token=<login token>`, as the mock server and the portal already use. The server filters by role instead of by room: hospital staff hear the emergencies their hospital was alerted for (and hospital-wide news such as `hospital.availability_updated`), an admin hears every sent emergency, a patient hears their own, and family and responders hear nothing yet (the family link and responder alerts are not built). A bad token is accepted and closed at once with code 1008. With no token in the address, send `{"type":"auth","token":"..."}` within 5 seconds and wait for `auth.ok`. `replay_since` is read and ignored (replay is not built). The older two-path design above stays in this contract until the three of us decide.
+
+**Escalation (as built):** an emergency in `SOS_SENT` that nobody acknowledges for `ESCALATION_TIMEOUT_SECONDS` (default 30) goes `SOS_SENT` to `ESCALATED` to `SOS_SENT` and the next verified hospital in the SOS ranking is alerted (`hospital.escalated`, `emergency.created`, `hospital.alerted`). The app checks once a second (`ESCALATION_SWEEP_SECONDS`).
+
 ### 5.1 Event envelope (every event uses it)
 
 ```json
@@ -585,6 +598,10 @@ Connect to `ws://localhost:8000/ws/hospitals/{hospital_id}?token=<jwt>` for hosp
 | emergency.arrived | Ambulance arrived | `ambulance_id` |
 | emergency.handover_done | Handover finished | `handover_by` |
 | vitals.update | Every second while monitoring | `patient_id`, `heart_rate`, `spo2`, `bp_sys`, `bp_dia`, `glucose`, `resp_rate` |
+| emergency.note | Desk adds a timeline note (PROPOSED) | `note_id`, `kind`, `note`, `actor`, `fields` |
+| chat.message | Desk or crew chat line (PROPOSED) | `message_id`, `sender_role`, `sender_name`, `text` |
+| emergency.checklist | Desk ticks an item (PROPOSED) | `item_id`, `done`, `by` |
+| hospital.availability_updated | A hospital changes its beds or labs | `hospital_id`, `availability` |
 | responder.alert | Nearby volunteer alerted | `distance_m`, `type` (no identity until accepted) |
 
 Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connecting to get missed events (full replay arrives in Phase 2).
@@ -596,6 +613,8 @@ Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connect
 `patients`, `users`, `vitals`, `symptom_reports`, `emergencies`, `status_events`, `hospitals`, `hospital_alerts`, `ambulances`, `emergency_passports`, `reports`, `contacts`, `consents`, `audit_log`
 
 Added in 0.7.3 (J3): `passport_secrets` (the QR link, encrypted), `passport_opens` (when it was opened: times only), `reminders` (names and notes encrypted), `reminder_log`, `patient_preferences`.
+
+Added in 0.7.5 (P2, proposed): `desk_entries` (desk notes, chat lines and checklist ticks, text encrypted).
 
 Added in 0.7.4 (J4): `family_invites`, `family_links`, `family_checkins`, `responder_profiles`, `responder_acceptances`, `content_items`, `feedback` (comment encrypted), `privacy_requests`.
 
