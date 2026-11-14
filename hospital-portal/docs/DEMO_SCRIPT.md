@@ -6,6 +6,16 @@ Legend: ✅ checked on the laptop on 2026-11-14 · ⚠️ not checked yet (do it
 
 ## 0. Before the demo (10 minutes)
 
+**Quickest start (built-in mock, no backend)** ⚠️ not run yet: the script was written without PowerShell available, so run it once on the laptop before the day.
+
+```powershell
+cd C:\Users\punee\College-project\hospital-portal
+.\scripts\start-demo.ps1
+```
+
+It checks Node, runs `npm ci` if needed, creates `.env` from `.env.example` if you have none, starts the portal and opens the browser. Options: `-Port 5175` (if 5174 is busy), `-NoBrowser`, `-SkipInstall`. If PowerShell says scripts are blocked, run `Set-ExecutionPolicy -Scope Process Bypass` in that window first, then the script again. To stop, press Ctrl+C in that window.
+The steps below show the longer way, with Jehal's mock server, for the full demo.
+
 **Pre-demo checklist**
 
 - [ ] Full-size screen. Browser zoom **80%** (Ctrl and minus). A short window hides the Dispatch confirm button.
