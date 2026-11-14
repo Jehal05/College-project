@@ -36,8 +36,11 @@ Also verified later on 14 Nov (checked from the browser extension):
 - The mock moves the ambulance by itself after dispatch (28 updates, ETA 54 s to 0 s in about 15 s). It does not send "arrived"; the desk clicks Arrived and Handed over.
 - Live availability: a PATCH from outside changed beds free in an already-open portal tab with no refresh.
 
-Still unconfirmed:
-- Live availability in a *separate* second tab.
-- Hindi and Gujarati on the alert card and detail panel by eye. The tab I used was running an older build, so I could not judge them. Check after a fresh `npm run dev`.
+Also verified in the second round on 14 Nov (two real browser tabs, fresh `npm run dev`):
+- The browser loaded the new translation code (`phrases.js`).
+- Live availability: beds free changed 11 to 6 in both open tabs with no refresh, then restored.
+- Escalation: an unanswered alert escalated after about 6 s (DEMO_SPEED 5), and "now at" followed each new hospital. No flicker between states.
+- Hindi and Gujarati: the card, detail panel, timeline and dispatch dialog are translated, with no empty boxes. Left in English on purpose or not yet done: the emergency type, the EMERGENCY badge, HR/SpO₂/BP, and the readiness, notes, passport, nearest AED, responders and ranking cards.
+- Two leftovers found and fixed: "now at …" on the card and "No on-call roster". The fix is in the code and passed the unit tests and the sandbox browser suites. It was not yet seen on the laptop, so run `git pull origin Puneet` and look once.
 
-New browser tests in `e2e/flow.spec.js` (escalation, dispatch, Hindi and Gujarati dashboard, availability form) passed in a stand-in runner in the build sandbox, 13 of 13 with the older tests. They have **not** run in real Playwright yet. Run `npm run e2e` on the laptop.
+Nothing is left unconfirmed from the 14 Nov list.

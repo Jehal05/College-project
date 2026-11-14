@@ -43,6 +43,8 @@ export default {
   'card.notOpened': 'अभी खोला नहीं गया',
   'card.new': 'नया',
   'card.cancelled': 'रद्द',
+  'card.nowAt': 'अभी यहाँ: {name}',
+  'team.noRoster': 'इस अस्पताल के लिए ऑन-कॉल रोस्टर नहीं है।',
   'card.locationNotShared': 'स्थान साझा नहीं किया गया',
   'card.checkin': 'सुरक्षा चेक-इन अलर्ट। Simulated।',
   'state.EMERGENCY_DETECTED': 'शुरुआती सूचना · मरीज़ ने अभी SOS की पुष्टि नहीं की',

@@ -44,4 +44,4 @@ Verified on the laptop: staff login returns `HSP-AMD-002`; escalation shows on t
 
 Also verified later on 14 Nov: the mock moves the ambulance itself after dispatch (28 position updates and `vitals.update` events; ETA 54 s to 0 s in about 15 s at DEMO_SPEED 5), and then stays En route until the desk clicks Arrived. A `hospital.availability_updated` event changed beds free in an already-open tab with no refresh.
 
-Still unconfirmed: live availability in a separate second tab, and the Hindi and Gujarati card and detail panel by eye. See `docs/DEMO_SCRIPT.md` for the fallback if the ambulance does not move.
+Second round on 14 Nov: live availability changed in two real tabs with no refresh (11 to 6, then restored); an unanswered alert escalated after about 6 s and "now at" followed each hospital; Hindi and Gujarati showed no boxes on the card, detail panel, timeline and dispatch dialog. Nothing from the 14 Nov list is left unconfirmed. Note: the mock keeps escalating an unanswered alert until the hospital list runs out.

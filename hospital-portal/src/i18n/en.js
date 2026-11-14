@@ -44,6 +44,8 @@ export default {
   'card.notOpened': 'Not opened yet',
   'card.new': 'NEW',
   'card.cancelled': 'CANCELLED',
+  'card.nowAt': 'now at {name}',
+  'team.noRoster': 'No on-call roster for this hospital.',
   'card.locationNotShared': 'Location not shared',
   'card.checkin': 'Safety check-in alert. Simulated.',
   'state.EMERGENCY_DETECTED': 'Early notice · patient has not confirmed the SOS yet',

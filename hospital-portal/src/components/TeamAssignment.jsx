@@ -5,8 +5,10 @@ import roster from '../data/roster.json';
 import { SPECIALTY_FOR_TYPE } from '../services/contract.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
+import { useT } from '../i18n/index.js';
 
 export default function TeamAssignment({ emergency }) {
+  const t = useT();
   const { session } = useAuth();
   const { addNote } = useEmergencies();
   const [choice, setChoice] = useState('');
@@ -40,7 +42,7 @@ export default function TeamAssignment({ emergency }) {
     }
   }
 
-  if (staff.length === 0) return <p className="text-slate-500">No on-call roster for this hospital.</p>;
+  if (staff.length === 0) return <p className="text-slate-500">{t('team.noRoster')}</p>;
 
   return (
     <div data-testid="assignment">

@@ -5,7 +5,7 @@ import EscalationCountdown from './EscalationCountdown.jsx';
 import { isEarly } from '../services/stateMachine.js';
 import { originText } from '../services/adapters.js';
 import { shouldFlash, showNewBadge } from '../services/alertFlags.js';
-import { elsewhereLabel } from '../services/queueScope.js';
+import { elsewhereName } from '../services/queueScope.js';
 import { cardWarning } from '../services/capacity.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
@@ -28,7 +28,8 @@ export default function AlertCard({ alert, selected, onSelect }) {
   const early = isEarly(state);
   const { session } = useAuth();
   const { hospitals } = useHospitals();
-  const elsewhere = elsewhereLabel(alert, session?.hospital_id, hospitals);
+  const elsewhereHospital = elsewhereName(alert, session?.hospital_id, hospitals);
+  const elsewhere = elsewhereHospital === null ? null : t('card.nowAt', { name: elsewhereHospital });
   const ownHospital = hospitals.find((h) => h.id === String(session?.hospital_id));
   const warning = !elsewhere && !isFinal(state) ? cardWarning(alert, ownHospital) : null;
   const fromCheckIn = originText(alert);

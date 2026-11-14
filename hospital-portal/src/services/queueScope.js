@@ -24,9 +24,14 @@ export const scopeList = (list, hospitalId, scope) => list.filter((e) => inScope
 export const hiddenCount = (list, hospitalId, scope) =>
   scope === 'all' ? 0 : list.filter((e) => isElsewhere(e, hospitalId) && !['HANDOVER_DONE', 'CANCELLED'].includes(e.state)).length;
 
+/** The name of the hospital that holds an alert held elsewhere, else null. */
+export function elsewhereName(alert, hospitalId, hospitals = []) {
+  if (!isElsewhere(alert, hospitalId)) return null;
+  return alert.alerted_hospital_name || hospitals.find((h) => same(h.id, alert.alerted_hospital_id))?.name || String(alert.alerted_hospital_id);
+}
+
 /** "now at <hospital name>" for an alert held elsewhere, else null. */
 export function elsewhereLabel(alert, hospitalId, hospitals = []) {
-  if (!isElsewhere(alert, hospitalId)) return null;
-  const name = alert.alerted_hospital_name || hospitals.find((h) => same(h.id, alert.alerted_hospital_id))?.name || String(alert.alerted_hospital_id);
-  return `now at ${name}`;
+  const name = elsewhereName(alert, hospitalId, hospitals);
+  return name === null ? null : `now at ${name}`;
 }

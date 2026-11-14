@@ -69,7 +69,7 @@ Point at: the red EMERGENCY card, the NEW badge, the sound and the flash, the vi
 
 Note: with **All hospitals** selected you see every alert. **My hospital** shows only alerts held by Navrangpura.
 
-## 2. Nobody answers: escalation (0:30 – 1:00) ✅
+## 2. Nobody answers: escalation (0:30 – 1:00) ✅ (re-checked 2026-11-14)
 
 Do: do **not** click Acknowledge. Wait about 6 seconds (30 s divided by the demo speed of 5). The alert moves from hospital to hospital until the last one on the list.
 
@@ -99,11 +99,11 @@ If the marker does not move on the day, **switch the demo to the built-in mock**
 
 ## 5. Activity page and language (2:30 – 3:00)
 
-Do: open **Activity** ✅ (opened against the mock on 2026-11-14, "15 of 15 entries"). Then switch the **Language** menu to **Hindi** ✅ (nav and capacity strip were checked on 2026-11-14; the alert card and detail panel were checked only by the automated tests, not yet by eye on the laptop) and back.
+Do: open **Activity** ✅ (opened against the mock on 2026-11-14, "15 of 15 entries"). Then switch the **Language** menu to **Hindi** ✅ (checked in the browser on 2026-11-14: nav, alert card, detail panel, timeline and dispatch dialog are translated and no characters show as boxes) and back.
 
 Say: "Every desk action is logged with who and when. The portal also works in Hindi and Gujarati. These translations are drafts and wait for a native-speaker review."
 
-Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly that some details (readiness card, ranking table, notes) are still English.
+Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly that some details are still English: the emergency type and EMERGENCY badge, HR/SpO₂/BP labels, and the readiness, notes, patient passport, nearest AED, responders and ranking cards.
 
 ## If something goes wrong
 
@@ -118,4 +118,4 @@ Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly 
 
 ## Not covered by this script
 
-Notes and chat need Daksh's backend. In the mock they work on this screen only. Live availability was checked in a tab that was already open (beds 11 to 4 with no refresh, then back to 11). A second separate tab was not tried. The escalation step was verified earlier; it was not re-run in the last dry run.
+Notes and chat need Daksh's backend. In the mock they work on this screen only. Live availability was checked with two real tabs open (beds 11 to 6 in both with no refresh, then back to 11). Escalation was re-checked: an unanswered alert escalated at about 6 s and the "now at" name followed each new hospital. The mock keeps escalating until the list runs out, so acknowledge soon after the first escalation.
