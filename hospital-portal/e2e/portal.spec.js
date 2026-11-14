@@ -83,7 +83,15 @@ test.describe('queue scope', () => {
     await expect(page.locator('[data-testid=scope-mine]')).toHaveAttribute('aria-pressed', 'true');
     const mine = await cards(page).count();
     expect(mine).toBeLessThanOrEqual(all);
-    if (mine < all) await expect(page.locator('[data-testid=hidden-count]')).toContainText(String(all - mine));
+    if (mine < all) {
+      await expect(page.locator('[data-testid=hidden-count]')).toContainText(String(all - mine));
+      // the hint has a link that goes straight to All hospitals
+      await page.click('[data-testid=show-all-link]');
+      await expect(page.locator('[data-testid=scope-all]')).toHaveAttribute('aria-pressed', 'true');
+      await expect(cards(page)).toHaveCount(all);
+      await expect(page.locator('[data-testid=show-all-link]')).toHaveCount(0);
+      await page.click('[data-testid=scope-mine]');
+    }
     await page.click('[data-testid=scope-all]');
     await expect(cards(page)).toHaveCount(all);
   });
