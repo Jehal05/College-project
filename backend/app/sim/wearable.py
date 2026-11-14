@@ -244,6 +244,16 @@ class WearableSimulator:
             self._current = {k: float(v) for k, v in PROFILES["normal"].targets.items()}
             self.last_reading = self._snapshot()
 
+    def snap(self) -> "Reading":
+        """Jump straight to the current profile's target values (no slow drift), for the demo scenarios,
+        so an alert raised a moment after the profile switch already carries matching readings.
+        Pinned overrides still win."""
+        with self._lock:
+            for name in VITAL_NAMES:
+                self._current[name] = float(self._overrides.get(name, PROFILES[self._profile].targets[name]))
+            self.last_reading = self._snapshot()
+            return self.last_reading
+
     # ------------------------------------------------------------ the stream
 
     def tick(self) -> Reading:

@@ -175,9 +175,11 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
 | GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent, once feature 61 exists | Shagun (feature 67) |
 | POST /reports | Upload a health report | PATIENT | Jehal |
-| POST /demo/scenario | Run a scenario | any logged-in user, demo mode only (404 otherwise) | Demo panel |
-| POST /demo/reset | Reset to start state | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| POST /demo/scenario | Run a ready-made emergency for the demo patient and send its SOS (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| POST /demo/reset | Reset to start state (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
 | POST /demo/vitals | Switch wearable profile or override vitals | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| GET /demo/state | The demo panel's view: speed and wearable profile (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
+| POST /demo/speed | Speed up timed demo steps (see 4.4) | any logged-in user, demo mode only (404 otherwise) | Demo panel |
 
 ### Added for family, responder and admin apps (Shagun)
 
@@ -497,6 +499,16 @@ Status codes used: `200`, `201`, `400` (bad input, including every validation er
 
 **Events** are published through `app/services/events.py` (a hook: the WebSocket manager subscribes to it). Every event carries an `audience` (`hospitals`, `patient:<id>`, `family:<id>`, `responders`, `all`) for the manager to filter on, and both `event` and `type` with the same name.
 
+### 4.4 Demo panel (0.7.2, DEMO_MODE only)
+
+Both calls answer `404` for everybody (logged in or not) unless `DEMO_MODE=true`, and `401` without a login in demo mode. Any logged-in role may call them.
+
+**POST /demo/scenario** body `{ "type": "HEART" | "STROKE" | "DIABETIC" | "ASTHMA" | "FALL" }` (the key `scenario` also works; any case; `HEART_ATTACK` and `LOW_GLUCOSE` are aliases). It switches the demo patient's wearable to the matching profile and **snaps** the readings to it (so the alert carries matching vitals at once), raises the alert for the patient `PT-2026-0417` (or the caller's own patient) with the symptoms the patient app would send, uses the patient's current consents and the demo location (source `demo`), then sends the SOS. `FALL` is a safety check-in (`source` `FALL_CHECK`, type `UNKNOWN`). Reply `201 { id, state: "SOS_SENT", type, severity, simulated }`. Anything else: `400`, nothing created.
+
+**GET /demo/state** `{ speed, allowed_speeds: [1,2,5,10,20], vitals: { profile, overrides, profiles: [...] }, simulated }` (the caller's patient, else the demo patient). **POST /demo/speed** `{ multiplier }` with 1, 2, 5, 10 or 20 (anything else `400`, nothing changes) sets the speed that timed demo steps divide their waiting time by (`app.services.demo.get_speed()`); a reset sets it back to 1. `POST /demo/fail` is a mock-server helper only and is not built here.
+
+**POST /demo/reset** empties every table (the append-only ones too: audit log, consent ledger, status timeline), loads the seed data again, sets emergency numbers back to `0001`, puts every simulator back to the normal profile and clears the login limiter. Demo logins keep their ids, so a login issued before the reset still works. Reply `200 { status: "reset", ok: true, seeded: { ... }, simulated: true }` (both `status` and `ok` are sent for the two apps). The append-only protection is back in place afterwards. Other modules that keep demo state in memory register a function with `app.services.demo.register_reset_hook`.
+
 ---
 
 ## 5. WebSocket
@@ -592,3 +604,4 @@ Passwords are set in the seed script and are demo values only.
 | 13 Nov 2026 | 0.6.2 | Draft rules for 7 unmapped symptoms and the safety check-in (pending doctor review), `UNKNOWN` emergency type, symptom-id map |
 | 14 Nov 2026 | 0.7 (in progress) | **Patient record, vitals, baseline, contacts (Task 3)**, contacts now need the `history` consent, `sex` is always shown, consent answers carry `changes`. **Login (feature 33):** `POST /auth/login`, real roles, rate limit, one error shape, 400 instead of 422, demo endpoints for any logged-in user in demo mode only. **Foundation, agreed with Puneet:** opaque ids in the apps' formats, hospital availability keys `beds_free` / `icu_free` / `cath_lab_ready` / `stroke_unit_ready`, seed logins (section 7), CORS allow-list, all 14 tables built. More lines are added here as the later tasks land. **Not yet announced: waiting for Jehal's answers.** |
 | 14 Nov 2026 | 0.7.1 | **Emergency core (J1, Jehal):** `POST /emergencies`, `POST /emergencies/{id}/sos` (new, decision recorded in section 2), `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}`, `GET /emergencies/{id}/reasons`, `GET /patients/{id}/emergencies`, `GET /patients/{id}/emergencies/{eid}/summary`. Section 4.3 added. Event hook `app/services/events.py`. State changes only through `app/services/emergency_state.py` |
+| 14 Nov 2026 | 0.7.2 | **Demo panel (J2, Jehal):** `POST /demo/scenario` (HEART, STROKE, DIABETIC, ASTHMA, FALL), `POST /demo/reset`, `GET /demo/state`, `POST /demo/speed`, section 4.4. New `WearableSimulator.snap()` |

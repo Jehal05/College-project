@@ -256,3 +256,21 @@ def test_invalid_alpha_is_rejected():
     for bad in (0, -1, 1.5):
         with pytest.raises(ValueError):
             WearableSimulator(alpha=bad)
+
+
+def test_snap_jumps_to_the_profile_targets_at_once():
+    from app.sim.wearable import PROFILES, WearableSimulator
+    sim = WearableSimulator("pat_001", seed=1)
+    sim.apply(profile="heart_attack")
+    assert sim.last_reading.values["heart_rate"] < 100            # still drifting without a snap
+    reading = sim.snap()
+    assert reading is sim.last_reading
+    assert reading.values["heart_rate"] == PROFILES["heart_attack"].targets["heart_rate"]
+    assert reading.values["spo2"] == PROFILES["heart_attack"].targets["spo2"]
+
+
+def test_snap_keeps_pinned_overrides():
+    from app.sim.wearable import WearableSimulator
+    sim = WearableSimulator("pat_001", seed=1)
+    sim.apply(profile="heart_attack", overrides={"heart_rate": 150})
+    assert sim.snap().values["heart_rate"] == 150
