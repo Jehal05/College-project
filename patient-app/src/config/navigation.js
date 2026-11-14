@@ -1,7 +1,7 @@
 // The app's pages for the sidebar (desktop) and the bottom bar (phone). `themed` pages use the dark/light HealthTwin look;
 // all others are the older screens, shown on a light surface until they are redesigned.
 export const NAV = [
-  { key: 'overview', to: '/', icon: 'home', end: true },
+  { key: 'overview', to: '/overview', icon: 'home', themed: true },
   { key: 'twin', to: '/twin', icon: 'user', themed: true },
   { key: 'diseases', to: '/diseases', icon: 'activity', themed: true },
   { key: 'monitor', to: '/monitor', icon: 'heart', themed: true },
@@ -15,5 +15,6 @@ export const NAV = [
 ];
 // Phone bottom bar: Home, Twin, Monitor, Reports, Profile.
 export const BOTTOM = ['overview', 'twin', 'monitor', 'reports', 'settings'];
-export const THEMED_ROUTES = ['/twin', '/diseases', '/monitor', '/emergency-center', '/simulator', '/care-circle', '/hospitals', '/design'];
+export const BOTTOM_TO = { overview: '/' }; // on the phone, Home is the original home screen
+export const THEMED_ROUTES = ['/overview', '/twin', '/diseases', '/monitor', '/emergency-center', '/simulator', '/care-circle', '/hospitals', '/design'];
 export const isThemed = (pathname) => THEMED_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
