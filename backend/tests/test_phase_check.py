@@ -22,10 +22,10 @@ def test_every_feature_status_is_valid():
 
 
 def test_features_known_to_exist_are_reported_as_built():
-    for number in (4, 13, 20, 33, 50, 51, 54):
+    for number in (4, 8, 13, 20, 33, 50, 51, 54):
         assert pc.FEATURES[number][2]()[0] == pc.BUILT, number
 
 
 def test_features_known_to_be_missing_are_not_reported_as_built():
-    for number in (2, 8, 12, 14, 17, 29, 52, 53, 55, 56, 60):
+    for number in (2, 12, 14, 17, 29, 52, 53, 55, 56, 60):
         assert pc.FEATURES[number][2]()[0] != pc.BUILT, number
