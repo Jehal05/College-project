@@ -127,3 +127,19 @@ class Counter(Base):
 
     key = Column(String, primary_key=True)
     value = Column(Integer, nullable=False, default=0)
+
+
+class DeskEntry(Base):
+    """What the hospital desk writes on an emergency: timeline notes, chat messages and checklist ticks (P2).
+    One row per entry, never edited. The text is encrypted at rest (staff may type anything)."""
+    __tablename__ = "desk_entries"
+    __table_args__ = (CheckConstraint("kind IN ('note','chat','check')", name="ck_desk_entries_kind"),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    emergency_id = Column(String, ForeignKey("emergencies.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False)                  # note, chat or check
+    label = Column(String, nullable=False)                 # the note kind, the chat sender role, or the checklist item id
+    content = Column(EncryptedJSON, nullable=False)
+    hospital_id = Column(String)
+    actor = Column(String, nullable=False)                 # the user id that wrote it
+    created_at = Column(DateTime, nullable=False, default=_utcnow)

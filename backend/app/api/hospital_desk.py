@@ -21,7 +21,7 @@ from app.models.emergencies import Emergency, HospitalAlert
 from app.models.enums import EmergencyState, InvalidTransition
 from app.models.hospitals import Ambulance
 from app.security.actor import Actor
-from app.services import audit, emergency_state, events
+from app.services import audit, desk, emergency_state, events
 from app.services import emergencies as svc
 from app.services import hospitals as hospital_svc
 
@@ -182,6 +182,88 @@ def move_on(emergency_id: str, body: Dict[str, Any], actor: Actor = Depends(get_
     return _answer(db, emergency)
 
 
+# ---------------------------------------------------------------- notes, chat and checklist (PROPOSED, not agreed)
+
+def _desk_writer(db: Session, actor: Actor, emergency_id: str, action: str) -> Emergency:
+    """Staff of an alerted hospital, on an emergency that is not closed."""
+    emergency = _desk_emergency(db, actor, emergency_id, action)
+    if not _alerted(db, emergency, actor.hospital_id):
+        _deny(db, actor, action, emergency.id, "forbidden_role", 403, "Not allowed", emergency.patient_id)
+    if desk.is_closed(emergency):
+        raise HTTPException(status_code=409, detail="This emergency is closed")
+    return emergency
+
+
+@router.post("/emergencies/{emergency_id}/notes", status_code=201)
+def add_note(emergency_id: str, body: Dict[str, Any], actor: Actor = Depends(get_current_actor),
+             db: Session = Depends(get_db)) -> dict:
+    emergency = _desk_writer(db, actor, emergency_id, "emergency.note")
+    try:
+        kind, note, fields = desk.clean_note(body)
+    except desk.DeskInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from None
+    entry = desk.add(db, emergency, actor, "note", kind, {"note": note, "fields": fields})
+    out = desk.note_view(entry)
+    events.queue(db, "emergency.note", {k: out[k] for k in ("note_id", "kind", "note", "actor", "fields")},
+                 audience="hospitals", emergency_id=emergency.id, state=emergency.state)
+    audit.record(db, action="emergency.note", resource_type="emergency", resource_id=emergency.id,
+                 patient_id=emergency.patient_id, outcome="allowed", actor=actor)
+    _finish(db)
+    return out
+
+
+@router.post("/emergencies/{emergency_id}/chat", status_code=201)
+def add_chat(emergency_id: str, body: Dict[str, Any], actor: Actor = Depends(get_current_actor),
+             db: Session = Depends(get_db)) -> dict:
+    emergency = _desk_writer(db, actor, emergency_id, "emergency.chat")
+    try:
+        role, name, text = desk.clean_chat(body)
+    except desk.DeskInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from None
+    entry = desk.add(db, emergency, actor, "chat", role, {"text": text, "sender_name": name})
+    out = desk.chat_view(entry)
+    events.queue(db, "chat.message", out, audience="hospitals", emergency_id=emergency.id, state=emergency.state)
+    audit.record(db, action="emergency.chat", resource_type="emergency", resource_id=emergency.id,
+                 patient_id=emergency.patient_id, outcome="allowed", actor=actor)
+    _finish(db)
+    return out
+
+
+@router.patch("/emergencies/{emergency_id}/checklist")
+def tick(emergency_id: str, body: Dict[str, Any], actor: Actor = Depends(get_current_actor),
+         db: Session = Depends(get_db)) -> dict:
+    emergency = _desk_writer(db, actor, emergency_id, "emergency.checklist")
+    try:
+        item, done = desk.clean_check(body)
+    except desk.DeskInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from None
+    desk.add(db, emergency, actor, "check", item, {"done": done})
+    events.queue(db, "emergency.checklist", {"item_id": item, "done": done, "by": actor.user_id},
+                 audience="hospitals", emergency_id=emergency.id, state=emergency.state)
+    audit.record(db, action="emergency.checklist", resource_type="emergency", resource_id=emergency.id,
+                 patient_id=emergency.patient_id, outcome="allowed", actor=actor)
+    _finish(db)
+    return {"checklist": desk.checklist(db, emergency)}
+
+
+@router.get("/emergencies/{emergency_id}/desk")
+def read_desk(emergency_id: str, actor: Actor = Depends(get_current_actor), db: Session = Depends(get_db)) -> dict:
+    """Everything the desk wrote on this emergency, so a reload does not lose it. Staff of an alerted hospital, admin."""
+    action = "emergency.read"
+    if actor.role == "ADMIN":
+        emergency = db.get(Emergency, emergency_id)
+        if emergency is None or emergency.sos_at is None:
+            _deny(db, actor, action, emergency_id, "emergency_not_found", 404, _NOT_FOUND,
+                  emergency.patient_id if emergency else None)
+    else:
+        emergency = _desk_emergency(db, actor, emergency_id, action)
+        if not _alerted(db, emergency, actor.hospital_id):
+            _deny(db, actor, action, emergency.id, "forbidden_role", 403, "Not allowed", emergency.patient_id)
+    audit.record(db, action=action, resource_type="emergency", resource_id=emergency.id,
+                 patient_id=emergency.patient_id, outcome="allowed", actor=actor)
+    return desk.desk_view(db, emergency)
+
+
 # ---------------------------------------------------------------- the lists
 
 @router.get("/emergencies")
@@ -204,7 +286,7 @@ def list_for_desk(status: Optional[str] = None, actor: Actor = Depends(get_curre
     for emergency in rows:
         body = svc.view(db, emergency, "staff")
         released.update(svc.released_fields(body))
-        out.append({**body, "emergency_id": emergency.id})
+        out.append({**body, "emergency_id": emergency.id, **desk.desk_view(db, emergency)})
     audit.record(db, action=action, resource_type="emergency", resource_id=None, outcome="allowed", actor=actor,
                  fields_released=sorted(released))
     return out
