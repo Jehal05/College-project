@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AlertAnnouncer from './components/AlertAnnouncer.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -5,16 +6,24 @@ import HospitalFallbackBanner from './components/HospitalFallbackBanner.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import NavBar from './components/NavBar.jsx';
-import Login from './pages/Login.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import MapPage from './pages/Map.jsx';
-import Fleet from './pages/Fleet.jsx';
-import Analytics from './pages/Analytics.jsx';
-import Admin from './pages/Admin.jsx';
-import Crew from './pages/Crew.jsx';
-import History from './pages/History.jsx';
-import Activity from './pages/Activity.jsx';
-import Report from './pages/Report.jsx';
+import { useT } from './i18n/index.js';
+
+// One chunk per page: the browser loads a page's code only when the route is opened.
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
+const MapPage = lazy(() => import('./pages/Map.jsx'));
+const Fleet = lazy(() => import('./pages/Fleet.jsx'));
+const Analytics = lazy(() => import('./pages/Analytics.jsx'));
+const Admin = lazy(() => import('./pages/Admin.jsx'));
+const Crew = lazy(() => import('./pages/Crew.jsx'));
+const History = lazy(() => import('./pages/History.jsx'));
+const Activity = lazy(() => import('./pages/Activity.jsx'));
+const Report = lazy(() => import('./pages/Report.jsx'));
+
+function PageLoading() {
+  const t = useT();
+  return <p role="status" data-testid="page-loading" className="p-6 text-xl text-slate-600">{t('common.loading')}</p>;
+}
 
 function Shell({ children }) {
   const { pathname } = useLocation();
@@ -38,7 +47,7 @@ function Shell({ children }) {
       <HospitalFallbackBanner />
       <main className="flex-1">
         {/* A screen error shows a message here; the navigation stays usable and a new page starts clean. */}
-        <ErrorBoundary key={pathname}>{children}</ErrorBoundary>
+        <ErrorBoundary key={pathname}><Suspense fallback={<PageLoading />}>{children}</Suspense></ErrorBoundary>
       </main>
     </div>
   );
@@ -49,7 +58,7 @@ const staff = ['staff', 'admin'];
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Suspense fallback={<PageLoading />}><Login /></Suspense>} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route
         path="/dashboard"
@@ -84,7 +93,7 @@ export default function App() {
         element={<ProtectedRoute roles={['admin']}><Shell><Admin /></Shell></ProtectedRoute>}
       />
       {/* Crew side of the chat (feature #49). Open it in a second browser tab. */}
-      <Route path="/crew/:emergencyId" element={<ProtectedRoute roles={staff}><Crew /></ProtectedRoute>} />
+      <Route path="/crew/:emergencyId" element={<ProtectedRoute roles={staff}><Suspense fallback={<PageLoading />}><Crew /></Suspense></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
