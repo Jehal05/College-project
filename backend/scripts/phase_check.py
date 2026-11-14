@@ -69,7 +69,7 @@ FEATURES: Dict[int, Tuple[str, str, Callable[[], Tuple[str, str]]]] = {
     55: ("FHIR passport export", "T3", lambda: status(has_regex(r'"Bundle"'))),
     56: ("Admin system-health panel", "T3", lambda: status(has_endpoint("GET", "/metrics"))),
     57: ("Demo control panel", "T1", lambda: status(
-        has_endpoint("POST", "/demo/scenario") and has_endpoint("POST", "/demo/reset"), "only POST /demo/vitals exists; no scenario launcher or reset",
+        has_endpoint("POST", "/demo/scenario") and has_endpoint("POST", "/demo/reset"), "the scenario launcher or the reset is missing",
         partial=has_endpoint("POST", "/demo/vitals"))),
     60: ("Mock 112/108 gateway", "T2", lambda: status(has_regex(r"MockGateway|EmergencyGateway"))),
 }
@@ -111,7 +111,8 @@ PHASES = [
     Phase("Phase 2: Safety core and Tier 1", "rules, vitals, alerts, passport, demo panel",
           ["app/rules/tests/test_engine.py", "app/rules/tests/test_draft_symptom_rules.py", "tests/test_passport_token.py",
            "tests/test_emergency_state.py", "tests/test_emergencies_api.py", "tests/test_hospitals_api.py",
-           "tests/test_hospital_desk_api.py"], [4, 20, 8, 2, 11, 12, 57]),
+           "tests/test_hospital_desk_api.py",
+           "tests/test_demo_panel_api.py"], [4, 20, 8, 2, 11, 12, 57]),
     Phase("Phase 3: Simulators and notifications", "wearable, gateway, family, SMS",
           ["tests/test_wearable.py", "tests/test_demo_vitals_api.py"], [13, 60, 17, 29], [
         ("escalation scheduler", lambda: has_regex(r"escalat\w*_?scheduler|def .*escalat")),
