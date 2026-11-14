@@ -46,9 +46,11 @@ export function announcementFor(list, msg, ctx = {}) {
   if (!visible(known)) return null;
   // An early notice that became a real SOS is announced like a new alert.
   if (msg.state === 'SOS_SENT' && isEarly(known.state)) return newAlertText(known);
-  // State changes: only for the alert that is open on screen.
-  if (msg.state && msg.state !== known.state && STATE_WORDS[msg.state] && ctx.selectedId === known.emergency_id) {
-    return { text: `${typeWord(known)}: ${STATE_WORDS[msg.state]}`, politeness: 'polite' };
+  // State changes are announced for every alert in the queue. The open alert is short; any other alert also says which patient,
+  // so a screen reader user can tell which card moved.
+  if (msg.state && msg.state !== known.state && STATE_WORDS[msg.state]) {
+    const open = ctx.selectedId === known.emergency_id;
+    return { text: open ? `${typeWord(known)}: ${STATE_WORDS[msg.state]}` : `${typeWord(known)}, ${who(known)}: ${STATE_WORDS[msg.state]}`, politeness: 'polite' };
   }
   return null;
 }

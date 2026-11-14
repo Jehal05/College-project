@@ -25,8 +25,11 @@ function PageLoading() {
   return <p role="status" data-testid="page-loading" className="p-6 text-xl text-slate-600">{t('common.loading')}</p>;
 }
 
+const skipClass = 'sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[3000] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-slate-900';
+
 function Shell({ children }) {
   const { pathname } = useLocation();
+  const t = useT();
   // Keyboard users jump over the navigation straight to the queue (only on the dashboard, where the queue is).
   const skip = (e) => {
     const target = document.getElementById('alert-queue');
@@ -34,18 +37,23 @@ function Shell({ children }) {
     e.preventDefault();
     target.focus();
   };
+  const skipMain = (e) => {
+    const target = document.getElementById('main');
+    if (!target) return;
+    e.preventDefault();
+    target.focus();
+  };
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#main" onClick={skipMain} data-testid="skip-main" className={skipClass}>{t('a11y.skipMain')}</a>
       {pathname === '/dashboard' && (
-        <a href="#alert-queue" onClick={skip} data-testid="skip-link" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[3000] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-slate-900">
-          Skip to alert queue
-        </a>
+        <a href="#alert-queue" onClick={skip} data-testid="skip-link" className={`${skipClass}`}>{t('a11y.skipQueue')}</a>
       )}
       <AlertAnnouncer />
       <NavBar />
       <OfflineBanner />
       <HospitalFallbackBanner />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
         {/* A screen error shows a message here; the navigation stays usable and a new page starts clean. */}
         <ErrorBoundary key={pathname}><Suspense fallback={<PageLoading />}>{children}</Suspense></ErrorBoundary>
       </main>

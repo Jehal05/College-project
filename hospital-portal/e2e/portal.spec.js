@@ -135,3 +135,25 @@ test.describe('language switch', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
+
+test.describe('accessibility basics', () => {
+  test('every page has a skip link that moves focus to the main area', async ({ page }) => {
+    await login(page);
+    for (const path of ['/dashboard', '/history', '/analytics']) {
+      await page.goto(path);
+      await expect(page.locator('nav')).toBeVisible();
+      await page.focus('[data-testid=skip-main]');
+      await page.keyboard.press('Enter');
+      expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
+    }
+  });
+
+  test('a page the role cannot open says so, with a way back and a log out', async ({ page }) => {
+    await login(page);
+    await page.goto('/admin');
+    await expect(page.locator('[data-testid=access-denied]')).toBeVisible();
+    await expect(page.locator('[data-testid=access-back]')).toBeVisible();
+    await page.click('[data-testid=access-logout]');
+    await expect(page.locator('input[type=password]')).toBeVisible();
+  });
+});

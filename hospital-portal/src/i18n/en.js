@@ -396,4 +396,11 @@ export default {
   'admin.f.cancel': 'Cancel',
   'admin.f.saving': 'Saving…',
   'hospitals.fallback': 'The hospital list could not be loaded from the server. Showing the saved sample list, so beds and units may be out of date.',
+  'a11y.skipMain': 'Skip to main content',
+  'a11y.skipQueue': 'Skip to alert queue',
+  'a11y.skipLogin': 'Skip to the login form',
+  'access.title': 'Access denied',
+  'access.body': 'Your role ({role}) cannot open this page.',
+  'access.back': 'Back to the alert queue',
+  'access.logout': 'Log out',
 };

@@ -41,13 +41,22 @@ test('early notice that becomes SOS is announced like a new alert', () => {
   assert.equal(a.politeness, 'assertive');
 });
 
-test('state changes are announced only for the open alert', () => {
+test('state changes are announced for every alert; another alert also names the patient', () => {
   const list = applyEvent([], created('E1', 'SOS_SENT'));
   const ack = { event: 'hospital.acknowledged', emergency_id: 'E1', state: 'HOSPITAL_ACKNOWLEDGED', payload: {} };
-  assert.equal(announcementFor(list, ack, ctx), null);
+  const other = announcementFor(list, ack, ctx);
+  assert.equal(other.politeness, 'polite');
+  assert.match(other.text, /patient .*: Acknowledged/);
   const a = announcementFor(list, ack, { ...ctx, selectedId: 'E1' });
   assert.equal(a.politeness, 'polite');
   assert.match(a.text, /Acknowledged/);
+  assert.doesNotMatch(a.text, /patient/);
+});
+
+test('a state change on an alert outside the queue scope stays silent', () => {
+  const list = applyEvent([], created('E9', 'SOS_SENT', { alerted_hospital_id: 'h2' }));
+  const ack = { event: 'hospital.acknowledged', emergency_id: 'E9', state: 'HOSPITAL_ACKNOWLEDGED', payload: {} };
+  assert.equal(announcementFor(list, ack, ctx), null);
 });
 
 test('escalated to this desk is announced and sounds; escalated away is silent', () => {
