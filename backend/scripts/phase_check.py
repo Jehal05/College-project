@@ -113,7 +113,8 @@ PHASES = [
            "tests/test_emergency_state.py", "tests/test_emergencies_api.py", "tests/test_hospitals_api.py",
            "tests/test_hospital_desk_api.py",
            "tests/test_demo_panel_api.py",
-           "tests/test_patient_extras_api.py", "tests/test_passport_links_api.py"], [4, 20, 8, 2, 11, 12, 57]),
+           "tests/test_patient_extras_api.py", "tests/test_passport_links_api.py",
+           "tests/test_other_apps_api.py"], [4, 20, 8, 2, 11, 12, 57]),
     Phase("Phase 3: Simulators and notifications", "wearable, gateway, family, SMS",
           ["tests/test_wearable.py", "tests/test_demo_vitals_api.py"], [13, 60, 17, 29], [
         ("escalation scheduler", lambda: has_regex(r"escalat\w*_?scheduler|def .*escalat")),

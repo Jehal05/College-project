@@ -21,7 +21,7 @@ def test_a_demo_start_loads_the_demo_data(file_db, monkeypatch):
     monkeypatch.setenv("DEMO_MODE", "true")
     with TestClient(create_app()):
         pass
-    assert counts(file_db) == (10, 5, 5, 1)
+    assert counts(file_db) == (12, 5, 5, 1)
 
 
 def test_a_second_demo_start_does_not_load_it_again(file_db, monkeypatch):
@@ -29,7 +29,7 @@ def test_a_second_demo_start_does_not_load_it_again(file_db, monkeypatch):
     for _ in range(2):
         with TestClient(create_app()):
             pass
-    assert counts(file_db) == (10, 5, 5, 1)
+    assert counts(file_db) == (12, 5, 5, 1)
 
 
 def test_a_demo_start_does_not_touch_a_database_that_already_has_users(file_db, monkeypatch):
@@ -50,4 +50,4 @@ def test_all_demo_logins_are_hashed_in_the_started_app(file_db, monkeypatch):
         pass
     with sqlite3.connect(file_db) as conn:
         hashes = [r[0] for r in conn.execute("SELECT password_hash FROM users")]
-    assert len(hashes) == 10 and all(h.startswith("$2b$04$") for h in hashes)      # tests use the cheap cost
+    assert len(hashes) == 12 and all(h.startswith("$2b$04$") for h in hashes)      # tests use the cheap cost

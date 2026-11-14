@@ -120,7 +120,7 @@ def test_reset_restores_the_seed_data_and_removes_everything_else(demo, engine):
         assert s.get(Hospital, "HSP-AMD-002").beds_free > 0
         assert [c.name for c in s.query(Contact).filter(Contact.patient_id == PID).order_by(Contact.position)] == [
             "Sunita Mehta", "Karan Mehta"]
-        assert s.query(User).count() == 10 and s.query(Hospital).count() == 5
+        assert s.query(User).count() == 12 and s.query(Hospital).count() == 5
 
 
 def test_reset_puts_the_consents_and_the_audit_log_back_to_the_start(demo, engine):
@@ -171,7 +171,7 @@ def test_reset_clears_the_login_limiter(demo):
 
 def test_reset_twice_in_a_row_is_fine(demo, engine):
     assert reset(demo).status_code == reset(demo).status_code == 200
-    assert count(engine, User) == 10
+    assert count(engine, User) == 12
 
 
 def test_reset_runs_the_registered_hooks_and_sends_no_events(demo, seen):

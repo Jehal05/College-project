@@ -178,7 +178,7 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /ambulances/{id}/location | Ambulance position update | HOSPITAL_STAFF | Puneet |
 | GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
-| GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent, once feature 61 exists | Shagun (feature 67) |
+| GET /patients/{id}/insights | Sleep, activity and stress notes (wellbeing only) | PATIENT (own). Linked FAMILY with `vitals` consent | Shagun (feature 67) |
 | POST /reports | Upload a health report for the caller's own record (raw file body, `?name=`; same as the call below) | PATIENT | Jehal |
 | GET, POST /patients/{id}/reports | List the reports (no file bytes) / upload one: raw PDF, JPG or PNG body, file name in `?name=` | PATIENT (own) | Jehal |
 | GET /patients/{id}/reports/{rid}/file | Download one report | PATIENT (own) | Jehal |
@@ -200,6 +200,7 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 
 | Method and path | Purpose | Roles allowed |
 |---|---|---|
+| POST /patients/{id}/family-invites | Make a one-time invite code for a relative | PATIENT (own) |
 | POST /family/link | Link a relative with an invite code | FAMILY |
 | GET /family/patients | List linked patients | FAMILY |
 | POST /family/checkin | Family reply, for example "I'm on my way" | FAMILY |
@@ -380,7 +381,7 @@ Plain-language notes on sleep, activity and stress from the last 7 days of **sim
 - **All wording is fixed text, pending doctor review.** No diagnosis or urgency words appear anywhere (a test scans every possible sentence).
 - Bands and thresholds are draft values, pending doctor review.
 - **Who can read it:** the patient (no audit row). A linked `FAMILY` member only while the patient's `vitals` consent is on. Everyone else gets `403`. Every read by anyone other than the patient is written to the audit log (`insights.read`, allowed or denied, reason `forbidden_role` or `consent_missing`).
-- **TODO (feature 61):** family linking does not exist yet, so for now only the patient can read this. Shagun's feature 67 can be built against the mock server and will work for family once feature 61 is done.
+- **Family linking (feature 61) is built** (section 4.6): a relative linked with an invite code reads this while the `vitals` consent is on.
 - `404` unknown patient (only after the access check passes). Revoking `vitals` consent blocks a family member on the very next request.
 
 **POST /demo/scenario**
@@ -538,6 +539,24 @@ All of these are for the **PATIENT, own record only**. Another role or another p
 
 **Opening the link.** `GET /passport/{token}` needs no login. A live link answers `200` with the passport (`shared: { history, reports }`, `shared_fields`, `expires_at`, and only what the patient shares), writes one audit row (role `TOKEN`), logs the time and sends `passport.opened` to the patient. A revoked or expired link, or a token nobody issued, answers **`410`** (`{ error: "This passport is no longer available." }`). The same token also opens `GET /passport/{patient_id}?token=` (and a revoked one answers `410` there too). An address that looks like a patient id (`PT-2026-0417`, `pat_001`) is never treated as a link: it still needs a token or a login (`401` without). New audit reason: `revoked_token`.
 
+### 4.6 Family, responders, admin users, content, feedback and privacy requests (0.7.4, J4)
+
+All answers carry `simulated: true`. Errors use the shape of 4.2 (**`400` for every bad body, never `422`**). No password, token or phone number appears in any answer, event or audit row.
+
+**THE PRIVACY RULE.** A field reaches a relative or a volunteer only if the patient allowed it **when the SOS was sent AND still allows it now**. Withdrawing a consent removes the field on the very next read. A relative never gets allergies, conditions, medications, phone numbers, severity or symptoms; a volunteer's alert carries no identity at all.
+
+**Family.** `POST /patients/{id}/family-invites` (PATIENT, own) answers `201 { code, expires_at }`: a code like `FAM-K7QX-42MD`, valid 24 hours, **single use**. `POST /family/link { invite_code }` (FAMILY) answers `200 { patient_id, name, linked: true }`; `400` no code, `404` unknown code, `410` expired or already used (a relative who is already linked just gets `200` again). The demo code `FAM-0417` never expires and can be used again (demo mode only). `GET /family/patients` answers a list of `{ patient_id, name, shared_fields, vitals?, active_emergency }`: `vitals` only while the `vitals` consent is on (and, during an emergency, was on at the SOS); `active_emergency` is `null`, or `{ id, state, started_at, hospital?: { name }, eta_seconds?, location?: { lat, lng }, checkins: [{ message, at }] }` with `location` only if the `location` consent was on at the SOS and is on now. `POST /family/checkin { patient_id, emergency_id?, message }` (`ON_MY_WAY`, `CALLING_NOW`, `CANNOT_REACH`) answers `201 { id, emergency_id, message, at }`; `400` bad message, `403` not linked to that patient, `404` no such emergency for the patient, `409` the emergency has finished. The patient gets a `family.checkin` event (message only). Every `GET /family/patients` is audited (names of the released fields). Another role gets `403`.
+
+**Responders.** `POST /responders/register { name, email, password }` (public) answers `201 { id, verified: false }`; `400` bad body (password 8 to 128 characters), `409` email in use. The account **starts unverified**. `GET /responders/alerts` (verified RESPONDER; unverified `403`) answers `[{ id, type, distance_m, state, accepted }]`: no name, no allergies, no location. `distance_m` is a fixed fake number (simulated). `POST /responders/{emergency_id}/accept` answers `200 { id, accepted: true, patient: { name, age, allergies? }, location? }`: `allergies` needs the `history` consent and `location` the `location` consent (both at the SOS and now); `404` for an unknown or finished alert. The patient gets a `responder.accepted` event; the audit row lists field names.
+
+**Admin users.** `GET /admin/users?role=` (ADMIN) answers `[{ id, email, role, disabled, verified? (volunteers), hospital_id?, patient_id? }]` (`email` is the login). `PATCH /admin/users { id, disabled?, role?, verified? }` answers the changed row; `400` bad body or role, `404` unknown id, `409` disabling or demoting yourself, or a role that cannot fit (a patient account needs a patient, a desk account a hospital, only volunteers are verified). A disabled or re-roled user is signed out on the next request. Other roles get `403` (audited).
+
+**Content.** `GET /content/{type}` (any login) answers `{ type, version, approved, approved_by, items }` for **approved** text only (`404` otherwise; an admin also sees unapproved text). `PUT /content/{type} { items: [text, ...], approved? }` (ADMIN) answers the new row with `version` + 1; **the text is unapproved unless `approved: true` is sent**; `400` for no items, a blank item, more than 50 items or an item over 500 characters. Seeds (demo mode): `emergency_numbers` (approved) and `first_aid_basics` (not approved: a doctor has not reviewed it).
+
+**Feedback.** `POST /feedback { emergency_id, rating (1 to 5), comment? (500 characters at most) }` (PATIENT for their own emergency, linked FAMILY) answers `201 { id }`; `400` bad body, `404` unknown emergency (also for a patient asking about someone else's), `403` family not linked, `409` already sent for this emergency by this person. The comment is stored encrypted.
+
+**Privacy requests.** `POST /privacy-requests { type: EXPORT | DELETE, patient_id? }` (PATIENT for themselves; ADMIN with `patient_id`) answers `202 { id, type, status: "RECEIVED", note }`. **Simulated. Nothing is exported or deleted.** `400` bad type, `403` another patient's data, `404` unknown patient. Audited.
+
 ---
 
 ## 5. WebSocket
@@ -583,6 +602,8 @@ Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connect
 
 Added in 0.7.3 (J3): `passport_secrets` (the QR link, encrypted), `passport_opens` (when it was opened: times only), `reminders` (names and notes encrypted), `reminder_log`, `patient_preferences`.
 
+Added in 0.7.4 (J4): `family_invites`, `family_links`, `family_checkins`, `responder_profiles`, `responder_acceptances`, `content_items`, `feedback` (comment encrypted), `privacy_requests`.
+
 ---
 
 ## 7. Seed users (demo mode only)
@@ -597,8 +618,10 @@ Loaded **only** when `DEMO_MODE=true`, and only into an empty database (`python 
 | `staff@demo` | `demo123` | HOSPITAL_STAFF | hospital `HSP-AMD-002` (the portal's own login) |
 | `admin@demo` | `demo123` | ADMIN | hospital `HSP-AMD-002` |
 | `patient1`, `staff1`, `admin1` | `demo-password` | PATIENT, HOSPITAL_STAFF, ADMIN | same as the rows above |
-| `family1` | `demo-password` | FAMILY | not linked to anyone yet (feature 61) |
-| `responder1` | `demo-password` | RESPONDER | not verified yet (feature 68) |
+| `family1` | `demo-password` | FAMILY | not linked to anyone yet (link it with the demo code `FAM-0417`) |
+| `family@demo.test` | `demo1234` | FAMILY | not linked yet (same code, `FAM-0417`) |
+| `responder1` | `demo-password` | RESPONDER | not verified (an admin verifies it) |
+| `responder@demo.test` | `demo1234` | RESPONDER | verified |
 
 Logins are matched in lowercase. A staff account always belongs to a hospital, and a patient account always belongs to a patient (the database enforces both). The demo hospitals, ambulances, patient, contacts and consents come from the same fictional seed files (`app/seed/data/`). The demo patient shares all four consents, as in the mock server.
 
@@ -637,3 +660,4 @@ Passwords are set in the seed script and are demo values only.
 | 14 Nov 2026 | 0.7.1 | **Emergency core (J1, Jehal):** `POST /emergencies`, `POST /emergencies/{id}/sos` (new, decision recorded in section 2), `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}`, `GET /emergencies/{id}/reasons`, `GET /patients/{id}/emergencies`, `GET /patients/{id}/emergencies/{eid}/summary`. Section 4.3 added. Event hook `app/services/events.py`. State changes only through `app/services/emergency_state.py` |
 | 14 Nov 2026 | 0.7.2 | **Demo panel (J2, Jehal):** `POST /demo/scenario` (HEART, STROKE, DIABETIC, ASTHMA, FALL), `POST /demo/reset`, `GET /demo/state`, `POST /demo/speed`, section 4.4. New `WearableSimulator.snap()` |
 | 14 Nov 2026 | 0.7.3 | **Patient extras (J3, Jehal):** reports (upload, list, download, delete, and the contract's `POST /reports`), reminders with log, preferences, the QR passport link (create, show again, revoke, open log) and the public `GET /passport/{token}` (`410` when gone). Passport answers now also carry `shared: { history, reports }` and each contact's `relation`. Section 4.5. Five new tables. A token-looking address with no login now answers `410` instead of `401` |
+| 14 Nov 2026 | 0.7.4 | **Other apps (J4, Jehal):** family invites, linking, status view and check-in (feature 61 is now real: linked relatives can read insights), volunteer sign-up, alerts and accept, admin users list and change, content with approval, feedback, privacy requests (simulated), section 4.6. New seeds `family@demo.test` and `responder@demo.test` (verified). New events `family.checkin`, `responder.accepted`. New tables listed in section 6. |
