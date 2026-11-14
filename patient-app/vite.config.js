@@ -21,6 +21,8 @@ function contentSecurityPolicy(env) {
 
 export default defineConfig(({ mode }) => ({
   server: { port: 5173 },
+  // The 3D library goes in its own file so it is only downloaded when the 3D body is opened.
+  build: { rollupOptions: { output: { manualChunks: (id) => (id.includes('node_modules/three') ? 'three' : undefined) } } },
   plugins: [
     react(),
     contentSecurityPolicy(loadEnv(mode, process.cwd(), '')),
@@ -32,9 +34,9 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
         // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
-        globIgnores: ['**/assets/{browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family,Responder,Volunteer,Admin,useLazyStrings}-*.js', '**/assets/{family,responder,admin}.*-*.js'],
+        globIgnores: ['**/assets/{three,Twin3D,browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family,Responder,Volunteer,Admin,useLazyStrings}-*.js', '**/assets/{family,responder,admin}.*-*.js'],
         runtimeCaching: [{
-          urlPattern: ({ url }) => /\/assets\/(browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools|Family|Responder|Volunteer|Admin|useLazyStrings|(family|responder|admin)\.(en|hi|gu))-[^/]+\.js$/.test(url.pathname),
+          urlPattern: ({ url }) => /\/assets\/(three|Twin3D|browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools|Family|Responder|Volunteer|Admin|useLazyStrings|(family|responder|admin)\.(en|hi|gu))-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'ht-server-screens', expiration: { maxEntries: 12 } },
         }],

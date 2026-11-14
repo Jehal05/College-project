@@ -1,6 +1,6 @@
 // My Digital Twin (2D): body map in the centre, organ list on the left, the chosen organ's information on the right,
 // and a replay of the last minute of readings at the bottom. All readings are simulated; nothing here is a diagnosis.
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
@@ -20,8 +20,14 @@ import { DataSourceBadge } from '../components/ui/Badge';
 import BodyMap from '../components/themed/BodyMap';
 import TrendChart from '../components/themed/TrendChart';
 import Icon from '../components/icons';
+import useTheme from '../hooks/useTheme';
+import { canWebGL, defaultView } from '../utils/webgl';
 
-const btn = 'min-h-[44px] rounded-xl border border-ht-line bg-ht-card px-4 text-sm font-semibold text-ht-text hover:border-ht-accent';
+const Twin3D = lazy(() => import('../components/themed/Twin3D')); // the 3D library loads only when the 3D body is shown
+
+const btnBase = 'min-h-[44px] rounded-xl border px-4 text-sm font-semibold';
+const btn = btnBase + ' border-ht-line bg-ht-card text-ht-text hover:border-ht-accent';
+const toggle = (on) => btnBase + (on ? ' border-ht-accent bg-ht-accent/15 text-ht-accent' : ' border-ht-line bg-ht-card text-ht-text hover:border-ht-accent');
 
 export default function Twin() {
   const { t } = useTranslation();
@@ -35,6 +41,11 @@ export default function Twin() {
   const [patient, setPatient] = useState(null);
   const [selected, setSelected] = useState('heart');
   const [focus, setFocus] = useState(false);
+  const [view, setView] = useState(defaultView); // '3d' only when this device can draw it and motion is not reduced
+  const [failed3d, setFailed3d] = useState(false);
+  const { theme } = useTheme();
+  const can3d = canWebGL() && !failed3d;
+  const show3d = view === '3d' && can3d;
   const total = history.heart_rate.length;
   const replay = useReplay(total);
   useEffect(() => { getPatient(id).then(setPatient).catch(() => {}); }, [id]);
@@ -55,8 +66,10 @@ export default function Twin() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div><h1 className="text-2xl font-extrabold">{t('nav.twin')}</h1><p className="text-ht-muted">{t('dtwin.intro')}</p></div>
         <div className="flex flex-wrap items-center gap-2">
-          <StatusChip tone="info" icon="user">{t('dtwin.view2d')}</StatusChip>
-          <button type="button" disabled className={btn + ' opacity-60'} title={t('dtwin.view3dSoon')}>{t('dtwin.view3d')}</button>
+          <div role="group" aria-label={t('dtwin.view')} className="flex gap-2">
+            <button type="button" aria-pressed={!show3d} onClick={() => setView('2d')} className={toggle(!show3d)}>{t('dtwin.view2d')}</button>
+            <button type="button" aria-pressed={show3d} disabled={!can3d} onClick={() => setView('3d')} title={can3d ? undefined : t('dtwin.view3dOff')} className={toggle(show3d) + ' disabled:opacity-50'}>{t('dtwin.view3d')}</button>
+          </div>
           <DataSourceBadge source="simulated" />
         </div>
       </header>
@@ -78,8 +91,13 @@ export default function Twin() {
           <button type="button" aria-pressed={focus} onClick={() => setFocus(!focus)} className={btn + ' mt-3 w-full'}>{focus ? t('dtwin.focusOff') : t('dtwin.focusOn')}</button>
         </nav>
 
-        <Panel glow className="flex items-center justify-center" aria-label={t('dtwin.mapTitle')}>
-          <BodyMap selected={selected} onSelect={setSelected} focus={focus} />
+        <Panel glow className="flex flex-col items-center justify-center" aria-label={t('dtwin.mapTitle')}>
+          {view === '3d' && !can3d && <p role="status" className="mb-2 text-sm text-ht-muted">{t('dtwin.fallback2d')}</p>}
+          {show3d ? (
+            <Suspense fallback={<p role="status" className="text-ht-muted">{t('dtwin.loading3d')}</p>}>
+              <Twin3D selected={selected} onSelect={setSelected} focus={focus} theme={theme} onError={() => setFailed3d(true)} />
+            </Suspense>
+          ) : <BodyMap selected={selected} onSelect={setSelected} focus={focus} />}
         </Panel>
 
         <Panel aria-live="polite" aria-labelledby="organ-name">

@@ -639,7 +639,6 @@
   "dtwin.map.label": "Body map, {{organ}} selected",
   "dtwin.view2d": "2D body map",
   "dtwin.view3d": "3D view",
-  "dtwin.view3dSoon": "The 3D view is planned next",
   "dtwin.focusOn": "Focus on this organ",
   "dtwin.focusOff": "Show whole body",
   "dtwin.organ.heart.name": "Heart",
@@ -668,5 +667,11 @@
   "dtwin.replay.live": "Back to live",
   "dtwin.replay.slider": "Position in the replay",
   "dtwin.replay.status": "Reading {{n}} of {{total}}",
-  "dtwin.replay.liveNow": "Showing live readings"
+  "dtwin.replay.liveNow": "Showing live readings",
+  "dtwin.view": "View",
+  "dtwin.view3dOff": "3D is not available on this device, so the 2D map is shown",
+  "dtwin.loading3d": "Loading the 3D body...",
+  "dtwin.fallback2d": "3D is not available on this device. Showing the 2D map.",
+  "dtwin.map3d.label": "3D body, {{organ}} selected",
+  "dtwin.map3d.hint": "Drag to turn the body. Click an organ to select it, or use the list."
 }
