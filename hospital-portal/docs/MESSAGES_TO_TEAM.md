@@ -46,15 +46,21 @@ b. The mock sends no "arrived" event, so the desk clicks Arrived and Handed over
 
 Also `npm ci` in your repo reports 14 vulnerabilities (1 high, 2 critical). Please look at `npm audit`, but do not run `npm audit fix --force`.
 
-## To Daksh (top 5 missing calls for the demo)
+## To Daksh (refreshed 14 Nov: what I built on your branch, what I need you to confirm)
 
-**Draft only. Not sent.** Puneet sends it. The full list is `docs/BACKEND_GAPS.md` on branch `integration` (measured from the code on 14 Nov 2026).
+**Draft only. Not sent.** Puneet sends it. Nothing below is agreed until Daksh answers in writing.
 
-Daksh, the portal and the patient app can only run on Jehal's mock because these are not in the backend yet (list measured after your J1 to J4 commits). The five the demo needs most, in this order:
-1. (Done in your latest commit, thank you: create, SOS, cancel and read.) Next: `GET /emergencies?status=active` and `?status=finished`, which the portal's queue and history need.
-2. `POST /emergencies/{id}/ack`, `.../dispatch`, `.../status`.
-3. `GET /hospitals` and `PATCH /hospitals/{id}/availability`.
-4. The WebSocket and its events. Please tell us the one path: the portal uses `/ws?token=`, your contract says `/ws/hospitals/{hospital_id}`.
-5. `POST /ambulances/{id}/location` and `GET /ambulances`.
+Daksh, I added the hospital-side backend blocks on branch `Daksh` (commit a2681d6; CI "Backend checks" run 43586143495: 1977 tests passed, 74 endpoints built, 1 not built). Please `git pull origin Daksh` and read it. I did not run the portal or the patient app against it on a laptop, and I did not run the contract script or Docker, so "works end to end" is not proven yet.
 
-Which of these can you build first, and by when? I will change the apps' paths to match whatever you decide, and I will only mark something agreed when you say so in writing.
+Please confirm or change, one line each:
+1. Hospital calls I added to `CONTRACT.md` as PROPOSED: add, edit and verify hospitals; notes, chat and checklist; `GET /emergencies?status=active|finished`.
+2. One WebSocket path: I built `/ws?token=` (or an `auth` message within 5 s). Your contract said `/ws/hospitals/{hospital_id}`. Which one stays?
+3. Escalation after 30 s without acknowledge (`ESCALATION_TIMEOUT_SECONDS`): OK for the demo?
+4. `POST /location-shares` is the only call not built. Who owns it?
+5. The flaky test `test_the_patient_baseline_is_ciphertext` (random ciphertext can contain "60") failed once in CI and passed on re-run. Can you fix it?
+
+## To Jehal (add to the message above)
+
+**Draft only. Not sent.**
+
+Jehal, two questions: (1) Your `TRANSLATION_REVIEW.md` still says "not reviewed by a native speaker". Who reviewed the Hindi and Gujarati text, and can you write their name in the file? Until then we say it is unreviewed. (2) The backend now has the hospital calls and a WebSocket, so we can try the apps against it. Do you want to try that with me on one laptop? Neither of us has run it yet.
