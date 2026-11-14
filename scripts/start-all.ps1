@@ -81,7 +81,7 @@ try {
 
   $okPortal = Wait-Url 'http://localhost:5174/' 'The portal' 120
   $okApp = Wait-Url 'http://localhost:5173/' 'The patient app' 120
-  if (-not ($okPortal -and $okApp)) { Fail 'The portal or the patient app did not answer within 60 seconds.' }
+  if (-not ($okPortal -and $okApp)) { Fail 'The portal or the patient app did not answer within 120 seconds.' }
 
   Write-Host ''
   Say 'Everything is running (Simulated prototype). Addresses and logins:'
