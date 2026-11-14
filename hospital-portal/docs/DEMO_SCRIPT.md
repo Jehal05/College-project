@@ -81,7 +81,7 @@ Note: with the mock, an alert that nobody acknowledges keeps moving until the li
 
 ## 3. Acknowledge and dispatch (1:00 – 1:45)
 
-Do: click the card, then **Acknowledge** ✅, then **Dispatch** ✅. Pick the nearest unit (Alpha 1 is preselected). Click **Yes, dispatch** ✅.
+Do: click the card, then **Acknowledge** ✅, then **Dispatch** ✅. The nearest unit is preselected (Bravo 2 in the rehearsal; the name can change, so read it from the screen). Click **Yes, dispatch** ✅.
 
 Say: "The desk acknowledges, then sends the nearest ambulance. The system only allows the next valid step, so nobody can skip a step by mistake."
 
@@ -99,11 +99,11 @@ If the marker does not move on the day, **switch the demo to the built-in mock**
 
 ## 5. Activity page and language (2:30 – 3:00)
 
-Do: open **Activity** ✅ (opened against the mock on 2026-11-14, "15 of 15 entries"). Then switch the **Language** menu to **Hindi** ✅ (checked in the browser on 2026-11-14: nav, alert card, detail panel, timeline and dispatch dialog are translated and no characters show as boxes) and back.
+Do: open **Activity** ✅ (rehearsal 2026-11-14: "33 of 33 entries", the new case shows its steps in order). Stay in **English** on this page: in Hindi only the page title is translated and the filters and rows stay English. Then switch the **Language** menu to **Hindi** ✅ (checked in the browser on 2026-11-14: nav, alert card, detail panel, timeline and dispatch dialog are translated and no characters show as boxes) and back.
 
 Say: "Every desk action is logged with who and when. The portal also works in Hindi and Gujarati. These translations are drafts and wait for a native-speaker review."
 
-Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly that some details are still English: the emergency type and EMERGENCY badge, HR/SpO₂/BP labels, and the readiness, notes, patient passport, nearest AED, responders and ranking cards.
+Do the language switch back on the **Dashboard**, not on Activity. Point at: the Hindi nav bar, alert queue, card (including "अभी यहाँ: <hospital>") and capacity strip. Say honestly that some details are still English: the Activity page rows and filters, the emergency type and EMERGENCY badge, HR/SpO₂/BP labels, and the readiness, notes, patient passport, nearest AED, responders and ranking cards.
 
 ## If something goes wrong
 
@@ -119,3 +119,15 @@ Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly 
 ## Not covered by this script
 
 Notes and chat need Daksh's backend. In the mock they work on this screen only. Live availability was checked with two real tabs open (beds 11 to 6 in both with no refresh, then back to 11). Escalation was re-checked: an unanswered alert escalated at about 6 s and the "now at" name followed each new hospital. The mock keeps escalating until the list runs out, so acknowledge soon after the first escalation.
+
+## Rehearsal timings (2026-11-14, machine time only, no talking)
+
+| Step | What happened | Time from the SOS |
+|---|---|---|
+| 1 | Card appears with NEW badge, flash and EMERGENCY badge | 0.5 s |
+| 2 | First escalation (state ESCALATED, orange banner) | 6.4 s |
+| 3 | Acknowledge, dispatch dialog (nearest unit preselected), confirm | 7.9 s to 10.1 s |
+| 4 | Ambulance moves, ETA 40 s then 0 s, Arrived, Handed over | 13 s to 23 s |
+| 5 | Activity page, Hindi switch | after 23 s |
+
+The whole machine part takes about 25 seconds, so the 3 minutes is mostly what you say. You can pause on any step. Click Acknowledge soon after the first escalation, or the mock keeps escalating until the hospital list runs out. No console errors appeared (the console was only watched from the rehearsal start). Sound was not tested: the browser tool cannot hear it.
