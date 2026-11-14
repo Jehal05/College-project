@@ -25,6 +25,7 @@ LOGINS = [
     ("staff@demo", "demo123"), ("admin@demo", "demo123"),
     ("patient1", "demo-password"), ("staff1", "demo-password"), ("admin1", "demo-password"),
     ("family1", "demo-password"), ("responder1", "demo-password"),
+    ("family@demo.test", "demo1234"), ("responder@demo.test", "demo1234"),
 ]
 
 
@@ -70,13 +71,13 @@ def test_the_command_line_seeds_in_demo_mode_and_prints_only_counts(file_db, mon
     monkeypatch.setenv("DEMO_MODE", "true")
     assert main() == 0
     out = capsys.readouterr().out
-    assert "'users': 10" in out and not any(p in out for _, p in LOGINS)
+    assert "'users': 12" in out and not any(p in out for _, p in LOGINS)
 
 
 # ------------------------------------------------------------ what gets loaded
 
 def test_the_counts(seeded):
-    assert seeded.counts == {"hospitals": 5, "ambulances": 5, "patients": 1, "contacts": 2, "users": 10, "consents": 4}
+    assert seeded.counts == {"hospitals": 5, "ambulances": 5, "patients": 1, "contacts": 2, "users": 12, "consents": 4}
     assert seeded.query(Hospital).count() == 5 and seeded.query(Ambulance).count() == 5 and seeded.query(Contact).count() == 2
 
 
@@ -143,7 +144,7 @@ def test_roles_and_scopes(seeded):
 
 def test_ids_and_logins_are_unique_and_lowercase(seeded):
     users = seeded.query(User).all()
-    assert len({u.id for u in users}) == len({u.login for u in users}) == 10
+    assert len({u.id for u in users}) == len({u.login for u in users}) == 12
     assert all(u.login == u.login.lower() for u in users)
 
 
@@ -185,7 +186,7 @@ def test_demo_passwords_appear_in_exactly_one_source_file():
 
 def test_seeding_twice_changes_nothing(seeded):
     assert seed_demo(seeded) == {"already_seeded": True}
-    assert (seeded.query(User).count(), seeded.query(Hospital).count(), seeded.query(ConsentLedger).count()) == (10, 5, 4)
+    assert (seeded.query(User).count(), seeded.query(Hospital).count(), seeded.query(ConsentLedger).count()) == (12, 5, 4)
 
 
 def test_each_demo_password_is_hashed_once_per_process(monkeypatch, engine):

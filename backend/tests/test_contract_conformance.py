@@ -14,10 +14,7 @@ from tests.contract_tools import _cell_endpoints, app_endpoints, contract_endpoi
 NOT_BUILT_YET = {
     ("POST", "/emergencies/{}/ack"), ("POST", "/emergencies/{}/dispatch"), ("POST", "/emergencies/{}/status"),
     ("GET", "/hospitals"), ("PATCH", "/hospitals/{}/availability"), ("POST", "/ambulances/{}/location"),
-    ("POST", "/family/link"), ("GET", "/family/patients"), ("POST", "/family/checkin"),
-    ("POST", "/location-shares"), ("GET", "/responders/alerts"), ("POST", "/responders/{}/accept"),
-    ("POST", "/responders/register"), ("GET", "/admin/users"), ("PATCH", "/admin/users"),
-    ("GET", "/content/{}"), ("PUT", "/content/{}"), ("POST", "/feedback"), ("POST", "/privacy-requests"),
+    ("POST", "/location-shares"),
 }
 
 
