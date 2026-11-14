@@ -65,7 +65,7 @@ async def live(websocket: WebSocket, db: Session = Depends(get_db)) -> None:
     if actor is None:
         await websocket.close(code=POLICY_VIOLATION)
         return
-    conn = ws_hub.hub.register(asyncio.get_running_loop())
+    conn = ws_hub.hub.register(asyncio.get_running_loop(), actor.patient_id if actor.role == "PATIENT" else None)
     tasks = []
     try:
         if by_message:

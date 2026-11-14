@@ -10,14 +10,14 @@ rules once it has.
 
 | | Count |
 |---|---|
-| Endpoints described in CONTRACT.md | 75 |
-| Built in the app | 74 |
-| **Not built yet** | **1** (`POST /location-shares`) |
-| Backend tests | 1977 passed |
+| Endpoints described in CONTRACT.md | 76 |
+| Built in the app | 76 |
+| **Not built yet** | **0** |
+| Backend tests | 2010 passed (local run, 14 Nov 2026; CI not yet re-run) |
 
-The older snapshot in this file (17 of 42) is out of date: Daksh's emergency-core and J2 to J4 commits and Puneet's P1 to P4 are in. The numbers above are from a real CI run; the contract status still prints NOT READY TO FREEZE because of the one missing endpoint.
+The older snapshot in this file (17 of 42) is out of date: Daksh's emergency-core and J2 to J4 commits and Puneet's P1 to P4 are in. The numbers above are from a real CI run; `contract_status.py` now prints FREEZE READY (that only means every endpoint exists; the other conditions below are still open).
 
-Not run by anyone yet: the contract script (`node scripts/contract.mjs`) against this backend, the two apps in a browser against it, and the Docker build. Not built: a once-a-second `vitals.update` stream, WebSocket replay, a desk taking over another hospital's alert, `POST /location-shares`.
+The contract script was run against this backend on 14 Nov 2026: **24 of 27 core checks pass**. The 3 that fail are expectations of the script, not missing endpoints: a patient token may list `GET /emergencies?status=` (the backend answers 403: the list is for desks), a desk acting on an emergency that has not been sent gets 409 in the mock but 404 here (a hospital hears nothing before the SOS), and the audit check rejects the word "token" even in reason codes such as `expired_token`. Not run by anyone yet: the two apps in a browser against this backend, and the Docker build. Not built: WebSocket replay, a desk taking over another hospital's alert, `family.status` and `responder.alert` pushes, `POST /demo/fail`.
 
 ## Conditions to START the freeze (all must be ticked)
 

@@ -93,7 +93,9 @@ def get_passport(
     if built is None:
         deny(404, "patient_not_found", who_actor=viewer, via_token=via_token)
     passport, released = built
-    audit.record(db, action="passport.view", resource_type="passport", resource_id=patient_id,
+    # A desk reading by patient id is told apart from a QR/token open and from the patient's own look.
+    action = "passport.staff_view" if viewer is not None and viewer.role == "HOSPITAL_STAFF" else "passport.view"
+    audit.record(db, action=action, resource_type="passport", resource_id=patient_id,
                  patient_id=patient_id, outcome="allowed", actor=viewer, via_token=via_token,
                  fields_released=released)
     return passport

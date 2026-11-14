@@ -44,4 +44,6 @@ def read_audit(
         db, patient_id=patient_id, user_id=user_id, action=action,
         start=_parse_time(start, "from"), end=_parse_time(end, "to"), page=page, page_size=page_size,
     )
-    return {"items": items, "page": page, "page_size": page_size, "total": total, "simulated": True}
+    # `rows` is the same list in the names the portal and the mock use (at, user, fields). `items` stays for the contract.
+    rows = [{**i, "at": i["timestamp"], "user": i["user_id"], "fields": i["fields_released"]} for i in items]
+    return {"items": items, "rows": rows, "page": page, "page_size": page_size, "total": total, "simulated": True}

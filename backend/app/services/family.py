@@ -18,6 +18,7 @@ from app.models.patient_data import Patient
 from app.security.actor import Actor
 from app.services import events
 from app.services.consent import current_consents, shared_fields
+from app.services import location_shares
 from app.services.emergencies import LIVE_STATES, timeline
 from app.services.vitals import current_vitals
 
@@ -120,6 +121,11 @@ def patient_view(session: Session, patient_id: str):
         vitals = current_vitals(patient_id)
         view["vitals"] = {k: v for k, v in vitals.items() if k != "patient_id"}
         released.append("vitals")
+    share = location_shares.live_share(session, patient_id)
+    if share is not None and now.get("location"):                 # the patient's consent for location is on right now
+        view["location_share"] = {"lat": share.location["lat"], "lng": share.location["lng"],
+                                  "expires_at": location_shares.iso(share.expires_at)}
+        released.append("location")
     if emergency is not None:
         tl = timeline(session, emergency)
         active = {"id": emergency.id, "state": emergency.state, "started_at": tl[0]["timestamp"] if tl else None}
@@ -130,7 +136,8 @@ def patient_view(session: Session, patient_id: str):
             active["eta_seconds"] = emergency.eta_seconds
         if allowed.get("location") and emergency.location:
             active["location"] = {"lat": emergency.location["lat"], "lng": emergency.location["lng"]}
-            released.append("location")
+            if "location" not in released:
+                released.append("location")
         rows = session.query(FamilyCheckin).filter_by(emergency_id=emergency.id).order_by(FamilyCheckin.created_at).all()
         active["checkins"] = [{"message": c.message, "at": _iso(c.created_at)} for c in rows]
         view["active_emergency"] = active

@@ -200,6 +200,7 @@ def alert_payload(session: Session, emergency: Emergency, hospital: Optional[dic
     patient = session.get(Patient, emergency.patient_id)
     payload: Dict[str, Any] = {
         "type": emergency.type, "severity": emergency.severity, "symptom_ids": list(emergency.symptoms or []),
+        "symptoms": list(emergency.symptoms or []),
         "source": emergency.source, "patient_id": emergency.patient_id, "created_at": _iso(emergency.created_at),
         "reasons": list((emergency.engine_result or {}).get("reasons", [])), "consents": dict(consents),
         "passport_available": bool(consents.get("history")), "simulated": True}
@@ -255,13 +256,18 @@ def send_sos(session: Session, actor: Actor, emergency: Emergency, location: Opt
 
     emergency_state.transition(session, emergency, S.SOS_SENT, actor, announce=False)
     sid, pid = emergency.id, emergency.patient_id
-    events.queue(session, "emergency.created", alert_payload(session, emergency, hospital, top and top["rank"]),
-                 audience="hospitals", emergency_id=sid, state=S.SOS_SENT.value)
+    created = alert_payload(session, emergency, hospital, top and top["rank"])
+    events.queue(session, "emergency.created", created, audience="hospitals", emergency_id=sid, state=S.SOS_SENT.value)
+    # The patient hears the same event (it holds only what they chose to share, their own data), so the app and the
+    # hospital portal read one shape. Hospitals and the patient are separate audiences: nobody hears it twice.
+    events.queue(session, "emergency.created", created, audience="patient:" + pid, emergency_id=sid,
+                 state=S.SOS_SENT.value)
     events.queue(session, "emergency.sos_sent", {}, audience="all", emergency_id=sid, state=S.SOS_SENT.value)
     if top:
-        events.queue(session, "hospital.alerted", {"hospital_id": top["hospital"].id, "rank": top["rank"],
-                                                   "hospital": hospital}, audience="hospitals", emergency_id=sid,
-                     state=S.SOS_SENT.value)
+        alerted = {"hospital_id": top["hospital"].id, "rank": top["rank"], "hospital": hospital}
+        for audience in ("hospitals", "patient:" + pid):             # the patient sees which hospital was alerted
+            events.queue(session, "hospital.alerted", alerted, audience=audience, emergency_id=sid,
+                         state=S.SOS_SENT.value)
     if contacts:
         events.queue(session, "contacts.notified", {"contacts": contacts}, audience="patient:" + pid,
                      emergency_id=sid, state=S.SOS_SENT.value)

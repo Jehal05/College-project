@@ -208,7 +208,7 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /family/link | Link a relative with an invite code | FAMILY |
 | GET /family/patients | List linked patients | FAMILY |
 | POST /family/checkin | Family reply, for example "I'm on my way" | FAMILY |
-| POST /location-shares | Time-limited location sharing | PATIENT |
+| POST /location-shares, DELETE /location-shares/{id} | Share my location with linked relatives for 15, 30 or 60 minutes; stop sharing | PATIENT |
 | GET /responders/alerts | Alerts for a responder | RESPONDER |
 | POST /responders/{id}/accept | Accept an alert and release identity | RESPONDER |
 | POST /responders/register | Volunteer sign-up | public, then RESPONDER |
@@ -358,7 +358,7 @@ Every passport view and every emergency read writes exactly one row, allowed or 
 - `role` is a user role, or `TOKEN` (opened with a valid token) or `ANONYMOUS` (no valid credentials).
 - `fields_released` lists consent **names** only (`location`, `history`, `vitals`, `reports`), never values.
 - The log never contains a token, a password or any patient data. Reasons come from the fixed list above. Ids that are not plain ids are stored as `invalid_id`.
-- Actions so far: `passport.view`, `emergency.read`, `insights.read`. Extra reason code: `consent_missing`.
+- Actions so far: `passport.view`, `passport.staff_view`, `emergency.read`, `insights.read`. Extra reason code: `consent_missing`.
 
 **Wellbeing insights** (feature 54) `GET /patients/{id}/insights`
 
@@ -561,6 +561,14 @@ All answers carry `simulated: true`. Errors use the shape of 4.2 (**`400` for ev
 
 **Privacy requests.** `POST /privacy-requests { type: EXPORT | DELETE, patient_id? }` (PATIENT for themselves; ADMIN with `patient_id`) answers `202 { id, type, status: "RECEIVED", note }`. **Simulated. Nothing is exported or deleted.** `400` bad type, `403` another patient's data, `404` unknown patient. Audited.
 
+### 4.7 Location sharing and the last contract gaps (0.7.5)
+
+`POST /location-shares { minutes?: 15 | 30 | 60 (default 30), location: { lat, lng, accuracy?, source? } }` (PATIENT) answers `201 { id, expires_at, minutes, simulated: true }`. `lat` and `lng` may also be sent at the top level. A new share **replaces** the old one (one live share at a time). `400` bad minutes or location, `403` another patient's id in `patient_id`, another role, or the **`location` consent is off** (audited with reason `consent_missing`). `DELETE /location-shares/{id}` stops it: `200 { ok: true }`; another patient's id is `404`, the same as an unknown one.
+
+Who sees it: a **linked relative** gets `location_share: { lat, lng, expires_at }` in `GET /family/patients`, and only while the share is live **and the patient's `location` consent is still on**: withdrawing the consent hides it on the next read. Expired and stopped shares are never shown. The location is stored encrypted; the audit rows hold field names only.
+
+Changes in 0.7.5 that make the real backend match the apps: `vitals.update` is now streamed once a second (`state: "MONITORING"`, `emergency_id: null`, audience = that patient only, payload `patient_id, heart_rate, spo2, bp, bp_sys, bp_dia, glucose, resp_rate`) to every open PATIENT socket; the patient also hears `emergency.created` (the same payload hospitals get, with `symptoms` as well as `symptom_ids`) and `hospital.alerted` (which hospital, and its rank); `GET /audit` answers `rows` (same rows with `at`, `user`, `fields`) next to `items`; a desk reading `GET /passport/{patient_id}` is logged as `passport.staff_view` (a patient's own look and a QR open stay `passport.view`); hospital availability also shows `icu_beds` (the old name, equal to `icu_free`).
+
 ---
 
 ## 5. WebSocket
@@ -615,6 +623,8 @@ Reconnect: a client can send `{"replay_since": "<ISO timestamp>"}` after connect
 Added in 0.7.3 (J3): `passport_secrets` (the QR link, encrypted), `passport_opens` (when it was opened: times only), `reminders` (names and notes encrypted), `reminder_log`, `patient_preferences`.
 
 Added in 0.7.5 (P2, proposed): `desk_entries` (desk notes, chat lines and checklist ticks, text encrypted).
+
+Added in 0.7.5: `location_shares` (location encrypted).
 
 Added in 0.7.4 (J4): `family_invites`, `family_links`, `family_checkins`, `responder_profiles`, `responder_acceptances`, `content_items`, `feedback` (comment encrypted), `privacy_requests`.
 
@@ -675,3 +685,4 @@ Passwords are set in the seed script and are demo values only.
 | 14 Nov 2026 | 0.7.2 | **Demo panel (J2, Jehal):** `POST /demo/scenario` (HEART, STROKE, DIABETIC, ASTHMA, FALL), `POST /demo/reset`, `GET /demo/state`, `POST /demo/speed`, section 4.4. New `WearableSimulator.snap()` |
 | 14 Nov 2026 | 0.7.3 | **Patient extras (J3, Jehal):** reports (upload, list, download, delete, and the contract's `POST /reports`), reminders with log, preferences, the QR passport link (create, show again, revoke, open log) and the public `GET /passport/{token}` (`410` when gone). Passport answers now also carry `shared: { history, reports }` and each contact's `relation`. Section 4.5. Five new tables. A token-looking address with no login now answers `410` instead of `401` |
 | 14 Nov 2026 | 0.7.4 | **Other apps (J4, Jehal):** family invites, linking, status view and check-in (feature 61 is now real: linked relatives can read insights), volunteer sign-up, alerts and accept, admin users list and change, content with approval, feedback, privacy requests (simulated), section 4.6. New seeds `family@demo.test` and `responder@demo.test` (verified). New events `family.checkin`, `responder.accepted`. New tables listed in section 6. |
+| 14 Nov 2026 | 0.7.5 | `POST /location-shares` and `DELETE /location-shares/{id}` (section 4.7), `vitals.update` stream, `emergency.created` also sent to the patient, `GET /audit` `rows`, `passport.staff_view`, `icu_beds` alias. Every endpoint in this contract is now built. |

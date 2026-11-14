@@ -130,3 +130,23 @@ def test_the_endpoint_cannot_change_the_log(api, seeded):
     api.login_as(ADMIN)
     for method in ("put", "patch", "delete", "post"):
         assert getattr(api, method)("/audit").status_code == 405
+
+
+# ------------------------------------------------------------ the portal's names for the same rows (rows, at, user, fields)
+
+def test_rows_repeat_the_items_in_the_portals_names(demo):
+    demo.get("/passport/PT-2026-0417", headers=demo.headers("staff@demo.test", "demo1234"))
+    body = demo.get("/audit?page=1&page_size=50", headers=demo.headers("admin@demo.test", "demo1234")).json()
+    assert [r["id"] for r in body["rows"]] == [i["id"] for i in body["items"]]
+    row = next(r for r in body["rows"] if r["action"] == "passport.staff_view")
+    assert row["at"] == row["timestamp"] and row["user"] == row["user_id"] and row["fields"] == row["fields_released"]
+    assert row["outcome"] == "allowed" and row["role"] == "HOSPITAL_STAFF" and row["fields"]
+    assert "token" not in str(body).lower()
+
+
+def test_a_patient_and_a_qr_open_are_not_logged_as_staff_views(demo):
+    demo.get("/passport/PT-2026-0417", headers=demo.headers())
+    token = demo.post("/patients/PT-2026-0417/passport", json={"hours": 1}, headers=demo.headers()).json()["token"]
+    demo.get(f"/passport/{token}")
+    actions = {r["action"] for r in demo.get("/audit", headers=demo.headers("admin@demo.test", "demo1234")).json()["items"]}
+    assert actions == {"passport.view"}

@@ -5,7 +5,7 @@ from sqlalchemy import (JSON, Boolean, CheckConstraint, Column, DateTime, Foreig
 
 from app.db import Base
 from app.models.idgen import new_id
-from app.security.types import EncryptedText
+from app.security.types import EncryptedJSON, EncryptedText
 
 
 def _utcnow() -> datetime:
@@ -103,4 +103,16 @@ class PrivacyRequest(Base):
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     type = Column(String, nullable=False)
     status = Column(String, nullable=False, default="RECEIVED")
+    created_at = Column(DateTime, nullable=False, default=_utcnow)
+
+
+class LocationShare(Base):
+    """The patient shares where they are with their linked relatives for a limited time. One live share at a time."""
+    __tablename__ = "location_shares"
+
+    id = Column(String, primary_key=True, default=lambda: new_id("LS"))
+    patient_id = Column(String, ForeignKey("patients.id"), nullable=False, index=True)
+    location = Column(EncryptedJSON, nullable=False)       # {lat, lng, accuracy?, source?}
+    expires_at = Column(DateTime, nullable=False)
+    revoked_at = Column(DateTime)
     created_at = Column(DateTime, nullable=False, default=_utcnow)

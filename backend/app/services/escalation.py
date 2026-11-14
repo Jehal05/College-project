@@ -66,8 +66,9 @@ def escalate(session: Session, emergency: Emergency) -> bool:
     ref = emergency_svc._hospital_ref(session, emergency)
     events.queue(session, "emergency.created", emergency_svc.alert_payload(session, emergency, ref, rank),
                  audience="hospitals", emergency_id=emergency.id, state=S.SOS_SENT.value)
-    events.queue(session, "hospital.alerted", {"hospital_id": hospital.id, "rank": rank, "hospital": ref},
-                 audience="hospitals", emergency_id=emergency.id, state=S.SOS_SENT.value)
+    for audience in ("hospitals", "patient:" + emergency.patient_id):
+        events.queue(session, "hospital.alerted", {"hospital_id": hospital.id, "rank": rank, "hospital": ref},
+                     audience=audience, emergency_id=emergency.id, state=S.SOS_SENT.value)
     return True
 
 

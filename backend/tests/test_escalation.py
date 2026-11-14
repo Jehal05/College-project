@@ -54,7 +54,8 @@ def test_the_alert_moves_to_the_next_ranked_hospital_after_the_timeout(demo, eng
         states = [x.state for x in s.query(StatusEvent).filter(StatusEvent.emergency_id == eid).order_by(StatusEvent.id)]
         assert states[-3:] == ["SOS_SENT", "ESCALATED", "SOS_SENT"]
     names = [x["event"] for x in seen]
-    assert names == ["hospital.escalated", "emergency.created", "hospital.alerted"]
+    assert names == ["hospital.escalated", "emergency.created", "hospital.alerted", "hospital.alerted"]
+    assert [x["audience"] for x in seen[2:]] == ["hospitals", "patient:PT-2026-0417"]       # the patient is told too
     assert seen[0]["payload"] == {"from_hospital_id": ranking[0], "to_hospital_id": ranking[1]}
     assert seen[1]["audience"] == "hospitals" and seen[1]["payload"]["hospital"]["rank"] == 2
 

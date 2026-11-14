@@ -65,7 +65,8 @@ def hospital_view(hospital: Hospital, where: Optional[Dict[str, float]] = None, 
     body = {
         "id": hospital.id, "portal_id": hospital.portal_id, "name": hospital.name, "address": hospital.address,
         "phone": hospital.phone, "lat": hospital.lat, "lng": hospital.lng, "verified": bool(hospital.verified),
-        "capabilities": hospital.capabilities, "availability": hospital.availability,
+        "capabilities": hospital.capabilities,
+        "availability": {**hospital.availability, "icu_beds": hospital.availability["icu_free"]},   # icu_beds: the old name
         "distance_km": round(hospital_match.distance_km(point["lat"], point["lng"], hospital.lat, hospital.lng), 2),
         "simulated": True}
     if emergency_type:

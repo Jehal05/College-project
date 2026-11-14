@@ -266,8 +266,11 @@ def test_sos_publishes_the_hospital_events_after_the_commit(demo, seen):
     seen.clear()
     sos(demo, eid)
     kinds = [e["event"] for e in seen]
-    assert kinds[:2] == ["emergency.created", "emergency.sos_sent"] and "hospital.alerted" in kinds
+    assert kinds[:3] == ["emergency.created", "emergency.created", "emergency.sos_sent"] and "hospital.alerted" in kinds
     created = seen[0]
+    mine = seen[1]                                     # the same event for the patient, who owns that data
+    assert mine["audience"] == "patient:" + PID and mine["payload"] == created["payload"]
+    assert created["payload"]["symptoms"] == created["payload"]["symptom_ids"] == CHEST["symptoms"]
     assert created["audience"] == "hospitals" and created["state"] == "SOS_SENT" and created["emergency_id"] == eid
     assert created["payload"]["type"] == "HEART" and created["payload"]["hospital"]["id"].startswith("HSP-")
 

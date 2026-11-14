@@ -131,3 +131,54 @@ def test_an_alert_before_the_sos_is_not_visible_to_a_hospital(demo, engine):
 def test_the_envelope_has_no_audience():
     event = events.build("hospital.acknowledged", {"x": 1}, audience="hospitals", emergency_id="EM-1", state="SOS_SENT")
     assert "audience" not in ws_hub.public(event) and ws_hub.public(event)["event"] == "hospital.acknowledged"
+
+
+# ------------------------------------------------------------ the once-a-second vitals stream (J-P4 follow-up)
+
+def test_a_tick_sends_each_watched_patient_their_own_vitals_only_to_them(demo):
+    import asyncio
+    got = []
+    events.subscribe(got.append)
+    hub = ws_hub.Hub()
+    loop = asyncio.new_event_loop()
+    try:
+        hub._connections = [ws_hub.Connection(loop, "PT-2026-0417"), ws_hub.Connection(loop, "PT-2026-0417"),
+                            ws_hub.Connection(loop, None)]
+        assert hub.watched_patients() == ["PT-2026-0417"] and hub.tick() == 1
+    finally:
+        loop.close()
+    [event] = got
+    assert event["event"] == event["type"] == "vitals.update" and event["emergency_id"] is None
+    assert event["state"] == "MONITORING" and event["audience"] == "patient:PT-2026-0417"
+    assert set(event["payload"]) == {"patient_id", "heart_rate", "spo2", "bp", "bp_sys", "bp_dia", "glucose", "resp_rate"}
+    assert event["payload"]["bp"] == f"{event['payload']['bp_sys']}/{event['payload']['bp_dia']}"
+
+
+def test_no_patient_socket_means_no_vitals_tick(demo):
+    got = []
+    events.subscribe(got.append)
+    assert ws_hub.Hub().tick() == 0 and got == []
+
+
+def test_the_stream_reaches_the_patient_socket_but_never_the_desk(demo, monkeypatch):
+    monkeypatch.setattr(ws_hub, "TICK_SECONDS", 0.05)
+    with demo.websocket_connect("/ws?token=" + demo.token(*PATIENT)) as patient, \
+            demo.websocket_connect("/ws?token=" + demo.token(*STAFF)) as desk:
+        first, second = hear(patient), hear(patient)
+        for event in (first, second):
+            assert event["type"] == "vitals.update" and event["payload"]["patient_id"] == "PT-2026-0417"
+            assert "audience" not in event and event["emergency_id"] is None
+        demo.patch(f"/hospitals/{DEMO_HOSPITAL_ID}/availability", json={"beds_free": 2}, headers=demo.headers(*STAFF))
+        assert hear(desk)["event"] == "hospital.availability_updated"          # the desk's first message is not vitals
+
+
+def test_the_stream_follows_the_demo_profile(demo, monkeypatch):
+    monkeypatch.setattr(ws_hub, "TICK_SECONDS", 0.05)
+    demo.post("/demo/scenario", json={"type": "HEART"}, headers=demo.headers(*PATIENT))
+    with demo.websocket_connect("/ws?token=" + demo.token(*PATIENT)) as patient:
+        beats = []
+        for _ in range(8):
+            event = hear(patient)
+            if event["type"] == "vitals.update":
+                beats.append(event["payload"]["heart_rate"])
+    assert beats and max(beats) > 100
