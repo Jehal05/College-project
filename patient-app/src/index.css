@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Design tokens (Phase 8). Brand = teal. Red (--emergency) is ONLY for the emergency flow. ---- */
+:root {
+  --brand: #0f766e;
+  --brand-soft: #f0fdfa;
+  --surface: #f8fafc;
+  --ink: #0f172a;
+  --muted: #475569;
+  --line: #e2e8f0;
+  --emergency: #b91c1c;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: #e2e8f0; color: var(--ink); font-size: 1rem; line-height: 1.5;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Gujarati', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { letter-spacing: -0.01em; line-height: 1.25; }
+.num { font-variant-numeric: tabular-nums; }
+button, a { -webkit-tap-highlight-color: transparent; }
+/* Space for phones with a notch or home bar. */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+/* Gentle skeleton shimmer; removed for people who ask for less motion (see below). */
+@keyframes ht-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.skeleton { background: #e2e8f0; border-radius: 0.5rem; animation: ht-pulse 1.4s ease-in-out infinite; }
+
+
+/* Clear keyboard focus ring on every interactive element. */
+:focus-visible {
+  outline: 3px solid #0f766e;
+  outline-offset: 2px;
+}
+
+/* White focus ring on the red emergency screens, where blue would be hard to see. */
+.bg-red-700 :focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Page content and headings receive focus from code (after a page change); they are not controls. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* People who ask their device for less motion get no animations or transitions. The countdown still works. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: only the passport QR code is printed. */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; border: 0; }
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "email": "patient@demo.test",
+    "password": "demo1234",
+    "role": "PATIENT",
+    "patient_id": "PT-2026-0417"
+  },
+  {
+    "email": "staff@demo.test",
+    "password": "demo1234",
+    "role": "HOSPITAL_STAFF",
+    "patient_id": null,
+    "hospital_id": "HSP-AMD-002"
+  },
+  {
+    "email": "admin@demo.test",
+    "password": "demo1234",
+    "role": "ADMIN",
+    "patient_id": null
+  },
+  {
+    "email": "family@demo.test",
+    "password": "demo1234",
+    "role": "FAMILY",
+    "patient_id": null
+  },
+  {
+    "email": "responder@demo.test",
+    "password": "demo1234",
+    "role": "RESPONDER",
+    "patient_id": null,
+    "verified": true
+  }
+]

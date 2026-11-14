@@ -1,0 +1,25 @@
+{
+  "_note": "SAMPLE on-call roster for the prototype (feature #46). All names are invented.",
+  "H1": [
+    { "id": "H1-D1", "name": "Dr. A. Shah (Sample)", "role": "Duty physician", "specialty": "Emergency Medicine" },
+    { "id": "H1-D2", "name": "Dr. B. Patel (Sample)", "role": "Intensivist", "specialty": "Critical Care" }
+  ],
+  "H2": [
+    { "id": "H2-D1", "name": "Dr. C. Mehta (Sample)", "role": "On-call cardiologist", "specialty": "Cardiology" },
+    { "id": "H2-D2", "name": "Dr. D. Desai (Sample)", "role": "On-call neurologist", "specialty": "Neurology" },
+    { "id": "H2-D3", "name": "Dr. E. Vyas (Sample)", "role": "Duty physician", "specialty": "Emergency Medicine" },
+    { "id": "H2-D4", "name": "Dr. F. Amin (Sample)", "role": "On-call pulmonologist", "specialty": "Pulmonology" },
+    { "id": "H2-T1", "name": "Cath lab team B (Sample)", "role": "Team", "specialty": "Cardiology" }
+  ],
+  "H3": [
+    { "id": "H3-D1", "name": "Dr. G. Nair (Sample)", "role": "On-call cardiologist", "specialty": "Cardiology" },
+    { "id": "H3-D2", "name": "Dr. H. Rao (Sample)", "role": "Duty physician", "specialty": "Emergency Medicine" }
+  ],
+  "H4": [
+    { "id": "H4-D1", "name": "Dr. I. Kapoor (Sample)", "role": "On-call neurologist", "specialty": "Neurology" },
+    { "id": "H4-D2", "name": "Dr. J. Gandhi (Sample)", "role": "Duty physician", "specialty": "Emergency Medicine" }
+  ],
+  "H5": [
+    { "id": "H5-D1", "name": "Dr. K. Modi (Sample)", "role": "Duty physician", "specialty": "Emergency Medicine" }
+  ]
+}

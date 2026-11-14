@@ -1,0 +1,389 @@
+{
+ "_comment": "Copy of origin/Daksh backend/app/rules/rules.yaml, version 0.1, converted to JSON with a one-off script. Source of truth stays Daksh's file. Every rule is 'pending doctor review'. NOT medical advice.",
+ "version": "0.1",
+ "review_status": "pending doctor review",
+ "rules": [
+  {
+   "id": "HEART_CHEST_PAIN",
+   "type": "HEART",
+   "severity": "EMERGENCY",
+   "reason": "Chest pain is a red-flag symptom",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "chest_pain"
+    ]
+   }
+  },
+  {
+   "id": "HEART_ARM_PAIN_WITH_SWEATING_OR_BREATHLESSNESS",
+   "type": "HEART",
+   "severity": "EMERGENCY",
+   "reason": "Left-arm pain together with sweating or breathlessness",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "left_arm_pain"
+    ],
+    "any_symptoms": [
+     "sweating",
+     "breathlessness"
+    ]
+   }
+  },
+  {
+   "id": "HEART_BREATHLESSNESS_WITH_SWEATING",
+   "type": "HEART",
+   "severity": "EMERGENCY",
+   "reason": "Breathlessness together with sweating",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "breathlessness",
+     "sweating"
+    ]
+   }
+  },
+  {
+   "id": "HEART_LEFT_ARM_PAIN",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Left-arm pain reported",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "left_arm_pain"
+    ]
+   }
+  },
+  {
+   "id": "HEART_SWEATING",
+   "type": "HEART",
+   "severity": "WATCH",
+   "reason": "Unexplained sweating reported",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "sweating"
+    ]
+   }
+  },
+  {
+   "id": "HEART_RATE_VERY_HIGH",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Heart rate is well above the usual range",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "heart_rate": {
+      "gt": 120
+     }
+    }
+   }
+  },
+  {
+   "id": "HEART_RATE_VERY_LOW",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Heart rate is well below the usual range",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "heart_rate": {
+      "lt": 45
+     }
+    }
+   }
+  },
+  {
+   "id": "HEART_RATE_RAISED",
+   "type": "HEART",
+   "severity": "WATCH",
+   "reason": "Heart rate is somewhat raised",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "heart_rate": {
+      "gt": 100,
+      "lte": 120
+     }
+    }
+   }
+  },
+  {
+   "id": "HEART_BP_VERY_HIGH",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Systolic blood pressure is very high",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "bp_sys": {
+      "gte": 180
+     }
+    }
+   }
+  },
+  {
+   "id": "HEART_BP_VERY_LOW",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Systolic blood pressure is very low",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "bp_sys": {
+      "lt": 90
+     }
+    }
+   }
+  },
+  {
+   "id": "HEART_BP_RAISED",
+   "type": "HEART",
+   "severity": "WATCH",
+   "reason": "Systolic blood pressure is raised",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "bp_sys": {
+      "gte": 160,
+      "lt": 180
+     }
+    }
+   }
+  },
+  {
+   "id": "STROKE_FACE_DROOPING",
+   "type": "STROKE",
+   "severity": "EMERGENCY",
+   "reason": "Face drooping is a stroke warning sign",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "face_drooping"
+    ]
+   }
+  },
+  {
+   "id": "STROKE_ARM_WEAKNESS",
+   "type": "STROKE",
+   "severity": "EMERGENCY",
+   "reason": "Arm weakness is a stroke warning sign",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "arm_weakness"
+    ]
+   }
+  },
+  {
+   "id": "STROKE_SLURRED_SPEECH",
+   "type": "STROKE",
+   "severity": "EMERGENCY",
+   "reason": "Slurred speech is a stroke warning sign",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "slurred_speech"
+    ]
+   }
+  },
+  {
+   "id": "DIABETIC_LOW_GLUCOSE_READING_WITH_CONFUSION_OR_SWEATING",
+   "type": "DIABETIC",
+   "severity": "EMERGENCY",
+   "reason": "Low glucose reading with confusion or sweating",
+   "review_status": "pending doctor review",
+   "when": {
+    "any_symptoms": [
+     "confusion",
+     "sweating"
+    ],
+    "vitals": {
+     "glucose": {
+      "lt": 70
+     }
+    }
+   }
+  },
+  {
+   "id": "DIABETIC_LOW_GLUCOSE_REPORTED_WITH_CONFUSION_OR_SWEATING",
+   "type": "DIABETIC",
+   "severity": "EMERGENCY",
+   "reason": "Low glucose reported with confusion or sweating",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "low_glucose"
+    ],
+    "any_symptoms": [
+     "confusion",
+     "sweating"
+    ]
+   }
+  },
+  {
+   "id": "DIABETIC_LOW_GLUCOSE_READING",
+   "type": "DIABETIC",
+   "severity": "URGENT",
+   "reason": "Low glucose reading",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "glucose": {
+      "lt": 70
+     }
+    }
+   }
+  },
+  {
+   "id": "DIABETIC_LOW_GLUCOSE_REPORTED",
+   "type": "DIABETIC",
+   "severity": "URGENT",
+   "reason": "Low glucose reported by the patient",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "low_glucose"
+    ]
+   }
+  },
+  {
+   "id": "DIABETIC_CONFUSION",
+   "type": "DIABETIC",
+   "severity": "URGENT",
+   "reason": "Confusion reported; a glucose check is advised",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "confusion"
+    ]
+   }
+  },
+  {
+   "id": "DIABETIC_GLUCOSE_HIGH",
+   "type": "DIABETIC",
+   "severity": "WATCH",
+   "reason": "Glucose reading is high",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "glucose": {
+      "gt": 250
+     }
+    }
+   }
+  },
+  {
+   "id": "ASTHMA_WHEEZE_WITH_LOW_SPO2",
+   "type": "ASTHMA",
+   "severity": "EMERGENCY",
+   "reason": "Wheeze together with low oxygen saturation",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "wheeze"
+    ],
+    "vitals": {
+     "spo2": {
+      "lt": 92
+     }
+    }
+   }
+  },
+  {
+   "id": "ASTHMA_WHEEZE_WITH_BREATHLESSNESS",
+   "type": "ASTHMA",
+   "severity": "EMERGENCY",
+   "reason": "Wheeze together with breathlessness",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "wheeze",
+     "breathlessness"
+    ]
+   }
+  },
+  {
+   "id": "ASTHMA_WHEEZE",
+   "type": "ASTHMA",
+   "severity": "URGENT",
+   "reason": "Wheeze reported",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "wheeze"
+    ]
+   }
+  },
+  {
+   "id": "ASTHMA_BREATHLESSNESS",
+   "type": "ASTHMA",
+   "severity": "URGENT",
+   "reason": "Breathlessness reported",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "breathlessness"
+    ]
+   }
+  },
+  {
+   "id": "HEART_BREATHLESSNESS",
+   "type": "HEART",
+   "severity": "URGENT",
+   "reason": "Breathlessness reported",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "breathlessness"
+    ]
+   }
+  },
+  {
+   "id": "ASTHMA_SPO2_LOW",
+   "type": "ASTHMA",
+   "severity": "URGENT",
+   "reason": "Oxygen saturation is low",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "spo2": {
+      "lt": 92
+     }
+    }
+   }
+  },
+  {
+   "id": "ASTHMA_SPO2_BORDERLINE",
+   "type": "ASTHMA",
+   "severity": "WATCH",
+   "reason": "Oxygen saturation is slightly low",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "spo2": {
+      "gte": 92,
+      "lt": 95
+     }
+    }
+   }
+  },
+  {
+   "id": "ASTHMA_BREATHING_FAST",
+   "type": "ASTHMA",
+   "severity": "WATCH",
+   "reason": "Breathing rate is raised",
+   "review_status": "pending doctor review",
+   "when": {
+    "vitals": {
+     "resp_rate": {
+      "gt": 24
+     }
+    }
+   }
+  }
+ ]
+}

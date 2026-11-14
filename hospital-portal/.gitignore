@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+test-results
+playwright-report
+.env.backup
+.env.local
+
+# Review sheet made by npm run i18n:export (a copy for the reviewers; not part of the code)
+translations-review*.csv

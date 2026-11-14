@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.DS_Store
+dist-test/
+dist-normal/
+/dist-audit/
+dist-joint/
+dist-shots/
+dist-audit/
+phase1-results.txt
