@@ -1,0 +1,35 @@
+# Automatic check for the backend (Daksh's part).
+# Runs on every push and pull request that touches backend/: install the pinned packages and run all the tests.
+# Put this file at the repo root:  .github/workflows/backend.yml
+name: Backend checks
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.lock.txt
+      - name: Install the pinned packages
+        run: pip install -r requirements.lock.txt
+      - name: Run all the tests
+        run: python -m pytest -q
+      - name: Contract status (information only, never fails the check)
+        run: python scripts/contract_status.py
+        continue-on-error: true

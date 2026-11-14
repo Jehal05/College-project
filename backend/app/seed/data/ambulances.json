@@ -1,0 +1,75 @@
+{
+ "_comment": "Copied on 2026-11-13 from origin/Puneet hospital-portal/src/data/ambulances.json (call signs, positions). Ids (AMB-AMD-nn) and crew names are fictional but realistic-looking; portal_id keeps AMB-1..5.",
+ "ambulances": [
+  {
+   "id": "AMB-AMD-01",
+   "portal_id": "AMB-1",
+   "call_sign": "Alpha 1",
+   "crew": {
+    "driver": "Rajesh Solanki",
+    "paramedic": "Neha Dave"
+   },
+   "base_hospital_id": "HSP-AMD-001",
+   "lat": 23.0335,
+   "lng": 72.569,
+   "status": "available",
+   "simulated": true
+  },
+  {
+   "id": "AMB-AMD-02",
+   "portal_id": "AMB-2",
+   "call_sign": "Bravo 2",
+   "crew": {
+    "driver": "Kiran Parmar",
+    "paramedic": "Sneha Joshi"
+   },
+   "base_hospital_id": "HSP-AMD-002",
+   "lat": 23.039,
+   "lng": 72.547,
+   "status": "available",
+   "simulated": true
+  },
+  {
+   "id": "AMB-AMD-03",
+   "portal_id": "AMB-3",
+   "call_sign": "Charlie 3",
+   "crew": {
+    "driver": "Mahesh Rathod",
+    "paramedic": "Pooja Trivedi"
+   },
+   "base_hospital_id": "HSP-AMD-003",
+   "lat": 22.999,
+   "lng": 72.6,
+   "status": "available",
+   "simulated": true
+  },
+  {
+   "id": "AMB-AMD-04",
+   "portal_id": "AMB-4",
+   "call_sign": "Delta 4",
+   "crew": {
+    "driver": "Harsh Chauhan",
+    "paramedic": "Amit Bhatt"
+   },
+   "base_hospital_id": "HSP-AMD-004",
+   "lat": 23.04,
+   "lng": 72.531,
+   "status": "available",
+   "simulated": true
+  },
+  {
+   "id": "AMB-AMD-05",
+   "portal_id": "AMB-5",
+   "call_sign": "Echo 5",
+   "crew": {
+    "driver": "Vijay Thakor",
+    "paramedic": "Divya Pandya"
+   },
+   "base_hospital_id": "HSP-AMD-005",
+   "lat": 23.068,
+   "lng": 72.652,
+   "status": "available",
+   "simulated": true
+  }
+ ]
+}

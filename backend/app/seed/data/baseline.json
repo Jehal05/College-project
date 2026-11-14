@@ -1,0 +1,23 @@
+{
+  "heart_rate": {
+    "min": 60,
+    "max": 85
+  },
+  "spo2": {
+    "min": 95,
+    "max": 100
+  },
+  "bp_systolic": {
+    "min": 100,
+    "max": 130
+  },
+  "bp_diastolic": {
+    "min": 65,
+    "max": 85
+  },
+  "glucose": {
+    "min": 80,
+    "max": 140
+  },
+  "updated_at": "2026-11-01T08:00:00.000Z"
+}
