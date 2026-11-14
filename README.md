@@ -17,7 +17,7 @@ Shagun's branch has only the initial commit. The family, responder and admin scr
 
 ## What is real, what is mocked, what is not built
 
-Measured from the code on 14 Nov 2026. `docs/PROJECT_STATUS.md` has the details and `docs/BACKEND_GAPS.md` lists every call.
+Measured from the code on 14 Nov 2026, after merging Daksh's emergency-core commit. `docs/PROJECT_STATUS.md` has the details and `docs/BACKEND_GAPS.md` lists every call.
 
 | Feature | Real backend (`backend/`) | Jehal's mock | Notes |
 |---|---|---|---|
@@ -27,7 +27,8 @@ Measured from the code on 14 Nov 2026. `docs/PROJECT_STATUS.md` has the details 
 | Health passport view, audit log | **Real** | Mocked | |
 | Wearable simulator (`POST /demo/vitals`), wellbeing insights | **Real** | Mocked | |
 | Symptom rules engine | **Real** (module, draft rules, not reviewed by a doctor) | Mocked copy | |
-| Emergency create, SOS, cancel, acknowledge, dispatch, status | **Not built** | **Mocked** | The core demo flow |
+| Emergency create, SOS, cancel, read, reasons, history | **Real** (new in Daksh's latest commit; not yet tried with the apps) | Mocked | The core demo flow, first half |
+| Acknowledge, dispatch, status | **Not built** | **Mocked** | The core demo flow, second half |
 | Hospitals and availability, ambulances and location | **Not built** | **Mocked** | |
 | Live WebSocket events | **Not built** | **Mocked** | |
 | Demo scenarios and reset | **Not built** | **Mocked** | |
@@ -35,7 +36,7 @@ Measured from the code on 14 Nov 2026. `docs/PROJECT_STATUS.md` has the details 
 | Family, responder, admin, content, feedback, privacy | **Not built** | **Mocked** | |
 | Notes, chat, checklist saving, hospital add/edit/verify | **Not in the contract** | Not in the mock either | Proposed in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`; the portal shows "saved on this screen only" or "not sent" |
 
-In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's own `backend/FREEZE.md` counts 17 of 42 contract endpoints built.
+In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 contract endpoints built; his latest commit adds 7 emergency routes after that count. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
 
 ## Run the whole demo (Windows PowerShell)
 

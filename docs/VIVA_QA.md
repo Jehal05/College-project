@@ -43,17 +43,17 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 ## Backend (Daksh)
 
 1. **What is real in the backend today?**
-   Login with hashed passwords and a limit on wrong tries, the patient record, vitals, baseline, contacts, consents with a change history, the health passport, the audit log, wellbeing insights, the wearable simulator, and the rules engine. His `FREEZE.md` counts 17 of 42 contract endpoints built.
+   Login with hashed passwords and a limit on wrong tries, the patient record, vitals, baseline, contacts, consents with a change history, the health passport, the audit log, wellbeing insights, the wearable simulator, the rules engine, and emergency create, SOS, cancel and read. His `FREEZE.md` counts 17 of 42 contract endpoints built, and his latest commit adds seven emergency routes after that count.
 2. **What is not built?**
-   The whole emergency flow (create, acknowledge, dispatch, status), hospitals and availability, ambulance location, demo reset, reports, the WebSocket, and the family, responder and admin endpoints.
+   Acknowledge, dispatch and status, hospitals and availability, ambulance location, demo reset, reports, the WebSocket, and the family, responder and admin endpoints. (Emergency create, SOS, cancel and read were added in his latest commit.)
 3. **How is patient data protected?**
    Sensitive fields are encrypted in the database, passwords use bcrypt, the status timeline is append-only, every passport view is audited, and tokens are checked on each request.
 4. **How are the medical rules made, and are they approved?**
    The rule table maps symptoms and vitals to a severity and an action. Every decision carries "pending doctor review". Twelve rules were drafted by an AI assistant from public first-aid guidance and accepted for the prototype; a doctor has not reviewed any of it.
 5. **How do you know it works?**
-   His changelog reports 1222 passing tests and the repo has a CI workflow that runs pytest. We did not run them for this page; see `docs/PROJECT_STATUS.md` for what CI showed.
+   His commit reports 1422 passing tests and the repo has a CI workflow that runs pytest; see `docs/PROJECT_STATUS.md` for what CI showed.
 6. **Why does the demo not use your backend?**
-   Because the emergency flow and the WebSocket are not built yet. The honest answer is: the mock stands in for them.
+   Because acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are not built yet. The honest answer is: the mock stands in for them, and the apps have not yet been run against the new emergency routes.
 7. **What is the plan to finish?**
    The five most needed calls are listed in `docs/BACKEND_GAPS.md`. No date has been agreed.
 8. **Is there anything demo-only?**
@@ -62,7 +62,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 ## Questions we cannot answer yet (say so, do not guess)
 - Has any doctor reviewed the checklists, severity levels, rules or symptom words? **No.**
 - Has a native speaker reviewed the Hindi and Gujarati text? **No.**
-- Does the full flow run end to end on the real backend? **No.** It runs on the mock.
+- Does the full flow run end to end on the real backend? **No.** The first half (create, SOS, cancel) exists there now; acknowledge, dispatch, hospitals and the WebSocket do not. The demo runs on the mock.
 - When will the backend's emergency flow be finished? **Not agreed.**
 - Has the whole demo been recorded on the demo laptop? **Not yet.** The table in `hospital-portal/docs/DEMO_SCRIPT.md` ("Laptop run") is empty until it is.
 - Is `main` the final version? **No.** `main` holds only the initial commit; `integration` is the combined version.
