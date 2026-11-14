@@ -36,7 +36,7 @@ Measured from the code on 14 Nov 2026, after merging Daksh's J1 to J4 commits. `
 | Family, responder, admin, content, feedback, privacy | **Real** (not yet tried with the apps) | Mocked | |
 | Notes, chat, checklist saving, hospital add/edit/verify | **Not in the contract** | Not in the mock either | Proposed in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`; the portal shows "saved on this screen only" or "not sent" |
 
-In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 built (older snapshot); the local contract status on the integrated code says 70 built, 1 not built. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
+In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 built (older snapshot); CI run 43586143495 (Backend checks, 14 Nov) shows 1977 tests passed and the contract status 74 built, 1 not built (`POST /location-shares`). Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are now built on the backend, but the apps have not been run against them on a laptop yet.
 
 ## Run the whole demo (Windows PowerShell)
 
