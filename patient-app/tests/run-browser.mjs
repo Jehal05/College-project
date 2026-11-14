@@ -43,7 +43,7 @@ if (!process.env.TEST_NO_SERVERS) {
 }
 
 const only = process.argv[2];
-const files = readdirSync(path.join(here, 'browser')).filter((f) => f.endsWith('.test.mjs') && (!only || f.includes(only))).sort();
+const files = readdirSync(path.join(here, 'browser')).filter((f) => f.endsWith('.test.mjs') && (!only || only.split(',').some((o) => f.includes(o)))).sort();
 const env = { ...process.env, TEST_API_URL: API, TEST_APP_URL: APP, TEST_DEV_URL: DEV, TEST_NORMAL_URL: NORMAL };
 const summary = [];
 for (const file of files) {
