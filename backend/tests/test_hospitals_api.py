@@ -45,7 +45,8 @@ def test_staff_see_every_hospital_nearest_first_in_the_contract_shape(demo):
     first = body[0]
     assert {"id", "name", "lat", "lng", "capabilities", "availability", "verified", "distance_km", "simulated"} <= set(first)
     assert set(first["capabilities"]) == {"emergency", "cath_lab", "stroke_unit", "icu"}
-    assert set(first["availability"]) == {"beds_free", "icu_free", "cath_lab_ready", "stroke_unit_ready"}
+    assert set(first["availability"]) == {"beds_free", "icu_free", "icu_beds", "cath_lab_ready", "stroke_unit_ready"}
+    assert first["availability"]["icu_beds"] == first["availability"]["icu_free"]      # the old name, kept in step
 
 
 def test_a_type_puts_the_hospitals_that_can_handle_it_first(demo):

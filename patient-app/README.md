@@ -207,7 +207,7 @@ Mock server and one patient-app message (details in `docs/API_CONTRACT.md`, "Pha
 - `hospital.escalated` then `hospital.alerted` when nobody acknowledges in `ESCALATION_SECONDS`.
 - `PATCH /hospitals/{id}/availability` (both key name sets), `GET /audit` (admin), WebSocket login (`?token=`, closed with 1008 otherwise).
 - Patient app: a refused cancel after dispatch says "The ambulance is already sent. Please call the number shown."
-- Joint rehearsal now has 26 checks against the current portal (`origin/Puneet`). Reply for Puneet: `docs/REPLY_TO_PUNEET.md`.
+- Joint rehearsal now has 26 checks against the current portal (`origin/Puneet`).
 - Not built, waiting for Daksh: notes, chat, checklist, hospital add/edit/verify endpoints.
 
 ## Phase 10: family, responder and admin work, shared out

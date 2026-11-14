@@ -15,7 +15,7 @@ import Button from '../components/ui/Button';
 import Card, { Avatar, ListRow } from '../components/ui/Card';
 import { Chip, InlineNotice, Skeleton } from '../components/ui/Feedback';
 
-const LINKS = [['/consent', 'profile.consent', 'shield'], ['/contacts', 'profile.contacts', 'users'], ['/reports', 'profile.reports', 'file'], ['/reminders', 'profile.reminders', 'pill'], ['/passport', 'profile.passport', 'qr']];
+const LINKS = [['/consent', 'profile.consent', 'shield'], ['/access', 'profile.access', 'shield'], ['/contacts', 'profile.contacts', 'users'], ['/reports', 'profile.reports', 'file'], ['/reminders', 'profile.reminders', 'pill'], ['/passport', 'profile.passport', 'qr']];
 
 // Turn the patient from the API into plain strings the form can edit.
 const toForm = (p) => ({

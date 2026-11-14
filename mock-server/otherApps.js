@@ -131,6 +131,14 @@ router.post('/responders/:id/accept', requireAuth, need('RESPONDER'), (req, res)
   res.json({ id: e.id, accepted: true, patient, ...(c.location && e.location ? { location: { lat: e.location.lat, lng: e.location.lng } } : {}), simulated: true });
 });
 
+// ---------- who saw my data ----------
+router.get('/patients/:id/access-log', requireAuth, (req, res) => {
+  if (req.user.role !== 'PATIENT' || req.user.patient_id !== req.params.id) return res.status(403).json({ error: 'Not allowed' });
+  const limit = Number(req.query.limit || 50); const before = req.query.before === undefined ? null : Number(req.query.before);
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100 || (before !== null && (!Number.isInteger(before) || before < 1))) return res.status(400).json({ error: 'limit must be 1 to 100 and before a whole number' });
+  res.json(audit.accessLog(req.params.id, limit, before));
+});
+
 // ---------- admin ----------
 const userRow = (u) => ({ id: userId(u), email: u.email, role: u.role, disabled: Boolean(u.disabled), ...(u.role === 'RESPONDER' ? { verified: Boolean(u.verified) } : {}),
   ...(u.hospital_id ? { hospital_id: u.hospital_id } : {}), ...(u.patient_id ? { patient_id: u.patient_id } : {}) });
@@ -208,6 +216,7 @@ router.post('/privacy-requests', requireAuth, need('PATIENT', 'ADMIN'), (req, re
 // Patients and staff get every event as before. A relative gets only a plain status change for a linked patient.
 // A verified volunteer gets only responder.alert (no identity). Anyone else gets nothing.
 function filterFor(user, event) {
+  if (event.type === 'data.accessed') return user && user.role === 'PATIENT' ? event : null; // only the patient hears who looked
   if (!user || ['PATIENT', 'HOSPITAL_STAFF', 'ADMIN'].includes(user.role)) return event;
   const e = event.emergency_id && store.emergencies.get(event.emergency_id);
   const stamp = { emergency_id: event.emergency_id, state: event.state, timestamp: event.timestamp };

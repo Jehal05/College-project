@@ -11,9 +11,7 @@ real measure of how far the project is from a feature freeze.
 from app.main import app
 from tests.contract_tools import _cell_endpoints, app_endpoints, contract_endpoints
 
-NOT_BUILT_YET = {
-    ("POST", "/location-shares"),
-}
+NOT_BUILT_YET: set = set()          # empty: every endpoint in the contract is built
 
 
 def test_every_endpoint_the_app_serves_is_in_the_contract():

@@ -70,7 +70,7 @@ async def live(websocket: WebSocket, db: Session = Depends(get_db)) -> None:
         await websocket.close(code=POLICY_VIOLATION)
         return
     db.rollback()                                  # the login lookup is done; give the connection back
-    conn = ws_hub.hub.register(asyncio.get_running_loop())
+    conn = ws_hub.hub.register(asyncio.get_running_loop(), actor.patient_id if actor.role == "PATIENT" else None)
     tasks = []
     try:
         if by_message:

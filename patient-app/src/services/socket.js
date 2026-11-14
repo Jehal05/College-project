@@ -24,8 +24,9 @@ export function connectEvents(onEvent, onStatus) {
       }
     };
     socket.onclose = () => {
+      if (stopped) return; // a listener that was stopped (e.g. React re-mounting in development) must not report "offline" for the new one
       onStatus(false);
-      if (!stopped) timer = setTimeout(open, 2000); // Try again in 2 seconds.
+      timer = setTimeout(open, 2000); // Try again in 2 seconds.
     };
     socket.onerror = () => socket.close();
   }

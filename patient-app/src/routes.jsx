@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { homeFor } from './utils/roles';
 import useAuth from './hooks/useAuth';
+import useIsDesktop from './hooks/useIsDesktop';
 import Login from './screens/Login';
 import Home from './screens/Home';
 import Profile from './screens/Profile';
@@ -18,9 +19,12 @@ import NeedsConnection from './components/NeedsConnection';
 // Screens that only work with the server are loaded the first time they are opened (they are not part of the offline install,
 // see vite.config.js). A failed load shows the calm error page, whose Call 112 / 108 link is plain HTML.
 const screen = (load) => lazy(() => load().catch(() => ({ default: NeedsConnection })));
+const Overview = screen(() => import('./screens/Overview'));
+const Twin = screen(() => import('./screens/Twin'));
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
 const Consent = screen(() => import('./screens/Consent'));
+const AccessLog = screen(() => import('./screens/AccessLog'));
 const Reports = screen(() => import('./screens/Reports'));
 const Reminders = screen(() => import('./screens/Reminders'));
 const Summary = screen(() => import('./screens/Summary'));
@@ -28,6 +32,7 @@ const Family = screen(() => import('./screens/Family'));
 const Responder = screen(() => import('./screens/Responder'));
 const Volunteer = screen(() => import('./screens/Volunteer'));
 const Admin = screen(() => import('./screens/Admin'));
+const Design = DEMO_ENABLED ? screen(() => import('./screens/Design')) : null; // developer page, left out of normal builds
 const DemoTools = DEMO_ENABLED ? screen(() => import('./screens/DemoTools')) : null; // left out of normal builds
 
 function Waiting() {
@@ -39,12 +44,19 @@ function Waiting() {
   );
 }
 import NotFound from './screens/NotFound';
+import ComingSoon from './screens/ComingSoon';
 
 // Patient screens. Anyone else who signs in goes to their own screen and cannot open patient screens.
 function Protected({ children }) {
   const { isLoggedIn, session } = useAuth();
   if (!isLoggedIn) return <Navigate to="/login" replace />;
   return session && session.role !== 'PATIENT' ? <Navigate to={homeFor(session.role)} replace /> : children;
+}
+
+// "/" is the original Home on phones; on desktop it opens the new Overview.
+function HomeEntry() {
+  const desktop = useIsDesktop();
+  return desktop ? <Navigate to="/overview" replace /> : <Home />;
 }
 
 function RoleOnly({ role, children }) {
@@ -58,8 +70,10 @@ export default function AppRoutes() {
     <Suspense fallback={<Waiting />}>
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Protected><Home /></Protected>} />
+      <Route path="/" element={<Protected><HomeEntry /></Protected>} />
+      <Route path="/overview" element={<Protected><Overview /></Protected>} />
       <Route path="/profile" element={<Protected><Profile /></Protected>} />
+      <Route path="/access" element={<Protected><AccessLog /></Protected>} />
       <Route path="/consent" element={<Protected><Consent /></Protected>} />
       <Route path="/contacts" element={<Protected><Contacts /></Protected>} />
       <Route path="/reports" element={<Protected><Reports /></Protected>} />
@@ -74,6 +88,11 @@ export default function AppRoutes() {
       <Route path="/cancelled" element={<Protected><Cancelled /></Protected>} />
       <Route path="/reminders" element={<Protected><Reminders /></Protected>} />
       <Route path="/summary/:id" element={<Protected><Summary /></Protected>} />
+      <Route path="/twin" element={<Protected><Twin /></Protected>} />
+      {[['diseases', '/diseases'], ['monitor', '/monitor'], ['emergency', '/emergency-center'], ['simulator', '/simulator'], ['care', '/care-circle'], ['hospitals', '/hospitals']].map(([page, path]) => (
+        <Route key={path} path={path} element={<Protected><ComingSoon page={page} /></Protected>} />
+      ))}
+      {DEMO_ENABLED && <Route path="/design" element={<Protected><Design /></Protected>} />}
       {DEMO_ENABLED && <Route path="/demo" element={<Protected><DemoTools /></Protected>} />}
       <Route path="*" element={<NotFound />} />
     </Routes>
