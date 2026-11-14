@@ -150,9 +150,32 @@ Do the language switch back on the **Dashboard**, not on Activity. Point at: the
 | Ambulance does not move | Switch to the built-in mock: `VITE_USE_MOCK=true` in `.env`, restart `npm run dev`. |
 | Everything fails | Show the recorded video in `docs/demo/` and the screenshots in `docs/DEMO.md`. |
 
+## Laptop run (fill in yourself after running `RUN_WITH_JEHALS_MOCK.md`)
+
+**Empty on purpose.** Claude has not run this on a laptop and does not fill it in. Write what you saw, in your words. Leave a row blank if you did not do that step. Send the filled table to Claude to turn problems into fixes. Do not tick the rehearsal boxes above on Claude's behalf.
+
+Date: ____________  Laptop / browser: ____________  Mock started with `DEMO_SPEED=` ______  `HOSPITAL_MODE=` ______  `ALERT_AT=` ______
+
+| Step (as in `RUN_WITH_JEHALS_MOCK.md` / `RUN_BOTH_APPS.md`) | What I saw | Problem (copy the exact error text and the step number) |
+|---|---|---|
+| Mock starts, two "running on" lines | | |
+| Portal `.env` set, `npm run dev`, login `staff@demo.test` | | |
+| Dashboard shows my hospital (`HSP-AMD-002`) | | |
+| Patient app SOS: card appears with sound once | | |
+| Test sound: two beeps heard? Amber "Sound is blocked" banner seen? Tab title blinks on a new alert? | | |
+| Acknowledge: patient app timeline | | |
+| Dispatch: ambulance moves, ETA counts down, map says backend moves it | | |
+| Arrived, Handed over, report opens | | |
+| Cancel path (needs `ALERT_AT=detected`) | | |
+| Safety check-in without symptoms | | |
+| Escalation (unanswered alert) and live bed availability in two tabs | | |
+| Tracking km text reads sensibly (no "undefined km") | | |
+| Hindi and Gujarati on Dashboard, Map, Fleet, Report: no empty boxes | | |
+| Stop the mock for 15 seconds: banner, then reconnect | | |
+
 ## Not covered by this script
 
-Notes and chat need Daksh's backend. In the mock they work on this screen only. Live availability was checked with two real tabs open (beds 11 to 6 in both with no refresh, then back to 11). Escalation was re-checked: an unanswered alert escalated at about 6 s and the "now at" name followed each new hospital. The mock keeps escalating until the list runs out, so acknowledge soon after the first escalation.
+Notes, chat and checklist saving need Daksh's backend (see `ENDPOINTS_TO_AGREE.md`). With the built-in sample data they work on this screen only. With Jehal's mock, notes and checklist ticks stay on this screen (marked "saved on this screen only") and sending a chat message shows a "not sent" error. Live availability was checked with two real tabs open (beds 11 to 6 in both with no refresh, then back to 11). Escalation was re-checked: an unanswered alert escalated at about 6 s and the "now at" name followed each new hospital. The mock keeps escalating until the list runs out, so acknowledge soon after the first escalation.
 
 ## Rehearsal timings (2026-11-14, machine time only, no talking)
 

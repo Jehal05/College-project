@@ -18,6 +18,19 @@ Daksh, open items for the hospital portal. Full wording is in `hospital-portal/d
 10. **Take over.** A desk that acts on an alert held by another hospital now first sends a `desk` note to `POST /emergencies/{id}/notes` with `fields: { taken_over_by, taken_over_from }` and the reason as text. Please just store `fields` as sent.
 11. **Health check (optional).** The portal sends a tokenless `GET /health` every 15 seconds in real mode. Any answer counts as "up", even 404. Only a network failure shows the red banner "Backend unreachable, using mock data". A plain `200` would be nice.
 
+## To Daksh (short: please answer the endpoint table)
+
+**Draft only. Not sent.** Puneet sends it.
+
+Daksh, I wrote down the six calls the portal needs that are not in `backend/CONTRACT.md` yet, in one table: `hospital-portal/docs/ENDPOINTS_TO_AGREE.md` (branch `Puneet`).
+1. `PATCH /emergencies/{id}/checklist`
+2. `POST /emergencies/{id}/notes` (six note kinds)
+3. `POST /emergencies/{id}/chat`
+4. `POST /hospitals`, `PUT /hospitals/{id}`, `PATCH /hospitals/{id}/verify` (admin: add, edit, verify)
+plus the events `emergency.note` and `chat.message`.
+
+Every row says "PROPOSED, not agreed". For each row please write **OK** or **change to: ...** in the last column (or reply in the chat and I will copy your words in). I will only mark a row agreed when you have said so in writing. If you say no to a row, the table already says what the portal does without it.
+
 ## To Jehal
 
 Jehal, thanks for Phase 9. I ran the portal against your mock (commit f0bce14) and these work: staff login returns `HSP-AMD-002`, and an unacknowledged alert escalates and shows "Escalated to the next hospital". Two notes:
