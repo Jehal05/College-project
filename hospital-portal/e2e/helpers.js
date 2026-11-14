@@ -21,3 +21,10 @@ export async function simulate(page, testid) {
   const after = await cards(page).evaluateAll((els) => els.map((e) => e.dataset.id));
   return after.find((id) => !before.includes(id));
 }
+
+/** The desk may only act on an alert its own hospital holds. If another hospital holds it, take it over first (one click in mock mode). */
+export async function takeOverIfAsked(page) {
+  const box = page.locator('[data-testid=takeover-box]');
+  if (await box.count()) await page.click('[data-testid=takeover-confirm]');
+  await expect(page.locator('[data-testid=takeover-box]')).toHaveCount(0);
+}

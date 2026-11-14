@@ -1,6 +1,6 @@
 // End-to-end tests of the hospital portal in mock mode (everything shown is simulated).
 import { test, expect } from '@playwright/test';
-import { login, cards, cardById, simulate } from './helpers.js';
+import { login, cards, cardById, simulate, takeOverIfAsked } from './helpers.js';
 
 test.describe('login and queue', () => {
   test('a wrong password is refused and the right one opens the queue', async ({ page }) => {
@@ -44,6 +44,7 @@ test.describe('early notice and SOS', () => {
     await expect(card.locator('[data-testid=new-badge]')).toHaveText('NEW');
     await expect(page.locator('[data-testid=live-assertive]')).toContainText('New emergency alert');
     await card.click();
+    await takeOverIfAsked(page);
     await page.click('[data-action=HOSPITAL_ACKNOWLEDGED]');
     await expect(card).toHaveAttribute('data-state', 'HOSPITAL_ACKNOWLEDGED');
   });
@@ -57,6 +58,7 @@ test.describe('acknowledge and cancel', () => {
   test('acknowledge adds a step to the timeline', async ({ page }) => {
     const id = await simulate(page, 'mock-new-alert');
     await cardById(page, id).click();
+    await takeOverIfAsked(page);
     await page.click('[data-action=HOSPITAL_ACKNOWLEDGED]');
     await expect(cardById(page, id)).toHaveAttribute('data-state', 'HOSPITAL_ACKNOWLEDGED');
     await expect(page.locator('[data-testid=timeline] li[data-reached=true]')).toHaveCount(2);

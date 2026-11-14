@@ -5,6 +5,11 @@ import { useEmergencies } from './EmergencyProvider.jsx';
 import { useAmbulances } from './AmbulanceProvider.jsx';
 import { useT } from '../i18n/index.js';
 import { actionText } from '../i18n/phrases.js';
+import { useAuth } from './AuthProvider.jsx';
+import { useHospitals } from './HospitalProvider.jsx';
+import TakeOverBox from './TakeOverBox.jsx';
+import { needsTakeOver } from '../services/takeOver.js';
+import { elsewhereName } from '../services/queueScope.js';
 
 // With mock data the ambulance simulator sets En route and Arrived by itself, so those two
 // buttons are hidden. With the real backend they stay as a manual fallback.
@@ -19,6 +24,10 @@ export default function ActionButtons({ emergency }) {
   const { act } = useEmergencies();
   const t = useT();
   const { availableFor, requestTrip } = useAmbulances();
+  const { session } = useAuth();
+  const { hospitals } = useHospitals();
+  // An alert held by another hospital must be taken over (with a reason) before the desk may act on it.
+  const locked = needsTakeOver(emergency, session?.hospital_id);
   const [busy, setBusy] = useState(null); // target state being sent
   const [error, setError] = useState('');
   const [confirming, setConfirming] = useState(null); // action waiting for confirmation
@@ -56,6 +65,7 @@ export default function ActionButtons({ emergency }) {
 
   return (
     <div>
+      {locked && <TakeOverBox emergency={emergency} heldBy={elsewhereName(emergency, session?.hospital_id, hospitals)} />}
       <div className="flex flex-wrap gap-3">
         {actions.map((action) => {
           const allowed = canTransition(emergency.state, action.target);
@@ -64,8 +74,8 @@ export default function ActionButtons({ emergency }) {
             <button
               key={action.target}
               data-action={action.target}
-              disabled={!allowed || busy !== null}
-              title={allowed ? '' : whyNot(emergency.state, action.target)}
+              disabled={!allowed || busy !== null || locked}
+              title={locked ? t('takeover.locked') : allowed ? '' : whyNot(emergency.state, action.target)}
               onClick={() => (action.confirm ? setConfirming(action) : run(action))}
               className={`rounded-lg px-5 py-3 text-lg font-bold ${
                 allowed

@@ -13,6 +13,7 @@ import { USE_MOCK } from '../services/config.js';
 import { getScope, getSelectedId, subscribeUi } from '../services/uiStore.js';
 import { announcementFor } from '../services/announce.js';
 import { scopeList } from '../services/queueScope.js';
+import { needsTakeOver } from '../services/takeOver.js';
 
 const EmergencyContext = createContext(null);
 
@@ -92,6 +93,10 @@ export function EmergencyProvider({ children }) {
       const current = listRef.current.find((e) => e.emergency_id === id);
       if (!current) throw new Error('This emergency is no longer in the list.');
       if (!canTransition(current.state, target)) throw new Error(whyNot(current.state, target));
+      // Acknowledge and dispatch on an alert another hospital holds need the take-over step first (the buttons are locked too).
+      if (['HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED'].includes(target) && needsTakeOver(current, ctxRef.current.hospitalId)) {
+        throw new Error('This alert is held by another hospital. Take it over first.');
+      }
 
       let res;
       let localOnly = false;

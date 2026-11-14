@@ -289,6 +289,7 @@ export function mergeLoaded(list, loaded, startedAt = 0) {
       alerted_ids: [...new Set([...(fresh.alerted_ids || []), ...(local.alerted_ids || [])])],
       _read: Boolean(local._read),
       _new: local._new ?? fresh._new,
+      ...(local.taken_over_by ? { taken_over_by: local.taken_over_by, taken_over_from: local.taken_over_from } : {}),
       ...(local.flash_from != null ? { flash_from: local.flash_from } : {}),
       ...(local.sos_sent_at && !fresh.sos_sent_at ? { sos_sent_at: local.sos_sent_at } : {}),
     };

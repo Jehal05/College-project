@@ -81,7 +81,7 @@ Note: with the mock, an alert that nobody acknowledges keeps moving until the li
 
 ## 3. Acknowledge and dispatch (1:00 – 1:45)
 
-Do: click the card, then **Acknowledge** ✅, then **Dispatch** ✅. The nearest unit is preselected (Bravo 2 in the rehearsal; the name can change, so read it from the screen). Click **Yes, dispatch** ✅.
+Do: click the card. If the card says "now at <another hospital>", an amber **Take over this alert** box appears first and the buttons are locked (a new safety step: a desk may not act on another hospital's alert by accident). In the mock the reason "Demo or training" is already chosen, so one click on **Take over this alert** is enough; the reason is saved in the timeline. Then click **Acknowledge**, then **Dispatch**. (Not yet checked in a real browser: this step is new.) The nearest unit is preselected (Bravo 2 in the rehearsal; the name can change, so read it from the screen). Click **Yes, dispatch** ✅.
 
 Say: "The desk acknowledges, then sends the nearest ambulance. The system only allows the next valid step, so nobody can skip a step by mistake."
 

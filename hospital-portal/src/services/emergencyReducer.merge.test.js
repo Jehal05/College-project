@@ -98,3 +98,10 @@ test('the load action goes through mergeLoaded', () => {
   const next = emergencyReducer(list, { type: 'load', list: [base()], startedAt: 0 });
   assert.equal(next[0]._read, true);
 });
+test('a take-over made on this screen is kept after a reload', () => {
+  let list = created([], base({ alerted_hospital_id: 'H1' }));
+  list = applyEvent(list, { event: 'emergency.note', emergency_id: 'E1', timestamp: at(2), payload: { note_id: 't1', kind: 'desk', note: 'Taken over from X. Reason: Demo', fields: { taken_over_by: 'H2', taken_over_from: 'H1' } } });
+  const next = mergeLoaded(list, [base({ alerted_hospital_id: 'H1' })], 0);
+  assert.equal(next[0].taken_over_by, 'H2');
+  assert.equal(next[0].taken_over_from, 'H1');
+});
