@@ -28,9 +28,9 @@ export function reviewSummary(items = []) {
 
 /**
  * Label for the checklist. It says "Reviewed by ..." only when signOff() says both name and date are filled in;
- * in every other case, whatever the per-item fields say, it is the sample label. (items is kept for old callers.)
+ * in every other case, whatever the per-item fields say, it is the sample label. (_items is kept for old callers.)
  */
-export function reviewBadge(items = [], t, status = reviewStatus) {
+export function reviewBadge(_items = [], t, status = reviewStatus) {
   const s = signOff(status);
   const L = (key, english, vars) => {
     const v = t ? t(key, vars) : key;
