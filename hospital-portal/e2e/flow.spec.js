@@ -18,6 +18,23 @@ test.describe('escalation', () => {
 });
 
 test.describe('dispatch', () => {
+  test('on a small window the Confirm button can still be reached and clicked (1280 x 495)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 495 });
+    await login(page);
+    const id = await simulate(page, 'mock-new-alert');
+    await cardById(page, id).click();
+    await page.click('[data-action=HOSPITAL_ACKNOWLEDGED]');
+    await page.click('[data-action=AMBULANCE_DISPATCHED]');
+    const confirm = page.locator('[data-testid=confirm-dispatch]');
+    await expect(confirm).toBeVisible();
+    // The whole dialog fits inside the window, so Confirm is on screen without scrolling the page.
+    const box = await confirm.boundingBox();
+    expect(box.y + box.height <= 495).toBe(true);
+    expect(box.y >= 0).toBe(true);
+    await confirm.click();
+    await expect(page.locator('[data-testid=dispatch-dialog]')).toHaveCount(0);
+  });
+
   test('dispatch needs acknowledge first, shows a confirm dialog, then moves the state on', async ({ page }) => {
     await login(page);
     const id = await simulate(page, 'mock-new-alert');

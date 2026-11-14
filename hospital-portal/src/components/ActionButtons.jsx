@@ -89,12 +89,14 @@ export default function ActionButtons({ emergency }) {
       )}
 
       {confirming && (
-        <div className="fixed inset-0 z-[2000] grid place-items-center bg-black/50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-2xl font-bold">{t('dispatch.title')}</h3>
-            <p className="mt-2 text-slate-600">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-3 sm:p-6" role="dialog" aria-modal="true">
+          {/* The panel never grows taller than the window: the unit list scrolls inside it and the buttons stay visible. */}
+          <div data-testid="dispatch-dialog" className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-xl flex-col rounded-2xl bg-white p-6 shadow-xl sm:max-h-[calc(100dvh-3rem)]">
+            <h3 className="shrink-0 text-2xl font-bold">{t('dispatch.title')}</h3>
+            <p className="mt-2 shrink-0 text-slate-600">
               {t('dispatch.emergency')} <b>{id}</b>, {t('dispatch.patientWord')} <b>{emergency.patient_id}</b>. {t('dispatch.simNote')}
             </p>
+            <div data-testid="dispatch-body" className="min-h-0 flex-1 overflow-y-auto">
 
             {available.length === 0 ? (
               <p data-testid="no-units" role="alert" className="mt-4 rounded-xl bg-red-100 p-4 text-lg font-semibold text-red-800">
@@ -121,8 +123,9 @@ export default function ActionButtons({ emergency }) {
                 ))}
               </fieldset>
             )}
+            </div>
 
-            <div className="mt-5 flex justify-end gap-3">
+            <div className="mt-5 flex shrink-0 justify-end gap-3">
               <button onClick={() => setConfirming(null)} className="rounded-lg bg-slate-200 px-5 py-2.5 text-lg font-semibold">
                 {t('dispatch.no')}
               </button>
