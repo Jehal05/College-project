@@ -5,6 +5,8 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import BackendHealthBanner from './components/BackendHealthBanner.jsx';
 import HospitalFallbackBanner from './components/HospitalFallbackBanner.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
+import SoundBanner from './components/SoundBanner.jsx';
+import AlertTitleCue from './components/AlertTitleCue.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import NavBar from './components/NavBar.jsx';
 import { useT } from './i18n/index.js';
@@ -55,6 +57,8 @@ function Shell({ children }) {
       <NavBar />
       <BackendHealthBanner />
       <OfflineBanner />
+      <SoundBanner />
+      <AlertTitleCue />
       <HospitalFallbackBanner />
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
         {/* A screen error shows a message here; the navigation stays usable and a new page starts clean. */}

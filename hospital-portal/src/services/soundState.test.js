@@ -27,3 +27,34 @@ test('an alert only plays when on', () => {
   assert.equal(shouldPlay(true, 'suspended'), false);
   assert.equal(shouldPlay(false, 'running'), false);
 });
+
+import { showSoundBanner, testOutcome, isNewAlert, titleFrame } from './soundState.js';
+
+test('the banner shows only when sound is on but blocked', () => {
+  assert.equal(showSoundBanner(soundStatus(true, 'suspended')), true);
+  assert.equal(showSoundBanner(soundStatus(true, null)), true);
+  assert.equal(showSoundBanner(soundStatus(true, 'running')), false);
+  assert.equal(showSoundBanner(soundStatus(false, 'suspended')), false);
+});
+test('unlocking (suspended -> running) hides the banner', () => {
+  assert.equal(showSoundBanner(soundStatus(true, 'suspended')), true);
+  assert.equal(showSoundBanner(soundStatus(true, 'running')), false);
+});
+test('a test that stays blocked is reported, never shown as a pass', () => {
+  assert.equal(testOutcome('running'), 'played');
+  assert.equal(testOutcome('suspended'), 'blocked');
+  assert.equal(testOutcome(null), 'blocked');
+  assert.equal(testOutcome('running', false), 'unsupported');
+});
+test('a new alert is an increase in unread count', () => {
+  assert.equal(isNewAlert(0, 1), true);
+  assert.equal(isNewAlert(2, 2), false);
+  assert.equal(isNewAlert(3, 2), false);
+  assert.equal(isNewAlert(undefined, 1), false);
+});
+test('tab title: blinks with the label and keeps the unread count', () => {
+  assert.equal(titleFrame('HealthTwin', 2, true), '(2) NEW ALERT · HealthTwin');
+  assert.equal(titleFrame('HealthTwin', 2, false), '(2) HealthTwin');
+  assert.equal(titleFrame('HealthTwin', 0, false), 'HealthTwin');
+  assert.equal(titleFrame('HealthTwin', 1, true, 'नया अलर्ट'), '(1) नया अलर्ट · HealthTwin');
+});

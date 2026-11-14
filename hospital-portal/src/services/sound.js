@@ -1,7 +1,7 @@
 // Short two-tone alert sound made with Web Audio (no audio file needed).
 // Browsers only allow sound after the user has clicked something on the page. The NavBar sound control shows
 // that state ("tap to enable") and a first click anywhere on the page unlocks it. The on/off choice is saved.
-import { SOUND_KEY, parseEnabled, serializeEnabled, soundStatus, shouldPlay } from './soundState.js';
+import { SOUND_KEY, parseEnabled, serializeEnabled, soundStatus, shouldPlay, testOutcome } from './soundState.js';
 
 let ctx = null;
 let enabled = readEnabled();
@@ -106,12 +106,16 @@ export function playAlertSound() {
   }
 }
 
-/** The "Test sound" button: always tries (a click unlocks it), even if the desk had it off. */
+/** The "Test sound" button: always tries (a click unlocks it), even if the desk had it off. Returns played | blocked | unsupported. */
 export async function playTestSound() {
   try {
     await unlockSound();
-    if (ctxState() === 'running') beep();
+    const supported = typeof window !== 'undefined' && Boolean(window.AudioContext || window.webkitAudioContext);
+    const outcome = testOutcome(ctxState(), supported);
+    if (outcome === 'played') beep();
+    return outcome;
   } catch (err) {
     console.warn('Test sound could not play', err);
+    return 'blocked';
   }
 }

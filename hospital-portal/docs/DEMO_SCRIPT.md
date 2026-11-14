@@ -13,7 +13,7 @@ Nothing below has been done yet. Tick a box only when you saw it work yourself.
 - [ ] Start script: `.\scripts\start-demo.ps1` opens the portal (never run on the laptop yet)
 - [ ] Login works (`staff1`)
 - [ ] Send the SOS (or press **+ Simulate new alert** in built-in mock mode): the card appears with NEW and EMERGENCY
-- [ ] **Sound check:** turn sound on, press + Simulate new alert, listen for two beeps (nobody has heard it yet)
+- [ ] **Sound check:** sound on, click "Test sound" and listen for two beeps, then press + Simulate new alert and listen again (nobody has heard it yet). If you see the amber banner "Sound is blocked by the browser", click it first. The tab title also blinks "NEW ALERT" for a few seconds, so a silent laptop still shows the alert.
 - [ ] Take over the alert, then Acknowledge
 - [ ] Dispatch: **Yes, dispatch** works
 - [ ] Tracking: the ambulance moves and the ETA counts down; click Arrived, then Handed over
