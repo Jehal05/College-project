@@ -70,3 +70,4 @@ Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local co
 | A "contact acknowledged" status event for family members told about an alert | Emergency Center (shows "not tracked in this prototype") | missing |
 | Live readings for brain, kidney and liver areas (for example lab values over time) | Disease Intelligence (these areas show "no live readings") | missing; reports and notes only |
 | Server-side vitals history (the screens keep the last 60 readings in memory only) | Overview, Twin, Monitor, Disease Intelligence | missing; lost on page close |
+| Endpoints to store confirmed lab values (and a clinician-review status) per patient | Report Intelligence (values live in localStorage on one device) | missing |

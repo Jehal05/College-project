@@ -25,6 +25,7 @@ const DiseaseHub = screen(() => import('./screens/DiseaseHub'));
 const DiseaseDetail = screen(() => import('./screens/DiseaseDetail'));
 const Monitor = screen(() => import('./screens/Monitor'));
 const EmergencyCenter = screen(() => import('./screens/EmergencyCenter'));
+const ReportIntelligence = screen(() => import('./screens/ReportIntelligence'));
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
 const Consent = screen(() => import('./screens/Consent'));
@@ -100,6 +101,7 @@ export default function AppRoutes() {
       <Route path="/diseases/:key" element={<Protected><DiseaseDetail /></Protected>} />
       <Route path="/monitor" element={<Protected><Monitor /></Protected>} />
       <Route path="/emergency-center" element={<Protected><EmergencyCenter /></Protected>} />
+      <Route path="/report-intelligence" element={<Protected><ReportIntelligence /></Protected>} />
       {DEMO_ENABLED && <Route path="/design" element={<Protected><Design /></Protected>} />}
       {DEMO_ENABLED && <Route path="/demo" element={<Protected><DemoTools /></Protected>} />}
       <Route path="*" element={<NotFound />} />

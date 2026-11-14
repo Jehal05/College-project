@@ -8,6 +8,9 @@ import useVitals from '../hooks/useVitals';
 import useBaseline from '../hooks/useBaseline';
 import useConsents from '../hooks/useConsents';
 import useReports from '../hooks/useReports';
+import useLabValues from '../hooks/useLabValues';
+import LabValueList from '../components/themed/LabValueList';
+import { labsForOrgan } from '../utils/labs';
 import useVitalsHistory from '../hooks/useVitalsHistory';
 import useReplay from '../hooks/useReplay';
 import { getPatient } from '../services/api';
@@ -38,6 +41,7 @@ export default function Twin() {
   const { consents } = useConsents(id);
   const history = useVitalsHistory(vitals, !!consents && consents.vitals === true);
   const { reports } = useReports(id);
+  const { labs } = useLabValues(id);
   const [patient, setPatient] = useState(null);
   const [selected, setSelected] = useState('heart');
   const [focus, setFocus] = useState(false);
@@ -60,6 +64,7 @@ export default function Twin() {
   };
   const conditions = relatedConditions(organ, patient && patient.conditions);
   const files = relatedReports(organ, reports);
+  const organLabs = labsForOrgan(labs, selected);
 
   return (
     <div className="space-y-6">
@@ -126,6 +131,7 @@ export default function Twin() {
           <h3 className="text-sm font-bold">{t('dtwin.reports')}</h3>
           {files.length ? <ul className="mb-2 space-y-1 text-sm">{files.map((r) => <li key={r.id} className="flex items-center gap-2"><Icon name="file" size={16} />{r.name}</li>)}</ul>
             : <p className="mb-2 text-sm text-ht-muted">{t('dtwin.noneLinked')} <Link to="/reports" className="font-semibold text-ht-accent underline">{t('dtwin.uploadReport')}</Link></p>}
+          {organLabs.length > 0 && (<><h3 className="mt-3 mb-1 text-sm font-bold">{t('ri.confirmedShort')}</h3><LabValueList entries={organLabs} /></>)}
           {selected !== 'heart' && organ.metrics.length === 0 && <p className="mt-2 text-xs text-ht-muted">{t('dtwin.noLab')}</p>}
           <p className="mt-3 text-xs font-semibold text-ht-muted">{t('twin.notDiagnosis')}</p>
         </Panel>

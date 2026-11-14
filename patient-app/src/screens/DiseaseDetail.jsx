@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import useHealthData from '../hooks/useHealthData';
 import { moduleByKey, STEP_COUNT } from '../config/diseases';
 import { relatedConditions, relatedReports } from '../config/organs';
+import { labsForOrgan } from '../utils/labs';
+import LabValueList from '../components/themed/LabValueList';
 import { summarize, STATUS_TONE, QUALITY_TONE } from './DiseaseHub';
 import Panel from '../components/ui/Panel';
 import StatusChip from '../components/ui/StatusChip';
@@ -21,6 +23,7 @@ export default function DiseaseDetail() {
   const name = t('dis.mod.' + mod.key + '.name');
   const conditions = relatedConditions(s.organ, data.patient && data.patient.conditions);
   const files = relatedReports(s.organ, data.reports);
+  const organLabs = labsForOrgan(data.labs, s.organ.key);
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -67,6 +70,10 @@ export default function DiseaseDetail() {
             <TrendChart key={m.key} name={t('twin.' + m.key)} unit={t(m.unit)} values={data.history[m.series] || []} band={m.range && data.baseline ? data.baseline[m.range] : null} />
           ))}
         </div>
+      )}
+
+      {organLabs.length > 0 && (
+        <Panel aria-labelledby="lab-title"><h2 id="lab-title" className="mb-2 text-lg font-bold">{t('ri.confirmedShort')}</h2><LabValueList entries={organLabs} /></Panel>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
