@@ -19,14 +19,14 @@ Status words: **built** = a route with that method and path exists. **not built*
 | `POST /emergencies/{id}/ack` | **built** (Puneet, P1 to P3) | yes | the click is applied on the portal screen only |
 | `POST /emergencies/{id}/dispatch` | **built** (Puneet, P1 to P3) | yes | same, on the screen only |
 | `POST /emergencies/{id}/status` | **built** (Puneet, P1 to P3) | yes | same, on the screen only |
-| `PATCH /emergencies/{id}/checklist` | not built | no | tick stays on this screen only |
-| `POST /emergencies/{id}/notes` | not built | no | note stays on this screen, marked "saved on this screen only" |
-| `POST /emergencies/{id}/chat` | not built | no | shows "not sent" |
+| `PATCH /emergencies/{id}/checklist` | **built** (Puneet, P2, proposed) | yes, marked proposed | tick stays on this screen only |
+| `POST /emergencies/{id}/notes` | **built** (Puneet, P2, proposed) | yes, marked proposed | note stays on this screen, marked "saved on this screen only" |
+| `POST /emergencies/{id}/chat` | **built** (Puneet, P2, proposed) | yes, marked proposed | shows "not sent" |
 | `GET /ambulances` | **built** (Puneet, P1 to P3) | no (only the location call is) | shows a sample fleet, marked not real |
 | `POST /ambulances/{id}/location` | **built** (Puneet, P1 to P3) | yes | the movement is shown on this screen only |
 | `GET /passport/{patient_id}` (staff login) | built | yes | shows a plain message for 401, 403, 404 |
 | `GET /audit?page&page_size` (admin) | built (also accepts filters the portal does not send) | yes | "The backend has no audit log yet" |
-| WebSocket `ws://host/ws?token=` | not built (contract names `/ws/hospitals/{id}` and `/ws/emergencies/{id}`) | yes, different path | shows "Reconnecting" and the connection-lost banner; no live alerts |
+| WebSocket `ws://host/ws?token=` | **built** (Puneet, P4): one path, filtered by role; the contract's older two-path design is still written there | yes (section 5, as built) | shows "Reconnecting" and the connection-lost banner; no live alerts |
 
 Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/ENDPOINTS_TO_AGREE.md` and `PROPOSED_ENDPOINTS_FOR_DAKSH.md`.
 
@@ -58,9 +58,7 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 
 ## What the demo needs most (in order)
 1. ~~Emergency create, SOS, cancel and `GET /emergencies/{id}`~~: **built in Daksh's latest commit** (the backend's own tests; not yet tried by the apps).
-2. Acknowledge, dispatch and status (`ack`, `dispatch`, `status`).
-3. `GET /hospitals` and `PATCH /hospitals/{id}/availability`.
-4. The WebSocket and its events (one agreed path).
-5. `POST /ambulances/{id}/location` and `GET /ambulances`.
+2. ~~Acknowledge, dispatch and status~~, ~~hospitals and availability~~, ~~ambulances~~, ~~the WebSocket~~: **built** (Puneet, P1 to P4). The real-browser run of both apps against this backend has NOT been done yet.
+3. Still open: a desk taking over an alert held by another hospital is refused (403) by the backend; `vitals.update` is not streamed once a second; `replay_since` is ignored; the WebSocket path is not agreed with Daksh and Jehal.
 
 Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local contract status on the integrated code says 70 built, 1 not built (`POST /location-shares`). There is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `POST /location-shares`, the WebSocket (P4), checklist, notes and chat, and `POST /demo/fail`.
