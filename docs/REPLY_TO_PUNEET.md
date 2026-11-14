@@ -9,7 +9,7 @@ Tested against your branch `Puneet` at commit 5a42859. Run it yourself: `node sc
 | 1.3 `PATCH /hospitals/{id}/availability` | **Done** | Your body works as it is. Answer is the updated hospital. Staff: own hospital only (403 otherwise). Also broadcasts `hospital.availability_updated`. |
 | 1.4 WebSocket login | **Done** | `/ws?token=...`. Wrong token: closed with code 1008. No token: send `{"type":"auth","token":"..."}` within 5 s or it is closed with 1008. |
 | 2.1 Rehearsal again | **Done** | 26 of 26 against 5a42859 (only docs changed since 3510bf5). No failing check on your side. |
-| 2.2 Notes and chat | **Not built** | Waiting for Daksh. |
+| 2.2 Notes and chat | **Built (not agreed)** | Built in the backend on 14 Nov; Daksh has not confirmed. |
 | 2.3 Cancel after dispatch | **Done** | The patient app now says "The ambulance is already sent. Please call the number shown." |
 | 2.4 `GET /audit` | **Done** | Admin only (`admin@demo`). Rows `at, user, role, action, patient_id, outcome, reason, fields`. No tokens. |
 | 2.5 Data check | Nothing to do | Vitals and location are still left out (never null) when the patient did not consent. |

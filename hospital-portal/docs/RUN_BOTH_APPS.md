@@ -141,9 +141,9 @@ The real portal sends a **username** (not an email) to the login call; Jehal's m
 
 ## C. Portal + Daksh's backend (not ready yet)
 
-Daksh's `backend/README.md` on branch `Daksh` says the emergency lifecycle, the WebSocket and hospitals/ambulances are **not built yet**, so the live demo cannot run on it. When they are built:
+Daksh's `backend/README.md` on branch `Daksh` said earlier that the emergency lifecycle, the WebSocket and hospitals/ambulances were not built. They are now built on that branch (CI run 43586143495) and the socket path is `/ws?token=`, but nobody has run the apps against it on a laptop yet, so the live demo still uses the mock. To try it:
 - Install and start it as his README says (Python 3.12, `.venv`, `.env` with real keys, `uvicorn app.main:app --port 8000`). Health check: http://localhost:8000/health. **CHECK ON LAPTOP.**
-- Portal `.env`: `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000`, `VITE_WS_URL=ws://localhost:8000/ws` (these are the defaults in `.env.example`). His contract names the socket `/ws/hospitals/{hospital_id}`: ask him which one he built.
+- Portal `.env`: `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000`, `VITE_WS_URL=ws://localhost:8000/ws` (these are the defaults in `.env.example`). His contract names the socket `/ws/hospitals/{hospital_id}`, but the built one is `/ws?token=`; Daksh has not confirmed which stays.
 - Log in as `staff1` / `demo-password` (his seed users).
 - Missing endpoints (notes, chat, checklist, hospital add/edit/verify) are listed in `ENDPOINTS_TO_AGREE.md`.
 
