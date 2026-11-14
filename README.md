@@ -28,15 +28,15 @@ Measured from the code on 14 Nov 2026, after merging Daksh's J1 to J4 commits. `
 | Wearable simulator (`POST /demo/vitals`), wellbeing insights | **Real** | Mocked | |
 | Symptom rules engine | **Real** (module, draft rules, not reviewed by a doctor) | Mocked copy | |
 | Emergency create, SOS, cancel, read, reasons, history | **Real** (not yet tried with the apps) | Mocked | The core demo flow, first half |
-| Acknowledge, dispatch, status | **Not built** | **Mocked** | The core demo flow, second half |
-| Hospitals and availability, ambulances and location | **Not built** | **Mocked** | |
+| Acknowledge, dispatch, status | **Real** (Puneet, not yet tried with the apps) | Mocked | The core demo flow, second half |
+| Hospitals and availability, ambulances and location | **Real** (Puneet, not yet tried with the apps) | Mocked | |
 | Live WebSocket events | **Not built** | **Mocked** | |
 | Demo scenarios and reset | **Real** (not yet tried with the apps) | Mocked | |
 | Reports upload, reminders, preferences, QR passport links | **Real** (not yet tried with the apps) | Mocked | |
 | Family, responder, admin, content, feedback, privacy | **Real** (not yet tried with the apps) | Mocked | |
 | Notes, chat, checklist saving, hospital add/edit/verify | **Not in the contract** | Not in the mock either | Proposed in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`; the portal shows "saved on this screen only" or "not sent" |
 
-In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 built (older snapshot); the local contract status after J4 says 59 built, 7 not built. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
+In short: **the live demo runs on Jehal's mock server, not on the real backend.** Daksh's `backend/FREEZE.md` counts 17 of 42 built (older snapshot); the local contract status on the integrated code says 70 built, 1 not built. Acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are still not built.
 
 ## Run the whole demo (Windows PowerShell)
 

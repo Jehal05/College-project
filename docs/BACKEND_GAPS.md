@@ -1,6 +1,6 @@
 # Backend gaps: what the apps call and what Daksh's backend has
 
-**Draft for Daksh. Nothing here has been agreed with him.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's J1 to J4 commits, last `fe52ee4`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend suite was run on 14 Nov 2026 with these four commits: **1789 passed**; contract status **59 built, 7 not built**. "Built" means a route exists and is tested.
+**Draft for Daksh. Nothing here has been agreed with him.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's J1 to J4 commits, last `fe52ee4`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend suite was run on 14 Nov 2026 with J1 to J4 and Puneet's P1 to P3: **1893 passed**; contract status **70 built, 1 not built**. "Built" means a route exists and is tested.
 
 Status words: **built** = a route with that method and path exists. **not built** = no such route. **differs** = a similar route exists but the path or shape is different.
 "In contract?" = the path appears in `backend/CONTRACT.md`.
@@ -11,19 +11,19 @@ Status words: **built** = a route with that method and path exists. **not built*
 |---|---|---|---|
 | `GET /health` (every 15 s) | built | yes | treats any answer as "up" |
 | `POST /auth/login` (sends `username`) | built | yes | cannot log in |
-| `GET /hospitals?lat&lng&type` | not built | yes | falls back to the saved sample hospitals and says so in a banner |
-| `PATCH /hospitals/{id}/availability` | not built | yes | shows an error; nothing saved |
-| `POST /hospitals`, `PUT /hospitals/{id}`, `PATCH /hospitals/{id}/verify` | not built | no | Admin screen says "The backend has no ... yet" |
-| `GET /emergencies?status=active` and `?status=finished` | not built | no (only `GET /emergencies/{id}`) | queue starts empty and says why; new alerts still arrive live if the WebSocket works |
+| `GET /hospitals?lat&lng&type` | **built** (Puneet, P1 to P3) | yes | falls back to the saved sample hospitals and says so in a banner |
+| `PATCH /hospitals/{id}/availability` | **built** (Puneet, P1 to P3) | yes | shows an error; nothing saved |
+| `POST /hospitals`, `PUT /hospitals/{id}`, `PATCH /hospitals/{id}/verify` | **built** (Puneet, P1 to P3) | no | Admin screen says "The backend has no ... yet" |
+| `GET /emergencies?status=active` and `?status=finished` | **built** (Puneet, P1 to P3) | no (only `GET /emergencies/{id}`) | queue starts empty and says why; new alerts still arrive live if the WebSocket works |
 | `GET /emergencies/{id}` | **built** (new) | yes | cannot open the detail if it fails |
-| `POST /emergencies/{id}/ack` | not built | yes | the click is applied on the portal screen only |
-| `POST /emergencies/{id}/dispatch` | not built | yes | same, on the screen only |
-| `POST /emergencies/{id}/status` | not built | yes | same, on the screen only |
+| `POST /emergencies/{id}/ack` | **built** (Puneet, P1 to P3) | yes | the click is applied on the portal screen only |
+| `POST /emergencies/{id}/dispatch` | **built** (Puneet, P1 to P3) | yes | same, on the screen only |
+| `POST /emergencies/{id}/status` | **built** (Puneet, P1 to P3) | yes | same, on the screen only |
 | `PATCH /emergencies/{id}/checklist` | not built | no | tick stays on this screen only |
 | `POST /emergencies/{id}/notes` | not built | no | note stays on this screen, marked "saved on this screen only" |
 | `POST /emergencies/{id}/chat` | not built | no | shows "not sent" |
-| `GET /ambulances` | not built | no (only the location call is) | shows a sample fleet, marked not real |
-| `POST /ambulances/{id}/location` | not built | yes | the movement is shown on this screen only |
+| `GET /ambulances` | **built** (Puneet, P1 to P3) | no (only the location call is) | shows a sample fleet, marked not real |
+| `POST /ambulances/{id}/location` | **built** (Puneet, P1 to P3) | yes | the movement is shown on this screen only |
 | `GET /passport/{patient_id}` (staff login) | built | yes | shows a plain message for 401, 403, 404 |
 | `GET /audit?page&page_size` (admin) | built (also accepts filters the portal does not send) | yes | "The backend has no audit log yet" |
 | WebSocket `ws://host/ws?token=` | not built (contract names `/ws/hospitals/{id}` and `/ws/emergencies/{id}`) | yes, different path | shows "Reconnecting" and the connection-lost banner; no live alerts |
@@ -63,4 +63,4 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 4. The WebSocket and its events (one agreed path).
 5. `POST /ambulances/{id}/location` and `GET /ambulances`.
 
-Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local contract status after J4 says 59 built, 7 not built. There is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `ack`, `dispatch`, `status`, hospitals and availability, ambulance location, `POST /location-shares`, the WebSocket and `POST /demo/fail`.
+Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local contract status on the integrated code says 70 built, 1 not built (`POST /location-shares`). There is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `POST /location-shares`, the WebSocket (P4), checklist, notes and chat, and `POST /demo/fail`.

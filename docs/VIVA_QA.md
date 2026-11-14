@@ -51,7 +51,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 4. **How are the medical rules made, and are they approved?**
    The rule table maps symptoms and vitals to a severity and an action. Every decision carries "pending doctor review". Twelve rules were drafted by an AI assistant from public first-aid guidance and accepted for the prototype; a doctor has not reviewed any of it.
 5. **How do you know it works?**
-   The backend suite has 1789 passing tests (run locally on 14 Nov 2026) and the repo has a CI workflow that runs pytest; see `docs/PROJECT_STATUS.md` for what CI showed.
+   The backend suite has 1893 passing tests (run locally on 14 Nov 2026) and the repo has a CI workflow that runs pytest; see `docs/PROJECT_STATUS.md` for what CI showed.
 6. **Why does the demo not use your backend?**
    Because acknowledge, dispatch, status, hospitals, ambulance location and the WebSocket are not built yet. The honest answer is: the mock stands in for them, and the apps have not yet been run against the new emergency routes.
 7. **What is the plan to finish?**
