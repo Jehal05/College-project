@@ -4,7 +4,7 @@ Everything here is **simulated**. No real hospital, ambulance or patient is invo
 
 Legend: ✅ checked on the laptop on 2026-11-14 · ⚠️ not checked yet (do it in a rehearsal before the jury).
 
-Checked in a real browser on 2026-11-14 (real mode, Jehal's mock): the Dispatch dialog fits a short window, the take-over box and reason, the sound control states, Presentation mode on and off, and Hindi on the Map, Fleet, History, Activity, Handover and Analytics pages. Not checked in a browser: the Acknowledge unlock after a take-over, the hiding of mock helper buttons, and the alert sound itself (nobody could listen to it).
+Checked in a real browser on 2026-11-14 (real mode, Jehal's mock): the Dispatch dialog fits a short window, the take-over box and reason, the sound control states, Presentation mode on and off, and Hindi on the Map, Fleet, History, Activity, Handover and Analytics pages. Checked later the same day with the built-in mock (`VITE_USE_MOCK=true`): after a take-over the Acknowledge and Dispatch buttons unlock, Presentation mode hides the mock helper button on the case and turning it off brings it back, and a new alert asks the browser to play two beeps only when sound is on (0 beeps when off). Not checked: how the sound actually sounds (nobody could listen to it), and Gujarati on pages other than Analytics.
 
 ## 0. Before the demo (10 minutes)
 
@@ -93,7 +93,7 @@ Note: with the mock, an alert that nobody acknowledges keeps moving until the li
 
 ## 3. Acknowledge and dispatch (1:00 – 1:45)
 
-Do: click the card. If the card says "now at <another hospital>", an amber **Take over this alert** box appears first and the buttons are locked (a new safety step: a desk may not act on another hospital's alert by accident). In the mock the reason "Demo or training" is already chosen, so one click on **Take over this alert** is enough; the reason is saved in the timeline. Then click **Acknowledge**, then **Dispatch**. (Checked in a real browser: the box, the reason check, the timeline note and the box closing. Not seen: the buttons unlocking, because the mock escalated the alert again at once. If that happens, click the card again and take over again.) The nearest unit is preselected (Bravo 2 in the rehearsal; the name can change, so read it from the screen). Click **Yes, dispatch** ✅.
+Do: click the card. If the card says "now at <another hospital>", an amber **Take over this alert** box appears first and the buttons are locked (a new safety step: a desk may not act on another hospital's alert by accident). In the mock the reason "Demo or training" is already chosen, so one click on **Take over this alert** is enough; the reason is saved in the timeline. Then click **Acknowledge**, then **Dispatch**. (Checked in a real browser: the box, the reason check, the box closing, and with the built-in mock the buttons unlocking. With Jehal's mock the alert can escalate again at once; if that happens, click the card and take over again.) The nearest unit is preselected (Bravo 2 in the rehearsal; the name can change, so read it from the screen). Click **Yes, dispatch** ✅.
 
 Say: "The desk acknowledges, then sends the nearest ambulance. The system only allows the next valid step, so nobody can skip a step by mistake."
 
@@ -119,7 +119,7 @@ Do the language switch back on the **Dashboard**, not on Activity. Point at: the
 
 ## Extras (optional, if there is time)
 
-- **Presentation mode** (button in the nav bar): bigger text, the language is locked, and the built-in mock's helper buttons are hidden. Toggle and bigger text were seen in the browser; the hiding of helper buttons was not (needs `VITE_USE_MOCK=true`).
+- **Presentation mode** (button in the nav bar): bigger text, the language is locked, and the built-in mock's helper buttons are hidden. Toggle and bigger text were seen in the browser; the hiding of the helper button was seen with the built-in mock (`VITE_USE_MOCK=true`).
 - **Handover** page: a printable shift handover sheet, with a CSV download for the case list on **History**. Seen in Hindi in the browser; the CSV file was not opened.
 - **Analytics** page: counts and average step times from the saved timelines. All values are simulated.
 
