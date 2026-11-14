@@ -5,6 +5,7 @@ identifiers for names and tidy ids. Free text, tokens and patient values
 cannot be stored, even by mistake.
 """
 import json
+import logging
 import re
 from datetime import datetime
 from typing import Iterable, List, Optional, Tuple
@@ -14,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.models.audit import AuditLog
 from app.security.actor import Actor
 
+log = logging.getLogger("healthtwin.audit")
 OUTCOMES = ("allowed", "denied")
 
 # Every reason that may appear in the log.
@@ -76,7 +78,21 @@ def record(
     )
     session.add(row)
     session.commit()
+    _tell_the_patient(row)
     return row
+
+
+def _tell_the_patient(row: AuditLog) -> None:
+    """Someone other than the patient touched their data: the patient's open screen hears it at once (no ids, no values)."""
+    if row.role == "PATIENT" or not row.patient_id or row.patient_id == INVALID_ID:
+        return
+    try:
+        from app.services import access_log, events
+        if row.action not in access_log.WHAT:           # desk actions (acknowledge, notes ...) are not "looking at data"
+            return
+        events.publish("data.accessed", {"entry": access_log.entry_light(row)}, audience="patient:" + row.patient_id)
+    except Exception:                                  # noqa: BLE001  telling the patient must never break the request
+        log.exception("could not announce a data access")
 
 
 def record_emergency_read(session: Session, *, emergency_id: str, outcome: str, actor: Optional[Actor] = None,

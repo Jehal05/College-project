@@ -30,7 +30,7 @@ PATIENT = Actor("usr_001", "PATIENT", PID)
 def seen():
     got = []
     events.clear_subscribers()
-    events.subscribe(got.append)
+    events.subscribe(lambda e: got.append(e) if e["event"] != "data.accessed" else None)   # that one has its own tests
     yield got
     events.clear_subscribers()
 

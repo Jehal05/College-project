@@ -21,6 +21,7 @@ const screen = (load) => lazy(() => load().catch(() => ({ default: NeedsConnecti
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
 const Consent = screen(() => import('./screens/Consent'));
+const AccessLog = screen(() => import('./screens/AccessLog'));
 const Reports = screen(() => import('./screens/Reports'));
 const Reminders = screen(() => import('./screens/Reminders'));
 const Summary = screen(() => import('./screens/Summary'));
@@ -60,6 +61,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Protected><Home /></Protected>} />
       <Route path="/profile" element={<Protected><Profile /></Protected>} />
+      <Route path="/access" element={<Protected><AccessLog /></Protected>} />
       <Route path="/consent" element={<Protected><Consent /></Protected>} />
       <Route path="/contacts" element={<Protected><Contacts /></Protected>} />
       <Route path="/reports" element={<Protected><Reports /></Protected>} />

@@ -84,6 +84,8 @@ export const resetDemo = () => request('/demo/reset', { method: 'POST' });
 const patientPath = (id, rest) => '/patients/' + id + rest;
 export const getConsents = (id) => request(patientPath(id, '/consents'));
 export const saveConsents = (id, consents) => request(patientPath(id, '/consents'), { method: 'PUT', body: consents });
+export const getAccessLog = (id, { limit = 50, before } = {}) =>
+  request(patientPath(id, '/access-log?limit=' + limit + (before ? '&before=' + before : '')));
 export const getContacts = (id) => request(patientPath(id, '/contacts'));
 export const addContact = (id, contact) => request(patientPath(id, '/contacts'), { method: 'POST', body: contact });
 export const updateContact = (id, contactId, contact) => request(patientPath(id, '/contacts/' + contactId), { method: 'PUT', body: contact });

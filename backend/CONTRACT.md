@@ -208,6 +208,7 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /family/link | Link a relative with an invite code | FAMILY |
 | GET /family/patients | List linked patients | FAMILY |
 | POST /family/checkin | Family reply, for example "I'm on my way" | FAMILY |
+| GET /patients/{id}/access-log | Who looked at my data, and what they were shown | PATIENT (own) |
 | POST /location-shares, DELETE /location-shares/{id} | Share my location with linked relatives for 15, 30 or 60 minutes; stop sharing | PATIENT |
 | GET /responders/alerts | Alerts for a responder | RESPONDER |
 | POST /responders/{id}/accept | Accept an alert and release identity | RESPONDER |
@@ -569,6 +570,18 @@ Who sees it: a **linked relative** gets `location_share: { lat, lng, expires_at 
 
 Changes in 0.7.5 that make the real backend match the apps: `vitals.update` is now streamed once a second (`state: "MONITORING"`, `emergency_id: null`, audience = that patient only, payload `patient_id, heart_rate, spo2, bp, bp_sys, bp_dia, glucose, resp_rate`) to every open PATIENT socket; the patient also hears `emergency.created` (the same payload hospitals get, with `symptoms` as well as `symptom_ids`) and `hospital.alerted` (which hospital, and its rank); `GET /audit` answers `rows` (same rows with `at`, `user`, `fields`) next to `items`; a desk reading `GET /passport/{patient_id}` is logged as `passport.staff_view` (a patient's own look and a QR open stay `passport.view`); hospital availability also shows `icu_beds` (the old name, equal to `icu_free`).
 
+### 4.8 Who saw my data (0.7.6)
+
+`GET /patients/{id}/access-log?limit=50&before=<id>` (PATIENT, own record; anyone else `403`, audited; unknown patient `404`) answers `{ entries: [...], more, simulated }`, **newest first** (`limit` 1 to 100, `before` = the smallest `id` already shown). Each entry: `{ id, at, who: { kind, hospital? }, what, action, outcome, fields, reason }`.
+
+- `who.kind`: `hospital_desk` (with the hospital's **name** in `hospital`), `admin`, `relative`, `volunteer`, `qr_link` (someone who opened the QR link), `unknown`. **Never a user id, login, name of a person, token or phone number.**
+- `what`: `passport`, `emergency`, `insights`, `status` (a relative's view), `checkin`, `volunteer`, `link`, `location`, `profile`, or `data`. The apps turn these into words in the patient's language.
+- `outcome`: `allowed` or `denied`. A **refused** attempt is shown too, so the patient sees who tried. `reason` is one of the audit reason codes, or `null`.
+- `fields`: the **names** of what was released (`location`, `history`, `vitals`, `reports`). Never a value.
+- The patient's own reads are not in the list. It is read from the audit log, so nothing can be edited or deleted.
+
+**Live:** each time someone other than the patient touches their data, the patient's open sockets get `data.accessed` with `payload: { entry }` (the same entry, without the hospital name), `emergency_id: null`, audience that patient only. To stop sharing, the patient uses the consent switches (`PUT /patients/{id}/consents`): it takes effect on the very next read.
+
 ---
 
 ## 5. WebSocket
@@ -609,6 +622,7 @@ Connect to `ws://localhost:8000/ws/hospitals/{hospital_id}?token=<jwt>` for hosp
 | emergency.note | Desk adds a timeline note (PROPOSED) | `note_id`, `kind`, `note`, `actor`, `fields` |
 | chat.message | Desk or crew chat line (PROPOSED) | `message_id`, `sender_role`, `sender_name`, `text` |
 | emergency.checklist | Desk ticks an item (PROPOSED) | `item_id`, `done`, `by` |
+| data.accessed | Someone other than the patient read their data | `entry` (see 4.8) |
 | hospital.availability_updated | A hospital changes its beds or labs | `hospital_id`, `availability` |
 | responder.alert | Nearby volunteer alerted | `distance_m`, `type` (no identity until accepted) |
 
@@ -686,3 +700,4 @@ Passwords are set in the seed script and are demo values only.
 | 14 Nov 2026 | 0.7.3 | **Patient extras (J3, Jehal):** reports (upload, list, download, delete, and the contract's `POST /reports`), reminders with log, preferences, the QR passport link (create, show again, revoke, open log) and the public `GET /passport/{token}` (`410` when gone). Passport answers now also carry `shared: { history, reports }` and each contact's `relation`. Section 4.5. Five new tables. A token-looking address with no login now answers `410` instead of `401` |
 | 14 Nov 2026 | 0.7.4 | **Other apps (J4, Jehal):** family invites, linking, status view and check-in (feature 61 is now real: linked relatives can read insights), volunteer sign-up, alerts and accept, admin users list and change, content with approval, feedback, privacy requests (simulated), section 4.6. New seeds `family@demo.test` and `responder@demo.test` (verified). New events `family.checkin`, `responder.accepted`. New tables listed in section 6. |
 | 14 Nov 2026 | 0.7.5 | `POST /location-shares` and `DELETE /location-shares/{id}` (section 4.7), `vitals.update` stream, `emergency.created` also sent to the patient, `GET /audit` `rows`, `passport.staff_view`, `icu_beds` alias. Every endpoint in this contract is now built. |
+| 14 Nov 2026 | 0.7.6 | `GET /patients/{id}/access-log` and the live `data.accessed` event: who looked at my data (section 4.8). |

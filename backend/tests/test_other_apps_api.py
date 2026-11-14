@@ -33,7 +33,7 @@ BAD_WORDS = ("allerg", "medication", "condition", "phone", "token", "password", 
 def seen():
     got = []
     events.clear_subscribers()
-    events.subscribe(got.append)
+    events.subscribe(lambda e: got.append(e) if e["event"] != "data.accessed" else None)   # that one has its own tests
     yield got
     events.clear_subscribers()
 
