@@ -431,4 +431,12 @@ export default {
   'handover.by': 'by {name}',
   'handover.localOnly': 'saved on this screen only',
   'handover.sign': 'Handed over by: ______________ Received by: ______________',
+  'type.HEART': 'Heart attack',
+  'type.STROKE': 'Stroke',
+  'type.DIABETIC': 'Diabetic emergency',
+  'type.ASTHMA': 'Severe asthma',
+  'type.UNKNOWN': 'Safety check-in (no symptoms)',
+  'dur.sec': '{s} s',
+  'dur.minSec': '{m} min {s} s',
+  'dur.hourMin': '{h} h {m} min',
 };

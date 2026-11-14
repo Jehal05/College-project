@@ -6,10 +6,9 @@ import { useAmbulances } from '../components/AmbulanceProvider.jsx';
 import BarChart, { PALETTE } from '../components/BarChart.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { summarise, STEPS } from '../services/analytics.js';
-import { formatSeconds } from '../services/report.js';
-import { EMERGENCY_TYPES, TYPE_LABELS } from '../services/contract.js';
+import { EMERGENCY_TYPES } from '../services/contract.js';
 import { useT } from '../i18n/index.js';
-import { stateText, severityText } from '../i18n/phrases.js';
+import { stateText, severityText, typeText, durationText } from '../i18n/phrases.js';
 
 const SEVERITY_COLORS = { EMERGENCY: '#D55E00', URGENT: '#E69F00', WATCH: '#0072B2' };
 
@@ -58,7 +57,7 @@ export default function Analytics() {
           testId="chart-type"
           title={t('an.byType')}
           axisLabel={t('an.axisNum')}
-          rows={EMERGENCY_TYPES.map((ty, i) => ({ label: TYPE_LABELS[ty], value: s.byType[ty] || 0, color: PALETTE[i] }))}
+          rows={EMERGENCY_TYPES.map((ty, i) => ({ label: typeText(t, ty), value: s.byType[ty] || 0, color: PALETTE[i] }))}
         />
         <BarChart
           testId="chart-severity"
@@ -85,12 +84,12 @@ export default function Analytics() {
         color={PALETTE[0]}
         rows={STEPS.map((step) => {
           const a = s.averages[step.key];
-          return { label: t(`an.step.${step.key}`), value: a.seconds ?? 0, text: a.seconds === null ? t('an.noData') : `${formatSeconds(a.seconds)} (${a.count})` };
+          return { label: t(`an.step.${step.key}`), value: a.seconds ?? 0, text: a.seconds === null ? t('an.noData') : `${durationText(t, a.seconds)} (${a.count})` };
         })}
       />
       <p className="text-slate-500">
         {t('an.bracket')}
-        {s.averageTotal.seconds !== null && <> {t('an.avgTotal', { time: formatSeconds(s.averageTotal.seconds), n: s.averageTotal.count })}</>}
+        {s.averageTotal.seconds !== null && <> {t('an.avgTotal', { time: durationText(t, s.averageTotal.seconds), n: s.averageTotal.count })}</>}
       </p>
     </div>
   );

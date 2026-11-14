@@ -4,9 +4,8 @@ import { useParams } from 'react-router-dom';
 import ChatPanel from '../components/ChatPanel.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
-import { TYPE_LABELS } from '../services/contract.js';
 import { useT } from '../i18n/index.js';
-import { stateText } from '../i18n/phrases.js';
+import { stateText, typeText } from '../i18n/phrases.js';
 
 export default function Crew() {
   const { emergencyId } = useParams();
@@ -24,7 +23,7 @@ export default function Crew() {
         <p className="text-lg">
           {t('crew.emergency')} <b data-testid="crew-emergency">{emergencyId}</b>
           {e && (
-            <span className="text-slate-600"> · {TYPE_LABELS[e.type] || e.type} · {stateText(t, e.state)}</span>
+            <span className="text-slate-600"> · {typeText(t, e.type)} · {stateText(t, e.state)}</span>
           )}
         </p>
         <ChatPanel emergencyId={emergencyId} role="crew" senderName="Ambulance crew (simulated)" />

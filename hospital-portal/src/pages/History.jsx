@@ -13,9 +13,9 @@ import { casesToCsv } from '../services/csv.js';
 import { downloadText } from '../services/download.js';
 import { isFinal } from '../services/stateMachine.js';
 import { formatSeconds } from '../services/report.js';
-import { EMERGENCY_TYPES, SEVERITY, TYPE_LABELS, SEVERITY_STYLES } from '../services/contract.js';
+import { EMERGENCY_TYPES, SEVERITY, SEVERITY_STYLES } from '../services/contract.js';
 import { useT } from '../i18n/index.js';
-import { stateText, severityText } from '../i18n/phrases.js';
+import { stateText, severityText, typeText } from '../i18n/phrases.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
 
@@ -59,7 +59,7 @@ export default function History() {
           <input data-testid="history-search" className={`${field} w-full`} value={f.text} onChange={set('text')} placeholder={t('hist.ph')} /></label>
         <label className="block"><span className="text-sm text-slate-600">{t('hist.type')}</span>
           <select data-testid="history-type" className={`${field} w-full`} value={f.type} onChange={set('type')}>
-            <option value="">{t('hist.allTypes')}</option>{EMERGENCY_TYPES.map((ty) => <option key={ty} value={ty}>{TYPE_LABELS[ty]}</option>)}</select></label>
+            <option value="">{t('hist.allTypes')}</option>{EMERGENCY_TYPES.map((ty) => <option key={ty} value={ty}>{typeText(t, ty)}</option>)}</select></label>
         <label className="block"><span className="text-sm text-slate-600">{t('hist.severity')}</span>
           <select data-testid="history-severity" className={`${field} w-full`} value={f.severity} onChange={set('severity')}>
             <option value="">{t('hist.allSev')}</option>{SEVERITY.filter((x) => x !== 'NONE').map((x) => <option key={x} value={x}>{severityText(t, x)}</option>)}</select></label>
@@ -89,7 +89,7 @@ export default function History() {
               <tr key={`${e.emergency_id}|${e.created_at}`} data-testid="history-row" data-id={e.emergency_id} data-state={e.state} className="border-t border-slate-200">
                 <td className="px-4 py-3"><b>{e.emergency_id}</b><span className="block text-sm text-slate-500">{t('hist.patientSample', { id: e.patient_id })}{e.sample ? t('hist.sampleCase') : ''}</span></td>
                 <td className="px-4 py-3 text-base">{new Date(e.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</td>
-                <td className="px-4 py-3">{TYPE_LABELS[e.type] || e.type}</td>
+                <td className="px-4 py-3">{typeText(t, e.type)}</td>
                 <td className="px-4 py-3"><span className={`rounded-full px-3 py-1 text-base font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, e.severity)}</span></td>
                 <td className="px-4 py-3 text-base">{hospitalName(e.alerted_hospital_id)}</td>
                 <td className="px-4 py-3">{stateText(t, e.state)}</td>

@@ -6,7 +6,7 @@ import { useEmergencies } from '../components/EmergencyProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import TrackingMap, { formatEta } from '../components/TrackingMap.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
-import { TYPE_LABELS } from '../services/contract.js';
+import { typeText } from '../i18n/phrases.js';
 import { useT } from '../i18n/index.js';
 
 // Label keys (fleet.s.<status>) and colours.
@@ -68,7 +68,7 @@ export default function Fleet() {
                   <td className="px-4 py-3">
                     {e ? (
                       <>
-                        <b>{e.emergency_id}</b> · {TYPE_LABELS[e.type] || e.type}
+                        <b>{e.emergency_id}</b> · {typeText(t, e.type)}
                         {a.status === 'en_route' && e.ambulance?.eta_seconds != null && (
                           <span className="block text-base text-slate-600">{t('fleet.eta', { time: formatEta(e.ambulance.eta_seconds) })}</span>
                         )}
@@ -96,7 +96,7 @@ export default function Fleet() {
         <div className="grid gap-6 xl:grid-cols-2">
           {active.map((e) => (
             <div key={e.emergency_id} className="rounded-2xl bg-white p-4 shadow">
-              <h3 className="mb-2 text-xl font-bold">{e.emergency_id} · {TYPE_LABELS[e.type] || e.type}</h3>
+              <h3 className="mb-2 text-xl font-bold">{e.emergency_id} · {typeText(t, e.type)}</h3>
               <TrackingMap emergency={e} compact />
             </div>
           ))}

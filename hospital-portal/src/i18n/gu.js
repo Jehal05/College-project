@@ -430,4 +430,12 @@ export default {
   'handover.by': '{name} દ્વારા',
   'handover.localOnly': 'ફક્ત આ સ્ક્રીન પર સાચવ્યું',
   'handover.sign': 'હેન્ડઓવર આપનાર: ______________ મેળવનાર: ______________',
+  'type.HEART': 'હૃદયરોગનો હુમલો',
+  'type.STROKE': 'સ્ટ્રોક',
+  'type.DIABETIC': 'ડાયાબિટીસ કટોકટી',
+  'type.ASTHMA': 'ગંભીર અસ્થમા',
+  'type.UNKNOWN': 'સલામતી તપાસ (કોઈ લક્ષણ નથી)',
+  'dur.sec': '{s} સેકન્ડ',
+  'dur.minSec': '{m} મિનિટ {s} સેકન્ડ',
+  'dur.hourMin': '{h} કલાક {m} મિનિટ',
 };

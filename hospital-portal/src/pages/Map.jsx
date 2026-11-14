@@ -8,7 +8,7 @@ import { useHospitals } from '../components/HospitalProvider.jsx';
 import { useRanking } from '../components/useRanking.js';
 import RankingTable from '../components/RankingTable.jsx';
 import { useAuth } from '../components/AuthProvider.jsx';
-import { EMERGENCY_TYPES, TYPE_LABELS, hasCapabilities } from '../services/contract.js';
+import { EMERGENCY_TYPES, hasCapabilities } from '../services/contract.js';
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
@@ -17,6 +17,7 @@ import aedData from '../data/aed.json';
 import responderData from '../data/responders.json';
 import { nearestAeds, respondersNear, withDistanceFrom } from '../services/nearby.js';
 import { useT } from '../i18n/index.js';
+import { typeText } from '../i18n/phrases.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
 function hospitalIcon(h, selected, isTop) {
@@ -87,7 +88,7 @@ export default function MapPage() {
             >
               <option value="">{t('map.allTypes')}</option>
               {EMERGENCY_TYPES.map((ty) => (
-                <option key={ty} value={ty}>{TYPE_LABELS[ty]}</option>
+                <option key={ty} value={ty}>{typeText(t, ty)}</option>
               ))}
             </select>
           </label>
@@ -164,7 +165,7 @@ export default function MapPage() {
 
         {ranking ? (
           <div className="rounded-2xl bg-white p-4 shadow">
-            <h2 className="mb-2 text-lg font-bold">{t('map.rankFor', { type: TYPE_LABELS[type] })}</h2>
+            <h2 className="mb-2 text-lg font-bold">{t('map.rankFor', { type: typeText(t, type) })}</h2>
             <RankingTable ranking={ranking} ownHospitalId={session?.hospital_id} onSelect={(h) => setSelectedId(h.id)} />
           </div>
         ) : (

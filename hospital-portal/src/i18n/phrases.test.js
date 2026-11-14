@@ -33,3 +33,25 @@ test('every real state has a translation in all three languages', () => {
     }
   }
 });
+
+test('emergency type names: English is unchanged, Hindi and Gujarati differ, unknown falls back', async () => {
+  const { typeText } = await import('./phrases.js');
+  const { TYPE_LABELS, EMERGENCY_TYPES } = await import('../services/contract.js');
+  for (const ty of EMERGENCY_TYPES) {
+    assert.equal(typeText(tr('en'), ty), TYPE_LABELS[ty]);
+    assert.notEqual(typeText(tr('hi'), ty), TYPE_LABELS[ty]);
+    assert.notEqual(typeText(tr('gu'), ty), TYPE_LABELS[ty]);
+  }
+  assert.equal(typeText(tr('hi'), 'NEW_TYPE'), 'NEW_TYPE');
+});
+
+test('durations: English matches formatSeconds, Hindi and Gujarati use their own unit words', async () => {
+  const { durationText } = await import('./phrases.js');
+  const { formatSeconds } = await import('../services/report.js');
+  for (const sec of [0, 18, 55, 59.6, 60, 125, 3599, 3600, 7260]) {
+    assert.equal(durationText(tr('en'), sec), formatSeconds(sec));
+  }
+  assert.equal(durationText(tr('hi'), 55), '55 सेकंड');
+  assert.equal(durationText(tr('gu'), 125), '2 મિનિટ 5 સેકન્ડ');
+  assert.equal(durationText(tr('hi'), 3660), '1 घंटा 1 मिनट');
+});

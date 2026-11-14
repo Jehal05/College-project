@@ -430,4 +430,12 @@ export default {
   'handover.by': '{name} द्वारा',
   'handover.localOnly': 'केवल इस स्क्रीन पर सहेजा गया',
   'handover.sign': 'हैंडओवर देने वाला: ______________ प्राप्तकर्ता: ______________',
+  'type.HEART': 'दिल का दौरा',
+  'type.STROKE': 'स्ट्रोक',
+  'type.DIABETIC': 'मधुमेह आपातकाल',
+  'type.ASTHMA': 'गंभीर दमा',
+  'type.UNKNOWN': 'सुरक्षा जाँच (कोई लक्षण नहीं)',
+  'dur.sec': '{s} सेकंड',
+  'dur.minSec': '{m} मिनट {s} सेकंड',
+  'dur.hourMin': '{h} घंटा {m} मिनट',
 };

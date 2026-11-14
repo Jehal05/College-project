@@ -1,6 +1,6 @@
 // Small pure helpers that turn the portal's English labels into the chosen language (t = the function from useT()).
 // Anything without a key stays in English, so nothing is ever blank.
-import { STATE_LABELS } from '../services/contract.js';
+import { STATE_LABELS, TYPE_LABELS } from '../services/contract.js';
 
 const withFallback = (t, key, fallback) => {
   const v = t(key);
@@ -22,3 +22,14 @@ export const capText = (t, text) => (CAP[text] ? t(CAP[text]) : text);
 
 /** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
 export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);
+
+/** Emergency type name (Heart attack, Stroke, ...). An unknown type stays as it is. */
+export const typeText = (t, type) => withFallback(t, `type.${type}`, TYPE_LABELS[type] || type);
+
+/** Duration in the chosen language ("55 s" in English). Same rounding as formatSeconds in services/report.js. */
+export function durationText(t, totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds));
+  if (s < 60) return t('dur.sec', { s });
+  const m = Math.floor(s / 60);
+  return m < 60 ? t('dur.minSec', { m, s: s % 60 }) : t('dur.hourMin', { h: Math.floor(m / 60), m: m % 60 });
+}
