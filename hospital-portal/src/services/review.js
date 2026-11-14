@@ -1,6 +1,14 @@
 // Medical review status of the sample checklists. Pure functions (tests: review.test.js).
-// Nothing here names a reviewer by itself: the names and dates come only from src/data/checklists.json,
-// where a real doctor or medical teacher is recorded after reading docs/DOCTOR_REVIEW_SHEET.md.
+// Nothing here names a reviewer by itself. The label "Sample checklist. Pending medical review."
+// goes away ONLY when src/data/reviewStatus.js has both reviewedBy and reviewedOn filled in.
+import { reviewStatus } from '../data/reviewStatus.js';
+
+/** @returns {{ signed: boolean, who: string, date: string }} signed only when both fields hold real text */
+export function signOff(status = reviewStatus) {
+  const who = String(status?.reviewedBy ?? '').trim();
+  const date = String(status?.reviewedOn ?? '').trim();
+  return { signed: Boolean(who && date), who, date };
+}
 
 export const REVIEW_STATUSES = ['draft', 'reviewed'];
 
@@ -18,14 +26,16 @@ export function reviewSummary(items = []) {
   return { state, reviewers, date };
 }
 
-/** Short badge text for the checklist. Draft keeps the original wording. */
-export function reviewBadge(items = [], t) {
-  const s = reviewSummary(items);
+/**
+ * Label for the checklist. It says "Reviewed by ..." only when signOff() says both name and date are filled in;
+ * in every other case, whatever the per-item fields say, it is the sample label. (items is kept for old callers.)
+ */
+export function reviewBadge(items = [], t, status = reviewStatus) {
+  const s = signOff(status);
   const L = (key, english, vars) => {
     const v = t ? t(key, vars) : key;
     return !t || v === key ? english : v;
   };
-  if (s.state === 'reviewed') return L('rv.reviewed', `Reviewed by ${s.reviewers.join(', ')} on ${s.date}`, { who: s.reviewers.join(', '), date: s.date });
-  if (s.state === 'partial') return L('rv.partial', `Partly reviewed (${items.filter(isReviewed).length} of ${items.length} items). Sample checklist.`, { n: items.filter(isReviewed).length, m: items.length });
+  if (s.signed) return L('rv.reviewed', `Reviewed by ${s.who} on ${s.date}`, { who: s.who, date: s.date });
   return L('rp.sampleChecklist', 'Sample checklist. Pending medical review.');
 }

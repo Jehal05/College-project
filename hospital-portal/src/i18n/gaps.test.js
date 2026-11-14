@@ -85,14 +85,13 @@ test('Activity rows: English text is unchanged, hi/gu translate the status and t
   assert.ok(!activityText(tr('hi'), byKind.note).startsWith('Desk note'));
   assert.notEqual(activityText(tr('gu'), byKind.checklist).split(':')[0], 'Ticked');
 });
-test('review badge: English unchanged, hi/gu translated, never claims a review that did not happen', () => {
-  const draft = [{ id: 'a', text: 'x', status: 'draft' }];
-  const part = [{ id: 'a', text: 'x', status: 'reviewed', reviewed_by: 'Dr A', reviewed_on: '2026-11-01' }, { id: 'b', text: 'y', status: 'draft' }];
-  const done = [part[0]];
-  for (const items of [draft, part, done]) {
-    assert.equal(reviewBadge(items, tr('en')), reviewBadge(items));
-    for (const l of ['hi', 'gu']) assert.notEqual(reviewBadge(items, tr(l)), reviewBadge(items), `${l} ${items.length}`);
+test('review badge: English unchanged, hi/gu translated, pending until signed off', () => {
+  const none = { reviewedBy: '', reviewedOn: '' };
+  const signed = { reviewedBy: 'Dr A', reviewedOn: '2026-11-01' };
+  assert.equal(reviewBadge([], tr('en'), none), reviewBadge([], undefined, none));
+  assert.equal(reviewBadge([], undefined, none), 'Sample checklist. Pending medical review.');
+  for (const l of ['hi', 'gu']) {
+    assert.notEqual(reviewBadge([], tr(l), none), reviewBadge([], undefined, none), l);
+    assert.ok(reviewBadge([], tr(l), signed).includes('Dr A') && reviewBadge([], tr(l), signed).includes('2026-11-01'), l);
   }
-  assert.ok(reviewBadge(done, tr('hi')).includes('Dr A') && reviewBadge(done, tr('hi')).includes('2026-11-01'));
-  assert.ok(reviewBadge(part, tr('gu')).includes('1') && reviewBadge(part, tr('gu')).includes('2'));
 });

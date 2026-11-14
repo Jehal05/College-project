@@ -11,6 +11,7 @@ import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import checklists from '../data/checklists.json';
 import rankingConfig from '../data/ranking-config.json';
 import { buildReport, reportToText } from '../services/report.js';
+import { reviewBadge } from '../services/review.js';
 import { SEVERITY_STYLES } from '../services/contract.js';
 import { useT, useLang } from '../i18n/index.js';
 import { typeText, severityText, stateText, ruledOutText, durationText } from '../i18n/phrases.js';
@@ -121,7 +122,7 @@ export default function Report() {
           <h2 className="mb-1 text-xl font-bold">{t('sec.checklist')}</h2>
           <p data-testid="report-checklist" className="text-lg font-semibold">{t('rd.checklistDone', { done: r.checklist.done, total: r.checklist.total })}</p>
           <ul className="text-lg">{r.checklist.items.map((i) => <li key={i.id}>{i.done ? '☑' : '☐'} {i.text}</li>)}</ul>
-          <p className="text-sm text-slate-500">{t('rp.sampleChecklist')}</p>
+          <p className="text-sm text-slate-500">{reviewBadge([], t)}</p>
         </section>
 
         <section data-testid="report-handover">

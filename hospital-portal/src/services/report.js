@@ -4,6 +4,7 @@ import { staffNotes } from './notes.js';
 import { NOT_SHARED, originText } from './adapters.js';
 import { TYPE_LABELS, STATE_LABELS } from './contract.js';
 import { rankHospitals } from './ranking.js';
+import { reviewBadge, signOff } from './review.js';
 import { stepDurations, escalationCount, STEPS } from './analytics.js';
 
 const ms = (t) => new Date(t).getTime();
@@ -128,7 +129,7 @@ export function reportToText(r) {
   L.push('TIMELINE');
   for (const t of r.timeline) L.push(`  ${new Date(t.timestamp).toLocaleTimeString()}  +${t.offset_seconds ?? '?'} s  ${t.label}${t.actor ? ` (${t.actor})` : ''}${t.note ? ` - ${t.note}` : ''}`);
   L.push('');
-  L.push(`CHECKLIST: ${r.checklist.done} of ${r.checklist.total} done (sample checklist, pending medical review)`);
+  L.push(`CHECKLIST: ${r.checklist.done} of ${r.checklist.total} done (${signOff().signed ? reviewBadge() : 'sample checklist, pending medical review'})`);
   for (const i of r.checklist.items) L.push(`  [${i.done ? 'x' : ' '}] ${i.text}${i.done && i.by ? ` (${i.by})` : ''}`);
   L.push('');
   L.push('SHIFT HANDOVER');

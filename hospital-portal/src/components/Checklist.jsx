@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import checklists from '../data/checklists.json';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { formatTime } from './AlertCard.jsx';
-import { reviewBadge, reviewSummary } from '../services/review.js';
+import { reviewBadge, signOff } from '../services/review.js';
 import { useT } from '../i18n/index.js';
 
 export default function Checklist({ emergency }) {
@@ -41,8 +41,8 @@ export default function Checklist({ emergency }) {
         </span>
         <span
           data-testid="review-badge"
-          data-review={reviewSummary(items).state}
-          className={`rounded-full border px-2.5 py-0.5 text-sm font-semibold ${reviewSummary(items).state === 'reviewed' ? 'border-emerald-600 bg-emerald-100 text-emerald-900' : 'border-amber-500 bg-amber-100 text-amber-800'}`}
+          data-review={signOff().signed ? 'reviewed' : 'draft'}
+          className={`rounded-full border px-2.5 py-0.5 text-sm font-semibold ${signOff().signed ? 'border-emerald-600 bg-emerald-100 text-emerald-900' : 'border-amber-500 bg-amber-100 text-amber-800'}`}
         >
           {reviewBadge(items, t)}
         </span>

@@ -192,5 +192,5 @@
       "reviewed_on": null
     }
   ],
-  "_review": "Each item carries status ('draft' or 'reviewed'), reviewed_by and reviewed_on. A real doctor or medical teacher fills these in after reading docs/DOCTOR_REVIEW_SHEET.md. They stay null until then: nobody is named as a reviewer by default."
+  "_review": "Each item carries status ('draft' or 'reviewed'), reviewed_by and reviewed_on. A real doctor or medical teacher fills these in after reading docs/DOCTOR_REVIEW_SHEET.md. They stay null until then: nobody is named as a reviewer by default. The label 'Sample checklist. Pending medical review.' is switched off only by reviewedBy and reviewedOn in src/data/reviewStatus.js, not by these fields."
 }

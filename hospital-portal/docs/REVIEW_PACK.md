@@ -28,9 +28,14 @@ Please reply for each row: **OK**, or the better wording. Add your name and the 
 
 Hello Doctor. I am building a college project: a hospital emergency screen. It is a **simulated** prototype. No real patient or hospital is involved, and nothing in it is medical advice.
 
-I would be grateful if you could look at one file: `DOCTOR_REVIEW_SHEET.md`.
+I would be grateful if you could look at one file: `DOCTOR_REVIEW_SHEET.html` (open it in a browser and print it; the same content is in `DOCTOR_REVIEW_SHEET.md`).
 1. Which hospital capability each emergency type needs.
 2. The severity in the sample alerts.
 3. The sample symptoms and checklists.
 
-For each line, please mark **OK**, **Change** (write the change) or **Remove**, and add your name and the date. Thank you!
+For each line, please tick **OK**, write the change under **Change to**, or tick **Remove**. At the end please add your name, the date and your signature. Thank you!
+
+## After the doctor has signed
+
+1. Read the signed sheet. If the doctor changed or removed a line, make that change in the data first (the clinical wording is the doctor's, not ours), then run `npm run review-sheet`.
+2. Only then open `src/data/reviewStatus.js` and fill in `reviewedBy` (the doctor's name) and `reviewedOn` (the date they signed, e.g. `2026-11-20`). The label "Sample checklist. Pending medical review." goes away only when both are filled. Leave them empty if nobody has signed.
