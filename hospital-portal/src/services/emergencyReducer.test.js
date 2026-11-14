@@ -221,3 +221,17 @@ test('a missing or bad time never replaces a card', () => {
   const noTime = applyEvent(list, { event: 'emergency.created', emergency_id: 'E1', state: 'SOS_SENT', timestamp: 'not a time', payload: {} });
   assert.equal(noTime, list);
 });
+
+test('after a take-over, the acknowledging hospital becomes the one holding the alert (found on the real backend)', () => {
+  const start = [{ ...base()[0], alerted_hospital_id: 'HSP-AMD-004', alerted_hospital_name: 'Naroda Community Hospital' }];
+  const list = applyEvent(start, ev('hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED', { payload: { actor: 'usr_003', hospital_id: 'HSP-AMD-002' } }));
+  assert.equal(list[0].alerted_hospital_id, 'HSP-AMD-002');
+  assert.equal(list[0].alerted_hospital_name, null); // the old name belonged to the hospital it left; the label looks it up by id
+});
+
+test('an acknowledge without a hospital id leaves the holder alone', () => {
+  const start = [{ ...base()[0], alerted_hospital_id: 'HSP-AMD-002', alerted_hospital_name: 'Navrangpura' }];
+  const list = applyEvent(start, ev('hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED'));
+  assert.equal(list[0].alerted_hospital_id, 'HSP-AMD-002');
+  assert.equal(list[0].alerted_hospital_name, 'Navrangpura');
+});

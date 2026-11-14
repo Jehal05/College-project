@@ -158,6 +158,15 @@ export function applyEvent(list, msg) {
   const updated = {
     ...current,
     ...(payload.ambulance_id ? { ambulance_id: payload.ambulance_id } : {}),
+    // The hospital that acknowledged now holds the alert (after a take-over it is not the one that was alerted).
+    // Found on the real backend: the card kept saying "now at <old hospital>". The label looks the name up by id.
+    ...(state === 'HOSPITAL_ACKNOWLEDGED' && payload.hospital_id != null
+      ? {
+        alerted_hospital_id: payload.hospital_id,
+        alerted_hospital_name: payload.hospital_name
+          || (payload.hospital_id === current.alerted_hospital_id ? current.alerted_hospital_name : null),
+      }
+      : {}),
     // The patient confirmed the SOS: from now on it is a real alert for the desk (flash, sound, unread).
     ...(isEarly(current.state) && state === 'SOS_SENT'
       ? { _new: true, _read: false, sos_sent_at: timestamp || new Date().toISOString(), flash_from: receivedMs(msg) }
