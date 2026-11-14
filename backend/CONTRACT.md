@@ -168,8 +168,13 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /emergencies/{id}/ack | Hospital acknowledges | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/dispatch | Ambulance dispatched | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/status | Move to EN_ROUTE, ARRIVED or HANDOVER_DONE | HOSPITAL_STAFF | Puneet |
+| GET /emergencies?status=active or finished | The desk's lists: emergencies the hospital was alerted for (admin: all sent ones), only after the SOS, audited | HOSPITAL_STAFF, ADMIN | Puneet |
 | GET /hospitals?lat&lng&type | Candidate hospitals with capabilities | HOSPITAL_STAFF, PATIENT, ADMIN | Puneet |
-| PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF | Puneet |
+| PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF (own hospital), ADMIN | Puneet |
+| POST /hospitals | Add a hospital (starts unverified, never alerted until verified). PROPOSED by the portal, not agreed | ADMIN | Puneet |
+| PUT /hospitals/{id} | Edit a hospital; never changes `verified`. PROPOSED, not agreed | ADMIN | Puneet |
+| PATCH /hospitals/{id}/verify | Verify or unverify a hospital. PROPOSED, not agreed | ADMIN | Puneet |
+| GET /ambulances | List ambulances with position and status | HOSPITAL_STAFF, ADMIN | Puneet |
 | POST /ambulances/{id}/location | Ambulance position update | HOSPITAL_STAFF | Puneet |
 | GET /passport/{id}?token | Emergency passport (respects consent, always audited) | signed token for that patient, HOSPITAL_STAFF, or the patient | Hospital staff |
 | GET /audit | Search the audit log | ADMIN only | Shagun (feature 76) |
