@@ -6,6 +6,7 @@
 import rankingConfig from '../data/ranking-config.json';
 import SimulatedBadge from './SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
+import { ruledOutText } from '../i18n/phrases.js';
 
 const PARTS = [
   ['capability', 'Capability', 'bg-emerald-500'],
@@ -78,7 +79,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                     <div key={key} data-part={key} data-points={row.points[key]}>
                       <div className="text-sm font-semibold">{t(`rk.${key}`)}</div>
                       <div className="text-sm tabular-nums text-slate-600">
-                        {row.parts[key].toFixed(0)}/100 → <b className="text-slate-900">{row.points[key].toFixed(1)} pts</b>
+                        {row.parts[key].toFixed(0)}/100 → <b className="text-slate-900">{t('rk.pts', { n: row.points[key].toFixed(1) })}</b>
                       </div>
                       <div className="mt-1 h-3 overflow-hidden rounded-full bg-slate-200">
                         <div className={`h-full rounded-full ${color}`} style={{ width: `${row.parts[key]}%` }} />
@@ -109,7 +110,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                 className="flex flex-wrap justify-between gap-2 rounded-lg bg-slate-100 px-3 py-2 text-slate-500"
               >
                 <span>{hospital.name}</span>
-                <span className="font-semibold">{reason}</span>
+                <span className="font-semibold">{ruledOutText(t, reason)}</span>
               </li>
             ))}
           </ul>

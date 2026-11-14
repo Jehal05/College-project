@@ -58,7 +58,7 @@ test('durations: English matches formatSeconds, Hindi and Gujarati use their own
 
 test('detail panel, ranking, nearby help and hospital panel strings are translated in Hindi and Gujarati', async () => {
   const DICTS = { en: (await import('./en.js')).default, hi: (await import('./hi.js')).default, gu: (await import('./gu.js')).default };
-  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.', 'tk.', 'rd.', 'ck.', 'u.', 'capl.', 'map.topRanked', 'map.erOnly'];
+  const prefixes = ['cap.noEmergency', 'rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.', 'tk.', 'rd.', 'ck.', 'u.', 'capl.', 'map.topRanked', 'map.erOnly'];
   const sameIsFine = new Set(['tk.unitTip', 'tk.trafficOpt', 'rd.etaSim', 'capl.icu']); // only placeholders and the word simulated
   const keys = Object.keys(DICTS.en).filter((k) => prefixes.some((p) => k.startsWith(p)));
   assert.ok(keys.length >= 90, `expected many keys, got ${keys.length}`);
@@ -98,4 +98,19 @@ test('unit and capability words: placeholders kept, Hindi and Gujarati differ fo
   assert.equal(translate('hi', 'u.km', { n: 2.7 }), '2.7 किमी');
   assert.equal(translate('gu', 'u.min', { n: 4 }), '4 મિનિટ');
   for (const k of ['capl.cath_lab', 'capl.stroke_unit']) for (const l of ['hi', 'gu']) assert.notEqual(translate(l, k), translate('en', k));
+});
+
+test('ruledOutText: English unchanged, Hindi and Gujarati translate every part, unknown words stay', async () => {
+  const { ruledOutText } = await import('./phrases.js');
+  const tr = (lang) => (key, vars) => translate(lang, key, vars);
+  for (const reason of ['Not verified', 'No cath lab', 'No cath lab, No ICU', 'No stroke unit, No emergency department']) {
+    assert.equal(ruledOutText(tr('en'), reason), reason);
+    for (const lang of ['hi', 'gu']) {
+      const out = ruledOutText(tr(lang), reason);
+      assert.notEqual(out, reason);
+      assert.equal(out.split(', ').length, reason.split(', ').length);
+    }
+  }
+  assert.equal(ruledOutText(tr('hi'), 'Some new reason'), 'Some new reason');
+  assert.equal(translate('en', 'rk.pts', { n: '50.0' }), '50.0 pts');
 });

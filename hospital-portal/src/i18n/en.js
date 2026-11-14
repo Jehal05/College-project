@@ -553,4 +553,7 @@ export default {
   'hd.travel': 'Travel time',
   'ck.none': 'No checklist for this emergency type.',
   'ck.saveFail': 'Could not save: {msg}',
+  'cap.noEmergency': 'No emergency department',
+  'rk.notVerified': 'Not verified',
+  'rk.pts': '{n} pts',
 };

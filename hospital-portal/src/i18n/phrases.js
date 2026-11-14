@@ -16,7 +16,7 @@ export const stepText = (t, state, english) => withFallback(t, `tl.${state}`, en
 /** Action button label (Acknowledge, Dispatch, ...). */
 export const actionText = (t, target, english) => withFallback(t, `action.${target}`, english);
 
-const CAP = { Ready: 'cap.ready', 'Not ready': 'cap.notReady', 'Not shared': 'common.notShared', 'No cath lab': 'cap.noCath', 'No stroke unit': 'cap.noStroke', 'No ICU': 'cap.noIcu' };
+const CAP = { Ready: 'cap.ready', 'Not ready': 'cap.notReady', 'Not shared': 'common.notShared', 'No cath lab': 'cap.noCath', 'No stroke unit': 'cap.noStroke', 'No ICU': 'cap.noIcu', 'No emergency department': 'cap.noEmergency' };
 /** Words the capacity strip gets from services/capacity.js. Numbers and unknown words pass through. */
 export const capText = (t, text) => (CAP[text] ? t(CAP[text]) : text);
 
@@ -26,6 +26,10 @@ export const formatWhen = (iso, lang) => new Date(iso).toLocaleString(DATE_LOCAL
 
 /** "Nov 12, 2026, 6:30 PM" in the chosen language (History table). English keeps the browser default, as before. */
 export const formatCreated = (iso, lang) => new Date(iso).toLocaleString(DATE_LOCALES[lang] || [], { dateStyle: 'medium', timeStyle: 'short' });
+
+/** Why a hospital was ruled out ("Not verified", "No cath lab, No ICU"). Unknown words stay as they are. */
+export const ruledOutText = (t, reason) =>
+  String(reason ?? '').split(', ').map((part) => (part === 'Not verified' ? withFallback(t, 'rk.notVerified', part) : capText(t, part))).join(', ');
 
 /** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
 export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);

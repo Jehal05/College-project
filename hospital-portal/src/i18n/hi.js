@@ -552,4 +552,7 @@ export default {
   'hd.travel': 'यात्रा समय',
   'ck.none': 'इस आपातकाल के प्रकार के लिए कोई चेकलिस्ट नहीं।',
   'ck.saveFail': 'सहेजा नहीं जा सका: {msg}',
+  'cap.noEmergency': 'आपातकालीन विभाग नहीं',
+  'rk.notVerified': 'सत्यापित नहीं',
+  'rk.pts': '{n} अंक',
 };

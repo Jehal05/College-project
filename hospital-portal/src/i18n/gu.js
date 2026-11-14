@@ -552,4 +552,7 @@ export default {
   'hd.travel': 'મુસાફરી સમય',
   'ck.none': 'આ કટોકટીના પ્રકાર માટે કોઈ ચેકલિસ્ટ નથી.',
   'ck.saveFail': 'સાચવી શકાયું નહીં: {msg}',
+  'cap.noEmergency': 'ઇમરજન્સી વિભાગ નથી',
+  'rk.notVerified': 'ચકાસેલ નથી',
+  'rk.pts': '{n} ગુણ',
 };
