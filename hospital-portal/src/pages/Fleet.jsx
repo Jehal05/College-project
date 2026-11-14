@@ -7,15 +7,18 @@ import { useHospitals } from '../components/HospitalProvider.jsx';
 import TrackingMap, { formatEta } from '../components/TrackingMap.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { TYPE_LABELS } from '../services/contract.js';
+import { useT } from '../i18n/index.js';
 
+// Label keys (fleet.s.<status>) and colours.
 const STATUS = {
-  available: ['Available', 'bg-emerald-100 text-emerald-800 border-emerald-500'],
-  dispatched: ['Dispatched', 'bg-amber-100 text-amber-900 border-amber-500'],
-  en_route: ['En route', 'bg-red-100 text-red-800 border-red-500'],
-  at_hospital: ['At hospital', 'bg-sky-100 text-sky-800 border-sky-500'],
+  available: 'bg-emerald-100 text-emerald-800 border-emerald-500',
+  dispatched: 'bg-amber-100 text-amber-900 border-amber-500',
+  en_route: 'bg-red-100 text-red-800 border-red-500',
+  at_hospital: 'bg-sky-100 text-sky-800 border-sky-500',
 };
 
 export default function Fleet() {
+  const t = useT();
   const { ambulances, error, movementMode } = useAmbulances();
   const { emergencies } = useEmergencies();
   const { hospitals } = useHospitals();
@@ -26,10 +29,10 @@ export default function Fleet() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Ambulance fleet</h1>
-        <SimulatedBadge text="Simulated fleet. Sample crews." />
+        <h1 className="text-3xl font-bold">{t('fleet.title')}</h1>
+        <SimulatedBadge text={t('fleet.badge')} />
         <span data-testid="fleet-summary" className="ml-auto text-xl font-semibold">
-          {free} of {ambulances.length} available
+          {t('fleet.summary', { free, total: ambulances.length })}
         </span>
       </div>
       <p data-testid="fleet-movement" className="text-slate-600">
@@ -41,16 +44,17 @@ export default function Fleet() {
         <table className="w-full text-left text-lg">
           <thead className="bg-slate-100 text-sm uppercase tracking-wide text-slate-600">
             <tr>
-              <th className="px-4 py-3">Unit</th>
-              <th className="px-4 py-3">Crew</th>
-              <th className="px-4 py-3">Base</th>
-              <th className="px-4 py-3">Current emergency</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">{t('fleet.unit')}</th>
+              <th className="px-4 py-3">{t('fleet.crew')}</th>
+              <th className="px-4 py-3">{t('fleet.base')}</th>
+              <th className="px-4 py-3">{t('fleet.current')}</th>
+              <th className="px-4 py-3">{t('fleet.status')}</th>
             </tr>
           </thead>
           <tbody>
             {ambulances.map((a) => {
-              const [label, style] = STATUS[a.status];
+              const style = STATUS[a.status];
+              const label = t(`fleet.s.${a.status}`);
               const e = emergencies.find((x) => x.emergency_id === a.emergency_id);
               return (
                 <tr key={a.id} data-testid="fleet-row" data-id={a.id} data-status={a.status} className="border-t border-slate-200">
@@ -58,7 +62,7 @@ export default function Fleet() {
                     <b>{a.call_sign}</b> <span className="text-slate-500">({a.id})</span>
                   </td>
                   <td className="px-4 py-3 text-base">
-                    Driver: {a.crew?.driver}<br />Paramedic: {a.crew?.paramedic}
+                    {t('fleet.driver')}: {a.crew?.driver}<br />{t('fleet.paramedic')}: {a.crew?.paramedic}
                   </td>
                   <td className="px-4 py-3 text-base">{hospitalName(a.base_hospital_id)}</td>
                   <td className="px-4 py-3">
@@ -66,11 +70,11 @@ export default function Fleet() {
                       <>
                         <b>{e.emergency_id}</b> · {TYPE_LABELS[e.type] || e.type}
                         {a.status === 'en_route' && e.ambulance?.eta_seconds != null && (
-                          <span className="block text-base text-slate-600">ETA {formatEta(e.ambulance.eta_seconds)} (simulated)</span>
+                          <span className="block text-base text-slate-600">{t('fleet.eta', { time: formatEta(e.ambulance.eta_seconds) })}</span>
                         )}
                       </>
                     ) : (
-                      <span className="text-slate-400">None</span>
+                      <span className="text-slate-400">{t('common.none')}</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -80,15 +84,15 @@ export default function Fleet() {
               );
             })}
             {ambulances.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-6 text-slate-500">No ambulances loaded.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-6 text-slate-500">{t('fleet.none')}</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
       <div>
-        <h2 className="mb-3 text-2xl font-bold">Active trips ({active.length})</h2>
-        {active.length === 0 && <p className="rounded-2xl bg-white p-6 text-slate-500 shadow">No ambulance is out. Dispatch one from the Dashboard.</p>}
+        <h2 className="mb-3 text-2xl font-bold">{t('fleet.trips', { n: active.length })}</h2>
+        {active.length === 0 && <p className="rounded-2xl bg-white p-6 text-slate-500 shadow">{t('fleet.noTrips')}</p>}
         <div className="grid gap-6 xl:grid-cols-2">
           {active.map((e) => (
             <div key={e.emergency_id} className="rounded-2xl bg-white p-4 shadow">

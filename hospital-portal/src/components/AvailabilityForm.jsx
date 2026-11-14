@@ -2,11 +2,13 @@
 // the ranking reads these values, so a change here re-ranks at once.
 import { useEffect, useState } from 'react';
 import { useHospitals } from './HospitalProvider.jsx';
+import { useT } from '../i18n/index.js';
 
 const isWholeNumber = (v) => /^\d+$/.test(String(v).trim());
 
 export default function AvailabilityForm({ hospital }) {
   const { saveAvailability } = useHospitals();
+  const t = useT();
   const [form, setForm] = useState(null);
   const [status, setStatus] = useState({ kind: 'idle', text: '' }); // idle | saving | saved | error
 
@@ -28,15 +30,15 @@ export default function AvailabilityForm({ hospital }) {
     setStatus({ kind: 'idle', text: '' });
   };
   const errors = {
-    beds_free: isWholeNumber(form.beds_free) ? '' : 'Enter a whole number, 0 or more',
-    icu_free: isWholeNumber(form.icu_free) ? '' : 'Enter a whole number, 0 or more',
+    beds_free: isWholeNumber(form.beds_free) ? '' : t('avail.whole'),
+    icu_free: isWholeNumber(form.icu_free) ? '' : t('avail.whole'),
   };
   const invalid = Boolean(errors.beds_free || errors.icu_free);
 
   async function submit(e) {
     e.preventDefault();
     if (invalid) return;
-    setStatus({ kind: 'saving', text: 'Saving…' });
+    setStatus({ kind: 'saving', text: t('common.saving') });
     try {
       await saveAvailability(hospital.id, {
         beds_free: Number(form.beds_free),
@@ -44,9 +46,9 @@ export default function AvailabilityForm({ hospital }) {
         cath_lab_ready: form.cath_lab_ready,
         stroke_unit_ready: form.stroke_unit_ready,
       });
-      setStatus({ kind: 'saved', text: `Saved at ${new Date().toLocaleTimeString()}. Rankings updated.` });
+      setStatus({ kind: 'saved', text: t('avail.saved', { time: new Date().toLocaleTimeString() }) });
     } catch (err) {
-      setStatus({ kind: 'error', text: `Not saved: ${err.message}` });
+      setStatus({ kind: 'error', text: t('avail.notSaved', { msg: err.message }) });
     }
   }
 
@@ -66,7 +68,7 @@ export default function AvailabilityForm({ hospital }) {
   const flag = (key, label, capability) => {
     const has = Boolean(hospital.capabilities?.[capability]);
     return (
-      <label className={`flex items-center gap-3 ${has ? '' : 'opacity-50'}`} title={has ? '' : `This hospital has no ${label.toLowerCase().replace(' ready', '')}`}>
+      <label className={`flex items-center gap-3 ${has ? '' : 'opacity-50'}`} title={has ? '' : t('avail.noUnit')}>
         <input
           type="checkbox"
           name={key}
@@ -75,25 +77,25 @@ export default function AvailabilityForm({ hospital }) {
           disabled={!has}
           onChange={(e) => set(key, e.target.checked)}
         />
-        <span className="font-semibold">{label}{has ? '' : ' (not available here)'}</span>
+        <span className="font-semibold">{label}{has ? '' : t('avail.notHere')}</span>
       </label>
     );
   };
 
   return (
     <form data-testid="availability-form" onSubmit={submit} className="flex flex-wrap items-end gap-x-8 gap-y-4">
-      {number('beds_free', 'Beds free')}
-      {number('icu_free', 'ICU beds free')}
+      {number('beds_free', t('avail.beds'))}
+      {number('icu_free', t('avail.icu'))}
       <div className="space-y-2">
-        {flag('cath_lab_ready', 'Cath lab ready', 'cath_lab')}
-        {flag('stroke_unit_ready', 'Stroke unit ready', 'stroke_unit')}
+        {flag('cath_lab_ready', t('avail.cath'), 'cath_lab')}
+        {flag('stroke_unit_ready', t('avail.stroke'), 'stroke_unit')}
       </div>
       <div className="flex items-center gap-3">
         <button
           disabled={invalid || status.kind === 'saving'}
           className="rounded-lg bg-sky-600 px-5 py-2.5 text-lg font-bold text-white hover:bg-sky-700 disabled:opacity-50"
         >
-          {status.kind === 'saving' ? 'Saving…' : 'Save availability'}
+          {status.kind === 'saving' ? t('common.saving') : t('avail.save')}
         </button>
         {status.text && status.kind !== 'saving' && (
           <span

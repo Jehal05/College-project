@@ -39,3 +39,34 @@ test('languages list matches dictionaries', () => assert.deepEqual(LANGS.map((l)
 test('no dictionary translates symptom words (no symptom keys exist)', () => {
   assert.ok(!Object.keys(en).some((k) => /symptom/i.test(k)));
 });
+
+// Every literal key passed to t('...') in the app must exist, so a screen can never show a raw key.
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+
+function sourceFiles(dir) {
+  return readdirSync(dir).flatMap((n) => {
+    const p = join(dir, n);
+    if (statSync(p).isDirectory()) return sourceFiles(p);
+    return /\.(jsx?|mjs)$/.test(n) && !/\.test\./.test(n) ? [p] : [];
+  });
+}
+
+test('every literal t("key") used in the source exists in en, hi and gu', () => {
+  const missing = [];
+  for (const file of sourceFiles(new URL('..', import.meta.url).pathname)) {
+    for (const m of readFileSync(file, 'utf8').matchAll(/\bt\('([a-zA-Z0-9_.]+)'/g)) {
+      if (!(m[1] in en && m[1] in hi && m[1] in gu)) missing.push(`${file.split('/src/')[1]}: ${m[1]}`);
+    }
+  }
+  assert.deepEqual(missing, []);
+});
+
+test('keys built from a template (an.step.*, act.k.*, act.w.*, admin.cap.*, fleet.s.*) exist for every value', () => {
+  const need = [];
+  for (const k of ['alert_to_ack', 'ack_to_dispatch', 'dispatch_to_arrival', 'arrival_to_handover']) need.push(`an.step.${k}`);
+  for (const k of ['all', 'state', 'note', 'checklist']) need.push(`act.k.${k}`);
+  for (const k of ['all', 'staff', 'patient', 'ambulance', 'system']) need.push(`act.w.${k}`);
+  for (const k of ['cath_lab', 'stroke_unit', 'icu', 'emergency']) need.push(`admin.cap.${k}`);
+  for (const k of need) assert.ok(k in en && k in hi && k in gu, k);
+});

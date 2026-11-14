@@ -47,7 +47,7 @@ export default function Login() {
 
         <label className="block">
           <span className="font-medium" data-testid="login-label">{LOGIN_FIELD === 'username' ? t('login.username') : t('login.email')}</span>
-          {LOGIN_FIELD === 'username' && <span className="ml-2 text-sm text-slate-500">The backend asks for a username, not an email.</span>}
+          {LOGIN_FIELD === 'username' && <span className="ml-2 text-sm text-slate-500">{t('login.usernameHint')}</span>}
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -77,9 +77,7 @@ export default function Login() {
         </button>
 
         {USE_MOCK && (
-          <p className="text-sm text-slate-500">
-            Mock mode demo accounts: <b>staff@demo</b> or <b>admin@demo</b>, password <b>demo123</b>. Jehal&apos;s logins also work: <b>staff@demo.test</b> / <b>demo1234</b> and <b>staff1</b> / <b>demo-password</b>.
-          </p>
+          <p className="text-sm text-slate-500">{t('login.demoAccounts')}</p>
         )}
       </form>
     </div>

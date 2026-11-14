@@ -20,13 +20,13 @@ export function needsTakeOver(alert, hospitalId) {
 
 /** Check the reason. `kind` is one of REASONS; for "other" the text is required. */
 export function checkReason(kind, text = '', labels = {}) {
-  if (!REASONS.includes(kind)) return { ok: false, reason: '', error: 'Choose a reason.' };
+  if (!REASONS.includes(kind)) return { ok: false, reason: '', error: 'Choose a reason.', code: 'choose' };
   const free = String(text ?? '').trim();
-  if (free.length > MAX_REASON) return { ok: false, reason: '', error: `The reason is too long (${MAX_REASON} letters at most).` };
-  if (kind === 'other' && !free) return { ok: false, reason: '', error: 'Write the reason.' };
+  if (free.length > MAX_REASON) return { ok: false, reason: '', error: `The reason is too long (${MAX_REASON} letters at most).`, code: 'long' };
+  if (kind === 'other' && !free) return { ok: false, reason: '', error: 'Write the reason.', code: 'write' };
   const label = kind === 'other' ? '' : labels[kind] || kind;
   const reason = [label, free].filter(Boolean).join(': ');
-  return { ok: true, reason, error: null };
+  return { ok: true, reason, error: null, code: null };
 }
 
 /** The timeline note. */

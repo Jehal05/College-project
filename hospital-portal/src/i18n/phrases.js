@@ -19,3 +19,6 @@ export const actionText = (t, target, english) => withFallback(t, `action.${targ
 const CAP = { Ready: 'cap.ready', 'Not ready': 'cap.notReady', 'Not shared': 'common.notShared', 'No cath lab': 'cap.noCath', 'No stroke unit': 'cap.noStroke', 'No ICU': 'cap.noIcu' };
 /** Words the capacity strip gets from services/capacity.js. Numbers and unknown words pass through. */
 export const capText = (t, text) => (CAP[text] ? t(CAP[text]) : text);
+
+/** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
+export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);

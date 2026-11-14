@@ -69,7 +69,7 @@ export default function Dashboard() {
           onClick={() => setShowAvailability((v) => !v)}
           className="ml-auto rounded-lg border-2 border-slate-300 bg-white px-4 py-2 font-semibold hover:bg-slate-50"
         >
-          {showAvailability ? 'Hide beds and ICU' : 'Update beds and ICU'}
+          {showAvailability ? t('dash.hideBeds') : t('dash.updateBeds')}
         </button>
         {USE_MOCK && (
           <>
@@ -78,14 +78,14 @@ export default function Dashboard() {
               onClick={() => mockCreateEmergency()}
               className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-white hover:bg-slate-700"
             >
-              + Simulate new alert
+              {t('dash.simNew')}
             </button>
             <button
               data-testid="mock-early"
               onClick={() => mockCreateEarlyNotice('HEART')}
               className="rounded-lg border-2 border-slate-700 px-4 py-2 font-semibold text-slate-800 hover:bg-slate-100"
             >
-              + Simulate early notice
+              {t('dash.simEarly')}
             </button>
           </>
         )}
@@ -113,7 +113,7 @@ export default function Dashboard() {
               </span>
             )}
           </h2>
-          <div className="mb-3 flex flex-wrap items-center gap-3" role="group" aria-label="Which alerts to show">
+          <div className="mb-3 flex flex-wrap items-center gap-3" role="group" aria-label={t('dash.scopeLabel')}>
             {[['mine', t('dash.mine')], ['all', t('dash.all')]].map(([value, label]) => (
               <button
                 key={value}
@@ -127,13 +127,19 @@ export default function Dashboard() {
             ))}
             {hidden > 0 && (
               <span data-testid="hidden-count" className="text-sm font-semibold text-slate-600">
-                {hidden} alert{hidden === 1 ? '' : 's'} at other hospitals
+                {hidden === 1 ? t('dash.otherOne') : t('dash.otherMany', { n: hidden })}
               </span>
+            )}
+            {/* In "My hospital" the desk is told that alerts exist elsewhere, with one click to see them. */}
+            {scope === 'mine' && hidden > 0 && (
+              <button data-testid="show-all-link" onClick={() => setScope('all')} className="text-sm font-semibold text-sky-700 underline">
+                {t('dash.showAll')}
+              </button>
             )}
           </div>
           {loading && emergencies.length === 0 && <p className="text-slate-500">{t('dash.loading')}</p>}
-          {!loading && emergencies.length === 0 && <p data-testid="queue-empty" className="text-slate-500">{scope === 'mine' ? 'No active alerts for this hospital.' : 'No active alerts.'}</p>}
-          <ul ref={listRef} aria-label="Alert queue" onKeyDown={onListKeyDown} className="space-y-3">
+          {!loading && emergencies.length === 0 && <p data-testid="queue-empty" className="text-slate-500">{scope === 'mine' ? t('dash.emptyMine') : t('dash.emptyAll')}</p>}
+          <ul ref={listRef} aria-label={t('dash.queueLabel')} onKeyDown={onListKeyDown} className="space-y-3">
             {emergencies.map((e) => (
               <li key={e.emergency_id}>
                 <AlertCard
@@ -148,7 +154,7 @@ export default function Dashboard() {
 
         {/* Right: detail panel */}
         <section className="rounded-2xl bg-white p-6 shadow">
-          {selected ? <EmergencyDetail emergency={selected} /> : <p className="text-slate-500">Select an alert to see its details.</p>}
+          {selected ? <EmergencyDetail emergency={selected} /> : <p className="text-slate-500">{t('dash.selectAlert')}</p>}
         </section>
       </div>
     </div>

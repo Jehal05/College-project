@@ -6,9 +6,11 @@ import { getMessages, onChat, sendMessage } from '../services/chatStore.js';
 import { USE_MOCK, mockCrewReply, CANNED_CREW_REPLIES } from '../services/api.js';
 import { formatTime } from './AlertCard.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
+import { useT } from '../i18n/index.js';
 
 export default function ChatPanel({ emergencyId, role, senderName }) {
   const messages = useSyncExternalStore(onChat, () => getMessages(emergencyId));
+  const t = useT();
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const box = useRef(null);
@@ -26,26 +28,26 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
       await sendMessage(emergencyId, clean, role, senderName);
       setText('');
     } catch (err) {
-      setError(`Message not sent: ${err.message}`);
+      setError(t('chat.notSent', { msg: err.message }));
     }
   }
 
   return (
     <div data-testid="chat" data-role={role}>
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <SimulatedBadge text="Simulated chat" />
-        <span className="text-sm text-slate-500">{role === 'desk' ? 'Hospital desk ↔ ambulance crew' : 'Ambulance crew ↔ hospital desk'}</span>
+        <SimulatedBadge text={t('chat.badge')} />
+        <span className="text-sm text-slate-500">{role === 'desk' ? t('chat.deskCrew') : t('chat.crewDesk')}</span>
       </div>
 
       <div ref={box} data-testid="chat-messages" className="h-56 space-y-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
-        {messages.length === 0 && <p className="text-slate-400">No messages yet.</p>}
+        {messages.length === 0 && <p className="text-slate-400">{t('chat.none')}</p>}
         {messages.map((m) => {
           const mine = m.sender_role === role;
           return (
             <div key={m.message_id} data-sender={m.sender_role} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] rounded-2xl px-4 py-2 ${mine ? 'bg-sky-600 text-white' : 'bg-white shadow'}`}>
                 <div className={`text-xs font-semibold ${mine ? 'text-sky-100' : 'text-slate-500'}`}>
-                  {m.sender_name || (m.sender_role === 'crew' ? 'Ambulance crew' : 'Hospital desk')} · {formatTime(m.timestamp)}
+                  {m.sender_name || (m.sender_role === 'crew' ? t('chat.crew') : t('chat.desk'))} · {formatTime(m.timestamp)}
                 </div>
                 <div className="text-lg">{m.text}</div>
               </div>
@@ -65,12 +67,12 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
           data-testid="chat-input"
           value={text}
           onChange={(ev) => setText(ev.target.value)}
-          placeholder="Type a message"
+          placeholder={t('chat.placeholder')}
           maxLength={300}
           className="min-w-0 flex-1 rounded-lg border-2 border-slate-300 px-3 py-2 text-lg"
         />
         <button data-testid="chat-send" disabled={!text.trim()} className="rounded-lg bg-sky-600 px-5 py-2 text-lg font-bold text-white disabled:opacity-50">
-          Send
+          {t('chat.send')}
         </button>
       </form>
 
@@ -87,7 +89,7 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
         <div className="mt-2 flex flex-wrap items-center gap-3">
           {/* eslint-disable-next-line react/jsx-no-target-blank -- same-site link; the new tab must inherit this tab's login (sessionStorage), so no noreferrer */}
           <a href={`/crew/${emergencyId}`} target="_blank" rel="opener" data-testid="crew-link" className="font-semibold text-sky-700 underline">
-            Open the crew view in a new tab
+            {t('chat.openCrew')}
           </a>
           {USE_MOCK && (
             <button
@@ -95,7 +97,7 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
               onClick={() => mockCrewReply(emergencyId)}
               className="rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-3 py-1 font-semibold text-amber-900"
             >
-              Mock: crew replies
+              {t('chat.mockReply')}
             </button>
           )}
         </div>

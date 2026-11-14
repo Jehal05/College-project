@@ -11,7 +11,7 @@ import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
-import { stateText } from '../i18n/phrases.js';
+import { stateText, severityText } from '../i18n/phrases.js';
 
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -67,7 +67,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
         {cancelled ? (
           <span className="rounded-full bg-slate-700 px-3 py-0.5 text-sm font-bold text-white">{t('card.cancelled')}</span>
         ) : (
-          <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${SEVERITY_STYLES[severity] || SEVERITY_STYLES.NONE}`}>{severity}{alert.severity_missing ? '?' : ''}</span>
+          <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${SEVERITY_STYLES[severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, severity)}{alert.severity_missing ? '?' : ''}</span>
         )}
       </div>
       <div className="mt-1 text-slate-600">
@@ -75,9 +75,9 @@ export default function AlertCard({ alert, selected, onSelect }) {
       </div>
       <div className="mt-2 text-slate-800" data-testid="card-symptoms">{fromCheckIn || (symptoms || []).join(', ') || t('common.notShared')}</div>
       <div className="mt-2 flex flex-wrap gap-x-4 text-slate-600">
-        <span>HR {vitals.heart_rate ?? '–'}</span>
+        <span>{t('card.hr')} {vitals.heart_rate ?? '–'}</span>
         <span>SpO₂ {vitals.spo2 ?? '–'}%</span>
-        <span>BP {vitals.bp ?? '–'}</span>
+        <span>{t('card.bp')} {vitals.bp ?? '–'}</span>
         <span className="ml-auto text-sm text-slate-500">
           {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : t('card.locationNotShared')}
         </span>

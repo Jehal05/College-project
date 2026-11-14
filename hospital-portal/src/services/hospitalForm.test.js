@@ -61,3 +61,14 @@ test('an unverified hospital is never ranked, even if it is the best and nearest
   const after = rankHospitals([...hospitals, { ...best, verified: true }], 'HEART', { lat: 23.0225, lng: 72.5714 }, config);
   assert.ok(after.ranked.some((r) => r.hospital.id === 'H9'));
 });
+
+test('every error also has an i18n key, and every key exists in all three languages', async () => {
+  const { validateHospital: v } = await import('./hospitalForm.js');
+  const en = (await import('../i18n/en.js')).default;
+  const hi = (await import('../i18n/hi.js')).default;
+  const gu = (await import('../i18n/gu.js')).default;
+  const bad = { name: '', address: '', phone: 'x', lat: '', lng: '', capabilities: {}, availability: { beds_free: 'a', icu_free: 'b', cath_lab_ready: true, stroke_unit_ready: true } };
+  const r = v(bad);
+  assert.deepEqual(Object.keys(r.errorKeys).sort(), Object.keys(r.errors).sort());
+  for (const key of Object.values(r.errorKeys)) for (const d of [en, hi, gu]) assert.ok(d[key], `missing ${key}`);
+});

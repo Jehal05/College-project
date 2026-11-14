@@ -7,7 +7,9 @@ import BarChart, { PALETTE } from '../components/BarChart.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { summarise, STEPS } from '../services/analytics.js';
 import { formatSeconds } from '../services/report.js';
-import { EMERGENCY_TYPES, TYPE_LABELS, STATE_LABELS } from '../services/contract.js';
+import { EMERGENCY_TYPES, TYPE_LABELS } from '../services/contract.js';
+import { useT } from '../i18n/index.js';
+import { stateText, severityText } from '../i18n/phrases.js';
 
 const SEVERITY_COLORS = { EMERGENCY: '#D55E00', URGENT: '#E69F00', WATCH: '#0072B2' };
 
@@ -22,54 +24,54 @@ function Tile({ label, value, testId, note }) {
 }
 
 export default function Analytics() {
+  const t = useT();
   const { cases, loading, error } = useHistory();
   const { ambulances } = useAmbulances();
   const s = useMemo(() => summarise(cases, ambulances), [cases, ambulances]);
   const samples = cases.filter((c) => c.sample).length;
 
   const stateRows = Object.entries(s.byState)
-    .map(([state, value]) => ({ label: (STATE_LABELS[state] || state).split(' · ')[0], value }))
+    .map(([state, value]) => ({ label: stateText(t, state).split(' · ')[0], value }))
     .sort((a, b) => b.value - a.value);
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Analytics</h1>
-        <SimulatedBadge text="Simulated cases" />
-        {loading && <span className="text-slate-500">Loading…</span>}
+        <h1 className="text-3xl font-bold">{t('an.title')}</h1>
+        <SimulatedBadge text={t('an.badge')} />
+        {loading && <span className="text-slate-500">{t('common.loading')}</span>}
       </div>
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
       <p data-testid="data-source" className="rounded-xl bg-sky-50 p-3 text-slate-700">
-        Worked out from the stored timeline of {s.total} case{s.total === 1 ? '' : 's'}
-        {samples > 0 ? `, including ${samples} sample past cases made up for the demo` : ''}. All values are simulated.
+        {t(s.total === 1 ? 'an.sourceOne' : 'an.source', { n: s.total, extra: samples > 0 ? t('an.samples', { n: samples }) : '' })}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Tile testId="tile-total" label="Emergencies" value={s.total} note={`${s.open} still open`} />
-        <Tile testId="tile-finished" label="Handed over" value={s.finished} />
-        <Tile testId="tile-cancelled" label="Cancelled (false alarm)" value={s.cancelled} />
-        <Tile testId="tile-escalations" label="Escalated to next hospital" value={s.escalations.cases} note={`${s.escalations.times} time${s.escalations.times === 1 ? '' : 's'} in total`} />
+        <Tile testId="tile-total" label={t('an.emerg')} value={s.total} note={t('an.stillOpen', { n: s.open })} />
+        <Tile testId="tile-finished" label={t('an.handed')} value={s.finished} />
+        <Tile testId="tile-cancelled" label={t('an.cancelled')} value={s.cancelled} />
+        <Tile testId="tile-escalations" label={t('an.escalated')} value={s.escalations.cases} note={s.escalations.times === 1 ? t('an.timesOne') : t('an.timesMany', { n: s.escalations.times })} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <BarChart
           testId="chart-type"
-          title="Emergencies by type"
-          axisLabel="Number of emergencies"
-          rows={EMERGENCY_TYPES.map((t, i) => ({ label: TYPE_LABELS[t], value: s.byType[t] || 0, color: PALETTE[i] }))}
+          title={t('an.byType')}
+          axisLabel={t('an.axisNum')}
+          rows={EMERGENCY_TYPES.map((ty, i) => ({ label: TYPE_LABELS[ty], value: s.byType[ty] || 0, color: PALETTE[i] }))}
         />
         <BarChart
           testId="chart-severity"
-          title="Emergencies by severity"
-          axisLabel="Number of emergencies"
-          rows={Object.entries(s.bySeverity).map(([k, v]) => ({ label: k, value: v, color: SEVERITY_COLORS[k] }))}
+          title={t('an.bySeverity')}
+          axisLabel={t('an.axisNum')}
+          rows={Object.entries(s.bySeverity).map(([k, v]) => ({ label: severityText(t, k), value: v, color: SEVERITY_COLORS[k] }))}
         />
-        <BarChart testId="chart-state" title="Emergencies by state" axisLabel="Number of emergencies" rows={stateRows} color={PALETTE[2]} />
+        <BarChart testId="chart-state" title={t('an.byState')} axisLabel={t('an.axisNum')} rows={stateRows} color={PALETTE[2]} />
         <BarChart
           testId="chart-ambulance"
-          title="Ambulance use"
-          axisLabel="Trips per unit"
-          emptyText="Not enough data yet. No ambulance has been sent."
+          title={t('an.ambUse')}
+          axisLabel={t('an.axisTrips')}
+          emptyText={t('an.noAmb')}
           rows={s.ambulance.units.map((u) => ({ label: u.name, value: u.trips }))}
           color={PALETTE[3]}
         />
@@ -77,18 +79,18 @@ export default function Analytics() {
 
       <BarChart
         testId="chart-steps"
-        title="Average time for each step"
-        axisLabel="Average time (shorter is faster)"
-        emptyText="Not enough data yet. No emergency has reached these steps."
+        title={t('an.stepsTitle')}
+        axisLabel={t('an.stepsAxis')}
+        emptyText={t('an.noSteps')}
         color={PALETTE[0]}
         rows={STEPS.map((step) => {
           const a = s.averages[step.key];
-          return { label: step.label, value: a.seconds ?? 0, text: a.seconds === null ? 'No data' : `${formatSeconds(a.seconds)} (${a.count})` };
+          return { label: t(`an.step.${step.key}`), value: a.seconds ?? 0, text: a.seconds === null ? t('an.noData') : `${formatSeconds(a.seconds)} (${a.count})` };
         })}
       />
       <p className="text-slate-500">
-        The number in brackets is how many cases the average is based on.
-        {s.averageTotal.seconds !== null && <> Average total time from alert to the end: <b>{formatSeconds(s.averageTotal.seconds)}</b> ({s.averageTotal.count} cases).</>}
+        {t('an.bracket')}
+        {s.averageTotal.seconds !== null && <> {t('an.avgTotal', { time: formatSeconds(s.averageTotal.seconds), n: s.averageTotal.count })}</>}
       </p>
     </div>
   );

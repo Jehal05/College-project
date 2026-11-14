@@ -11,8 +11,6 @@ import { useT } from '../i18n/index.js';
 import { buildActivity, filterActivity, auditRows, auditError, KINDS, WHO } from '../services/activity.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
-const KIND_LABELS = { all: 'All kinds', state: 'Status changes', note: 'Notes', checklist: 'Checklist ticks' };
-const WHO_LABELS = { all: 'Everyone', staff: 'Hospital staff', patient: 'Patient app', ambulance: 'Ambulance', system: 'System' };
 const when = (iso) => new Date(iso).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 function AuditLog() {
@@ -76,32 +74,32 @@ export default function Activity() {
     <div className="space-y-5 p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold">{t('activity.title')}</h1>
-        <SimulatedBadge text="Simulated cases · sample patients" />
-        <span data-testid="activity-count" className="ml-auto text-xl font-semibold">{rows.length} of {all.length} entries</span>
+        <SimulatedBadge text={t('hist.badge')} />
+        <span data-testid="activity-count" className="ml-auto text-xl font-semibold">{t('act.count', { n: rows.length, total: all.length })}</span>
       </div>
       {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
 
       <div className="grid gap-3 rounded-2xl bg-white p-4 shadow md:grid-cols-3">
-        <label className="block"><span className="text-sm text-slate-600">Kind</span>
-          <select data-testid="activity-kind" className={`${field} w-full`} value={f.kind} onChange={set('kind')}>{KINDS.map((k) => <option key={k} value={k}>{KIND_LABELS[k]}</option>)}</select></label>
-        <label className="block"><span className="text-sm text-slate-600">Who</span>
-          <select data-testid="activity-who" className={`${field} w-full`} value={f.who} onChange={set('who')}>{WHO.map((k) => <option key={k} value={k}>{WHO_LABELS[k]}</option>)}</select></label>
-        <label className="block"><span className="text-sm text-slate-600">Search (case ID, person, words)</span>
+        <label className="block"><span className="text-sm text-slate-600">{t('act.kind')}</span>
+          <select data-testid="activity-kind" className={`${field} w-full`} value={f.kind} onChange={set('kind')}>{KINDS.map((k) => <option key={k} value={k}>{t(`act.k.${k}`)}</option>)}</select></label>
+        <label className="block"><span className="text-sm text-slate-600">{t('act.who')}</span>
+          <select data-testid="activity-who" className={`${field} w-full`} value={f.who} onChange={set('who')}>{WHO.map((k) => <option key={k} value={k}>{t(`act.w.${k}`)}</option>)}</select></label>
+        <label className="block"><span className="text-sm text-slate-600">{t('act.search')}</span>
           <input data-testid="activity-search" className={`${field} w-full`} value={f.text} onChange={set('text')} /></label>
       </div>
 
-      {loading && <p>Loading…</p>}
-      {!loading && rows.length === 0 && <p data-testid="activity-empty" className="rounded-xl bg-white p-6 text-xl shadow">No activity matches these filters.</p>}
+      {loading && <p>{t('common.loading')}</p>}
+      {!loading && rows.length === 0 && <p data-testid="activity-empty" className="rounded-xl bg-white p-6 text-xl shadow">{t('act.empty')}</p>}
       {rows.length > 0 && (
-        <ol data-testid="activity-list" aria-label="Activity, newest first" className="divide-y divide-slate-200 rounded-2xl bg-white shadow">
+        <ol data-testid="activity-list" aria-label={t('act.listLabel')} className="divide-y divide-slate-200 rounded-2xl bg-white shadow">
           {rows.map((x) => (
             <li key={x.id} data-kind={x.kind} data-who={x.who} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 p-3">
               <time dateTime={x.ts} className="w-44 shrink-0 font-semibold tabular-nums text-slate-700">{when(x.ts)}</time>
               <Link to={`/report/${x.emergency_id}?t=${encodeURIComponent(x.case_key.split('|')[1] || '')}`} className="font-bold text-sky-800 underline">{x.emergency_id}</Link>
               <span className="text-sm text-slate-500">{x.type_label}</span>
               <span data-testid="activity-text" className="text-lg">{x.text}</span>
-              <span className="ml-auto text-slate-600">{x.actor || 'System'} <span className="text-sm">({WHO_LABELS[x.who]})</span></span>
-              {x.local_only && <span className="text-sm font-semibold text-amber-800">saved on this screen only</span>}
+              <span className="ml-auto text-slate-600">{x.actor || t('act.system')} <span className="text-sm">({t(`act.w.${x.who}`)})</span></span>
+              {x.local_only && <span className="text-sm font-semibold text-amber-800">{t('act.localOnly')}</span>}
             </li>
           ))}
         </ol>

@@ -49,14 +49,14 @@ export default function NavBar() {
         <div className="ml-auto flex items-center gap-3">
           {USE_MOCK && !confirmReset && (
             <button data-testid="reset-demo" onClick={() => setConfirmReset(true)} className="rounded-lg border border-amber-400 px-3 py-1.5 text-amber-200 hover:bg-slate-700">
-              Reset demo
+              {t('nav.resetDemo')}
             </button>
           )}
           {USE_MOCK && confirmReset && (
             <span data-testid="reset-confirm" className="flex items-center gap-2 rounded-lg bg-amber-100 px-3 py-1 text-slate-900">
-              Restore the starting data?
-              <button data-testid="reset-yes" onClick={resetDemo} className="rounded bg-red-600 px-3 py-1 font-bold text-white">Yes, reset</button>
-              <button data-testid="reset-no" onClick={() => setConfirmReset(false)} className="rounded bg-slate-300 px-3 py-1 font-semibold">No</button>
+              {t('nav.resetAsk')}
+              <button data-testid="reset-yes" onClick={resetDemo} className="rounded bg-red-600 px-3 py-1 font-bold text-white">{t('nav.resetYes')}</button>
+              <button data-testid="reset-no" onClick={() => setConfirmReset(false)} className="rounded bg-slate-300 px-3 py-1 font-semibold">{t('nav.resetNo')}</button>
             </span>
           )}
           {session?.hospital_from_login === false && hospitals.length > 0 && (

@@ -13,9 +13,9 @@ export function checkNote(raw, max = MAX_NOTE_LENGTH) {
   const text = String(raw ?? '').trim();
   const length = text.length;
   const remaining = max - String(raw ?? '').length;
-  if (length === 0) return { ok: false, text, length, remaining, error: 'Write a note first.' };
-  if (length > max) return { ok: false, text, length, remaining, error: `The note is ${length - max} characters too long (limit ${max}).` };
-  return { ok: true, text, length, remaining, error: null };
+  if (length === 0) return { ok: false, text, length, remaining, error: 'Write a note first.', code: 'empty' };
+  if (length > max) return { ok: false, text, length, remaining, error: `The note is ${length - max} characters too long (limit ${max}).`, code: 'long', over: length - max, max };
+  return { ok: true, text, length, remaining, error: null, code: null };
 }
 
 export const counterText = (raw, max = MAX_NOTE_LENGTH) => `${String(raw ?? '').length} / ${max}`;

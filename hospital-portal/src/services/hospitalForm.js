@@ -19,35 +19,41 @@ const isWhole = (v) => /^\d+$/.test(String(v).trim());
  */
 export function validateHospital(form) {
   const errors = {};
+  const keys = {}; // field -> i18n key of the same message (the screen shows it in the chosen language)
+  const fail = (field, key, text) => {
+    errors[field] = text;
+    keys[field] = key;
+  };
   const name = String(form.name ?? '').trim();
-  if (name.length < 3) errors.name = 'Enter the hospital name (at least 3 letters).';
-  else if (name.length > 80) errors.name = 'Name is too long (80 letters at most).';
+  if (name.length < 3) fail('name', 'hf.nameShort', 'Enter the hospital name (at least 3 letters).');
+  else if (name.length > 80) fail('name', 'hf.nameLong', 'Name is too long (80 letters at most).');
 
   const address = String(form.address ?? '').trim();
-  if (!address) errors.address = 'Enter the address.';
+  if (!address) fail('address', 'hf.address', 'Enter the address.');
 
   const phone = String(form.phone ?? '').trim();
-  if (!/^\+?[0-9][0-9 -]{5,18}[0-9]$/.test(phone)) errors.phone = 'Enter a phone number: digits, spaces or dashes, 7 to 20 characters.';
+  if (!/^\+?[0-9][0-9 -]{5,18}[0-9]$/.test(phone)) fail('phone', 'hf.phone', 'Enter a phone number: digits, spaces or dashes, 7 to 20 characters.');
 
   const lat = Number(String(form.lat).trim());
   const lng = Number(String(form.lng).trim());
-  if (String(form.lat).trim() === '' || !Number.isFinite(lat) || lat < -90 || lat > 90) errors.lat = 'Latitude must be a number from -90 to 90.';
-  if (String(form.lng).trim() === '' || !Number.isFinite(lng) || lng < -180 || lng > 180) errors.lng = 'Longitude must be a number from -180 to 180.';
+  if (String(form.lat).trim() === '' || !Number.isFinite(lat) || lat < -90 || lat > 90) fail('lat', 'hf.lat', 'Latitude must be a number from -90 to 90.');
+  if (String(form.lng).trim() === '' || !Number.isFinite(lng) || lng < -180 || lng > 180) fail('lng', 'hf.lng', 'Longitude must be a number from -180 to 180.');
 
   const caps = form.capabilities || {};
-  if (!CAPABILITY_KEYS.some((k) => caps[k])) errors.capabilities = 'Tick at least one capability.';
+  if (!CAPABILITY_KEYS.some((k) => caps[k])) fail('capabilities', 'hf.caps', 'Tick at least one capability.');
 
   const a = form.availability || {};
-  if (!isWhole(a.beds_free ?? '')) errors.beds_free = 'Beds free: a whole number, 0 or more.';
-  if (!isWhole(a.icu_free ?? '')) errors.icu_free = 'ICU beds free: a whole number, 0 or more.';
-  if (a.cath_lab_ready && !caps.cath_lab) errors.cath_lab_ready = 'The cath lab cannot be ready if the hospital has no cath lab.';
-  if (a.stroke_unit_ready && !caps.stroke_unit) errors.stroke_unit_ready = 'The stroke unit cannot be ready if the hospital has no stroke unit.';
-  if (Number(a.icu_free) > 0 && !caps.icu && isWhole(a.icu_free)) errors.icu_free = 'ICU beds are free, but the hospital has no ICU ticked.';
+  if (!isWhole(a.beds_free ?? '')) fail('beds_free', 'hf.beds', 'Beds free: a whole number, 0 or more.');
+  if (!isWhole(a.icu_free ?? '')) fail('icu_free', 'hf.icu', 'ICU beds free: a whole number, 0 or more.');
+  if (a.cath_lab_ready && !caps.cath_lab) fail('cath_lab_ready', 'hf.cathReady', 'The cath lab cannot be ready if the hospital has no cath lab.');
+  if (a.stroke_unit_ready && !caps.stroke_unit) fail('stroke_unit_ready', 'hf.strokeReady', 'The stroke unit cannot be ready if the hospital has no stroke unit.');
+  if (Number(a.icu_free) > 0 && !caps.icu && isWhole(a.icu_free)) fail('icu_free', 'hf.icuNoIcu', 'ICU beds are free, but the hospital has no ICU ticked.');
 
   const ok = Object.keys(errors).length === 0;
   return {
     ok,
     errors,
+    errorKeys: keys,
     value: ok
       ? {
           name,

@@ -16,6 +16,7 @@ import { patientIcon, aedIcon, responderIcon } from '../components/mapIcons.js';
 import aedData from '../data/aed.json';
 import responderData from '../data/responders.json';
 import { nearestAeds, respondersNear, withDistanceFrom } from '../services/nearby.js';
+import { useT } from '../i18n/index.js';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
 function hospitalIcon(h, selected, isTop) {
@@ -40,6 +41,7 @@ function hospitalIcon(h, selected, isTop) {
 }
 
 export default function MapPage() {
+  const t = useT();
   const { hospitals: stored, loading, error } = useHospitals();
   const { session } = useAuth();
   const [type, setType] = useState('');
@@ -66,26 +68,26 @@ export default function MapPage() {
     <div className="grid gap-6 p-6 lg:grid-cols-[1fr_420px]">
       <section className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">Nearby hospitals</h1>
-          <SimulatedBadge text={`Simulated ETA · assumed ${ASSUMED_SPEED_KMH} km/h`} />
+          <h1 className="text-3xl font-bold">{t('map.title')}</h1>
+          <SimulatedBadge text={t('map.badge', { kmh: ASSUMED_SPEED_KMH })} />
           <label className="ml-auto flex items-center gap-2 text-lg">
             <input data-testid="toggle-aed" type="checkbox" className="h-6 w-6" checked={showAed} onChange={(e) => setShowAed(e.target.checked)} />
-            AED locations (sample)
+            {t('map.aed')}
           </label>
           <label className="flex items-center gap-2 text-lg">
             <input data-testid="toggle-responders" type="checkbox" className="h-6 w-6" checked={showResponders} onChange={(e) => setShowResponders(e.target.checked)} />
-            Community responders (sample)
+            {t('map.responders')}
           </label>
           <label className="flex items-center gap-2">
-            <span className="font-medium">Emergency type</span>
+            <span className="font-medium">{t('map.type')}</span>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg"
             >
-              <option value="">All (no filter)</option>
-              {EMERGENCY_TYPES.map((t) => (
-                <option key={t} value={t}>{TYPE_LABELS[t]}</option>
+              <option value="">{t('map.allTypes')}</option>
+              {EMERGENCY_TYPES.map((ty) => (
+                <option key={ty} value={ty}>{TYPE_LABELS[ty]}</option>
               ))}
             </select>
           </label>
@@ -96,7 +98,7 @@ export default function MapPage() {
         <div className="relative h-[560px] overflow-hidden rounded-2xl shadow">
           {loading && (
             <div className="absolute inset-0 z-[1000] grid place-items-center bg-white/60 text-xl font-semibold">
-              Loading hospitals…
+              {t('map.loading')}
             </div>
           )}
           <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={12} className="h-full w-full">
@@ -105,7 +107,7 @@ export default function MapPage() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <Marker position={[origin.lat, origin.lng]} icon={patientIcon}>
-              <Tooltip direction="top" offset={[0, -12]}>{origin.label} (simulated)</Tooltip>
+              <Tooltip direction="top" offset={[0, -12]}>{t('map.patientTip', { label: origin.label })}</Tooltip>
             </Marker>
             <Circle
               center={[origin.lat, origin.lng]}
@@ -138,38 +140,38 @@ export default function MapPage() {
         </div>
 
         <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-          <span><b className="text-sky-600">●</b> Hospital</span>
-          <span><b className="text-emerald-600">●</b> Has needed capability</span>
-          <span><b className="text-slate-400">●</b> Missing a needed capability</span>
-          <span><b className="text-yellow-500">●</b> Top ranked (yellow ring)</span>
-          <span><b className="text-red-600">●</b> Patient (demo location)</span>
-          <span>CL = Cath Lab · SU = Stroke Unit</span>
-          {showAed && <span><b className="text-emerald-600">■</b> AED (sample)</span>}
-          {showResponders && <span><b className="text-purple-600">●</b> Community responder (sample)</span>}
+          <span><b className="text-sky-600">●</b> {t('map.l.hospital')}</span>
+          <span><b className="text-emerald-600">●</b> {t('map.l.has')}</span>
+          <span><b className="text-slate-400">●</b> {t('map.l.missing')}</span>
+          <span><b className="text-yellow-500">●</b> {t('map.l.top')}</span>
+          <span><b className="text-red-600">●</b> {t('map.l.patient')}</span>
+          <span>{t('map.l.abbr')}</span>
+          {showAed && <span><b className="text-emerald-600">■</b> {t('map.l.aed')}</span>}
+          {showResponders && <span><b className="text-purple-600">●</b> {t('map.l.resp')}</span>}
         </div>
       </section>
 
       <aside className="space-y-4">
         {showAed && nearAed && (
           <div data-testid="nearest-aed" className="rounded-2xl border-2 border-emerald-500 bg-white p-4 shadow">
-            <h2 className="text-lg font-bold">Nearest AED to the patient</h2>
+            <h2 className="text-lg font-bold">{t('map.nearAed')}</h2>
             <p className="text-xl font-semibold">{nearAed.name}</p>
-            <p>{nearAed.distance_km} km away · about {nearAed.walk_min} min on foot (simulated)</p>
-            <p className="text-sm text-slate-500">Sample data. {nearAed.note}</p>
+            <p>{t('map.aedAway', { km: nearAed.distance_km, min: nearAed.walk_min })}</p>
+            <p className="text-sm text-slate-500">{t('map.sampleData', { note: nearAed.note })}</p>
           </div>
         )}
         <HospitalDetails hospital={selected} type={type} onClose={() => setSelectedId(null)} />
 
         {ranking ? (
           <div className="rounded-2xl bg-white p-4 shadow">
-            <h2 className="mb-2 text-lg font-bold">Ranking for: {TYPE_LABELS[type]}</h2>
+            <h2 className="mb-2 text-lg font-bold">{t('map.rankFor', { type: TYPE_LABELS[type] })}</h2>
             <RankingTable ranking={ranking} ownHospitalId={session?.hospital_id} onSelect={(h) => setSelectedId(h.id)} />
           </div>
         ) : (
           <div className="rounded-2xl bg-white p-4 shadow">
-            <h2 className="text-lg font-bold">All hospitals by distance</h2>
+            <h2 className="text-lg font-bold">{t('map.byDistance')}</h2>
             <p className="mb-3 text-sm text-slate-500">
-              Distance only, not a recommendation. Choose an emergency type to see the ranking.
+              {t('map.byDistanceNote')}
             </p>
             <ul className="space-y-2">
               {byDistance.map((h) => (

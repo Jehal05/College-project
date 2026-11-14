@@ -21,7 +21,7 @@ export default function TakeOverBox({ emergency: e, heldBy }) {
 
   async function takeOver() {
     const check = checkReason(kind, text, EN_LABELS);
-    if (!check.ok) return setError(kind ? check.error : t('takeover.choose'));
+    if (!check.ok) return setError(check.code === 'long' ? t('takeover.long', { max: MAX_REASON }) : check.code === 'write' ? t('takeover.write') : t('takeover.choose'));
     setBusy(true);
     setError('');
     try {
