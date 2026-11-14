@@ -1,6 +1,6 @@
 // More end-to-end tests (mock mode, everything simulated): escalation, dispatch, Hindi/Gujarati cards, availability form.
 import { test, expect } from '@playwright/test';
-import { login, cards, cardById, simulate } from './helpers.js';
+import { login, cardById, simulate } from './helpers.js';
 
 test.describe('escalation', () => {
   test('escalating moves the alert on: orange banner, timeline entry, and it can still be acknowledged', async ({ page }) => {
