@@ -42,4 +42,6 @@ Record what you saw in `docs/DEMO.md` only after you have actually run it.
 
 Verified on the laptop: staff login returns `HSP-AMD-002`; escalation shows on the card; Hindi and Gujarati render without boxes; acknowledge and dispatch work.
 
-Still unconfirmed: ambulance movement sent by the mock after dispatch, and a live availability update on a second tab that was already open. See `docs/DEMO_SCRIPT.md` for the fallback if the ambulance does not move.
+Also verified later on 14 Nov: the mock moves the ambulance itself after dispatch (28 position updates and `vitals.update` events; ETA 54 s to 0 s in about 15 s at DEMO_SPEED 5), and then stays En route until the desk clicks Arrived. A `hospital.availability_updated` event changed beds free in an already-open tab with no refresh.
+
+Still unconfirmed: live availability in a separate second tab, and the Hindi and Gujarati card and detail panel by eye. See `docs/DEMO_SCRIPT.md` for the fallback if the ambulance does not move.

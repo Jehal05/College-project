@@ -87,17 +87,19 @@ Say: "The desk acknowledges, then sends the nearest ambulance. The system only a
 
 Point at: the greyed-out buttons with the tooltip "Not yet. … comes first", and the dispatch dialog with unit, crew and distance.
 
-## 4. Tracking and arrival (1:45 – 2:30) ⚠️
+## 4. Tracking and arrival (1:45 – 2:30) ✅
 
 Do: stay on the card. Watch the ETA and the tracking map. When the ambulance arrives, click **Arrived** if the state has not changed by itself, then **Handed over**.
 
 Say: "The ambulance position and the estimated arrival time update live. Everything is simulated: no real vehicle is tracked."
 
-Not checked yet: whether the mock moves the ambulance on its own (with `VITE_PORTAL_SIMULATES_AMBULANCE=false` it should send a position every 2 seconds for about a minute). If the marker does not move, **switch the demo to the built-in mock**: set `VITE_USE_MOCK=true`, restart the portal, and the portal moves the ambulance itself.
+Checked on 2026-11-14 (HOSPITAL_MODE=manual, DEMO_SPEED=5, `VITE_PORTAL_SIMULATES_AMBULANCE=false`): the mock moves the ambulance by itself. About 28 position updates came in, one every 2 seconds of mock time, and the ETA went 54 s, 52 s … 0 s in roughly 15 real seconds. The state stays **En route** at ETA 0: the mock does not send "arrived". **You must click Arrived, then Handed over.** Both worked. Plan for the movement to be short (about 15 s), so click Dispatch at the start of your "tracking" sentence.
+
+If the marker does not move on the day, **switch the demo to the built-in mock**: set `VITE_USE_MOCK=true`, restart the portal, and the portal moves the ambulance itself.
 
 ## 5. Activity page and language (2:30 – 3:00)
 
-Do: open **Activity** ⚠️ (the page was built and tested, not rechecked against the mock on 2026-11-14). Then switch the **Language** menu to **Hindi** ✅ and back.
+Do: open **Activity** ✅ (opened against the mock on 2026-11-14, "15 of 15 entries"). Then switch the **Language** menu to **Hindi** ✅ (nav and capacity strip were checked on 2026-11-14; the alert card and detail panel were checked only by the automated tests, not yet by eye on the laptop) and back.
 
 Say: "Every desk action is logged with who and when. The portal also works in Hindi and Gujarati. These translations are drafts and wait for a native-speaker review."
 
@@ -116,4 +118,4 @@ Point at: the Hindi nav bar, alert queue, card and capacity strip. Say honestly 
 
 ## Not covered by this script
 
-Notes and chat need Daksh's backend. In the mock they work on this screen only. Ambulance movement from Jehal's mock (step 4) and the second-tab live availability update are not confirmed yet.
+Notes and chat need Daksh's backend. In the mock they work on this screen only. Live availability was checked in a tab that was already open (beds 11 to 4 with no refresh, then back to 11). A second separate tab was not tried. The escalation step was verified earlier; it was not re-run in the last dry run.

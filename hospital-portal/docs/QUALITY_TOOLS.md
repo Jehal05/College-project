@@ -32,8 +32,12 @@ Verified:
 - Hindi and Gujarati render without boxes.
 - Acknowledge and dispatch work.
 
+Also verified later on 14 Nov (checked from the browser extension):
+- The mock moves the ambulance by itself after dispatch (28 updates, ETA 54 s to 0 s in about 15 s). It does not send "arrived"; the desk clicks Arrived and Handed over.
+- Live availability: a PATCH from outside changed beds free in an already-open portal tab with no refresh.
+
 Still unconfirmed:
-- The ambulance moving on the map from the mock's own updates.
-- Live availability on a second tab that was already open.
+- Live availability in a *separate* second tab.
+- Hindi and Gujarati on the alert card and detail panel by eye. The tab I used was running an older build, so I could not judge them. Check after a fresh `npm run dev`.
 
 New browser tests in `e2e/flow.spec.js` (escalation, dispatch, Hindi and Gujarati dashboard, availability form) passed in a stand-in runner in the build sandbox, 13 of 13 with the older tests. They have **not** run in real Playwright yet. Run `npm run e2e` on the laptop.
