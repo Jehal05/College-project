@@ -18,7 +18,7 @@ import { useHospitals } from './HospitalProvider.jsx';
 import { useAuth } from './AuthProvider.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
-import { formatEta } from '../services/eta.js';
+import { formatEta, legText } from '../services/eta.js';
 
 export { formatEta };
 
@@ -76,13 +76,7 @@ export default function TrackingMap({ emergency, compact = false }) {
           </div>
           <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id), t)}</div>
           <div data-testid="trip-leg" className="font-semibold text-slate-700">
-            {arrived
-              ? t('tk.atHospital')
-              : !live
-                ? t('tk.assigned')
-                : e.ambulance.leg === 'to_patient'
-                  ? t('tk.toPatient', { km: e.ambulance.remaining_km })
-                  : t('tk.onBoard', { km: e.ambulance.remaining_km })}
+            {legText({ arrived, live, ambulance: e.ambulance }, t)}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">

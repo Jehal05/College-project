@@ -556,4 +556,6 @@ export default {
   'cap.noEmergency': 'No emergency department',
   'rk.notVerified': 'Not verified',
   'rk.pts': '{n} pts',
+  'tk.toPatientNoKm': 'Heading to the patient',
+  'tk.onBoardNoKm': 'Patient on board · heading to the hospital',
 };

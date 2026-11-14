@@ -555,4 +555,6 @@ export default {
   'cap.noEmergency': 'ઇમરજન્સી વિભાગ નથી',
   'rk.notVerified': 'ચકાસેલ નથી',
   'rk.pts': '{n} ગુણ',
+  'tk.toPatientNoKm': 'દર્દી તરફ',
+  'tk.onBoardNoKm': 'દર્દી અંદર છે · હોસ્પિટલ તરફ',
 };

@@ -555,4 +555,6 @@ export default {
   'cap.noEmergency': 'आपातकालीन विभाग नहीं',
   'rk.notVerified': 'सत्यापित नहीं',
   'rk.pts': '{n} अंक',
+  'tk.toPatientNoKm': 'मरीज़ की ओर',
+  'tk.onBoardNoKm': 'मरीज़ सवार है · अस्पताल की ओर',
 };
