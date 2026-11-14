@@ -5,6 +5,16 @@
 ## What is translated
 Most screens now: the top bar and menu, login, the alert queue and cards, the detail panel (including the readiness card, nearby help, ranking table and timeline labels), the dispatch dialog, the tracking map, Map, Fleet, History, Activity (filters, dates and labels), Handover, Analytics, Presentation mode and the screen reader announcements. Still English on purpose: symptom words, hospital and unit names, checklist item texts, AED and responder sample data, backend event text and ranking "why" sentences. A missing translation falls back to English, so nothing breaks.
 
+## Left in English on purpose
+These are data or text that comes from the backend or from doctor-reviewed content, so the portal does not translate them:
+- Hospital names, ambulance unit names and symptom words.
+- Checklist item texts and the "Sample checklist. Pending medical review." note (they wait for doctor review).
+- AED places and community responder sample data.
+- Event text written by the backend or the desk, for example "Patient picked up (simulated)" and "Taken over from … Reason: …".
+- The "Why:" sentences in the hospital ranking.
+- Ordinals such as 1st, 2nd.
+- The short capacity codes CL, SU, ICU.
+
 ## Rules we kept
 - The word **Simulated** stays in English, everywhere.
 - **Symptom words** (Chest pain, Sweating, ...) are never translated. They are sample content waiting for doctor review, and a wrong translation could change the meaning.
@@ -163,7 +173,7 @@ Still English on purpose: symptom words, emergency type names (Heart attack, ...
 | `tl.ESCALATED` | Escalated to next hospital | अगले अस्पताल को भेजा गया | આગલી હોસ્પિટલને મોકલ્યો | pending | pending |
 | `tl.EMERGENCY_DETECTED` | Emergency detected | आपात स्थिति का पता चला | કટોકટી શોધાઈ | pending | pending |
 
-## Added after the review pack (2026-11-14): 413 strings
+## Added after the review pack (2026-11-14)
 These keys were not in the tables above when the review pack was sent. Please review only these if the first tables are already done. The table is generated from `src/i18n/*.js` (keys that are not in the tables above).
 
 | Key | English | Hindi | Gujarati | Hindi review | Gujarati review |
@@ -581,3 +591,15 @@ These keys were not in the tables above when the review pack was sent. Please re
 | `rd.noChecklist` | No checklist for this type | इस प्रकार के लिए कोई चेकलिस्ट नहीं | આ પ્રકાર માટે કોઈ ચેકલિસ્ટ નથી | pending | pending |
 | `rd.noTeam` | No one assigned yet | अभी किसी को नियुक्त नहीं किया गया | હજી કોઈને સોંપ્યું નથી | pending | pending |
 | `rd.shared` | Shared | साझा | શેર કર્યું | pending | pending |
+| `u.km` | {n} km | {n} किमी | {n} કિમી | pending | pending |
+| `u.min` | {n} min | {n} मिनट | {n} મિનિટ | pending | pending |
+| `capl.cath_lab` | Cath Lab | कैथ लैब | કેથ લેબ | pending | pending |
+| `capl.stroke_unit` | Stroke Unit | स्ट्रोक यूनिट | સ્ટ્રોક યુનિટ | pending | pending |
+| `capl.icu` | ICU | ICU | ICU | pending | pending |
+| `hd.distance` | Distance (straight line) | दूरी (सीधी रेखा) | અંતર (સીધી રેખા) | pending | pending |
+| `hd.travel` | Travel time | यात्रा समय | મુસાફરી સમય | pending | pending |
+| `ck.none` | No checklist for this emergency type. | इस आपातकाल के प्रकार के लिए कोई चेकलिस्ट नहीं। | આ કટોકટીના પ્રકાર માટે કોઈ ચેકલિસ્ટ નથી. | pending | pending |
+| `ck.saveFail` | Could not save: {msg} | सहेजा नहीं जा सका: {msg} | સાચવી શકાયું નહીં: {msg} | pending | pending |
+| `cap.noEmergency` | No emergency department | आपातकालीन विभाग नहीं | ઇમરજન્સી વિભાગ નથી | pending | pending |
+| `rk.notVerified` | Not verified | सत्यापित नहीं | ચકાસેલ નથી | pending | pending |
+| `rk.pts` | {n} pts | {n} अंक | {n} ગુણ | pending | pending |
