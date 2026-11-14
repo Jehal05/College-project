@@ -138,4 +138,9 @@ export default {
   'error.reload': 'Reload',
   'error.retry': 'Try again',
   'login.expired': 'Your session expired. Please log in again.',
+  'sound.on': 'Sound on',
+  'sound.off': 'Sound off',
+  'sound.tap': 'Tap to enable sound',
+  'sound.tapHelp': 'The browser blocks sound until you click once on this page.',
+  'sound.test': 'Test sound',
 };

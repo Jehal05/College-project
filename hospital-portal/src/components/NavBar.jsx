@@ -7,6 +7,7 @@ import { resetDemo } from '../services/demoReset.js';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
+import SoundControl from './SoundControl.jsx';
 
 const links = [
   { to: '/dashboard', label: 'nav.dashboard' },
@@ -68,6 +69,7 @@ export default function NavBar() {
               </select>
             </label>
           )}
+          <SoundControl />
           <LanguageSwitcher />
           <span className="text-slate-300">
             {session?.name} ({role})

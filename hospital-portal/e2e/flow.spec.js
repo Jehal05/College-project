@@ -79,3 +79,24 @@ test.describe('hospital availability', () => {
     await expect(page.locator('[data-testid=availability-status]')).toContainText('Saved at');
   });
 });
+
+test.describe('sound control', () => {
+  test('the choice is saved, "off" is shown, and the test button does not break the page', async ({ page }) => {
+    await login(page);
+    const control = page.locator('[data-testid=sound-control]');
+    await expect(control).toBeVisible();
+    // Switch it off the way a person would: the first click may only unlock the browser, so click until it says off.
+    for (let i = 0; i < 3; i += 1) {
+      if ((await control.getAttribute('data-status')) === 'off') break;
+      await page.click('[data-testid=sound-toggle]');
+    }
+    await expect(control).toHaveAttribute('data-status', 'off');
+    await page.reload();
+    await expect(page.locator('[data-testid=sound-control]')).toHaveAttribute('data-status', 'off');
+    await page.click('[data-testid=sound-test]');
+    await expect(page.locator('[data-testid=sound-control]')).toBeVisible();
+    // Switching it on again is saved too (on, or "tap to enable" if the browser still blocks sound).
+    await page.click('[data-testid=sound-toggle]');
+    await expect(page.locator('[data-testid=sound-control]')).not.toHaveAttribute('data-status', 'off');
+  });
+});
