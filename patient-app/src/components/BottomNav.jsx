@@ -2,7 +2,7 @@
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Icon from './icons';
-import { BOTTOM, NAV } from '../config/navigation';
+import { BOTTOM, BOTTOM_TO, NAV } from '../config/navigation';
 
 // Short names for the narrow bar; the sidebar uses the long ones.
 const LABEL = { overview: 'nav.home', twin: 'nav.short.twin', monitor: 'nav.short.monitor', reports: 'nav.short.reports', settings: 'nav.profile' };
@@ -16,7 +16,7 @@ export default function BottomNav() {
     <nav aria-label={t('nav.label')} className="safe-bottom sticky bottom-0 z-20 flex border-t border-slate-200 bg-white shadow-lift">
       {BOTTOM.map((key) => {
         const n = NAV.find((x) => x.key === key);
-        return <NavLink key={key} to={n.to} end={n.end} className={link}><Icon name={n.icon} /><span>{t(LABEL[key] || 'nav.' + key)}</span></NavLink>;
+        return <NavLink key={key} to={BOTTOM_TO[key] || n.to} end={key === 'overview'} className={link}><Icon name={n.icon} /><span>{t(LABEL[key] || 'nav.' + key)}</span></NavLink>;
       })}
     </nav>
   );
