@@ -218,3 +218,28 @@ test.describe('CSV export', () => {
     expect(d2.suggestedFilename()).toMatch(/^post-event-timeline-.*\.csv$/);
   });
 });
+
+test.describe('shift handover sheet', () => {
+  test('open cases are listed with their handover notes (not desk notes); the nav link opens it', async ({ page }) => {
+    await login(page);
+    const id = await simulate(page, 'mock-new-alert');
+    await cardById(page, id).click();
+    await takeOverIfAsked(page);
+    await page.locator('[data-testid=note-kind-handover]').check();
+    await page.fill('[data-testid=note-input]', 'Patient allergic to penicillin, bed 4 ready');
+    await page.click('[data-testid=note-save]');
+    await expect(page.locator('[data-testid=notes-list]')).toContainText('penicillin');
+    await page.locator('[data-testid=note-kind-desk]').check();
+    await page.fill('[data-testid=note-input]', 'Private desk reminder');
+    await page.click('[data-testid=note-save]');
+    await expect(page.locator('[data-testid=notes-list]')).toContainText('Private desk reminder');
+
+    await page.click('nav >> text=Handover');
+    await expect(page.locator('[data-testid=handover-summary]')).toBeVisible();
+    const sheetCase = page.locator(`[data-testid=handover-case][data-id="${id}"]`);
+    await expect(sheetCase).toContainText('penicillin');
+    expect(await sheetCase.innerText()).not.toContain('Private desk reminder');
+    // other open cases without a note say so
+    expect(await page.locator('[data-testid=handover-nonote]').count()).toBeGreaterThan(0);
+  });
+});

@@ -20,6 +20,7 @@ const Crew = lazy(() => import('./pages/Crew.jsx'));
 const History = lazy(() => import('./pages/History.jsx'));
 const Activity = lazy(() => import('./pages/Activity.jsx'));
 const Report = lazy(() => import('./pages/Report.jsx'));
+const Handover = lazy(() => import('./pages/Handover.jsx'));
 
 function PageLoading() {
   const t = useT();
@@ -93,6 +94,10 @@ export default function App() {
       <Route
         path="/activity"
         element={<ProtectedRoute roles={staff}><Shell><Activity /></Shell></ProtectedRoute>}
+      />
+      <Route
+        path="/handover"
+        element={<ProtectedRoute roles={staff}><Shell><Handover /></Shell></ProtectedRoute>}
       />
       <Route
         path="/analytics"
