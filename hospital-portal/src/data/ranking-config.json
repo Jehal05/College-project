@@ -1,0 +1,20 @@
+{
+  "_note": "Ranking and escalation config for features #15 and #43. Shared with Daksh. Hospitals missing a required capability are filtered out FIRST, then scored.",
+  "weights": { "capability": 0.5, "travel_time": 0.3, "availability": 0.2 },
+  "required_capabilities": {
+    "HEART": ["cath_lab", "emergency"],
+    "STROKE": ["stroke_unit", "emergency"],
+    "DIABETIC": ["emergency"],
+    "ASTHMA": ["icu", "emergency"],
+    "UNKNOWN": ["emergency"]
+  },
+  "scoring": {
+    "_note": "travel_time scores 0 at max_travel_minutes or more; availability scores full marks at these free-bed counts",
+    "max_travel_minutes": 30,
+    "beds_for_full_score": 10,
+    "icu_for_full_score": 3
+  },
+  "availability_fields": ["beds_free", "icu_free", "cath_lab_ready", "stroke_unit_ready"],
+  "only_verified_hospitals": true,
+  "escalation_seconds": 30
+}

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* Large, readable base size: the dashboard is shown to a jury from a distance. */
+html { font-size: 18px; }
+/* Hindi and Gujarati need a font that has the glyphs. Noto Sans first, then common system fonts that cover both. */
+body {
+  font-family: ui-sans-serif, system-ui, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Gujarati', 'Nirmala UI', 'Mangal', 'Shruti', 'Segoe UI', Roboto, sans-serif;
+}
+html[lang='hi'] body, html[lang='gu'] body { line-height: 1.6; }
+body { @apply bg-slate-100 text-slate-900 antialiased; }
+
+/* Leaflet divIcon wrapper: remove the default white square. */
+.ht-marker { background: transparent; border: none; }
+
+/* New alert: flash three times so it is noticed from across the room. */
+@keyframes ht-flash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0.45); }
+}
+.ht-flash { animation: ht-flash 0.8s ease-in-out 3; }
+
+/* Ambulance marker glides between position updates (one update per second). */
+.ht-smooth { transition: transform 1s linear; }
+
+/* Printing the post-event report (feature #31): only the report, on white paper. */
+@media print {
+  header, .no-print { display: none !important; }
+  body { background: #fff; font-size: 12pt; }
+  .report { box-shadow: none !important; padding: 0 !important; }
+}
+
+/* Keyboard focus: a clear outline on every interactive element (accessibility). */
+:where(a, button, select, input, textarea, [tabindex]):focus-visible { outline: 3px solid #0284c7; outline-offset: 2px; }
+
+/* Reduced motion: no flashing, no gliding, no smooth scrolling. The colour border, the unread dot and the NEW badge still mark a new alert. */
+@media (prefers-reduced-motion: reduce) {
+  .ht-flash { animation: none !important; }
+  .ht-smooth { transition: none !important; }
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Presentation mode: everything is sized in rem, so a bigger root size makes all text and buttons bigger. */
+html.presentation {
+  font-size: 118%;
+}

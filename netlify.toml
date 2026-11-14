@@ -1,0 +1,5 @@
+# Netlify build settings (see docs/DEPLOY.md). Environment variables are set in the Netlify site settings.
+[build]
+  base = "patient-app"
+  command = "npm run build"
+  publish = "dist"

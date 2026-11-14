@@ -1,0 +1,7 @@
+{
+  "_note": "Ambulance simulation settings (feature #25). Everything driven by these is SIMULATED.",
+  "speed_kmh": 40,
+  "time_scale": 9,
+  "_time_scale_note": "How much faster than real time the demo runs. 9 means a 6-minute trip takes about 40 seconds.",
+  "tick_ms": 1000
+}

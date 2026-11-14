@@ -1,0 +1,37 @@
+{
+  "name": "hospital-portal",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "HealthTwin AI – Hospital, Map and Ambulance portal (simulated prototype)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"src/**/*.test.js\"",
+    "lint": "eslint .",
+    "review-sheet": "node scripts/make-review-sheet.mjs",
+    "i18n:export": "node scripts/export-translations.mjs",
+    "i18n:import": "node scripts/import-translations.mjs",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^15.15.0",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.0"
+  }
+}

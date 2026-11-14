@@ -1,0 +1,334 @@
+# HealthTwin AI rule table (feature 4)
+#
+# DRAFT. EVERY RULE IS "pending doctor review". Symptom lists and numeric
+# thresholds are placeholders so the pipeline can be built and tested.
+# They are NOT medical advice and must be checked by a doctor or medical
+# teacher before any demo to the jury.
+#
+# Rule format
+#   id:            unique name
+#   type:          HEART | STROKE | DIABETIC | ASTHMA
+#   severity:      EMERGENCY | URGENT | WATCH
+#   reason:        plain-language text shown as the reason
+#   review_status: pending doctor review
+#   when:          every part that is present must be true
+#     all_symptoms: [..]   every one of these symptoms is reported
+#     any_symptoms: [..]   at least one of these symptoms is reported
+#     vitals:              each listed vital is present and passes its test
+#       <name>: {lt: n, lte: n, gt: n, gte: n}
+#
+# Design rule: conditions are positive only (no "not reported" tests), so
+# adding evidence can add matches but can never remove one. The engine takes
+# the highest severity among all matches. That is why severity never drops.
+#
+# DRAFT RULES ADDED 2026-11-13 (marked origin: ...): written by an AI assistant from public
+# first-aid guidance and accepted for the prototype by Daksh. A DOCTOR HAS NOT REVIEWED THEM.
+# The review sheet is docs/review/DOCTOR_REVIEW_NEW_RULES.md. Do not call these rules reviewed or signed off.
+#
+# Symptom names: chest_pain, breathlessness, sweating, left_arm_pain,
+#   face_drooping, arm_weakness, slurred_speech, confusion, wheeze, low_glucose
+#   (added in the 2026-11-13 draft) nausea, fainting, diabetic_fainting, severe_headache,
+#   sudden_confusion, shaking, cannot_speak_sentences, blue_lips, checkin_no_reply
+# Vital names: heart_rate, spo2, bp_sys, bp_dia, glucose, resp_rate
+
+version: "0.1"
+review_status: "pending doctor review"
+
+rules:
+  # ---------------- HEART ----------------
+  - id: HEART_CHEST_PAIN
+    type: HEART
+    severity: EMERGENCY
+    reason: "Chest pain is a red-flag symptom"
+    review_status: pending doctor review
+    when: {all_symptoms: [chest_pain]}
+
+  - id: HEART_ARM_PAIN_WITH_SWEATING_OR_BREATHLESSNESS
+    type: HEART
+    severity: EMERGENCY
+    reason: "Left-arm pain together with sweating or breathlessness"
+    review_status: pending doctor review
+    when: {all_symptoms: [left_arm_pain], any_symptoms: [sweating, breathlessness]}
+
+  - id: HEART_BREATHLESSNESS_WITH_SWEATING
+    type: HEART
+    severity: EMERGENCY
+    reason: "Breathlessness together with sweating"
+    review_status: pending doctor review
+    when: {all_symptoms: [breathlessness, sweating]}
+
+  - id: HEART_LEFT_ARM_PAIN
+    type: HEART
+    severity: URGENT
+    reason: "Left-arm pain reported"
+    review_status: pending doctor review
+    when: {all_symptoms: [left_arm_pain]}
+
+  - id: HEART_SWEATING
+    type: HEART
+    severity: WATCH
+    reason: "Unexplained sweating reported"
+    review_status: pending doctor review
+    when: {all_symptoms: [sweating]}
+
+  - id: HEART_RATE_VERY_HIGH
+    type: HEART
+    severity: URGENT
+    reason: "Heart rate is well above the usual range"
+    review_status: pending doctor review
+    when: {vitals: {heart_rate: {gt: 120}}}
+
+  - id: HEART_RATE_VERY_LOW
+    type: HEART
+    severity: URGENT
+    reason: "Heart rate is well below the usual range"
+    review_status: pending doctor review
+    when: {vitals: {heart_rate: {lt: 45}}}
+
+  - id: HEART_RATE_RAISED
+    type: HEART
+    severity: WATCH
+    reason: "Heart rate is somewhat raised"
+    review_status: pending doctor review
+    when: {vitals: {heart_rate: {gt: 100, lte: 120}}}
+
+  - id: HEART_BP_VERY_HIGH
+    type: HEART
+    severity: URGENT
+    reason: "Systolic blood pressure is very high"
+    review_status: pending doctor review
+    when: {vitals: {bp_sys: {gte: 180}}}
+
+  - id: HEART_BP_VERY_LOW
+    type: HEART
+    severity: URGENT
+    reason: "Systolic blood pressure is very low"
+    review_status: pending doctor review
+    when: {vitals: {bp_sys: {lt: 90}}}
+
+  - id: HEART_BP_RAISED
+    type: HEART
+    severity: WATCH
+    reason: "Systolic blood pressure is raised"
+    review_status: pending doctor review
+    when: {vitals: {bp_sys: {gte: 160, lt: 180}}}
+
+  # ---------------- STROKE ----------------
+  - id: STROKE_FACE_DROOPING
+    type: STROKE
+    severity: EMERGENCY
+    reason: "Face drooping is a stroke warning sign"
+    review_status: pending doctor review
+    when: {all_symptoms: [face_drooping]}
+
+  - id: STROKE_ARM_WEAKNESS
+    type: STROKE
+    severity: EMERGENCY
+    reason: "Arm weakness is a stroke warning sign"
+    review_status: pending doctor review
+    when: {all_symptoms: [arm_weakness]}
+
+  - id: STROKE_SLURRED_SPEECH
+    type: STROKE
+    severity: EMERGENCY
+    reason: "Slurred speech is a stroke warning sign"
+    review_status: pending doctor review
+    when: {all_symptoms: [slurred_speech]}
+
+  # ---------------- DIABETIC ----------------
+  - id: DIABETIC_LOW_GLUCOSE_READING_WITH_CONFUSION_OR_SWEATING
+    type: DIABETIC
+    severity: EMERGENCY
+    reason: "Low glucose reading with confusion or sweating"
+    review_status: pending doctor review
+    when: {any_symptoms: [confusion, sweating], vitals: {glucose: {lt: 70}}}
+
+  - id: DIABETIC_LOW_GLUCOSE_REPORTED_WITH_CONFUSION_OR_SWEATING
+    type: DIABETIC
+    severity: EMERGENCY
+    reason: "Low glucose reported with confusion or sweating"
+    review_status: pending doctor review
+    when: {all_symptoms: [low_glucose], any_symptoms: [confusion, sweating]}
+
+  - id: DIABETIC_LOW_GLUCOSE_READING
+    type: DIABETIC
+    severity: URGENT
+    reason: "Low glucose reading"
+    review_status: pending doctor review
+    when: {vitals: {glucose: {lt: 70}}}
+
+  - id: DIABETIC_LOW_GLUCOSE_REPORTED
+    type: DIABETIC
+    severity: URGENT
+    reason: "Low glucose reported by the patient"
+    review_status: pending doctor review
+    when: {all_symptoms: [low_glucose]}
+
+  - id: DIABETIC_CONFUSION
+    type: DIABETIC
+    severity: URGENT
+    reason: "Confusion reported; a glucose check is advised"
+    review_status: pending doctor review
+    when: {all_symptoms: [confusion]}
+
+  - id: DIABETIC_GLUCOSE_HIGH
+    type: DIABETIC
+    severity: WATCH
+    reason: "Glucose reading is high"
+    review_status: pending doctor review
+    when: {vitals: {glucose: {gt: 250}}}
+
+  # ---------------- ASTHMA ----------------
+  - id: ASTHMA_WHEEZE_WITH_LOW_SPO2
+    type: ASTHMA
+    severity: EMERGENCY
+    reason: "Wheeze together with low oxygen saturation"
+    review_status: pending doctor review
+    when: {all_symptoms: [wheeze], vitals: {spo2: {lt: 92}}}
+
+  - id: ASTHMA_WHEEZE_WITH_BREATHLESSNESS
+    type: ASTHMA
+    severity: EMERGENCY
+    reason: "Wheeze together with breathlessness"
+    review_status: pending doctor review
+    when: {all_symptoms: [wheeze, breathlessness]}
+
+  - id: ASTHMA_WHEEZE
+    type: ASTHMA
+    severity: URGENT
+    reason: "Wheeze reported"
+    review_status: pending doctor review
+    when: {all_symptoms: [wheeze]}
+
+  - id: ASTHMA_BREATHLESSNESS
+    type: ASTHMA
+    severity: URGENT
+    reason: "Breathlessness reported"
+    review_status: pending doctor review
+    when: {all_symptoms: [breathlessness]}
+
+  - id: HEART_BREATHLESSNESS
+    type: HEART
+    severity: URGENT
+    reason: "Breathlessness reported"
+    review_status: pending doctor review
+    when: {all_symptoms: [breathlessness]}
+
+  - id: ASTHMA_SPO2_LOW
+    type: ASTHMA
+    severity: URGENT
+    reason: "Oxygen saturation is low"
+    review_status: pending doctor review
+    when: {vitals: {spo2: {lt: 92}}}
+
+  - id: ASTHMA_SPO2_BORDERLINE
+    type: ASTHMA
+    severity: WATCH
+    reason: "Oxygen saturation is slightly low"
+    review_status: pending doctor review
+    when: {vitals: {spo2: {gte: 92, lt: 95}}}
+
+  - id: ASTHMA_BREATHING_FAST
+    type: ASTHMA
+    severity: WATCH
+    reason: "Breathing rate is raised"
+    review_status: pending doctor review
+    when: {vitals: {resp_rate: {gt: 24}}}
+
+  # ---------------- DRAFT RULES, 2026-11-13 (pending doctor review) ----------------
+
+  - id: ASTHMA_BLUE_LIPS
+    type: ASTHMA
+    severity: EMERGENCY
+    reason: "Blue lips reported"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [blue_lips]}
+
+  - id: ASTHMA_CANNOT_SPEAK_SENTENCES
+    type: ASTHMA
+    severity: EMERGENCY
+    reason: "Cannot speak in full sentences"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [cannot_speak_sentences]}
+
+  - id: STROKE_SUDDEN_CONFUSION
+    type: STROKE
+    severity: EMERGENCY
+    reason: "Sudden confusion is a stroke warning sign"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [sudden_confusion]}
+
+  - id: STROKE_SEVERE_HEADACHE
+    type: STROKE
+    severity: URGENT
+    reason: "Severe headache reported"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [severe_headache]}
+
+  - id: FAINTING
+    type: HEART
+    severity: URGENT
+    reason: "Fainting reported"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [fainting]}
+
+  - id: FAINTING_WITH_BREATHING_ARM_OR_CONFUSION_SIGNS
+    type: HEART
+    severity: EMERGENCY
+    reason: "Fainting together with breathlessness, arm pain or confusion"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [fainting], any_symptoms: [breathlessness, left_arm_pain, confusion]}
+
+  - id: DIABETIC_SHAKING
+    type: DIABETIC
+    severity: URGENT
+    reason: "Shaking reported"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [shaking]}
+
+  - id: DIABETIC_SHAKING_WITH_LOW_GLUCOSE_OR_CONFUSION
+    type: DIABETIC
+    severity: EMERGENCY
+    reason: "Shaking together with low glucose or confusion"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [shaking], any_symptoms: [low_glucose, confusion]}
+
+  - id: DIABETIC_FAINTING
+    type: DIABETIC
+    severity: EMERGENCY
+    reason: "Fainting reported with a diabetic emergency"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [diabetic_fainting]}
+
+  - id: HEART_NAUSEA
+    type: HEART
+    severity: WATCH
+    reason: "Nausea reported"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [nausea]}
+
+  - id: HEART_NAUSEA_WITH_SWEATING
+    type: HEART
+    severity: URGENT
+    reason: "Nausea together with sweating"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [nausea, sweating]}
+
+  - id: CHECKIN_NO_REPLY
+    type: UNKNOWN
+    severity: EMERGENCY
+    reason: "No reply to the safety check-in"
+    review_status: pending doctor review
+    origin: "AI-written draft from public guidance, accepted for the prototype by Daksh, NOT reviewed by a doctor"
+    when: {all_symptoms: [checkin_no_reply]}
