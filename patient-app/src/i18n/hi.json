@@ -639,7 +639,6 @@
   "dtwin.map.label": "शरीर का नक्शा, {{organ}} चुना गया",
   "dtwin.view2d": "2D शरीर नक्शा",
   "dtwin.view3d": "3D दृश्य",
-  "dtwin.view3dSoon": "3D दृश्य आगे आएगा",
   "dtwin.focusOn": "इस अंग पर फ़ोकस करें",
   "dtwin.focusOff": "पूरा शरीर दिखाएँ",
   "dtwin.organ.heart.name": "हृदय",
@@ -668,5 +667,11 @@
   "dtwin.replay.live": "लाइव पर लौटें",
   "dtwin.replay.slider": "रीप्ले में स्थिति",
   "dtwin.replay.status": "रीडिंग {{n}} / {{total}}",
-  "dtwin.replay.liveNow": "लाइव रीडिंग दिख रही हैं"
+  "dtwin.replay.liveNow": "लाइव रीडिंग दिख रही हैं",
+  "dtwin.view": "दृश्य",
+  "dtwin.view3dOff": "इस डिवाइस पर 3D उपलब्ध नहीं है, इसलिए 2D नक्शा दिख रहा है",
+  "dtwin.loading3d": "3D शरीर लोड हो रहा है...",
+  "dtwin.fallback2d": "इस डिवाइस पर 3D उपलब्ध नहीं है। 2D नक्शा दिख रहा है।",
+  "dtwin.map3d.label": "3D शरीर, {{organ}} चुना गया",
+  "dtwin.map3d.hint": "शरीर घुमाने के लिए खींचें। अंग चुनने के लिए उस पर क्लिक करें या सूची का उपयोग करें।"
 }
