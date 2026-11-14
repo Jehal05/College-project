@@ -47,9 +47,13 @@ def escalate(session: Session, emergency: Emergency) -> bool:
     current = _latest_alert(session, emergency)
     ranking = list(((emergency.engine_result or {}).get("sos") or {}).get("ranking") or [])
     already = {a.hospital_id for a in session.query(HospitalAlert).filter(HospitalAlert.emergency_id == emergency.id)}
-    next_id = next((h for h in ranking if h not in already), None)
-    hospital = session.get(Hospital, next_id) if next_id else None
-    if current is None or hospital is None or not hospital.verified:
+    hospital = None
+    for candidate_id in ranking:                    # the next one that was not alerted yet and is still verified
+        candidate = session.get(Hospital, candidate_id) if candidate_id not in already else None
+        if candidate is not None and candidate.verified:
+            hospital = candidate
+            break
+    if current is None or hospital is None:
         return False
     from_id, rank = current.hospital_id, current.rank + 1
     current.status = "ESCALATED_AWAY"

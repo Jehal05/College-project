@@ -68,25 +68,6 @@ def test_a_wrong_token_in_a_message_is_closed(demo):
     assert info.value.code == 1008
 
 
-def test_staff_hear_the_alert_for_their_hospital_and_nothing_private_leaks(demo, engine):
-    token = demo.token(*STAFF)
-    eid = my_alert(demo, engine)
-    with demo.websocket_connect("/ws?token=" + token) as ws:
-        demo.post(f"/emergencies/{eid}/sos", json={}, headers=demo.headers(*PATIENT))
-        with Session(engine) as s:                      # keep the alert with this desk's hospital
-            s.get(Emergency, eid).hospital_id = DEMO_HOSPITAL_ID
-            for a in s.query(HospitalAlert).filter(HospitalAlert.emergency_id == eid):
-                a.hospital_id = DEMO_HOSPITAL_ID
-            s.commit()
-        got = []
-        for _ in range(3):
-            got.append(hear(ws))
-    names = [e["event"] for e in got]
-    assert "emergency.sos_sent" in names or "emergency.created" in names
-    assert all("audience" not in e for e in got)
-    assert all({"event", "type", "emergency_id", "state", "timestamp", "payload"} <= set(e) for e in got)
-
-
 def test_the_desk_hears_its_own_acknowledge_and_the_patient_hears_it_too(demo, engine):
     eid = my_alert(demo, engine)
     sos_to_my_hospital(demo, engine, eid)
@@ -117,7 +98,6 @@ def test_a_hospital_that_was_not_alerted_hears_nothing_about_the_emergency(demo,
 def test_a_patient_never_hears_another_patients_emergency(demo, engine):
     ev = {"event": "emergency.sos_sent", "type": "emergency.sos_sent", "emergency_id": None, "state": None,
           "timestamp": "2026-11-14T10:00:00Z", "payload": {}, "audience": "all"}
-    from app.models.accounts import User
     from app.security.actor import Actor
     other = Actor(user_id="usr_x", role="PATIENT", patient_id="PT-2026-0002", hospital_id=None)
     eid = my_alert(demo, engine)

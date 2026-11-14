@@ -508,6 +508,10 @@ Status codes used: `200`, `201`, `400` (bad input, including every validation er
 
 Connect to `ws://localhost:8000/ws/hospitals/{hospital_id}?token=<jwt>` for hospital rooms and `ws://localhost:8000/ws/emergencies/{emergency_id}?token=<jwt>` for patient, family and responder views.
 
+**As built (14 Nov 2026, Puneet; the path is proposed, not agreed with Daksh and Jehal):** ONE path, `ws://localhost:8000/ws?token=<login token>`, as the mock server and the portal already use. The server filters by role instead of by room: hospital staff hear the emergencies their hospital was alerted for (and hospital-wide news such as `hospital.availability_updated`), an admin hears every sent emergency, a patient hears their own, and family and responders hear nothing yet (the family link and responder alerts are not built). A bad token is accepted and closed at once with code 1008. With no token in the address, send `{"type":"auth","token":"..."}` within 5 seconds and wait for `auth.ok`. `replay_since` is read and ignored (replay is not built). The older two-path design above stays in this contract until the three of us decide.
+
+**Escalation (as built):** an emergency in `SOS_SENT` that nobody acknowledges for `ESCALATION_TIMEOUT_SECONDS` (default 30) goes `SOS_SENT` to `ESCALATED` to `SOS_SENT` and the next verified hospital in the SOS ranking is alerted (`hospital.escalated`, `emergency.created`, `hospital.alerted`). The app checks once a second (`ESCALATION_SWEEP_SECONDS`).
+
 ### 5.1 Event envelope (every event uses it)
 
 ```json
