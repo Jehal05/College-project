@@ -6,6 +6,22 @@ Legend: ✅ checked on the laptop on 2026-11-14 · ⚠️ not checked yet (do it
 
 Checked in a real browser on 2026-11-14 (real mode, Jehal's mock): the Dispatch dialog fits a short window, the take-over box and reason, the sound control states, Presentation mode on and off, and Hindi on the Map, Fleet, History, Activity, Handover and Analytics pages. Checked later the same day with the built-in mock (`VITE_USE_MOCK=true`): after a take-over the Acknowledge and Dispatch buttons unlock, Presentation mode hides the mock helper button on the case and turning it off brings it back, and a new alert asks the browser to play two beeps only when sound is on (0 beeps when off). Not checked: how the sound actually sounds (nobody could listen to it), and Gujarati on pages other than Analytics.
 
+## Rehearsal checklist (tick each box during one full run on your laptop)
+
+Nothing below has been done yet. Tick a box only when you saw it work yourself.
+
+- [ ] Start script: `.\scripts\start-demo.ps1` opens the portal (never run on the laptop yet)
+- [ ] Login works (`staff1`)
+- [ ] Send the SOS (or press **+ Simulate new alert** in built-in mock mode): the card appears with NEW and EMERGENCY
+- [ ] **Sound check:** turn sound on, press + Simulate new alert, listen for two beeps (nobody has heard it yet)
+- [ ] Take over the alert, then Acknowledge
+- [ ] Dispatch: **Yes, dispatch** works
+- [ ] Tracking: the ambulance moves and the ETA counts down; click Arrived, then Handed over
+- [ ] Handover sheet: open **Handover** and check the open cases and notes
+- [ ] Language switch: Hindi and Gujarati on the Dashboard, Map and Fleet; no empty boxes in the letters
+- [ ] Presentation mode: bigger text, language locked, helper buttons hidden (built-in mock only)
+- [ ] Reset: close both windows, start again, and the first alert is fresh
+
 ## 0. Before the demo (10 minutes)
 
 **Quickest start (built-in mock, no backend)** ⚠️ not run yet: the script was written without PowerShell available, so run it once on the laptop before the day.
