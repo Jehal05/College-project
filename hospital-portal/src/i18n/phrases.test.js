@@ -58,8 +58,8 @@ test('durations: English matches formatSeconds, Hindi and Gujarati use their own
 
 test('detail panel, ranking, nearby help and hospital panel strings are translated in Hindi and Gujarati', async () => {
   const DICTS = { en: (await import('./en.js')).default, hi: (await import('./hi.js')).default, gu: (await import('./gu.js')).default };
-  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.', 'tk.', 'rd.', 'map.topRanked', 'map.erOnly'];
-  const sameIsFine = new Set(['tk.unitTip', 'tk.trafficOpt', 'rd.etaSim']); // only placeholders and the word simulated
+  const prefixes = ['rc.', 'nb.', 'ctl.', 'hd.', 'mv.', 'rk.', 'tk.', 'rd.', 'ck.', 'u.', 'capl.', 'map.topRanked', 'map.erOnly'];
+  const sameIsFine = new Set(['tk.unitTip', 'tk.trafficOpt', 'rd.etaSim', 'capl.icu']); // only placeholders and the word simulated
   const keys = Object.keys(DICTS.en).filter((k) => prefixes.some((p) => k.startsWith(p)));
   assert.ok(keys.length >= 90, `expected many keys, got ${keys.length}`);
   for (const k of keys) {
@@ -81,4 +81,21 @@ test('formatWhen: English keeps the browser default, Hindi and Gujarati use thei
   assert.equal(formatWhen(iso, undefined), old);
   assert.equal(formatWhen(iso, 'hi'), new Date(iso).toLocaleString('hi-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
   assert.equal(formatWhen(iso, 'gu'), new Date(iso).toLocaleString('gu-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+});
+
+test('formatCreated: English keeps the browser default; Hindi and Gujarati use their locale', async () => {
+  const { formatCreated } = await import('./phrases.js');
+  const iso = '2026-11-12T13:00:00.000Z';
+  assert.equal(formatCreated(iso, 'en'), new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+  assert.equal(formatCreated(iso, 'hi'), new Date(iso).toLocaleString('hi-IN', { dateStyle: 'medium', timeStyle: 'short' }));
+  assert.equal(formatCreated(iso, 'gu'), new Date(iso).toLocaleString('gu-IN', { dateStyle: 'medium', timeStyle: 'short' }));
+});
+
+test('unit and capability words: placeholders kept, Hindi and Gujarati differ for km, min and capability names', async () => {
+  const { translate } = await import('./translate.js');
+  assert.equal(translate('en', 'u.km', { n: 2.7 }), '2.7 km');
+  assert.equal(translate('en', 'u.min', { n: 4 }), '4 min');
+  assert.equal(translate('hi', 'u.km', { n: 2.7 }), '2.7 किमी');
+  assert.equal(translate('gu', 'u.min', { n: 4 }), '4 મિનિટ');
+  for (const k of ['capl.cath_lab', 'capl.stroke_unit']) for (const l of ['hi', 'gu']) assert.notEqual(translate(l, k), translate('en', k));
 });

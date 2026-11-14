@@ -4,6 +4,7 @@
 //   createdAt – ISO time of the alert (falls back to the first event)
 // An event may also carry an optional `note` (used for "Now alerting <hospital>").
 import { useEffect, useState } from 'react';
+import { durationText } from '../i18n/phrases.js';
 import { NOTE_KIND_LABELS } from '../services/notes.js';
 
 const STAGES = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE', 'ARRIVED', 'HANDOVER_DONE'];
@@ -24,7 +25,9 @@ const LABELS = {
 // An event with state 'NOTE' is a note with no state change: its `note` text is the title.
 const isNote = (e) => e.state === 'NOTE';
 
-export function formatDuration(totalSeconds) {
+/** @param t optional translate function; without it the text is English ("1 min 9 s"). */
+export function formatDuration(totalSeconds, t) {
+  if (t) return durationText(t, totalSeconds);
   const s = Math.max(0, Math.round(totalSeconds));
   if (s < 60) return `${s} s`;
   const m = Math.floor(s / 60);
@@ -67,7 +70,7 @@ export default function Timeline({ events = [], createdAt, t }) {
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
         <span className="text-sm text-slate-500">{finalEvent ? L('tl.total', 'Total time') : L('tl.timeSince', 'Time since alert')}</span>
         <span data-testid="timeline-counter" className={`text-3xl font-bold tabular-nums ${finalEvent ? 'text-slate-700' : 'text-red-600'}`}>
-          {formatDuration(elapsed)}
+          {formatDuration(elapsed, t)}
         </span>
         {finalEvent && <span className="text-sm font-semibold text-slate-500">{L('tl.stopped', '(stopped)')}</span>}
       </div>
@@ -90,8 +93,8 @@ export default function Timeline({ events = [], createdAt, t }) {
                 </div>
                 {isNote(e) && e.local_only && <div className="text-sm font-semibold text-amber-800">{L('tl.localOnly', 'Saved on this screen only')}</div>}
                 <div className="text-slate-600">
-                  {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000)} {L('tl.sinceAlert', 'since alert')}
-                  {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000)} ${L('tl.afterPrev', 'after previous step')}`}
+                  {clock(e.ms)} · {formatDuration((e.ms - startMs) / 1000, t)} {L('tl.sinceAlert', 'since alert')}
+                  {i > 0 && ` · ${formatDuration((e.ms - sorted[i - 1].ms) / 1000, t)} ${L('tl.afterPrev', 'after previous step')}`}
                 </div>
                 {e.note && !isNote(e) && <div className="font-semibold text-orange-700">{e.note}</div>}
                 {e.actor && <div className="text-sm text-slate-500">{L('tl.by', 'By')} {e.actor}</div>}

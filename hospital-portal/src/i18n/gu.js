@@ -543,4 +543,13 @@ export default {
   'rd.noChecklist': 'આ પ્રકાર માટે કોઈ ચેકલિસ્ટ નથી',
   'rd.noTeam': 'હજી કોઈને સોંપ્યું નથી',
   'rd.shared': 'શેર કર્યું',
+  'u.km': '{n} કિમી',
+  'u.min': '{n} મિનિટ',
+  'capl.cath_lab': 'કેથ લેબ',
+  'capl.stroke_unit': 'સ્ટ્રોક યુનિટ',
+  'capl.icu': 'ICU',
+  'hd.distance': 'અંતર (સીધી રેખા)',
+  'hd.travel': 'મુસાફરી સમય',
+  'ck.none': 'આ કટોકટીના પ્રકાર માટે કોઈ ચેકલિસ્ટ નથી.',
+  'ck.saveFail': 'સાચવી શકાયું નહીં: {msg}',
 };

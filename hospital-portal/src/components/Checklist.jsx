@@ -5,9 +5,11 @@ import checklists from '../data/checklists.json';
 import { useEmergencies } from './EmergencyProvider.jsx';
 import { formatTime } from './AlertCard.jsx';
 import { reviewBadge, reviewSummary } from '../services/review.js';
+import { useT } from '../i18n/index.js';
 
 export default function Checklist({ emergency }) {
   const { tick } = useEmergencies();
+  const t = useT();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(null);
   const items = checklists[emergency.type] || [];
@@ -23,19 +25,19 @@ export default function Checklist({ emergency }) {
     try {
       await tick(emergency.emergency_id, item.id, !ticks[item.id]?.done);
     } catch (err) {
-      setError(`Could not save: ${err.message}`);
+      setError(t('ck.saveFail', { msg: err.message }));
     } finally {
       setBusy(null);
     }
   }
 
-  if (items.length === 0) return <p className="text-slate-500">No checklist for this emergency type.</p>;
+  if (items.length === 0) return <p className="text-slate-500">{t('ck.none')}</p>;
 
   return (
     <div data-testid="checklist" data-type={emergency.type}>
       <div className="mb-2 flex flex-wrap items-center gap-3">
         <span data-testid="checklist-progress" className="text-lg font-bold">
-          {done} of {items.length} done
+          {t('rd.checklistDone', { done, total: items.length })}
         </span>
         <span
           data-testid="review-badge"

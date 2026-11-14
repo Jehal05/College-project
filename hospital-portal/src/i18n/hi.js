@@ -543,4 +543,13 @@ export default {
   'rd.noChecklist': 'इस प्रकार के लिए कोई चेकलिस्ट नहीं',
   'rd.noTeam': 'अभी किसी को नियुक्त नहीं किया गया',
   'rd.shared': 'साझा',
+  'u.km': '{n} किमी',
+  'u.min': '{n} मिनट',
+  'capl.cath_lab': 'कैथ लैब',
+  'capl.stroke_unit': 'स्ट्रोक यूनिट',
+  'capl.icu': 'ICU',
+  'hd.distance': 'दूरी (सीधी रेखा)',
+  'hd.travel': 'यात्रा समय',
+  'ck.none': 'इस आपातकाल के प्रकार के लिए कोई चेकलिस्ट नहीं।',
+  'ck.saveFail': 'सहेजा नहीं जा सका: {msg}',
 };

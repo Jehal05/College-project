@@ -30,14 +30,14 @@ export default function HospitalDetails({ hospital, type, onClose }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-slate-100 p-3">
-          <div className="text-sm text-slate-500">Distance (straight line)</div>
-          <div className="text-2xl font-bold">{hospital.distance_km} km</div>
+          <div className="text-sm text-slate-500">{t('hd.distance')}</div>
+          <div className="text-2xl font-bold">{t('u.km', { n: hospital.distance_km })}</div>
         </div>
         <div className="rounded-xl bg-slate-100 p-3">
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            Travel time <SimulatedBadge text="Simulated ETA" className="!text-xs" />
+            {t('hd.travel')} <SimulatedBadge text="Simulated ETA" className="!text-xs" />
           </div>
-          <div className="text-2xl font-bold">{hospital.eta_min} min</div>
+          <div className="text-2xl font-bold">{t('u.min', { n: hospital.eta_min })}</div>
         </div>
       </div>
 

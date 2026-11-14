@@ -544,4 +544,13 @@ export default {
   'rd.noChecklist': 'No checklist for this type',
   'rd.noTeam': 'No one assigned yet',
   'rd.shared': 'Shared',
+  'u.km': '{n} km',
+  'u.min': '{n} min',
+  'capl.cath_lab': 'Cath Lab',
+  'capl.stroke_unit': 'Stroke Unit',
+  'capl.icu': 'ICU',
+  'hd.distance': 'Distance (straight line)',
+  'hd.travel': 'Travel time',
+  'ck.none': 'No checklist for this emergency type.',
+  'ck.saveFail': 'Could not save: {msg}',
 };

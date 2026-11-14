@@ -133,7 +133,7 @@ export default function MapPage() {
                 eventHandlers={{ click: () => setSelectedId(h.id) }}
               >
                 <Tooltip direction="top" offset={[0, -44]}>
-                  {h.name} · {h.distance_km} km
+                  {h.name} · {t('u.km', { n: h.distance_km })}
                 </Tooltip>
               </Marker>
             ))}
@@ -185,7 +185,7 @@ export default function MapPage() {
                   >
                     <div className="flex justify-between font-semibold">
                       <span>{h.name}</span>
-                      <span>{h.distance_km} km · {h.eta_min} min</span>
+                      <span>{t('u.km', { n: h.distance_km })} · {t('u.min', { n: h.eta_min })}</span>
                     </div>
                     <div className="mt-1">
                       <CapabilityBadges capabilities={h.capabilities} size="sm" />

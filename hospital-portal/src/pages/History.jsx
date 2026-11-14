@@ -14,13 +14,14 @@ import { downloadText } from '../services/download.js';
 import { isFinal } from '../services/stateMachine.js';
 import { formatSeconds } from '../services/report.js';
 import { EMERGENCY_TYPES, SEVERITY, SEVERITY_STYLES } from '../services/contract.js';
-import { useT } from '../i18n/index.js';
-import { stateText, severityText, typeText } from '../i18n/phrases.js';
+import { useT, useLang } from '../i18n/index.js';
+import { stateText, severityText, typeText, formatCreated } from '../i18n/phrases.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
 
 export default function History() {
   const t = useT();
+  const lang = useLang();
   const { cases, loading, error, reload } = useHistory();
   const [asking, setAsking] = useState(false);
   const saved = savedCount();
@@ -88,7 +89,7 @@ export default function History() {
             {rows.map((e) => (
               <tr key={`${e.emergency_id}|${e.created_at}`} data-testid="history-row" data-id={e.emergency_id} data-state={e.state} className="border-t border-slate-200">
                 <td className="px-4 py-3"><b>{e.emergency_id}</b><span className="block text-sm text-slate-500">{t('hist.patientSample', { id: e.patient_id })}{e.sample ? t('hist.sampleCase') : ''}</span></td>
-                <td className="px-4 py-3 text-base">{new Date(e.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</td>
+                <td className="px-4 py-3 text-base">{formatCreated(e.created_at, lang)}</td>
                 <td className="px-4 py-3">{typeText(t, e.type)}</td>
                 <td className="px-4 py-3"><span className={`rounded-full px-3 py-1 text-base font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, e.severity)}</span></td>
                 <td className="px-4 py-3 text-base">{hospitalName(e.alerted_hospital_id)}</td>
