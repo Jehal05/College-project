@@ -234,7 +234,7 @@ Phase 5 added the passport, responder page and notification strings (`passport.*
 | `login.loading` | Signing in... | साइन इन हो रहा है... | સાઇન ઇન થઈ રહ્યું છે... | [ ] |
 | `login.error` | Invalid email or password | ईमेल या पासवर्ड गलत है | ઇમેઇલ અથવા પાસવર્ડ ખોટો છે | [ ] |
 | `login.networkError` | Cannot reach the server. Is the mock server running? | सर्वर से संपर्क नहीं हो पा रहा। क्या मॉक सर्वर चालू है? | સર્વર સુધી પહોંચી શકાતું નથી. શું મૉક સર્વર ચાલુ છે? | [ ] |
-| `login.wrongRole` | This app is for patients. Staff should use the hospital portal. | यह ऐप मरीज़ों के लिए है। स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ માટે છે. સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
+| `login.wrongRole` | This app is for patients, their family, volunteers and admins. Hospital staff should use the hospital portal. | यह ऐप मरीज़ों, उनके परिवार, स्वयंसेवकों और एडमिन के लिए है। अस्पताल स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ, તેમના પરિવાર, સ્વયંસેવકો અને એડમિન માટે છે. હૉસ્પિટલ સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
 | `login.demoHint` | Demo account: patient@demo.test / demo1234 | डेमो खाता: patient@demo.test / demo1234 | ડેમો ખાતું: patient@demo.test / demo1234 | [ ] |
 | `nav.label` | Main navigation | मुख्य नेविगेशन | મુખ્ય નેવિગેશન | [ ] |
 | `nav.home` | Home | होम | હોમ | [ ] |
@@ -600,12 +600,86 @@ The texts of the family screen live in `src/i18n/family.*.json` (loaded with the
 | `family.checkin.CANNOT_REACH` | I can't reach them | मैं उनसे संपर्क नहीं कर पा रहा | હું તેમનો સંપર્ક કરી શકતો નથી | [ ] |
 | `family.checkin.done` | Your message was sent. | आपका संदेश भेज दिया गया। | તમારો સંદેશ મોકલવામાં આવ્યો છે. | [ ] |
 | `family.checkin.error` | Could not send. Please try again. | भेजा नहीं जा सका। कृपया दोबारा कोशिश करें। | મોકલી શકાયું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
-| `login.wrongRole` | This app is for patients and their family. Staff should use the hospital portal. | यह ऐप मरीज़ों और उनके परिवार के लिए है। स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ અને તેમના પરિવાર માટે છે. સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
+| `login.wrongRole` | This app is for patients, their family, volunteers and admins. Hospital staff should use the hospital portal. | यह ऐप मरीज़ों, उनके परिवार, स्वयंसेवकों और एडमिन के लिए है। अस्पताल स्टाफ़ अस्पताल पोर्टल का उपयोग करें। | આ એપ દર્દીઓ, તેમના પરિવાર, સ્વયંસેવકો અને એડમિન માટે છે. હૉસ્પિટલ સ્ટાફે હૉસ્પિટલ પોર્ટલનો ઉપયોગ કરવો. | [ ] |
 | `invite.title` | Invite a family member | परिवार के सदस्य को आमंत्रित करें | પરિવારના સભ્યને આમંત્રિત કરો | [ ] |
 | `invite.help` | Create a code and give it to a relative. They sign in to this app with their own account and enter it. They only see what you chose to share. | एक कोड बनाएँ और किसी रिश्तेदार को दें। वे अपने खाते से इस ऐप में साइन इन करके इसे दर्ज करते हैं। उन्हें केवल वही दिखता है जो आपने साझा करना चुना है। | કોડ બનાવો અને સંબંધીને આપો. તેઓ પોતાના ખાતાથી આ એપમાં સાઇન ઇન કરીને તે દાખલ કરે છે. તેમને ફક્ત તે જ દેખાય છે જે તમે વહેંચવાનું પસંદ કર્યું છે. | [ ] |
 | `invite.create` | Create invite code | आमंત्रण कोड बनाएँ | આમંત્રણ કોડ બનાવો | [ ] |
 | `invite.valid` | Valid for 24 hours. | 24 घंटे के लिए मान्य। | 24 કલાક માટે માન્ય. | [ ] |
 | `invite.error` | Could not create a code. Please try again. | कोड नहीं बन सका। कृपया दोबारा कोशिश करें। | કોડ બનાવી શકાયો નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+
+## Volunteer responder and admin screens (Phase 10, AI-written, not reviewed)
+
+Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` was reworded too (see the family table).
+
+| Key | English | Hindi | Gujarati | OK |
+|---|---|---|---|---|
+| `responder.title` | Volunteer responder | स्वयंसेवी उत्तरदाता | સ્વયંસેવક પ્રતિભાવક | [ ] |
+| `responder.intro` | Someone nearby may need help. Accept an alert to see what the person chose to share. This is a simulation: in a real emergency call 112. | आस-पास किसी को मदद की ज़रूरत हो सकती है। अलर्ट स्वीकार करें और देखें कि उस व्यक्ति ने क्या साझा किया है। यह एक सिमुलेशन है: असली आपात स्थिति में 112 पर कॉल करें। | નજીકમાં કોઈને મદદની જરૂર હોઈ શકે છે. ચેતવણી સ્વીકારો અને જુઓ કે તે વ્યક્તિએ શું વહેંચ્યું છે. આ સિમ્યુલેશન છે: સાચી કટોકટીમાં 112 પર કૉલ કરો. | [ ] |
+| `responder.notVerified` | Your account is waiting for an admin to verify it. You will see alerts after that. | आपका खाता एडमिन के सत्यापन की प्रतीक्षा में है। उसके बाद आपको अलर्ट दिखेंगे। | તમારું ખાતું એડમિન દ્વારા ચકાસણીની રાહ જુએ છે. ત્યાર પછી તમને ચેતવણીઓ દેખાશે. | [ ] |
+| `responder.none` | No alerts right now. | अभी कोई अलर्ट नहीं है। | હાલમાં કોઈ ચેતવણી નથી. | [ ] |
+| `responder.distance` | {{metres}} m away | {{metres}} मीटर दूर | {{metres}} મીટર દૂર | [ ] |
+| `responder.accept` | Accept | स्वीकार करें | સ્વીકારો | [ ] |
+| `responder.accepted` | You accepted this alert. | आपने यह अलर्ट स्वीकार किया है। | તમે આ ચેતવણી સ્વીકારી છે. | [ ] |
+| `responder.age` | Age {{age}} | आयु {{age}} | ઉંમર {{age}} | [ ] |
+| `responder.allergies` | Allergies: {{list}} | एलर्जी: {{list}} | એલર્જી: {{list}} | [ ] |
+| `responder.location` | Location: {{latitude}}, {{longitude}} | स्थान: {{latitude}}, {{longitude}} | સ્થાન: {{latitude}}, {{longitude}} | [ ] |
+| `responder.noLocation` | Location is not shared. | स्थान साझा नहीं किया गया है। | સ્થાન વહેંચાયેલું નથી. | [ ] |
+| `responder.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `responder.acceptError` | Could not accept. The alert may have ended. | स्वीकार नहीं हो सका। अलर्ट समाप्त हो चुका हो सकता है। | સ્વીકારી શકાયું નથી. ચેતવણી પૂરી થઈ ગઈ હશે. | [ ] |
+| `responder.state.SOS_SENT` | Alert sent | अलर्ट भेजा गया | ચેતવણી મોકલાઈ | [ ] |
+| `responder.state.HOSPITAL_ACKNOWLEDGED` | Hospital has seen it | अस्पताल ने देख लिया | હૉસ્પિટલે જોયું | [ ] |
+| `responder.state.AMBULANCE_DISPATCHED` | Ambulance sent | एम्बुलेंस भेजी गई | એમ્બ્યુલન્સ મોકલાઈ | [ ] |
+| `responder.state.EN_ROUTE` | Ambulance on its way | एम्बुलेंस रास्ते में है | એમ્બ્યુલન્સ રસ્તામાં છે | [ ] |
+| `responder.state.ARRIVED` | Ambulance arrived | एम्बुलेंस पहुँच गई | એમ્બ્યુલન્સ પહોંચી | [ ] |
+| `volunteer.title` | Become a volunteer responder | स्वयंसेवी उत्तरदाता बनें | સ્વયંસેવક પ્રતિભાવક બનો | [ ] |
+| `volunteer.intro` | Sign up, then an admin checks your account. Until then you will not receive alerts. | साइन अप करें, फिर एडमिन आपका खाता जाँचेगा। तब तक आपको अलर्ट नहीं मिलेंगे। | સાઇન અપ કરો, પછી એડમિન તમારું ખાતું તપાસશે. ત્યાં સુધી તમને ચેતવણીઓ મળશે નહીં. | [ ] |
+| `volunteer.name` | Full name | पूरा नाम | પૂરું નામ | [ ] |
+| `volunteer.email` | Email | ईमेल | ઇમેઇલ | [ ] |
+| `volunteer.password` | Password (at least 8 characters) | पासवर्ड (कम से कम 8 अक्षर) | પાસવર્ડ (ઓછામાં ઓછા 8 અક્ષર) | [ ] |
+| `volunteer.submit` | Sign up | साइन अप करें | સાઇન અપ કરો | [ ] |
+| `volunteer.done` | Thank you. An admin will verify your account. You can sign in after that. | धन्यवाद। एडमिन आपका खाता सत्यापित करेगा। उसके बाद आप साइन इन कर सकते हैं। | આભાર. એડમિન તમારું ખાતું ચકાસશે. ત્યાર પછી તમે સાઇન ઇન કરી શકશો. | [ ] |
+| `volunteer.exists` | This email is already registered. | यह ईमेल पहले से पंजीकृत है। | આ ઇમેઇલ પહેલેથી નોંધાયેલો છે. | [ ] |
+| `volunteer.invalid` | Please fill in every field. The password needs at least 8 characters. | कृपया हर खाना भरें। पासवर्ड में कम से कम 8 अक्षर होने चाहिए। | કૃપા કરીને દરેક ખાનું ભરો. પાસવર્ડમાં ઓછામાં ઓછા 8 અક્ષર હોવા જોઈએ. | [ ] |
+| `volunteer.error` | Could not sign up. Please try again. | साइन अप नहीं हो सका। कृपया दोबारा कोशिश करें। | સાઇન અપ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `volunteer.back` | Back to sign in | साइन इन पर वापस जाएँ | સાઇન ઇન પર પાછા જાઓ | [ ] |
+| `admin.title` | Admin | एडमिन | એડમિન | [ ] |
+| `admin.intro` | Manage accounts, approve texts and read the access log. Simulated data only. | खाते प्रबंधित करें, पाठ स्वीकृत करें और एक्सेस लॉग पढ़ें। केवल सिमुलेटेड डेटा। | ખાતાં સંભાળો, લખાણ મંજૂર કરો અને એક્સેસ લૉગ વાંચો. ફક્ત સિમ્યુલેટેડ ડેટા. | [ ] |
+| `admin.users` | Accounts | खाते | ખાતાં | [ ] |
+| `admin.role.PATIENT` | Patient | मरीज़ | દર્દી | [ ] |
+| `admin.role.HOSPITAL_STAFF` | Hospital staff | अस्पताल स्टाफ़ | હૉસ્પિટલ સ્ટાફ | [ ] |
+| `admin.role.ADMIN` | Admin | एडमिन | એડમિન | [ ] |
+| `admin.role.FAMILY` | Family | परिवार | પરિવાર | [ ] |
+| `admin.role.RESPONDER` | Volunteer | स्वयंसेवी | સ્વયંસેવક | [ ] |
+| `admin.disabled` | Disabled | बंद | બંધ | [ ] |
+| `admin.verified` | Verified | सत्यापित | ચકાસાયેલ | [ ] |
+| `admin.notVerified` | Not verified | सत्यापित नहीं | ચકાસાયેલ નથી | [ ] |
+| `admin.disable` | Disable | बंद करें | બંધ કરો | [ ] |
+| `admin.enable` | Enable | चालू करें | ચાલુ કરો | [ ] |
+| `admin.verify` | Verify | सत्यापित करें | ચકાસો | [ ] |
+| `admin.userError` | Could not change this account. | यह खाता बदला नहीं जा सका। | આ ખાતું બદલી શકાયું નથી. | [ ] |
+| `admin.ownAccount` | You cannot disable your own account. | आप अपना खाता बंद नहीं कर सकते। | તમે તમારું પોતાનું ખાતું બંધ કરી શકતા નથી. | [ ] |
+| `admin.content` | Texts | पाठ | લખાણ | [ ] |
+| `admin.content.emergency_numbers` | Emergency numbers | आपातकालीन नंबर | કટોકટી નંબર | [ ] |
+| `admin.content.first_aid_basics` | First-aid basics (not reviewed by a doctor) | प्राथमिक उपचार की बुनियादी बातें (डॉक्टर ने जाँचा नहीं) | પ્રાથમિક સારવારની મૂળભૂત બાબતો (ડૉક્ટરે તપાસી નથી) | [ ] |
+| `admin.version` | Version {{n}} | संस्करण {{n}} | આવૃત્તિ {{n}} | [ ] |
+| `admin.approved` | Approved | स्वीकृत | મંજૂર | [ ] |
+| `admin.notApproved` | Not approved | स्वीकृत नहीं | મંજૂર નથી | [ ] |
+| `admin.edit` | Edit | संपादित करें | ફેરફાર કરો | [ ] |
+| `admin.editNote` | A changed text stays hidden from the apps until you approve it. | बदला हुआ पाठ आपके स्वीकृत करने तक ऐप्स से छिपा रहता है। | બદલાયેલું લખાણ તમે મંજૂર કરો ત્યાં સુધી એપ્સમાંથી છુપાયેલું રહે છે. | [ ] |
+| `admin.itemsLabel` | Text (one line per item) | पाठ (प्रति आइटम एक पंक्ति) | લખાણ (દરેક બાબત માટે એક લીટી) | [ ] |
+| `admin.approveBox` | Approve this text | इस पाठ को स्वीकृत करें | આ લખાણ મંજૂર કરો | [ ] |
+| `admin.save` | Save | सहेजें | સાચવો | [ ] |
+| `admin.saved` | Saved. | सहेजा गया। | સાચવ્યું. | [ ] |
+| `admin.saveError` | Could not save. | सहेजा नहीं जा सका। | સાચવી શકાયું નથી. | [ ] |
+| `admin.audit` | Access log | एक्सेस लॉग | એક્સેસ લૉગ | [ ] |
+| `admin.auditEmpty` | Nothing recorded yet. | अभी कुछ दर्ज नहीं है। | હજી કંઈ નોંધાયું નથી. | [ ] |
+| `admin.when` | When | कब | ક્યારે | [ ] |
+| `admin.who` | Who | कौन | કોણ | [ ] |
+| `admin.action` | Action | क्रिया | ક્રિયા | [ ] |
+| `admin.outcome` | Result | परिणाम | પરિણામ | [ ] |
+| `admin.refresh` | Refresh | ताज़ा करें | તાજું કરો | [ ] |
+| `admin.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `login.volunteer` | Become a volunteer responder | स्वयंसेवी उत्तरदाता बनें | સ્વયંસેવક પ્રતિભાવક બનો | [ ] |
 
 ## Not translated on purpose
 

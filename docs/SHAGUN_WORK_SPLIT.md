@@ -1,13 +1,13 @@
 # Shagun's work: how it is shared
 
-Shagun's branch holds only the initial commit, so the family, responder and admin apps and their backend endpoints are shared. This is a proposal; if Shagun has local work, collect it first and shrink the split.
+Update: all three apps are now built by Jehal. Original proposal below. Shagun's branch holds only the initial commit, so the family, responder and admin apps and their backend endpoints are shared. This is a proposal; if Shagun has local work, collect it first and shrink the split.
 
 | Piece | Owner | Why |
 |---|---|---|
 | Family app (live status, hospital, ambulance, only shared details) | Jehal | Reuses the patient app login, WebSocket and consent code. **Built** as `/family` in the patient app. |
 | Mock endpoints for family, responder and admin, plus contract text | Jehal | **Built** (`mock-server/otherApps.js`, `docs/API_CONTRACT.md` Phase 10). |
-| Admin app: users, hospitals, content, audit log | Puneet | Portal already has admin scope and the activity log. |
-| Responder app: assigned emergency, allowed patient summary, on the way / arrived | Puneet | Close to the portal's ambulance and dispatch views. |
+| Admin app: users, content approval, audit log | Jehal (done, as `/admin` in the patient app) | Puneet's portal keeps its own admin page for hospitals; the two do not overlap. |
+| Responder app: sign-up, alerts, accept (volunteer responders) | Jehal (done, `/volunteer` and `/responder`) | The responder status updates (on the way, arrived) are not built: the contract has no endpoint for them yet. |
 | Backend endpoints: family, responder, admin, content, feedback, privacy | Daksh | Owns the backend. Starts after the 27 core contract checks pass. |
 
 Order for Daksh: audit and admin users, family, responder, then content, feedback and privacy.

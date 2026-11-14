@@ -6,6 +6,7 @@ import { Skeleton as Wait } from '../components/ui/Feedback';
 import { familyCheckin, familyLink, getFamilyPatients } from '../services/api';
 import { connectEvents } from '../services/socket';
 import useAuth from '../hooks/useAuth';
+import useLazyStrings from '../hooks/useLazyStrings';
 import FormField from '../components/FormField';
 import ErrorMessage from '../components/ErrorMessage';
 import LanguageSelect from '../components/LanguageSelect';
@@ -14,23 +15,7 @@ import Card from '../components/ui/Card';
 import Icon from '../components/icons';
 import { Chip, Skeleton } from '../components/ui/Feedback';
 
-// The family texts are their own small files, loaded with this screen only (they are not part of the offline install).
 const BUNDLES = { en: () => import('../i18n/family.en.json'), hi: () => import('../i18n/family.hi.json'), gu: () => import('../i18n/family.gu.json') };
-function useFamilyStrings() {
-  const { i18n } = useTranslation();
-  const lang = BUNDLES[i18n.language] ? i18n.language : 'en';
-  const [loaded, setLoaded] = useState('');
-  useEffect(() => {
-    let on = true;
-    Promise.all([BUNDLES.en(), BUNDLES[lang]()]).then(([en, cur]) => {
-      i18n.addResourceBundle('en', 'translation', en.default, true, true);
-      i18n.addResourceBundle(lang, 'translation', cur.default, true, true);
-      if (on) setLoaded(lang);
-    }).catch(() => { if (on) setLoaded(lang); }); // without the file the English words of the key names would show; the screen still works
-    return () => { on = false; };
-  }, [i18n, lang]);
-  return loaded === lang;
-}
 
 const MESSAGES = ['ON_MY_WAY', 'CALLING_NOW', 'CANNOT_REACH'];
 const SHARE = ['location', 'history', 'vitals', 'reports'];
@@ -89,7 +74,7 @@ function PatientCard({ patient, onChanged }) {
 
 export default function Family() {
   const { t } = useTranslation();
-  const ready = useFamilyStrings();
+  const ready = useLazyStrings(BUNDLES);
   const { signOut } = useAuth();
   const [patients, setPatients] = useState(null);
   const [error, setError] = useState('');

@@ -50,6 +50,7 @@ for (const file of files) {
   console.log('\n=== ' + file + ' ===');
   const r = spawnSync('node', [path.join(here, 'browser', file)], { env, encoding: 'utf8' });
   const lines = (r.stdout || '').split('\n'); const total = lines.filter((l) => /^(PASS|FAIL) /.test(l)).length;
+  if (process.env.VERBOSE) console.log(r.stdout);
   lines.filter((l) => l.startsWith('FAIL ')).forEach((l) => console.log(l)); if (r.status !== 0 && r.stderr) console.log(r.stderr.split('\n').slice(0, 6).join('\n'));
   console.log(r.status === 0 ? 'PASS  ' + file + ' (' + total + ' checks)' : 'FAIL  ' + file);
   summary.push([file, r.status === 0, total]);

@@ -8,7 +8,7 @@
   "login.loading": "Signing in...",
   "login.error": "Invalid email or password",
   "login.networkError": "Cannot reach the server. Is the mock server running?",
-  "login.wrongRole": "This app is for patients and their family. Staff should use the hospital portal.",
+  "login.wrongRole": "This app is for patients, their family, volunteers and admins. Hospital staff should use the hospital portal.",
   "login.demoHint": "Demo account: patient@demo.test / demo1234",
   "nav.label": "Main navigation",
   "nav.home": "Home",
@@ -518,5 +518,6 @@
   "invite.help": "Create a code and give it to a relative. They sign in to this app with their own account and enter it. They only see what you chose to share.",
   "invite.create": "Create invite code",
   "invite.valid": "Valid for 24 hours.",
-  "invite.error": "Could not create a code. Please try again."
+  "invite.error": "Could not create a code. Please try again.",
+  "login.volunteer": "Become a volunteer responder"
 }

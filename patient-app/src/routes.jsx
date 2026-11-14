@@ -2,6 +2,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { homeFor } from './utils/roles';
 import useAuth from './hooks/useAuth';
 import Login from './screens/Login';
 import Home from './screens/Home';
@@ -24,6 +25,9 @@ const Reports = screen(() => import('./screens/Reports'));
 const Reminders = screen(() => import('./screens/Reminders'));
 const Summary = screen(() => import('./screens/Summary'));
 const Family = screen(() => import('./screens/Family'));
+const Responder = screen(() => import('./screens/Responder'));
+const Volunteer = screen(() => import('./screens/Volunteer'));
+const Admin = screen(() => import('./screens/Admin'));
 const DemoTools = DEMO_ENABLED ? screen(() => import('./screens/DemoTools')) : null; // left out of normal builds
 
 function Waiting() {
@@ -36,17 +40,17 @@ function Waiting() {
 }
 import NotFound from './screens/NotFound';
 
-// Patient screens. A relative who signs in goes to /family and cannot open patient screens.
+// Patient screens. Anyone else who signs in goes to their own screen and cannot open patient screens.
 function Protected({ children }) {
   const { isLoggedIn, session } = useAuth();
   if (!isLoggedIn) return <Navigate to="/login" replace />;
-  return session && session.role === 'FAMILY' ? <Navigate to="/family" replace /> : children;
+  return session && session.role !== 'PATIENT' ? <Navigate to={homeFor(session.role)} replace /> : children;
 }
 
-function FamilyOnly({ children }) {
+function RoleOnly({ role, children }) {
   const { isLoggedIn, session } = useAuth();
   if (!isLoggedIn) return <Navigate to="/login" replace />;
-  return session && session.role === 'FAMILY' ? children : <Navigate to="/" replace />;
+  return session && session.role === role ? children : <Navigate to={session ? homeFor(session.role) : '/login'} replace />;
 }
 
 export default function AppRoutes() {
@@ -61,7 +65,10 @@ export default function AppRoutes() {
       <Route path="/reports" element={<Protected><Reports /></Protected>} />
       <Route path="/passport" element={<Protected><Passport /></Protected>} />
       <Route path="/p/:token" element={<PassportView />} />
-      <Route path="/family" element={<FamilyOnly><Family /></FamilyOnly>} />
+      <Route path="/family" element={<RoleOnly role="FAMILY"><Family /></RoleOnly>} />
+      <Route path="/responder" element={<RoleOnly role="RESPONDER"><Responder /></RoleOnly>} />
+      <Route path="/volunteer" element={<Volunteer />} />
+      <Route path="/admin" element={<RoleOnly role="ADMIN"><Admin /></RoleOnly>} />
       <Route path="/symptoms" element={<Protected><Symptoms /></Protected>} />
       <Route path="/emergency/:id" element={<Protected><Emergency /></Protected>} />
       <Route path="/cancelled" element={<Protected><Cancelled /></Protected>} />

@@ -4,7 +4,7 @@
 - New `mock-server/otherApps.js`: family invite and link, family status and check-in, volunteer sign-up, responder alerts and accept, admin users, approved content, feedback, privacy requests. Details in `docs/API_CONTRACT.md` (Phase 10).
 - Family and responder WebSockets receive reduced events only (`family.status`, `responder.alert`).
 - Login refuses a disabled account (403). New demo users `family@demo.test` and `responder@demo.test`.
-- Contract script: 9 optional Phase 10 checks. Family screens in the patient app: see README.
+- Contract script: 9 optional Phase 10 checks. Patient app: family screen, volunteer sign-up and responder screen, admin screen (see README). A relative or volunteer sees a field only if the patient allowed it at SOS time and still allows it.
 
 ## Phase 9: what Puneet needs (mock server)
 - `GET /passport/{patient_id}` for staff and admin (consent honoured, every read logged); `passport_available` flag in `emergency.created`.

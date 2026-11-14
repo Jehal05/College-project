@@ -128,6 +128,15 @@ export const createFamilyInvite = (id) => request(patientPath(id, '/family-invit
 export const familyLink = (inviteCode) => request('/family/link', { method: 'POST', body: { invite_code: inviteCode } });
 export const getFamilyPatients = () => request('/family/patients');
 export const familyCheckin = (body) => request('/family/checkin', { method: 'POST', body });
+// Volunteer responders and admins (Phase 10)
+export const registerResponder = (body) => request('/responders/register', { method: 'POST', body });
+export const getResponderAlerts = () => request('/responders/alerts');
+export const acceptAlert = (id) => request('/responders/' + encodeURIComponent(id) + '/accept', { method: 'POST' });
+export const getAdminUsers = () => request('/admin/users');
+export const patchAdminUser = (body) => request('/admin/users', { method: 'PATCH', body });
+export const getContent = (type) => request('/content/' + encodeURIComponent(type));
+export const putContent = (type, body) => request('/content/' + encodeURIComponent(type), { method: 'PUT', body });
+export const getAudit = (page = 1) => request('/audit?page=' + page + '&page_size=20');
 export const getDemoState = () => request('/demo/state');
 export const setDemoSpeed = (multiplier) => request('/demo/speed', { method: 'POST', body: { multiplier } });
 export const setDemoVitals = (change) => request('/demo/vitals', { method: 'POST', body: change });

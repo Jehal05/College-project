@@ -70,10 +70,10 @@ await p.getByRole('button', { name: 'Sign out' }).click(); await p.waitForURL(BA
 check('I3 sign out returns to the login page', p.url() === BASE + '/login');
 await ctx.close();
 
-// --- staff and responder still cannot use this app ---
-for (const email of ['staff@demo.test', 'responder@demo.test']) {
+// --- hospital staff still cannot use this app ---
+for (const email of ['staff@demo.test']) {
   ctx = await phone(browser); p = await newPage(ctx); await signIn(p, email); await sleep(900);
-  check('R1 ' + email + ' is told to use their own app and stays on the login page', p.url() === BASE + '/login' && (await p.innerText('body')).includes('patients and their family'));
+  check('R1 ' + email + ' is told to use their own app and stays on the login page', p.url() === BASE + '/login' && (await p.innerText('body')).includes('Hospital staff should use the hospital portal'));
   await ctx.close();
 }
 

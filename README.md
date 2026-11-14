@@ -214,8 +214,11 @@ Mock server and one patient-app message (details in `docs/API_CONTRACT.md`, "Pha
 Shagun's three apps are shared between Jehal, Puneet and Daksh (`docs/SHAGUN_WORK_SPLIT.md`).
 - **Mock server:** endpoints for family linking and status, volunteer responders, admin users, approved content, feedback and privacy requests (`mock-server/otherApps.js`, table in `docs/API_CONTRACT.md`, "Phase 10"). Family and responder WebSockets get reduced events only. 9 optional contract checks.
 - **Family screen (patient app):** a relative signs in with `family@demo.test` (password `demo1234`), links with an invite code (`FAM-0417`, or a code the patient makes under Profile > Emergency contacts > "Invite a family member"), sees only what the patient shared, follows a plain live status and sends a check-in ("I'm on my way"). Patient screens are closed to a relative. Staff and responders are still told to use their own app.
-- Family texts are separate small files (`src/i18n/family.*.json`) loaded with the screen, so the offline install stays under budget (447 KiB of 450). **Hindi and Gujarati family texts are AI-written and need a native speaker** (add them to `docs/TRANSLATION_REVIEW.md`).
-- Not built: the responder app and the admin app (Puneet), and the real backend endpoints (Daksh).
+- Screen texts are separate small files (`src/i18n/family|responder|admin.*.json`) loaded with the screen, so the offline install stays under budget. **Hindi and Gujarati texts for these screens are AI-written and need a native speaker** (listed in `docs/TRANSLATION_REVIEW.md`).
+- **Volunteer responder screens:** `/volunteer` (sign-up, starts unverified) and `/responder` (alerts with a category and a distance only; accepting shows the name, age and, with consent, allergies and place). Demo login `responder@demo.test` (verified).
+- **Admin screen:** `/admin` for `admin@demo.test`: accounts (disable, verify volunteers), texts with approval (a changed text stays hidden until approved), and the access log. The list of text types is fixed in the screen until the backend has a list endpoint.
+- Each role lands on its own screen after signing in and cannot open the others. Hospital staff are still told to use the hospital portal. Offline install: 449 of 450 KiB, so the next addition to the main bundle needs room made first.
+- Not built: the real backend endpoints (Daksh). Shagun's branch was never used; this work replaces it.
 
 ## Phase 5: health passport, integration and release
 

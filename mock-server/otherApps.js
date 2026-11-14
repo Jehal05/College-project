@@ -36,6 +36,8 @@ const userId = (u) => 'usr_' + String(store.users.indexOf(u) + 1).padStart(3, '0
 const need = (...roles) => (req, res, next) => (roles.includes(req.user.role) ? next() : res.status(403).json({ error: 'This action is not allowed for your role' }));
 const linked = (u) => [...(state.links.get(u.email) || [])];
 const shared = (p) => ['location', 'history', 'vitals', 'reports'].filter((k) => p.consents && p.consents[k]);
+// A field is released only if the patient allowed it when the SOS was sent and still allows it now.
+const bothOn = (a, b) => Object.fromEntries(Object.keys(b).map((k) => [k, Boolean(a[k] && b[k])]));
 const latestLive = (pid) => [...store.emergencies.values()].filter((e) => e.patient_id === pid && LIVE.includes(e.state)).pop() || null;
 
 // ---------- family ----------
@@ -67,7 +69,7 @@ function familyView(pid) {
   const view = { patient_id: pid, name: p.name, shared_fields: shared(p), simulated: true, active_emergency: null };
   if (p.consents.vitals) { const { timestamp, ...v } = vitals.currentVitals(); view.vitals = { ...v, timestamp }; }
   if (e && e.state !== 'EMERGENCY_DETECTED') {
-    const sent = e.consents || p.consents;
+    const sent = bothOn(e.consents || p.consents, p.consents); // what was shared when the SOS was sent AND what is still shared now
     view.active_emergency = { id: e.id, state: e.state, started_at: e.status_events[0].timestamp,
       ...(e.hospital ? { hospital: { name: e.hospital.name } } : {}), ...(Number.isFinite(e.eta_seconds) ? { eta_seconds: e.eta_seconds } : {}),
       ...(sent.location && e.location ? { location: { lat: e.location.lat, lng: e.location.lng } } : {}),
@@ -123,7 +125,7 @@ router.post('/responders/:id/accept', requireAuth, need('RESPONDER'), (req, res)
   if (!e || !LIVE.includes(e.state)) return res.status(404).json({ error: 'Alert not found or already finished' });
   state.accepted = state.accepted || new Map();
   const set = state.accepted.get(req.user.email) || new Set(); set.add(e.id); state.accepted.set(req.user.email, set);
-  const p = store.patients[e.patient_id]; const c = e.consents || p.consents;
+  const p = store.patients[e.patient_id]; const c = bothOn(e.consents || p.consents, p.consents);
   const patient = { name: p.name, age: p.age, ...(c.history ? { allergies: p.allergies } : {}) };
   audit.record({ user: req.user.email, role: 'RESPONDER', action: 'responder.accept', patient_id: e.patient_id, fields: Object.keys(patient) });
   res.json({ id: e.id, accepted: true, patient, ...(c.location && e.location ? { location: { lat: e.location.lat, lng: e.location.lng } } : {}), simulated: true });

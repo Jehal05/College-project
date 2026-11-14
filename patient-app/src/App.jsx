@@ -18,7 +18,7 @@ import { useNotificationFeed } from './hooks/useNotifications';
 
 export default function App() {
   const { isLoggedIn, session } = useAuth();
-  const isPatient = Boolean(session) && session.role !== 'FAMILY'; // a relative has no reminders or safety check-in
+  const isPatient = Boolean(session) && session.role === 'PATIENT'; // others (family, volunteers, admins) have no reminders or safety check-in
   const { pathname } = useLocation();
   useLanguageSync(); // use the language saved on the patient record
   useAutoSend(); // send an unsent emergency when the connection returns
