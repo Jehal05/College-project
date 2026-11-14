@@ -408,4 +408,8 @@ export default {
   'hist.clearAsk': 'Delete the {n} cases saved in this browser? The sample past cases stay.',
   'hist.clearYes': 'Yes, clear',
   'hist.clearNo': 'No, keep',
+  'present.off': 'Presentation mode',
+  'present.on': 'Presentation mode: on',
+  'present.hint': 'Bigger text, no demo helper buttons, language fixed',
+  'present.langLocked': 'The language is fixed in presentation mode. Turn the mode off to change it.',
 };

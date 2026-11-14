@@ -6,6 +6,7 @@ import { formatTime } from '../AlertCard.jsx';
 import ActionButtons from '../ActionButtons.jsx';
 import EscalationCountdown from '../EscalationCountdown.jsx';
 import { useT } from '../../i18n/index.js';
+import { usePresenting } from '../usePresenting.js';
 import { stateText } from '../../i18n/phrases.js';
 
 const MOCK_BUTTON = 'mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-4 py-2 font-semibold text-amber-900 hover:bg-amber-100';
@@ -14,6 +15,7 @@ const MOCK_BUTTON = 'mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-
 export default function ActionsPanel({ emergency: e, next }) {
   const [error, setError] = useState('');
   const t = useT();
+  const helpers = USE_MOCK && !usePresenting(); // mock helper buttons are hidden in presentation mode
   const last = e.status_events[e.status_events.length - 1];
 
   async function run(fn) {
@@ -38,17 +40,17 @@ export default function ActionsPanel({ emergency: e, next }) {
           {last.actor ? <> {t('detail.by')} <b>{last.actor}</b></> : null} {t('detail.at')} {formatTime(last.timestamp)}
         </p>
       )}
-      {USE_MOCK && canCancel(e.state) && (
+      {helpers && canCancel(e.state) && (
         <button data-testid="mock-cancel" onClick={() => run(() => mockPatientCancel(e.emergency_id))} className={MOCK_BUTTON}>
           Mock: patient presses “I’m OK” (cancel)
         </button>
       )}
-      {USE_MOCK && isEarly(e.state) && (
+      {helpers && isEarly(e.state) && (
         <button data-testid="mock-confirm-sos" onClick={() => run(() => mockConfirmSos(e.emergency_id))} className={MOCK_BUTTON}>
           Mock: patient confirms the SOS
         </button>
       )}
-      {USE_MOCK && canEscalate(e.state) && next && (
+      {helpers && canEscalate(e.state) && next && (
         <button data-testid="mock-escalate" onClick={() => run(() => mockEscalate(e.emergency_id))} className={`${MOCK_BUTTON} ml-0 sm:ml-3`}>
           Mock: escalate now
         </button>

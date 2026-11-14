@@ -178,3 +178,26 @@ test.describe('saved mock history', () => {
     await expect(page.locator('[data-testid=history-row]').first()).toBeVisible(); // the sample past cases are still there
   });
 });
+
+test.describe('presentation mode', () => {
+  test('bigger text, mock helper buttons hidden, language fixed, and it survives a reload', async ({ page }) => {
+    await login(page);
+    await expect(page.locator('[data-testid=mock-new-alert]')).toBeVisible();
+    const size = () => page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).fontSize));
+    const normal = await size();
+    await page.click('[data-testid=presentation-toggle]');
+    await expect(page.locator('[data-testid=presentation-toggle]')).toHaveAttribute('aria-pressed', 'true');
+    expect(await size()).toBeGreaterThan(normal);
+    await expect(page.locator('[data-testid=mock-new-alert]')).toHaveCount(0);
+    await expect(page.locator('[data-testid=mock-early]')).toHaveCount(0);
+    await expect(page.locator('[data-testid=reset-demo]')).toHaveCount(0);
+    await expect(page.locator('[data-testid=lang-switch]')).toBeDisabled();
+    await page.reload();
+    await expect(page.locator('[data-testid=presentation-toggle]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-testid=mock-new-alert]')).toHaveCount(0);
+    await page.click('[data-testid=presentation-toggle]'); // off again: everything is back
+    await expect(page.locator('[data-testid=mock-new-alert]')).toBeVisible();
+    expect(await page.locator('[data-testid=lang-switch]').isDisabled()).toBe(false);
+    expect(await size()).toBe(normal);
+  });
+});

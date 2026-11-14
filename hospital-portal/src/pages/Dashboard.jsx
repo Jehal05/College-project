@@ -1,3 +1,4 @@
+import { usePresenting } from '../components/usePresenting.js';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { getScope, setScope, setSelectedId as publishSelected, subscribeUi } from '../services/uiStore.js';
 import { hiddenCount } from '../services/queueScope.js';
@@ -15,6 +16,7 @@ import OwnCapacity from '../components/OwnCapacity.jsx';
 import { useT } from '../i18n/index.js';
 
 export default function Dashboard() {
+  const presenting = usePresenting(); // in presentation mode the mock helper buttons are hidden
   const t = useT();
   const { session } = useAuth();
   const { emergencies: everyAlert, visibleEmergencies, unreadCount, loading, error, refresh, markRead } = useEmergencies();
@@ -71,7 +73,7 @@ export default function Dashboard() {
         >
           {showAvailability ? t('dash.hideBeds') : t('dash.updateBeds')}
         </button>
-        {USE_MOCK && (
+        {USE_MOCK && !presenting && (
           <>
             <button
               data-testid="mock-new-alert"

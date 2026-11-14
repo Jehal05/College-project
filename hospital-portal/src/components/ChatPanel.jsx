@@ -1,6 +1,7 @@
 // Desk and crew chat (feature #49). The same panel is used on both sides:
 //   role="desk"  in the hospital dashboard
 //   role="crew"  on the crew page (/crew/:emergencyId), opened in a second browser tab
+import { usePresenting } from './usePresenting.js';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { getMessages, onChat, sendMessage } from '../services/chatStore.js';
 import { USE_MOCK, mockCrewReply, CANNED_CREW_REPLIES } from '../services/api.js';
@@ -11,6 +12,7 @@ import { useT } from '../i18n/index.js';
 export default function ChatPanel({ emergencyId, role, senderName }) {
   const messages = useSyncExternalStore(onChat, () => getMessages(emergencyId));
   const t = useT();
+  const presenting = usePresenting();
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const box = useRef(null);
@@ -91,7 +93,7 @@ export default function ChatPanel({ emergencyId, role, senderName }) {
           <a href={`/crew/${emergencyId}`} target="_blank" rel="opener" data-testid="crew-link" className="font-semibold text-sky-700 underline">
             {t('chat.openCrew')}
           </a>
-          {USE_MOCK && (
+          {USE_MOCK && !presenting && (
             <button
               data-testid="mock-crew-reply"
               onClick={() => mockCrewReply(emergencyId)}
