@@ -57,7 +57,7 @@ Please confirm or change, one line each:
 2. One WebSocket path: I built `/ws?token=` (or an `auth` message within 5 s). Your contract said `/ws/hospitals/{hospital_id}`. Which one stays?
 3. Escalation after 30 s without acknowledge (`ESCALATION_TIMEOUT_SECONDS`): OK for the demo?
 4. `POST /location-shares` is the only call not built. Who owns it?
-5. The flaky test `test_the_patient_baseline_is_ciphertext` (random ciphertext can contain "60") failed once in CI and passed on re-run. Can you fix it?
+5. FYI: the baseline ciphertext test was already fixed in your J3 commit. I made one more short-needle test (`ECG` in `test_encrypted_columns.py`) deterministic, since 3 letters can appear in random ciphertext by chance. Please check my one-line change.
 
 ## To Jehal (add to the message above)
 

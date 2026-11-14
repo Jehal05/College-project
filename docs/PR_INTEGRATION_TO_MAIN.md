@@ -9,10 +9,10 @@
 ## Latest CI numbers (14 Nov 2026)
 | Check | Result | Run |
 |---|---|---|
-| Backend checks | 1977 tests passed; 74 endpoints built, 1 not built (`POST /location-shares`) | 43586143495 |
+| Backend checks | 1983 tests passed; 74 endpoints built, 1 not built (`POST /location-shares`) | 43601645853 |
 | Hospital portal checks | 454 unit tests passed, 22 browser tests passed | 43587514106 |
 | CI (patient app, mock, contract) | 93 unit tests, 15 of 15 browser test files, contract 27/27 core and 9/9 extras | 43586143472 |
-| CI on newest commit 79178d6 | still running when this was written, check before merging | 43587514105 |
+| CI (all apps) on the final commit | check that it is green right before merging; not recorded here | |
 
 ## What is NOT done
 - Nobody has run `start-all.ps1` or `scripts/phase1-check.ps1` on the Windows demo laptop.
