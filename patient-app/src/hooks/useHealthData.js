@@ -6,6 +6,7 @@ import useBaseline from './useBaseline';
 import useConsents from './useConsents';
 import useReports from './useReports';
 import useVitalsHistory from './useVitalsHistory';
+import useLabValues from './useLabValues';
 import { getPatient } from '../services/api';
 
 export default function useHealthData() {
@@ -17,7 +18,8 @@ export default function useHealthData() {
   const sharing = !!consents && consents.vitals === true;
   const history = useVitalsHistory(vitals, sharing);
   const { reports } = useReports(id);
+  const { labs } = useLabValues(id);
   const [patient, setPatient] = useState(null);
   useEffect(() => { getPatient(id).then(setPatient).catch(() => {}); }, [id]);
-  return { id, vitals, connected, baseline, sharing, history, reports, patient };
+  return { id, vitals, connected, baseline, sharing, history, reports, labs, patient };
 }

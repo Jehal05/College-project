@@ -96,3 +96,10 @@ A doctor should check these before anyone outside the team sees them:
 - A step is shown as done only if its exact status event exists (an EN_ROUTE event never makes "Ambulance dispatched" appear). The ETA shows only after the dispatch event.
 - "Notification sent" and "acknowledged" are separate lines. Contact acknowledgement is stated as not tracked, because the backend has no such event (listed in docs/BACKEND_GAPS.md).
 - A doctor or emergency-services adviser should check the wording of the step names and the 112 / 108 line.
+
+### 6. Report Intelligence (UI phase 1f)
+
+- The prototype cannot read report files. The person types a value from the report, reviews it, and confirms. Only then does it appear on the Twin and in Disease Intelligence.
+- There is no built-in "normal range". A value is called "Inside / Outside the range on your report" only against the low and high the person typed from their own report; with no range it says "No range given".
+- Every value and file carries "Clinician review: not reviewed". No clinician workflow exists yet.
+- The nine tests offered (HbA1c, fasting glucose, creatinine, eGFR, ALT, AST, bilirubin, total cholesterol, LDL) were chosen by the team. A doctor should confirm the list and the units (%, mg/dL, mL/min, U/L).

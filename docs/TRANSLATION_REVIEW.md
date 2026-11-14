@@ -826,6 +826,61 @@ Drafts, not yet checked by a native speaker.
 | `emc.record` | View record | रिकॉर्ड देखें | રેકોર્ડ જુઓ | [ ] |
 | `emc.notService` | HealthTwin AI is a student prototype. It is not an emergency service and not a medical device. | HealthTwin AI एक छात्र प्रोटोटाइप है। यह आपातकालीन सेवा नहीं है और चिकित्सा उपकरण नहीं है। | HealthTwin AI વિદ્યાર્થી પ્રોટોટાઇપ છે. તે કટોકટી સેવા નથી અને તબીબી ઉપકરણ નથી. | [ ] |
 
+## Report Intelligence (UI phase 1f)
+
+Drafts, not yet checked by a native speaker. Lab test names should follow the wording on real Indian lab reports.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `ri.intro` | Add values from your medical reports. They update your Twin only after you confirm them. | अपनी मेडिकल रिपोर्ट के मान जोड़ें। आपके पुष्टि करने के बाद ही ये आपके ट्विन को अपडेट करते हैं। | તમારા મેડિકલ રિપોર્ટના મૂલ્યો ઉમેરો. તમે પુષ્ટિ કરો પછી જ તે તમારા ટ્વિનને અપડેટ કરે છે. | [ ] |
+| `ri.honest` | This prototype cannot read your files by itself. Read the number from your report and type it in. Nothing reaches your Twin until you confirm it, and no clinician has reviewed it. | यह प्रोटोटाइप आपकी फ़ाइलें खुद नहीं पढ़ सकता। रिपोर्ट से संख्या पढ़कर यहाँ लिखें। आपकी पुष्टि तक कुछ भी आपके ट्विन तक नहीं पहुँचता, और किसी चिकित्सक ने इसकी समीक्षा नहीं की है। | આ પ્રોટોટાઇપ તમારી ફાઇલો જાતે વાંચી શકતું નથી. રિપોર્ટમાંથી સંખ્યા વાંચીને અહીં લખો. તમારી પુષ્ટિ સુધી કંઈ તમારા ટ્વિન સુધી પહોંચતું નથી, અને કોઈ ચિકિત્સકે તેની સમીક્ષા કરી નથી. | [ ] |
+| `ri.files` | Your uploaded reports | आपकी अपलोड की गई रिपोर्ट | તમારા અપલોડ કરેલા રિપોર્ટ | [ ] |
+| `ri.loading` | Loading reports… | रिपोर्ट लोड हो रही हैं… | રિપોર્ટ લોડ થઈ રહ્યા છે… | [ ] |
+| `ri.loadError` | Could not load your reports. | आपकी रिपोर्ट लोड नहीं हो सकीं। | તમારા રિપોર્ટ લોડ થઈ શક્યા નથી. | [ ] |
+| `ri.noFiles` | No reports uploaded yet. | अभी कोई रिपोर्ट अपलोड नहीं हुई। | હજી કોઈ રિપોર્ટ અપલોડ થયો નથી. | [ ] |
+| `ri.manageFiles` | Upload or manage files | फ़ाइलें अपलोड या प्रबंधित करें | ફાઇલો અપલોડ કે મેનેજ કરો | [ ] |
+| `ri.notReviewed` | Clinician review: not reviewed | चिकित्सक समीक्षा: समीक्षा नहीं हुई | ચિકિત્સક સમીક્ષા: સમીક્ષા થઈ નથી | [ ] |
+| `ri.add` | Add a value from a report | रिपोर्ट से एक मान जोड़ें | રિપોર્ટમાંથી એક મૂલ્ય ઉમેરો | [ ] |
+| `ri.test` | Test | जाँच | તપાસ | [ ] |
+| `ri.value` | Value | मान | મૂલ્ય | [ ] |
+| `ri.low` | Lowest value printed on the report (optional) | रिपोर्ट में छपा सबसे कम मान (वैकल्पिक) | રિપોર્ટમાં છાપેલું સૌથી ઓછું મૂલ્ય (વૈકલ્પિક) | [ ] |
+| `ri.high` | Highest value printed on the report (optional) | रिपोर्ट में छपा सबसे अधिक मान (वैकल्पिक) | રિપોર્ટમાં છાપેલું સૌથી વધુ મૂલ્ય (વૈકલ્પિક) | [ ] |
+| `ri.rangeHelp` | Type the range printed on your own report if there is one. The app does not decide what is normal. | अगर आपकी अपनी रिपोर्ट में सीमा छपी है तो वही लिखें। ऐप तय नहीं करता कि क्या सामान्य है। | તમારા પોતાના રિપોર્ટમાં શ્રેણી છાપેલી હોય તો તે લખો. એપ નક્કી કરતી નથી કે શું સામાન્ય છે. | [ ] |
+| `ri.date` | Date of the test | जाँच की तारीख | તપાસની તારીખ | [ ] |
+| `ri.fromReport` | From which report (optional) | किस रिपोर्ट से (वैकल्पिक) | કયા રિપોર્ટમાંથી (વૈકલ્પિક) | [ ] |
+| `ri.noneReport` | Not linked to a file | किसी फ़ाइल से जुड़ा नहीं | કોઈ ફાઇલ સાથે જોડાયેલું નથી | [ ] |
+| `ri.review` | Review before adding | जोड़ने से पहले जाँचें | ઉમેરતા પહેલાં તપાસો | [ ] |
+| `ri.confirmTitle` | Please check this value | कृपया यह मान जाँचें | કૃપા કરીને આ મૂલ્ય તપાસો | [ ] |
+| `ri.confirmText` | Compare it with your report. It is added to your Twin only when you press Confirm. | इसे अपनी रिपोर्ट से मिलाएँ। पुष्टि दबाने पर ही यह आपके ट्विन में जुड़ता है। | તેને તમારા રિપોર્ટ સાથે સરખાવો. પુષ્ટિ દબાવો ત્યારે જ તે તમારા ટ્વિનમાં ઉમેરાય છે. | [ ] |
+| `ri.confirm` | Confirm and add to my Twin | पुष्टि करें और मेरे ट्विन में जोड़ें | પુષ્ટિ કરો અને મારા ટ્વિનમાં ઉમેરો | [ ] |
+| `ri.edit` | Edit | बदलें | બદલો | [ ] |
+| `ri.added` | Added to your Twin. | आपके ट्विन में जोड़ दिया गया। | તમારા ટ્વિનમાં ઉમેરાયું. | [ ] |
+| `ri.saveError` | Could not save on this device. Storage may be blocked. | इस डिवाइस पर सहेजा नहीं जा सका। स्टोरेज बंद हो सकता है। | આ ડિવાઇસ પર સાચવી શકાયું નથી. સ્ટોરેજ બંધ હોઈ શકે. | [ ] |
+| `ri.confirmed` | Values you confirmed | आपके पुष्टि किए हुए मान | તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `ri.confirmedShort` | Values you confirmed from reports | रिपोर्ट से आपके पुष्टि किए हुए मान | રિપોર્ટમાંથી તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `ri.noneConfirmed` | You have not confirmed any values yet. | आपने अभी कोई मान पुष्ट नहीं किया है। | તમે હજી કોઈ મૂલ્ય પુષ્ટ કર્યું નથી. | [ ] |
+| `ri.deviceOnly` | Saved only on this device for now. They are not sent to the hospital. | अभी केवल इसी डिवाइस पर सहेजे गए हैं। ये अस्पताल को नहीं भेजे जाते। | હમણાં ફક્ત આ ડિવાઇસ પર સાચવાયા છે. તે હોસ્પિટલને મોકલાતા નથી. | [ ] |
+| `ri.measured` | Measured on {{date}} | {{date}} को जाँचा गया | {{date}} ના રોજ તપાસ્યું | [ ] |
+| `ri.printed` | Printed range {{low}} to {{high}} | छपी सीमा {{low}} से {{high}} | છાપેલી શ્રેણી {{low}} થી {{high}} | [ ] |
+| `ri.status.within` | Inside the range on your report | आपकी रिपोर्ट की सीमा के अंदर | તમારા રિપોર્ટની શ્રેણીની અંદર | [ ] |
+| `ri.status.outside` | Outside the range on your report | आपकी रिपोर्ट की सीमा के बाहर | તમારા રિપોર્ટની શ્રેણીની બહાર | [ ] |
+| `ri.status.norange` | No range given | कोई सीमा नहीं दी गई | કોઈ શ્રેણી આપી નથી | [ ] |
+| `ri.removeFor` | Delete {{name}} | {{name}} हटाएँ | {{name}} કાઢી નાખો | [ ] |
+| `ri.err.required` | Please fill this in. | कृपया यह भरें। | કૃપા કરીને આ ભરો. | [ ] |
+| `ri.err.range` | Enter a number above 0. | 0 से बड़ी संख्या लिखें। | 0 થી મોટી સંખ્યા લખો. | [ ] |
+| `ri.err.number` | Enter a number. | संख्या लिखें। | સંખ્યા લખો. | [ ] |
+| `ri.err.order` | The highest value must not be below the lowest. | सबसे अधिक मान सबसे कम मान से कम नहीं हो सकता। | સૌથી વધુ મૂલ્ય સૌથી ઓછા મૂલ્યથી ઓછું ન હોઈ શકે. | [ ] |
+| `ri.err.future` | The date cannot be in the future. | तारीख भविष्य की नहीं हो सकती। | તારીખ ભવિષ્યની ન હોઈ શકે. | [ ] |
+| `lab.hba1c` | HbA1c | HbA1c | HbA1c | [ ] |
+| `lab.fasting_glucose` | Fasting glucose | खाली पेट ग्लूकोज़ | ખાલી પેટે ગ્લુકોઝ | [ ] |
+| `lab.creatinine` | Creatinine | क्रिएटिनिन | ક્રિએટિનિન | [ ] |
+| `lab.egfr` | eGFR | eGFR | eGFR | [ ] |
+| `lab.alt` | ALT (SGPT) | ALT (SGPT) | ALT (SGPT) | [ ] |
+| `lab.ast` | AST (SGOT) | AST (SGOT) | AST (SGOT) | [ ] |
+| `lab.bilirubin` | Bilirubin | बिलीरुबिन | બિલિરુબિન | [ ] |
+| `lab.cholesterol` | Total cholesterol | कुल कोलेस्ट्रॉल | કુલ કોલેસ્ટ્રોલ | [ ] |
+| `lab.ldl` | LDL cholesterol | LDL कोलेस्ट्रॉल | LDL કોલેસ્ટ્રોલ | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

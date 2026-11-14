@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useHealthData from '../hooks/useHealthData';
 import { MODULES } from '../config/diseases';
 import { organByKey, relatedConditions, relatedReports } from '../config/organs';
+import { labsForOrgan } from '../utils/labs';
 import { metricStates, areaStatus, dataQuality } from '../utils/diseaseIntel';
 import Panel from '../components/ui/Panel';
 import StatusChip from '../components/ui/StatusChip';
@@ -22,6 +23,7 @@ export function summarize(mod, data) {
     readings,
     hasBaseline: states.some((s) => s.range),
     reports: relatedReports(organ, data.reports).length,
+    labs: labsForOrgan(data.labs, organ.key).length,
     conditions: relatedConditions(organ, data.patient && data.patient.conditions).length,
   });
   return { organ, states, status: areaStatus(states), quality, readings };

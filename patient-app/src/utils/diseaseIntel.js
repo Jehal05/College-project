@@ -23,7 +23,7 @@ export function areaStatus(states) {
 }
 
 // How much to trust the observations: more readings, a usual range, and linked records raise it. Each missing piece is listed as a reason.
-export function dataQuality({ hasMetrics, readings, hasBaseline, reports, conditions }) {
+export function dataQuality({ hasMetrics, readings, hasBaseline, reports, conditions, labs = 0 }) {
   const reasons = [];
   let score = 0;
   if (!hasMetrics) reasons.push('noLive');
@@ -31,7 +31,7 @@ export function dataQuality({ hasMetrics, readings, hasBaseline, reports, condit
     if (readings >= 30) score += 2; else if (readings >= 10) score += 1; else reasons.push('fewReadings');
     if (hasBaseline) score += 1; else reasons.push('noBaseline');
   }
-  if (reports > 0) score += 1; else reasons.push('noReports');
+  if (reports > 0 || labs > 0) score += 1; else reasons.push('noReports');
   if (conditions > 0) score += 1;
   return { level: score >= 4 ? 'good' : score >= 2 ? 'medium' : 'low', reasons, score };
 }
