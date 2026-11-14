@@ -137,4 +137,5 @@ export default {
   'error.body': 'Your alerts are not lost. Reload the page to continue.',
   'error.reload': 'Reload',
   'error.retry': 'Try again',
+  'login.expired': 'Your session expired. Please log in again.',
 };

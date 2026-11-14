@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import * as auth from '../services/auth.js';
 import { connect, disconnect } from '../services/socket.js';
 import { saveSession } from '../services/session.js';
+import { onSessionExpired } from '../services/sessionExpiry.js';
 
 const AuthContext = createContext(null);
 
@@ -14,6 +15,9 @@ export function AuthProvider({ children }) {
     connect(session.token);
     return () => disconnect();
   }, [session?.token]);
+
+  // A 401 from the backend: the session was already cleared, so drop it here too. ProtectedRoute then opens the login screen.
+  useEffect(() => onSessionExpired(() => setSession(null)), []);
 
   const value = {
     session,

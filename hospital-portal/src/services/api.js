@@ -9,6 +9,8 @@ import { emitMock } from './socket.js';
 import { getToken, getSession } from './session.js';
 import { withDistance, DEMO_LOCATION } from './geo.js';
 import { hasCapabilities } from './contract.js';
+import { isSessionExpired, messageFromBody, failureText } from './httpError.js';
+import { markExpired } from './sessionExpiry.js';
 import { normaliseHospitals, normaliseEmergency, normaliseEmergencies } from './adapters.js';
 
 /** The backend does not have this endpoint (yet): 404, 405 or 501. The screen then hides or limits that feature. */
@@ -32,9 +34,21 @@ export async function request(method, path, body) {
     // 404, 405 and 501 mean "this backend does not have that endpoint (yet)". Say so in plain words;
     // the screen then limits or switches off that one feature instead of failing.
     const missing = [404, 405, 501].includes(res.status);
-    const err = new Error(missing ? `The backend has no ${method} ${path.split('?')[0]} yet (${res.status}).` : `${method} ${path} failed: ${res.status}`);
+    // The login is no longer valid (token expired): clear it once. The app then goes to the login screen with a note.
+    const expired = isSessionExpired(res.status, path);
+    if (expired) markExpired();
+    // Use the server's own short message when it sends one.
+    const serverMessage = missing || expired ? '' : messageFromBody(await res.json().catch(() => null));
+    const err = new Error(
+      missing
+        ? `The backend has no ${method} ${path.split('?')[0]} yet (${res.status}).`
+        : expired
+          ? 'Your session expired. Please log in again.'
+          : failureText(method, path, res.status, serverMessage),
+    );
     err.status = res.status;
     err.missing = missing;
+    err.expired = expired;
     throw err;
   }
   return res.status === 204 ? null : res.json();

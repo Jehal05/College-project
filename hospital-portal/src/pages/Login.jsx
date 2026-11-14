@@ -4,6 +4,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { LOGIN_FIELD } from '../services/auth.js';
+import { takeExpiredNotice } from '../services/sessionExpiry.js';
 import { useT } from '../i18n/index.js';
 import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
 
@@ -16,6 +17,7 @@ export default function Login() {
   const [password, setPassword] = useState(USE_MOCK ? 'demo123' : 'demo-password');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [expired] = useState(() => takeExpiredNotice()); // shown once after a 401
 
   if (isLoggedIn) return <Navigate to="/dashboard" replace />;
 
@@ -64,6 +66,7 @@ export default function Login() {
           />
         </label>
 
+        {expired && !error && <p role="status" data-testid="login-expired" className="rounded-lg bg-amber-100 p-3 font-medium text-amber-900">{t('login.expired')}</p>}
         {error && <p role="alert" data-testid="login-error" className="rounded-lg bg-red-100 p-3 font-medium text-red-700">{error}</p>}
 
         <button
