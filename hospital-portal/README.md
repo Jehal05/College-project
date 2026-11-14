@@ -24,7 +24,7 @@ Log in with `staff@demo` or `admin@demo`, password `demo123` (mock mode only).
 | `VITE_USE_MOCK=false` | Calls Daksh's backend at `VITE_API_BASE_URL` and `VITE_WS_URL`. |
 
 | `VITE_PORTAL_SIMULATES_AMBULANCE` | `auto` (default), `true` or `false`. Who moves the (simulated) ambulance on the map. See below. |
-| `VITE_WS_AUTH` | `query` (default, token in the WebSocket address) or `message` (token sent as the first message, needs Daksh's OK). |
+| `VITE_WS_AUTH` | `query` (default, token in the WebSocket address) or `message` (safer for a real backend: token sent as the first message, needs Daksh's OK). |
 
 Restart `npm run dev` after changing `.env`.
 
@@ -57,7 +57,7 @@ Staff can add a **handover note** (for the next shift) or a **desk note** (500 c
 ### Known limitations (honest list)
 
 - **The login token is kept in the browser.** It is in `sessionStorage` (gone when the tab is closed), not `localStorage`. A script running on the page could still read it. This is a prototype; a real product would use short-lived tokens in an HttpOnly cookie.
-- **The token is sent in the WebSocket address** (`ws://…/ws?token=…`) by default. Addresses can end up in server logs. `VITE_WS_AUTH=message` sends it as the first message instead, but the backend must support that (question for Daksh in [docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md](docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md)).
+- **The token is sent in the WebSocket address** (`ws://…/ws?token=…`) by default. Addresses can end up in server logs. **For a real backend, `VITE_WS_AUTH=message` is the safer setting**: it sends the token as the first message instead. The backend must support that (question for Daksh in [docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md](docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md)).
 - **sessionStorage is per tab.** A new tab starts logged out. The "Open the crew view" link keeps the login because it opens from the portal. Opening `/crew/…` by typing the address asks for a login.
 - Everything medical, hospital and ambulance related is a simulated sample. This is not a real emergency system.
 

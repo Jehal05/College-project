@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AlertAnnouncer from './components/AlertAnnouncer.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
+import HospitalFallbackBanner from './components/HospitalFallbackBanner.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import NavBar from './components/NavBar.jsx';
@@ -34,6 +35,7 @@ function Shell({ children }) {
       <AlertAnnouncer />
       <NavBar />
       <OfflineBanner />
+      <HospitalFallbackBanner />
       <main className="flex-1">
         {/* A screen error shows a message here; the navigation stays usable and a new page starts clean. */}
         <ErrorBoundary key={pathname}>{children}</ErrorBoundary>

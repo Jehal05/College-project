@@ -4,10 +4,12 @@
 import { USE_MOCK, WS_URL, WS_AUTH } from './config.js';
 import { WS_EVENTS, PROPOSED_EVENTS } from './contract.js';
 import { normaliseEvent } from './adapters.js';
+import { reconnectDelay } from './backoff.js';
 
 let ws = null;
 let reconnectTimer = null;
 let wanted = false; // true between connect() and disconnect()
+let attempt = 0; // failed tries in a row; the wait grows with it and starts again after a good connection
 const handlers = new Map(); // event name -> Set of callbacks
 
 // ---- connection status: 'mock' | 'connecting' | 'live' | 'reconnecting'
@@ -33,7 +35,7 @@ function deliver(raw) {
   handlers.get('*')?.forEach((cb) => cb(message));
 }
 
-/** Open the connection (call after login). Reconnects by itself every 2 seconds if it drops. */
+/** Open the connection (call after login). If it drops, it tries again after 2 s, 4 s, 8 s ... up to 30 s (with a little jitter). */
 export function connect(token) {
   if (USE_MOCK) return setStatus('mock');
   wanted = true;
@@ -49,6 +51,7 @@ export function connect(token) {
   }
   ws = socket;
   socket.onopen = () => {
+    attempt = 0;
     if (token && WS_AUTH === 'message') socket.send(JSON.stringify({ type: 'auth', token }));
     setStatus('live');
   };
@@ -59,6 +62,10 @@ export function connect(token) {
       console.warn('Bad WebSocket message', err);
     }
   };
+  // The browser gives no useful detail here, and the address holds the token, so nothing is logged from it.
+  socket.onerror = () => {
+    if (wanted && ws === socket) setStatus('reconnecting');
+  };
   socket.onclose = () => {
     if (ws === socket) ws = null;
     if (wanted) scheduleReconnect(token);
@@ -68,12 +75,13 @@ export function connect(token) {
 function scheduleReconnect(token) {
   setStatus('reconnecting');
   clearTimeout(reconnectTimer);
-  reconnectTimer = setTimeout(() => wanted && connect(token), 2000);
+  reconnectTimer = setTimeout(() => wanted && connect(token), reconnectDelay(attempt++));
 }
 
 /** Close the connection (call on logout). */
 export function disconnect() {
   wanted = false;
+  attempt = 0;
   clearTimeout(reconnectTimer);
   if (ws) {
     const socket = ws;

@@ -12,6 +12,7 @@ import { hasCapabilities } from './contract.js';
 import { isSessionExpired, messageFromBody, failureText } from './httpError.js';
 import { markExpired } from './sessionExpiry.js';
 import { normaliseHospitals, normaliseEmergency, normaliseEmergencies } from './adapters.js';
+import { setHospitalFallback } from './hospitalSource.js';
 
 /** The backend does not have this endpoint (yet): 404, 405 or 501. The screen then hides or limits that feature. */
 export const isMissingEndpoint = (err) => Boolean(err?.missing) || [404, 405, 501].includes(err?.status);
@@ -69,9 +70,11 @@ export async function getHospitals({ lat, lng, type } = {}) {
     try {
       const q = new URLSearchParams({ ...(lat != null && lng != null ? { lat, lng } : {}), ...(type ? { type } : {}) });
       list = await request('GET', `/hospitals${q.toString() ? `?${q}` : ''}`);
+      setHospitalFallback(false);
     } catch (err) {
       console.warn('Backend unavailable, using hospitals.json', err);
       list = hospitalsSeed;
+      setHospitalFallback(true); // the banner tells the desk these are saved sample hospitals
     }
   }
   // Mock mode measures from the sample patient. With a real backend we never assume a city:

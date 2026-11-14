@@ -395,4 +395,5 @@ export default {
   'admin.f.notSaved': 'Not saved: {msg}',
   'admin.f.cancel': 'Cancel',
   'admin.f.saving': 'Saving…',
+  'hospitals.fallback': 'The hospital list could not be loaded from the server. Showing the saved sample list, so beds and units may be out of date.',
 };
