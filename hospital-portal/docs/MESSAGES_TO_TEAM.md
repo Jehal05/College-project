@@ -45,3 +45,16 @@ a. After `POST /demo/reset` the next alert gets the same id (`EM-20261113-0001`)
 b. The mock sends no "arrived" event, so the desk clicks Arrived and Handed over. Is that on purpose? Also an unanswered alert keeps escalating until the hospital list runs out. That is fine for the demo, I just want to be sure it is intended.
 
 Also `npm ci` in your repo reports 14 vulnerabilities (1 high, 2 critical). Please look at `npm audit`, but do not run `npm audit fix --force`.
+
+## To Daksh (top 5 missing calls for the demo)
+
+**Draft only. Not sent.** Puneet sends it. The full list is `docs/BACKEND_GAPS.md` on branch `integration` (measured from the code on 14 Nov 2026).
+
+Daksh, the portal and the patient app can only run on Jehal's mock because these are not in the backend yet. The five the demo needs most, in this order:
+1. `POST /emergencies`, the SOS step (or the call you prefer for "who moves to SOS_SENT"), `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}`.
+2. `POST /emergencies/{id}/ack`, `.../dispatch`, `.../status`.
+3. `GET /hospitals` and `PATCH /hospitals/{id}/availability`.
+4. The WebSocket and its events. Please tell us the one path: the portal uses `/ws?token=`, your contract says `/ws/hospitals/{hospital_id}`.
+5. `POST /ambulances/{id}/location` and `GET /ambulances`.
+
+Which of these can you build first, and by when? I will change the apps' paths to match whatever you decide, and I will only mark something agreed when you say so in writing.
