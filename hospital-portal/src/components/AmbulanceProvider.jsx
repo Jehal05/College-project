@@ -64,6 +64,15 @@ export function AmbulanceProvider({ children }) {
   }, [isLoggedIn, stopAll]);
   useEffect(() => stopAll, [stopAll]);
 
+  // A hidden tab slows its timers. When the tab is shown again, move every running trip by the time that passed.
+  useEffect(() => {
+    const onShow = () => {
+      if (document.visibilityState === 'visible') sims.current.forEach((sim) => sim.catchUp());
+    };
+    document.addEventListener('visibilitychange', onShow);
+    return () => document.removeEventListener('visibilitychange', onShow);
+  }, []);
+
   // Fleet with live status and position.
   const ambulances = useMemo(
     () =>

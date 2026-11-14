@@ -6,6 +6,9 @@
 // (see ambulance-route.test.js). components/AmbulanceProvider.jsx connects it to the app.
 import { haversineKm } from '../services/geo.js';
 
+// One step never covers more than this much wall-clock time (a laptop that slept for a day must not teleport the trip).
+export const MAX_STEP_MS = 10 * 60 * 1000;
+
 const toRad = (d) => (d * Math.PI) / 180;
 const toDeg = (r) => (r * 180) / Math.PI;
 
@@ -78,6 +81,10 @@ export function splitPath(points, cumulative, progress) {
  *   timeScale  demo speed-up (9 = nine times faster than real time)
  *   getFactor  returns the current traffic multiplier (read on every tick, so it can change mid-trip)
  *   onTick(snapshot), onPickup(snapshot) once at the patient, onArrive(snapshot) once at the hospital
+ *   now        clock in ms (default Date.now; tests pass a fake one)
+ *
+ * Movement follows REAL elapsed time, not the number of timer ticks. A browser slows timers in a hidden tab
+ * (about once a minute), so counting ticks would freeze the trip; measuring the time since the last tick makes it catch up.
  */
 export function createRouteSimulator({
   points,
@@ -89,6 +96,7 @@ export function createRouteSimulator({
   onTick,
   onPickup,
   onArrive,
+  now = Date.now,
 }) {
   const cumulative = cumulativeKm(points);
   const totalKm = cumulative[cumulative.length - 1];
@@ -97,6 +105,7 @@ export function createRouteSimulator({
   let status = 'idle'; // idle | running | paused | arrived
   let pickedUp = false;
   let timer = null;
+  let lastAt = now(); // wall-clock time of the last movement step
 
   function snapshot() {
     const factor = getFactor() || 1;
@@ -115,8 +124,15 @@ export function createRouteSimulator({
     };
   }
 
-  /** Move forward by dtMs of wall-clock time. Called by the timer; tests call it directly. */
-  function tick(dtMs = tickMs) {
+  /**
+   * Move forward. With no argument the time since the last step is used (so a throttled tab catches up).
+   * A number means "this many ms passed" (tests use it). One step never covers more than MAX_STEP_MS.
+   */
+  function tick(dtMs) {
+    const t = now();
+    const elapsed = Number.isFinite(dtMs) ? dtMs : t - lastAt;
+    lastAt = t;
+    dtMs = Math.max(0, Math.min(MAX_STEP_MS, elapsed));
     if (status !== 'running') return snapshot();
     const factor = getFactor() || 1;
     distanceKm = Math.min(totalKm, distanceKm + (speedKmh / factor) * timeScale * (dtMs / 3600000));
@@ -136,13 +152,15 @@ export function createRouteSimulator({
 
   const run = () => {
     clearInterval(timer);
-    timer = setInterval(() => tick(tickMs), tickMs);
+    lastAt = now(); // time spent paused or idle does not count
+    timer = setInterval(() => tick(), tickMs);
   };
 
   return {
     start() {
       if (status !== 'idle') return;
       status = 'running';
+      lastAt = now();
       onTick?.(snapshot()); // show the ambulance at its base straight away
       run();
     },
@@ -167,6 +185,10 @@ export function createRouteSimulator({
       if (status !== 'arrived') status = 'idle';
     },
     tick,
+    /** The tab became visible again: apply the time that passed while timers were slowed. */
+    catchUp() {
+      return tick();
+    },
     snapshot,
     get status() {
       return status;

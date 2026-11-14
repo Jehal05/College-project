@@ -147,3 +147,84 @@ test('simulator: heavier traffic means slower movement and a longer ETA', () => 
   assert.ok(etaHeavy > etaLight);
   s.stop();
 });
+
+// ---- movement follows real elapsed time (a hidden tab slows timers) ----
+import { MAX_STEP_MS } from './ambulance-route.js';
+
+const running = [];
+test.afterEach(() => {
+  while (running.length) running.pop().stop(); // the timers must not keep the test process alive
+});
+function clocked(extra = {}) {
+  const clock = { t: 1_000_000 };
+  const sim = createRouteSimulator({ points: straight, pickupIndex: 0, speedKmh: 60, timeScale: 1, tickMs: 1000, now: () => clock.t, ...extra });
+  running.push(sim);
+  return { clock, sim };
+}
+
+test('a late tick covers the whole time that passed (60 s late = 60 s of driving)', () => {
+  const { clock, sim } = clocked();
+  sim.start();
+  clock.t += 60_000;
+  const snap = sim.tick(); // one step, a minute after the start: 60 km/h for 1 minute = 1 km
+  assert.ok(near(snap.distance_km, 1, 0.001), `got ${snap.distance_km}`);
+});
+test('one big late tick equals many small ones', () => {
+  const a = clocked();
+  a.sim.start();
+  a.clock.t += 30_000;
+  const late = a.sim.tick().distance_km;
+  const b = clocked();
+  b.sim.start();
+  for (let i = 0; i < 30; i += 1) {
+    b.clock.t += 1000;
+    b.sim.tick();
+  }
+  assert.ok(near(late, b.sim.snapshot().distance_km, 0.0001));
+});
+test('catchUp() applies the time that passed while the tab was hidden', () => {
+  const { clock, sim } = clocked();
+  sim.start();
+  clock.t += 120_000;
+  const snap = sim.catchUp();
+  assert.ok(near(snap.distance_km, 2, 0.001));
+});
+test('time spent paused does not count', () => {
+  const { clock, sim } = clocked();
+  sim.start();
+  clock.t += 10_000;
+  sim.tick();
+  const before = sim.snapshot().distance_km;
+  sim.pause();
+  clock.t += 600_000; // ten minutes paused
+  sim.resume();
+  clock.t += 1000;
+  const after = sim.tick().distance_km;
+  assert.ok(near(after - before, 60 / 3600, 0.0005), `moved ${after - before} km`);
+});
+test('one step never covers more than the cap, and never goes backwards', () => {
+  const { clock, sim } = clocked({ speedKmh: 10, timeScale: 1 });
+  sim.start();
+  clock.t += 5 * 3600 * 1000; // five hours asleep
+  const capKm = (10 * MAX_STEP_MS) / 3600000;
+  assert.ok(sim.tick().distance_km <= capKm + 0.0001);
+  clock.t -= 10_000; // a clock that jumps back
+  const d = sim.snapshot().distance_km;
+  assert.ok(sim.tick().distance_km >= d);
+});
+test('an explicit number of ms still works (used by the older tests)', () => {
+  const { sim } = clocked();
+  sim.start();
+  assert.ok(near(sim.tick(60_000).distance_km, 1, 0.001));
+});
+test('a throttled tab still arrives and calls onArrive once', () => {
+  let arrived = 0;
+  const { clock, sim } = clocked({ speedKmh: 600, onArrive: () => arrived++ });
+  sim.start();
+  clock.t += 60_000; // one tick a minute at 600 km/h = 10 km: the end of the 10.2 km route is near
+  sim.tick();
+  clock.t += 60_000;
+  sim.tick();
+  assert.equal(arrived, 1);
+  assert.equal(sim.status, 'arrived');
+});
