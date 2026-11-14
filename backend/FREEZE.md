@@ -10,10 +10,10 @@ rules once it has.
 
 | | Count |
 |---|---|
-| Endpoints described in CONTRACT.md | 71 |
-| Built in the app | 70 |
+| Endpoints described in CONTRACT.md | 75 |
+| Built in the app | 74 |
 | **Not built yet** | **1** (`POST /location-shares`) |
-| Backend tests | 1909 passed (before the desk notes, chat and checklist tests were added; see the latest CI run) |
+| Backend tests | 1977 passed |
 
 The older snapshot in this file (17 of 42) is out of date: Daksh's emergency-core and J2 to J4 commits and Puneet's P1 to P4 are in. The numbers above are from a real CI run; the contract status still prints NOT READY TO FREEZE because of the one missing endpoint.
 
