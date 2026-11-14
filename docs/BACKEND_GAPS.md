@@ -1,6 +1,6 @@
 # Backend gaps: what the apps call and what Daksh's backend has
 
-**Draft for Daksh. Nothing here has been agreed with him.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's emergency-core commit `6ea4f5d`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend tests were **not run** (the sandbox has no Python packages); "built" means "a route exists in the code".
+**Draft for Daksh. Nothing here has been agreed with him.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's J1 to J4 commits, last `fe52ee4`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend suite was run on 14 Nov 2026 with these four commits: **1789 passed**; contract status **59 built, 7 not built**. "Built" means a route exists and is tested.
 
 Status words: **built** = a route with that method and path exists. **not built** = no such route. **differs** = a similar route exists but the path or shape is different.
 "In contract?" = the path appears in `backend/CONTRACT.md`.
@@ -46,15 +46,15 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 | `POST /emergencies/{id}/cancel`, `GET /emergencies/{id}` | **built** (new) | yes | |
 | `GET /emergencies/{id}/reasons` | **built** (new) | not listed | |
 | `GET /patients/{id}/emergencies` and `.../emergencies/{eid}/summary` | **built** (new) | not listed | |
-| `POST /demo/scenario`, `POST /demo/reset` | not built | yes | demo panel |
-| `GET /demo/state`, `POST /demo/speed`, `POST /demo/fail` | not built | no | mock-only helpers |
-| `GET /patients/{id}/reports`, `DELETE .../reports/{rid}` (and upload) | not built | `POST /reports` only | |
-| `POST, GET, DELETE /patients/{id}/passport`, `GET .../passport/log` | not built | no | **differs**: the backend only has `GET /passport/{patient_id}` (with `?token=` or a login) |
-| Reminders (`/patients/{id}/reminders` ...) and preferences | not built | no | |
-| `POST /patients/{id}/family-invites`, `POST /family/link`, `GET /family/patients`, `POST /family/checkin` | not built | partly (`/family/link`, others listed) | |
-| `POST /responders/register`, `GET /responders/alerts`, `POST /responders/{id}/accept` | not built | yes | |
-| `GET, PATCH /admin/users` | not built | yes | |
-| `GET, PUT /content/{type}` | not built | yes | |
+| `POST /demo/scenario`, `POST /demo/reset` | **built** (J2) | yes | demo panel |
+| `GET /demo/state`, `POST /demo/speed` | **built** (J2) | no | `POST /demo/fail` is still not built |
+| `GET /patients/{id}/reports`, `DELETE .../reports/{rid}` (and upload) | **built** (J3) | yes | |
+| `POST, GET, DELETE /patients/{id}/passport`, `GET .../passport/log` | **built** (J3) | yes (section 4.5) | `GET /passport/{token}` also works; a revoked, expired or unknown link answers 410 |
+| Reminders (`/patients/{id}/reminders` ...) and preferences | **built** (J3) | yes (section 4.5) | |
+| `POST /patients/{id}/family-invites`, `POST /family/link`, `GET /family/patients`, `POST /family/checkin` | **built** (J4) | yes (section 4.6) | demo code `FAM-0417` |
+| `POST /responders/register`, `GET /responders/alerts`, `POST /responders/{id}/accept` | **built** (J4) | yes | |
+| `GET, PATCH /admin/users` | **built** (J4) | yes | |
+| `GET, PUT /content/{type}` | **built** (J4) | yes | |
 
 ## What the demo needs most (in order)
 1. ~~Emergency create, SOS, cancel and `GET /emergencies/{id}`~~: **built in Daksh's latest commit** (the backend's own tests; not yet tried by the apps).
@@ -63,4 +63,4 @@ Details and exact bodies for the portal's proposed calls: `hospital-portal/docs/
 4. The WebSocket and its events (one agreed path).
 5. `POST /ambulances/{id}/location` and `GET /ambulances`.
 
-Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); CI's contract status after his latest commit says 24 built, 22 not built. He says there is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `ack`, `dispatch`, `status`, hospitals and availability, ambulance location, the WebSocket, demo scenario and reset.
+Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local contract status after J4 says 59 built, 7 not built. There is an event hook (`services/events.py`) for the WebSocket, but no WebSocket yet. Still not built: `ack`, `dispatch`, `status`, hospitals and availability, ambulance location, `POST /location-shares`, the WebSocket and `POST /demo/fail`.
