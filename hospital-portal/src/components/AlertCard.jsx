@@ -6,7 +6,7 @@ import { isEarly } from '../services/stateMachine.js';
 import { originText } from '../services/adapters.js';
 import { shouldFlash, showNewBadge } from '../services/alertFlags.js';
 import { elsewhereName } from '../services/queueScope.js';
-import { cardWarning } from '../services/capacity.js';
+import { cardWarning, cardWarningCode } from '../services/capacity.js';
 import { isFinal } from '../services/stateMachine.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
@@ -32,6 +32,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
   const elsewhere = elsewhereHospital === null ? null : t('card.nowAt', { name: elsewhereHospital });
   const ownHospital = hospitals.find((h) => h.id === String(session?.hospital_id));
   const warning = !elsewhere && !isFinal(state) ? cardWarning(alert, ownHospital) : null;
+  const warningCode = warning ? cardWarningCode(alert, ownHospital) : null;
   const fromCheckIn = originText(alert);
   const ranking = useRanking(type, location);
   const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
@@ -86,7 +87,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
         {stateText(t, state)}
       </div>
       {alert.severity_missing && !cancelled && <div data-testid="severity-missing" className="mt-2 rounded bg-amber-100 px-2 py-1 text-sm font-bold text-amber-900">{t('severity.missing')}</div>}
-      {warning && <div data-testid="card-warning" className="mt-2 rounded bg-red-50 px-2 py-1 text-sm font-bold text-red-800">Warning: your {warning}</div>}
+      {warning && <div data-testid="card-warning" className="mt-2 rounded bg-red-50 px-2 py-1 text-sm font-bold text-red-800">{warningCode ? t(`warn.card.${warningCode}`) : `Warning: your ${warning}`}</div>}
       {elsewhere && <div data-testid="elsewhere" className="mt-2 text-sm font-semibold text-slate-600">{elsewhere}</div>}
       {fromCheckIn && !early && !cancelled && (
         <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">{t('card.checkin')}</div>

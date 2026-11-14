@@ -49,13 +49,13 @@ function TeamAssignmentBody({ emergency }) {
     <div data-testid="assignment">
       <p data-testid="assigned" className="mb-2 text-lg">
         {current ? (
-          <>Assigned: <b>{current.name}</b> · {current.role} · {current.specialty}</>
+          <>{t('team.assigned')} <b>{current.name}</b> · {current.role} · {current.specialty}</>
         ) : (
-          <span className="text-slate-500">Nobody assigned yet. Suggested specialty: <b>{suggested}</b></span>
+          <span className="text-slate-500">{t('team.nobody')} <b>{suggested}</b></span>
         )}
       </p>
       {readOnly ? (
-        <p className="font-semibold text-slate-600">{e.state === 'CANCELLED' ? 'Cancelled' : 'Handed over'}: the assignment can no longer be changed.</p>
+        <p className="font-semibold text-slate-600">{e.state === 'CANCELLED' ? t('team.lockedCancelled') : t('team.lockedDone')}</p>
       ) : (
         <div className="flex flex-wrap items-center gap-3">
           <select
@@ -66,7 +66,7 @@ function TeamAssignmentBody({ emergency }) {
           >
             {staff.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name} · {s.specialty}{s.specialty === suggested ? ' (suggested)' : ''}
+                {s.name} · {s.specialty}{s.specialty === suggested ? t('team.suggested') : ''}
               </option>
             ))}
           </select>
@@ -76,11 +76,11 @@ function TeamAssignmentBody({ emergency }) {
             onClick={assign}
             className="rounded-lg bg-sky-600 px-5 py-2.5 text-lg font-bold text-white hover:bg-sky-700 disabled:opacity-50"
           >
-            {busy ? 'Assigning…' : current ? 'Change' : 'Assign'}
+            {busy ? t('team.assigning') : current ? t('team.change') : t('team.assign')}
           </button>
         </div>
       )}
-      <p className="mt-2 text-sm text-slate-500">Sample roster. All names are invented.</p>
+      <p className="mt-2 text-sm text-slate-500">{t('team.sample')}</p>
       {error && <p role="alert" className="mt-2 rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
     </div>
   );

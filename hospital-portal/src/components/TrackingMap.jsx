@@ -2,7 +2,7 @@
 // Reads the position from the emergency (kept up to date by ambulance.location events),
 // so it shows the same thing on every screen that is watching.
 import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip, Polyline, ZoomControl } from 'react-leaflet';
 import trafficConfig from '../data/traffic-config.json';
 import simConfig from '../data/sim-config.json';
 import { splitPath } from '../sim/ambulance-route.js';
@@ -86,7 +86,8 @@ export default function TrackingMap({ emergency, compact = false }) {
       </div>
 
       <div className={`${compact ? 'h-64' : 'h-96'} overflow-hidden rounded-xl border border-slate-200`}>
-        <MapContainer key={`${id}-${route.ambulance.id}`} bounds={route.points.map(toLatLng)} boundsOptions={{ padding: [40, 40] }} scrollWheelZoom={false} className="h-full w-full">
+        <MapContainer key={`${id}-${route.ambulance.id}`} bounds={route.points.map(toLatLng)} boundsOptions={{ padding: [40, 40] }} scrollWheelZoom={false} zoomControl={false} className="h-full w-full">
+          <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -136,7 +137,7 @@ export default function TrackingMap({ emergency, compact = false }) {
             {e.corridor_requested ? (
               <SimulatedBadge text={t('tk.corridorLogged')} />
             ) : (
-              <SimulatedBadge text="Simulated" className="!text-xs" />
+              <SimulatedBadge text={t('tk.sim')} className="!text-xs" />
             )}
           </div>
 

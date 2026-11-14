@@ -12,10 +12,9 @@ import { stepDurations } from '../services/analytics.js';
 import { casesToCsv } from '../services/csv.js';
 import { downloadText } from '../services/download.js';
 import { isFinal } from '../services/stateMachine.js';
-import { formatSeconds } from '../services/report.js';
 import { EMERGENCY_TYPES, SEVERITY, SEVERITY_STYLES } from '../services/contract.js';
 import { useT, useLang } from '../i18n/index.js';
-import { stateText, severityText, typeText, formatCreated } from '../i18n/phrases.js';
+import { stateText, severityText, typeText, formatCreated, durationText } from '../i18n/phrases.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
 
@@ -94,7 +93,7 @@ export default function History() {
                 <td className="px-4 py-3"><span className={`rounded-full px-3 py-1 text-base font-bold ${SEVERITY_STYLES[e.severity] || SEVERITY_STYLES.NONE}`}>{severityText(t, e.severity)}</span></td>
                 <td className="px-4 py-3 text-base">{hospitalName(e.alerted_hospital_id)}</td>
                 <td className="px-4 py-3">{stateText(t, e.state)}</td>
-                <td className="px-4 py-3">{formatSeconds(stepDurations(e).total).replace('Not reached', '–')}</td>
+                <td className="px-4 py-3">{stepDurations(e).total === null || stepDurations(e).total === undefined ? '–' : durationText(t, stepDurations(e).total)}</td>
                 <td className="px-4 py-3"><Link data-testid="open-report" to={`/report/${e.emergency_id}?t=${encodeURIComponent(e.created_at)}`} className="rounded-lg bg-sky-600 px-4 py-2 font-bold text-white hover:bg-sky-700">{t('hist.open')}</Link></td>
               </tr>
             ))}

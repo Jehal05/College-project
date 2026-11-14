@@ -8,11 +8,12 @@ import { useAuth } from '../components/AuthProvider.jsx';
 import { useHistory } from '../components/HistoryProvider.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useT, useLang } from '../i18n/index.js';
-import { typeText, formatWhen } from '../i18n/phrases.js';
+import { typeText, formatWhen, activityText } from '../i18n/phrases.js';
 import { buildActivity, filterActivity, auditRows, auditError, KINDS, WHO } from '../services/activity.js';
 
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg';
 function AuditLog() {
+  const t = useT();
   const lang = useLang();
   const when = (iso) => formatWhen(iso, lang);
   const [state, setState] = useState({ status: 'loading', rows: [], error: null });
@@ -29,19 +30,19 @@ function AuditLog() {
   }, [load]);
 
   return (
-    <section data-testid="audit-section" aria-label="Server audit log" className="space-y-3 rounded-2xl bg-white p-4 shadow">
+    <section data-testid="audit-section" aria-label={t('aud.title')} className="space-y-3 rounded-2xl bg-white p-4 shadow">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-2xl font-bold">Server audit log</h2>
-        <span className="rounded-full border border-slate-400 px-2.5 py-0.5 text-sm font-semibold text-slate-700">Admin only</span>
-        <button data-testid="audit-refresh" onClick={load} className="ml-auto rounded-lg border-2 border-slate-300 px-3 py-1.5 font-semibold hover:bg-slate-50">Refresh</button>
+        <h2 className="text-2xl font-bold">{t('aud.title')}</h2>
+        <span className="rounded-full border border-slate-400 px-2.5 py-0.5 text-sm font-semibold text-slate-700">{t('aud.admin')}</span>
+        <button data-testid="audit-refresh" onClick={load} className="ml-auto rounded-lg border-2 border-slate-300 px-3 py-1.5 font-semibold hover:bg-slate-50">{t('common.refresh')}</button>
       </div>
-      {state.status === 'loading' && <p data-testid="audit-loading">Loading…</p>}
+      {state.status === 'loading' && <p data-testid="audit-loading">{t('common.loading')}</p>}
       {state.status === 'error' && <p data-testid="audit-message" data-kind={state.error.kind} role={state.error.kind === 'missing' ? 'status' : 'alert'} className="rounded-lg bg-slate-100 p-3 text-lg font-semibold">{state.error.text}</p>}
-      {state.status === 'ok' && state.rows.length === 0 && <p data-testid="audit-message" className="text-lg text-slate-600">The audit log is empty.</p>}
+      {state.status === 'ok' && state.rows.length === 0 && <p data-testid="audit-message" className="text-lg text-slate-600">{t('aud.empty')}</p>}
       {state.status === 'ok' && state.rows.length > 0 && (
         <div className="overflow-x-auto">
           <table data-testid="audit-table" className="w-full text-left text-base">
-            <thead><tr className="border-b-2 border-slate-300"><th className="p-2">Time</th><th className="p-2">User</th><th className="p-2">Action</th><th className="p-2">Patient</th><th className="p-2">Outcome</th><th className="p-2">Shared fields</th></tr></thead>
+            <thead><tr className="border-b-2 border-slate-300"><th className="p-2">{t('aud.time')}</th><th className="p-2">{t('aud.user')}</th><th className="p-2">{t('aud.action')}</th><th className="p-2">{t('aud.patient')}</th><th className="p-2">{t('aud.outcome')}</th><th className="p-2">{t('aud.fields')}</th></tr></thead>
             <tbody>
               {state.rows.map((r) => (
                 <tr key={r.id} data-outcome={r.outcome} className="border-b border-slate-200">
@@ -49,7 +50,7 @@ function AuditLog() {
                   <td className="p-2">{r.user ?? '–'} <span className="text-sm text-slate-500">{r.role}</span></td>
                   <td className="p-2 font-semibold">{r.action}</td>
                   <td className="p-2">{r.patient ?? '–'}</td>
-                  <td className="p-2 font-semibold">{r.outcome === 'denied' ? `Denied${r.reason ? ` (${r.reason})` : ''}` : r.outcome ?? '–'}</td>
+                  <td className="p-2 font-semibold">{r.outcome === 'denied' ? `${t('aud.denied')}${r.reason ? ` (${r.reason})` : ''}` : r.outcome ?? '–'}</td>
                   <td className="p-2">{r.fields.length ? r.fields.join(', ') : '–'}</td>
                 </tr>
               ))}
@@ -57,7 +58,7 @@ function AuditLog() {
           </table>
         </div>
       )}
-      <p className="text-sm text-slate-600">Names of shared fields only; the log never holds tokens or patient values.</p>
+      <p className="text-sm text-slate-600">{t('aud.note')}</p>
     </section>
   );
 }
@@ -100,7 +101,7 @@ export default function Activity() {
               <time dateTime={x.ts} className="w-44 shrink-0 font-semibold tabular-nums text-slate-700">{when(x.ts)}</time>
               <Link to={`/report/${x.emergency_id}?t=${encodeURIComponent(x.case_key.split('|')[1] || '')}`} className="font-bold text-sky-800 underline">{x.emergency_id}</Link>
               <span className="text-sm text-slate-500">{x.type ? typeText(t, x.type) : x.type_label}</span>
-              <span data-testid="activity-text" className="text-lg">{x.text}</span>
+              <span data-testid="activity-text" className="text-lg">{activityText(t, x)}</span>
               <span className="ml-auto text-slate-600">{x.actor || t('act.system')} <span className="text-sm">({t(`act.w.${x.who}`)})</span></span>
               {x.local_only && <span className="text-sm font-semibold text-amber-800">{t('act.localOnly')}</span>}
             </li>

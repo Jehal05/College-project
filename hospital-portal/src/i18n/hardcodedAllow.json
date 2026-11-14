@@ -1,0 +1,162 @@
+{
+  "components/AlertCard.jsx": [
+    {
+      "text": "SpO₂",
+      "reason": "Medical abbreviation, the same in every language (like HR and BP)."
+    }
+  ],
+  "components/AmbulanceProvider.jsx": [
+    {
+      "text": "Patient picked up (simulated)",
+      "reason": "Event text written to the case timeline (data), English in every language."
+    }
+  ],
+  "components/EmergencyDetail.jsx": [
+    {
+      "text": "Hospital desk",
+      "reason": "Name saved with a message or note (data), not screen text."
+    }
+  ],
+  "components/EmergencyProvider.jsx": [
+    {
+      "text": "Hospital staff",
+      "reason": "Name saved with a message or note (data), not screen text."
+    }
+  ],
+  "components/PatientMiniMap.jsx": [
+    {
+      "text": "OpenStreetMap",
+      "reason": "Brand name in the map credit line."
+    }
+  ],
+  "components/RankingTable.jsx": [
+    {
+      "text": "Capability",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Travel time",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Availability",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Alerted now",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Next if no answer",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "After that",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Alerted · no answer",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Responding",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Not needed",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    }
+  ],
+  "components/TakeOverBox.jsx": [
+    {
+      "text": "Demo or training",
+      "reason": "Saved on the timeline, which is written in English in every language."
+    },
+    {
+      "text": "The other hospital cannot respond",
+      "reason": "Saved on the timeline, which is written in English in every language."
+    }
+  ],
+  "components/Timeline.jsx": [
+    {
+      "text": "Monitoring",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Symptoms reported",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Emergency detected",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Alert sent",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Hospital acknowledged",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Ambulance dispatched",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Ambulance en route",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Arrived",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Handed over",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Cancelled",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    },
+    {
+      "text": "Escalated to next hospital",
+      "reason": "English default kept next to a translation key (shown through t() or L())."
+    }
+  ],
+  "components/TrackingMap.jsx": [
+    {
+      "text": "OpenStreetMap",
+      "reason": "Brand name in the map credit line."
+    },
+    {
+      "text": "Corridor request logged (simulated)",
+      "reason": "Event text written to the case timeline (data), English in every language."
+    }
+  ],
+  "pages/Admin.jsx": [
+    {
+      "text": ".env",
+      "reason": "A file name and a command typed by a developer."
+    },
+    {
+      "text": "npm run dev",
+      "reason": "A file name and a command typed by a developer."
+    }
+  ],
+  "pages/Crew.jsx": [
+    {
+      "text": "Ambulance crew (simulated)",
+      "reason": "Name saved with a message or note (data), not screen text."
+    }
+  ],
+  "pages/Map.jsx": [
+    {
+      "text": "OpenStreetMap",
+      "reason": "Brand name in the map credit line."
+    },
+    {
+      "text": "Middle of the hospitals (no patient selected)",
+      "reason": "Marker value in code; the screen shows t(\"map.middle\")."
+    }
+  ]
+}

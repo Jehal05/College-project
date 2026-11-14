@@ -8,6 +8,7 @@ import { USE_MOCK } from '../services/config.js';
 import { resetDemo } from '../services/demoReset.js';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useT } from '../i18n/index.js';
+import { roleText } from '../i18n/phrases.js';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
 import SoundControl from './SoundControl.jsx';
 
@@ -79,7 +80,7 @@ export default function NavBar() {
           <SoundControl />
           <LanguageSwitcher />
           <span className="text-slate-300">
-            {session?.name} ({role})
+            {session?.name} ({roleText(t, role)})
           </span>
           <button
             onClick={() => {

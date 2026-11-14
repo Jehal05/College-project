@@ -90,7 +90,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
 
                 <p className="mt-3 text-slate-700">
                   <b>{t('rk.why')}</b> {row.why}
-                  {row.distance_km !== null && <span className="text-slate-500"> · {row.distance_km} km</span>}
+                  {row.distance_km !== null && <span className="text-slate-500"> · {t('u.km', { n: row.distance_km })}</span>}
                 </p>
               </Tag>
             </li>

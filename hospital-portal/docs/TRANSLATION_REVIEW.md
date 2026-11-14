@@ -8,7 +8,7 @@ Most screens now: the top bar and menu, login, the alert queue and cards, the de
 ## Left in English on purpose
 These are data or text that comes from the backend or from doctor-reviewed content, so the portal does not translate them:
 - Hospital names, ambulance unit names and symptom words.
-- Checklist item texts and the "Sample checklist. Pending medical review." note (they wait for doctor review).
+- Checklist item texts (they wait for doctor review). The sentence "Sample checklist. Pending medical review." is translated, because it says the content is not yet reviewed.
 - AED places and community responder sample data.
 - Event text written by the backend or the desk, for example "Patient picked up (simulated)" and "Taken over from … Reason: …".
 - The "Why:" sentences in the hospital ranking.
@@ -603,3 +603,156 @@ These keys were not in the tables above when the review pack was sent. Please re
 | `cap.noEmergency` | No emergency department | आपातकालीन विभाग नहीं | ઇમરજન્સી વિભાગ નથી | pending | pending |
 | `rk.notVerified` | Not verified | सत्यापित नहीं | ચકાસેલ નથી | pending | pending |
 | `rk.pts` | {n} pts | {n} अंक | {n} ગુણ | pending | pending |
+
+## Language check of every page (2026-11-14)
+**How it was done.** Every route was opened in English, Hindi and Gujarati in a real browser (the portal in mock mode, signed in as staff, and as admin for Admin and the audit log). A script listed every visible text and every title, aria-label and placeholder that was the same in Gujarati as in English. Each hit was then sorted into "data on purpose" or "missing UI string".
+
+**Pages checked:** Login, Dashboard (with an open alert and its detail panel), Map, Fleet, History, Activity, Handover, Analytics, Report (post-event report), Crew, Admin (as admin), and the admin audit log table. Hindi gave the same list as Gujarati.
+
+**Missing UI strings found and fixed**
+- The whole Report page (headings, buttons, outcome, hospital role, step durations, timeline state names, checklist line, handover and notes headings, dates and times).
+- The readiness warnings ("Your cath lab is not ready for this alert", and the other 10) and the short warning line on alert cards.
+- The nav bar role word (staff, admin).
+- Hospital panel: Capabilities, Availability, Beds free, ICU free, Cath lab ready, Stroke unit ready, Yes/No, Close, Simulated ETA.
+- Team assignment (Assigned, Assign, Change, the locked message, "(suggested)", sample roster note).
+- Checklist: the read-only line, "Ticked by … at …", and the review status line ("Reviewed by …", "Partly reviewed …").
+- Activity: the status text of each row, "Ticked/Unticked", note kinds; and the admin audit log table (title, columns, empty text, note).
+- History: the total time column.
+- Map: zoom button titles (all three maps), patient marker text, "Middle of the hospitals", "Demo patient location", "(sample)" on AED and responder markers, and km on nearby help, ranking and dispatch lists.
+- Smaller ones: "No timeline yet.", the "Simulated" badge on the tracking map, "(simulated)" on the readiness card, the sample fleet message, the Admin "To switch, set …" line.
+
+**Still English on purpose, and why**
+- Names: hospitals, ambulance units, crew and staff names, volunteers, AED places and their opening hours (data).
+- Symptom words and the vitals line (HR, SpO₂, BP, bpm): medical terms and units kept as written.
+- Checklist item texts, and the specialty names from the roster (Cardiology, Neurology, …): content that waits for doctor review.
+- Notes written by staff, and the actor names in the Activity list (System, Patient app, Ambulance (simulated)): case data.
+- The "Why:" ranking sentences and the "1st / 2nd" ordinals.
+- The canned crew chat replies on the Crew page (they are messages sent by the mock crew).
+- The reason words saved on the timeline when a desk takes over a case, and "Corridor request logged (simulated)": they are written into the case timeline, which is English in every language.
+- Files named .txt and .csv that are downloaded from a report: they stay English.
+- The Admin integration table (endpoint names, status codes, the notes about the backend): developer documentation.
+- Map credits ("Leaflet", "OpenStreetMap contributors").
+- Text of a screen reader announcement that was already spoken before the language was changed.
+
+**Could not open:** a hospital panel with a real map click (the test browser has no map tiles, so this was checked by code and tests only), the Admin page in real mode, and the audit log table with real rows (the mock has no audit endpoint, so only its empty/missing state shows).
+
+**A test now guards this.** `src/i18n/hardcoded.test.js` scans every `.jsx` file for English typed straight into it (JSX text, title/aria-label/placeholder/alt, capitalised phrases in quotes). A new unlisted hit fails the test. The few reviewed exceptions are in `src/i18n/hardcodedAllow.json` with a reason each, and a stale entry also fails the test.
+
+Please review these new strings (generated from `src/i18n/*.js`):
+
+| Key | English | Hindi | Gujarati | Hindi review | Gujarati review |
+|---|---|---|---|---|---|
+| `warn.warning` | Warning:  | चेतावनी:  | ચેતવણી:  | pending | pending |
+| `warn.note` | Note:  | नोट:  | નોંધ:  | pending | pending |
+| `warn.aria` | Readiness warnings | तैयारी की चेतावनियाँ | તૈયારીની ચેતવણીઓ | pending | pending |
+| `warn.c.not_accepting` | Your hospital is marked as not ready for new emergencies. | आपका अस्पताल नई आपात स्थितियों के लिए तैयार नहीं बताया गया है। | તમારી હોસ્પિટલ નવી ઇમરજન્સી માટે તૈયાર નથી એમ દર્શાવેલ છે. | pending | pending |
+| `warn.c.no_cath` | Your hospital has no cath lab for this alert. | इस अलर्ट के लिए आपके अस्पताल में कैथ लैब नहीं है। | આ એલર્ટ માટે તમારી હોસ્પિટલમાં કેથ લેબ નથી. | pending | pending |
+| `warn.c.cath_not_ready` | Your cath lab is not ready for this alert. | इस अलर्ट के लिए आपकी कैथ लैब तैयार नहीं है। | આ એલર્ટ માટે તમારી કેથ લેબ તૈયાર નથી. | pending | pending |
+| `warn.c.cath_unknown` | Cath lab readiness is not shared, so it cannot be checked. | कैथ लैब की तैयारी साझा नहीं की गई है, इसलिए जाँच नहीं हो सकती। | કેથ લેબની તૈયારી શેર કરેલી નથી, તેથી તપાસી શકાતી નથી. | pending | pending |
+| `warn.c.no_stroke` | Your hospital has no stroke unit for this alert. | इस अलर्ट के लिए आपके अस्पताल में स्ट्रोक यूनिट नहीं है। | આ એલર્ટ માટે તમારી હોસ્પિટલમાં સ્ટ્રોક યુનિટ નથી. | pending | pending |
+| `warn.c.stroke_not_ready` | Your stroke unit is not ready for this alert. | इस अलर्ट के लिए आपकी स्ट्रोक यूनिट तैयार नहीं है। | આ એલર્ટ માટે તમારું સ્ટ્રોક યુનિટ તૈયાર નથી. | pending | pending |
+| `warn.c.stroke_unknown` | Stroke unit readiness is not shared, so it cannot be checked. | स्ट्रोक यूनिट की तैयारी साझा नहीं की गई है, इसलिए जाँच नहीं हो सकती। | સ્ટ્રોક યુનિટની તૈયારી શેર કરેલી નથી, તેથી તપાસી શકાતી નથી. | pending | pending |
+| `warn.c.no_icu` | Your hospital has no ICU for this alert. | इस अलर्ट के लिए आपके अस्पताल में ICU नहीं है। | આ એલર્ટ માટે તમારી હોસ્પિટલમાં ICU નથી. | pending | pending |
+| `warn.c.icu_full` | Your ICU has no free bed for this alert. | इस अलर्ट के लिए आपके ICU में कोई खाली बिस्तर नहीं है। | આ એલર્ટ માટે તમારા ICU માં કોઈ ખાલી બેડ નથી. | pending | pending |
+| `warn.c.icu_unknown` | ICU beds are not shared, so they cannot be checked. | ICU के बिस्तरों की जानकारी साझा नहीं की गई है, इसलिए जाँच नहीं हो सकती। | ICU બેડની માહિતી શેર કરેલી નથી, તેથી તપાસી શકાતી નથી. | pending | pending |
+| `warn.c.no_emergency` | Your hospital has no emergency department. | आपके अस्पताल में आपातकालीन विभाग नहीं है। | તમારી હોસ્પિટલમાં ઇમરજન્સી વિભાગ નથી. | pending | pending |
+| `warn.card.not_accepting` | Warning: your hospital is marked as not ready for new emergencies. | चेतावनी: आपका अस्पताल नई आपात स्थितियों के लिए तैयार नहीं बताया गया है। | ચેતવણી: તમારી હોસ્પિટલ નવી ઇમરજન્સી માટે તૈયાર નથી એમ દર્શાવેલ છે. | pending | pending |
+| `warn.card.no_cath` | Warning: your hospital has no cath lab. | चेतावनी: आपके अस्पताल में कैथ लैब नहीं है। | ચેતવણી: તમારી હોસ્પિટલમાં કેથ લેબ નથી. | pending | pending |
+| `warn.card.cath_not_ready` | Warning: your cath lab is not ready. | चेतावनी: आपकी कैथ लैब तैयार नहीं है। | ચેતવણી: તમારી કેથ લેબ તૈયાર નથી. | pending | pending |
+| `warn.card.no_stroke` | Warning: your hospital has no stroke unit. | चेतावनी: आपके अस्पताल में स्ट्रोक यूनिट नहीं है। | ચેતવણી: તમારી હોસ્પિટલમાં સ્ટ્રોક યુનિટ નથી. | pending | pending |
+| `warn.card.stroke_not_ready` | Warning: your stroke unit is not ready. | चेतावनी: आपकी स्ट्रोक यूनिट तैयार नहीं है। | ચેતવણી: તમારું સ્ટ્રોક યુનિટ તૈયાર નથી. | pending | pending |
+| `warn.card.no_icu` | Warning: your hospital has no ICU. | चेतावनी: आपके अस्पताल में ICU नहीं है। | ચેતવણી: તમારી હોસ્પિટલમાં ICU નથી. | pending | pending |
+| `warn.card.icu_full` | Warning: your ICU has no free bed. | चेतावनी: आपके ICU में कोई खाली बिस्तर नहीं है। | ચેતવણી: તમારા ICU માં કોઈ ખાલી બેડ નથી. | pending | pending |
+| `warn.card.no_emergency` | Warning: your hospital has no emergency department. | चेतावनी: आपके अस्पताल में आपातकालीन विभाग नहीं है। | ચેતવણી: તમારી હોસ્પિટલમાં ઇમરજન્સી વિભાગ નથી. | pending | pending |
+| `common.yes` | Yes | हाँ | હા | pending | pending |
+| `common.no` | No | नहीं | ના | pending | pending |
+| `common.close` | Close | बंद करें | બંધ કરો | pending | pending |
+| `common.refresh` | Refresh | रीफ़्रेश करें | રિફ્રેશ કરો | pending | pending |
+| `role.staff` | staff | स्टाफ़ | સ્ટાફ | pending | pending |
+| `role.admin` | admin | एडमिन | એડમિન | pending | pending |
+| `hd.simEta` | Simulated ETA | Simulated अनुमानित समय | Simulated અંદાજિત સમય | pending | pending |
+| `hd.capabilities` | Capabilities | क्षमताएँ | ક્ષમતાઓ | pending | pending |
+| `hd.availability` | Availability | उपलब्धता | ઉપલબ્ધતા | pending | pending |
+| `hd.bedsFree` | Beds free: | खाली बिस्तर: | ખાલી બેડ: | pending | pending |
+| `hd.icuFree` | ICU free: | खाली ICU: | ખાલી ICU: | pending | pending |
+| `hd.cathReady` | Cath lab ready: | कैथ लैब तैयार: | કેથ લેબ તૈયાર: | pending | pending |
+| `hd.strokeReady` | Stroke unit ready: | स्ट्रोक यूनिट तैयार: | સ્ટ્રોક યુનિટ તૈયાર: | pending | pending |
+| `map.noLocation` | The patient did not share a location. | मरीज़ ने अपनी लोकेशन साझा नहीं की। | દર્દીએ પોતાનું લોકેશન શેર કર્યું નથી. | pending | pending |
+| `map.patientLoc` | Patient location (simulated) | मरीज़ की लोकेशन (simulated) | દર્દીનું લોકેશન (simulated) | pending | pending |
+| `map.middle` | Middle of the hospitals (no patient selected) | अस्पतालों का मध्य (कोई मरीज़ चुना नहीं गया) | હોસ્પિટલોની મધ્યમાં (કોઈ દર્દી પસંદ કર્યો નથી) | pending | pending |
+| `map.zoomIn` | Zoom in | ज़ूम इन | ઝૂમ ઇન | pending | pending |
+| `map.zoomOut` | Zoom out | ज़ूम आउट | ઝૂમ આઉટ | pending | pending |
+| `tk.sim` | Simulated | Simulated · सिमुलेशन | Simulated · સિમ્યુલેશન | pending | pending |
+| `rc.sim` | (simulated) | (simulated · सिमुलेशन) | (simulated · સિમ્યુલેશન) | pending | pending |
+| `team.assigned` | Assigned: | नियुक्त: | સોંપેલ: | pending | pending |
+| `team.nobody` | Nobody assigned yet. Suggested specialty: | अभी कोई नियुक्त नहीं। सुझाई गई विशेषज्ञता: | હજી કોઈને સોંપ્યું નથી. સૂચવેલ વિશેષતા: | pending | pending |
+| `team.lockedCancelled` | Cancelled: the assignment can no longer be changed. | रद्द: नियुक्ति अब बदली नहीं जा सकती। | રદ: સોંપણી હવે બદલી શકાતી નથી. | pending | pending |
+| `team.lockedDone` | Handed over: the assignment can no longer be changed. | हैंडओवर हो गया: नियुक्ति अब बदली नहीं जा सकती। | હેન્ડઓવર થઈ ગયું: સોંપણી હવે બદલી શકાતી નથી. | pending | pending |
+| `team.suggested` |  (suggested) |  (सुझाया गया) |  (સૂચવેલ) | pending | pending |
+| `team.assigning` | Assigning… | नियुक्त हो रहा है… | સોંપાઈ રહ્યું છે… | pending | pending |
+| `team.change` | Change | बदलें | બદલો | pending | pending |
+| `team.assign` | Assign | नियुक्त करें | સોંપો | pending | pending |
+| `team.sample` | Sample roster. All names are invented. | नमूना रोस्टर। सभी नाम काल्पनिक हैं। | નમૂનારૂપ રોસ્ટર. બધાં નામ કાલ્પનિક છે. | pending | pending |
+| `ck.readOnly` | Cancelled: the checklist is read-only. | रद्द: चेकलिस्ट केवल पढ़ने के लिए है। | રદ: ચેકલિસ્ટ ફક્ત વાંચવા માટે છે. | pending | pending |
+| `ck.tickedBy` | Ticked by {who} at {time} | {who} ने {time} पर टिक किया | {who} એ {time} વાગ્યે ટિક કર્યું | pending | pending |
+| `ck.staff` | staff | स्टाफ़ | સ્ટાફ | pending | pending |
+| `tl.none` | No timeline yet. | अभी कोई टाइमलाइन नहीं। | હજી કોઈ ટાઇમલાઇન નથી. | pending | pending |
+| `aud.title` | Server audit log | सर्वर ऑडिट लॉग | સર્વર ઑડિટ લૉગ | pending | pending |
+| `aud.admin` | Admin only | सिर्फ़ एडमिन के लिए | ફક્ત એડમિન માટે | pending | pending |
+| `aud.empty` | The audit log is empty. | ऑडिट लॉग खाली है। | ઑડિટ લૉગ ખાલી છે. | pending | pending |
+| `aud.time` | Time | समय | સમય | pending | pending |
+| `aud.user` | User | उपयोगकर्ता | વપરાશકર્તા | pending | pending |
+| `aud.action` | Action | कार्रवाई | કાર્યવાહી | pending | pending |
+| `aud.patient` | Patient | मरीज़ | દર્દી | pending | pending |
+| `aud.outcome` | Outcome | नतीजा | પરિણામ | pending | pending |
+| `aud.fields` | Shared fields | साझा किए गए फ़ील्ड | શેર કરેલા ફીલ્ડ | pending | pending |
+| `aud.denied` | Denied | अस्वीकृत | નકારેલ | pending | pending |
+| `aud.note` | Names of shared fields only; the log never holds tokens or patient values. | सिर्फ़ साझा फ़ील्ड के नाम; लॉग में कभी टोकन या मरीज़ के मान नहीं होते। | ફક્ત શેર કરેલા ફીલ્ડના નામ; લૉગમાં ક્યારેય ટોકન કે દર્દીની કિંમતો હોતી નથી. | pending | pending |
+| `fleet.sampleNote` | The backend has no ambulance list yet, so a sample fleet is shown (not real units). | बैकएंड में अभी एम्बुलेंस सूची नहीं है, इसलिए नमूना बेड़ा दिखाया गया है (असली यूनिट नहीं)। | બેકએન્ડમાં હજી એમ્બ્યુલન્સની યાદી નથી, તેથી નમૂનારૂપ ફ્લીટ બતાવ્યો છે (વાસ્તવિક યુનિટ નથી). | pending | pending |
+| `admin.int.sw1` | To switch, set | बदलने के लिए सेट करें | બદલવા માટે સેટ કરો | pending | pending |
+| `admin.int.sw2` | in | यहाँ | અહીં | pending | pending |
+| `admin.int.sw3` | (and the two address settings), then restart | (और दोनों पते की सेटिंग), फिर दोबारा शुरू करें | (અને બંને સરનામાંની સેટિંગ), પછી ફરી શરૂ કરો | pending | pending |
+| `rp.notFound` | Case {id} was not found. | केस {id} नहीं मिला। | કેસ {id} મળ્યો નથી. | pending | pending |
+| `rp.back` | Back to case history | केस इतिहास पर वापस जाएँ | કેસ ઇતિહાસ પર પાછા જાઓ | pending | pending |
+| `rp.dlTxt` | Download (.txt) | डाउनलोड (.txt) | ડાઉનલોડ (.txt) | pending | pending |
+| `rp.dlCsv` | Download timeline (.csv) | टाइमलाइन डाउनलोड (.csv) | ટાઇમલાઇન ડાઉનલોડ (.csv) | pending | pending |
+| `rp.title` | Post-event report | घटना के बाद की रिपोर्ट | ઘટના પછીનો અહેવાલ | pending | pending |
+| `rp.sample` | Sample content, pending medical review. Not a medical record. | नमूना सामग्री, चिकित्सीय समीक्षा बाकी है। यह मेडिकल रिकॉर्ड नहीं है। | નમૂનારૂપ સામગ્રી, તબીબી સમીક્ષા બાકી છે. આ મેડિકલ રેકોર્ડ નથી. | pending | pending |
+| `rp.sampleCase` |  This is a sample past case. |  यह एक नमूना पुराना केस है। |  આ એક નમૂનારૂપ જૂનો કેસ છે. | pending | pending |
+| `rp.patientId` | Patient ID (sample) | मरीज़ ID (नमूना) | દર્દી ID (નમૂનો) | pending | pending |
+| `rp.type` | Type | प्रकार | પ્રકાર | pending | pending |
+| `rp.alertTime` | Alert time | अलर्ट का समय | એલર્ટનો સમય | pending | pending |
+| `rp.outcome` | Outcome | नतीजा | પરિણામ | pending | pending |
+| `rp.o.cancelledEarly` | Cancelled by the patient before the SOS was sent | SOS भेजने से पहले मरीज़ ने रद्द किया | SOS મોકલતા પહેલાં દર્દીએ રદ કર્યું | pending | pending |
+| `rp.o.cancelled` | Cancelled by the patient (false alarm) | मरीज़ ने रद्द किया (गलत अलार्म) | દર્દીએ રદ કર્યું (ખોટો એલાર્મ) | pending | pending |
+| `rp.o.handed` | Handed over to the hospital team | अस्पताल की टीम को सौंपा गया | હૉસ્પિટલ ટીમને સોંપ્યું | pending | pending |
+| `rp.o.open` | Still open (not finished) | अभी खुला है (पूरा नहीं हुआ) | હજી ખુલ્લો છે (પૂર્ણ થયો નથી) | pending | pending |
+| `rp.h.chosen` | Chosen hospital | चुना गया अस्पताल | પસંદ કરેલી હૉસ્પિટલ | pending | pending |
+| `rp.h.alerted` | Alerted hospital (no one acknowledged) | अलर्ट किया गया अस्पताल (किसी ने स्वीकार नहीं किया) | એલર્ટ કરેલી હૉસ્પિટલ (કોઈએ સ્વીકાર્યું નથી) | pending | pending |
+| `rp.ranked` | ranked {pos} of {of} (score {total}).  | {of} में से {pos}वें स्थान पर (स्कोर {total})।  | {of} માંથી {pos} સ્થાને (સ્કોર {total}).  | pending | pending |
+| `rp.reasonNote` | The reason is worked out again from the current hospital data (simulated). | कारण मौजूदा अस्पताल डेटा से दोबारा निकाला गया है (simulated)। | કારણ હાલના હૉસ્પિટલ ડેટા પરથી ફરી કાઢ્યું છે (simulated). | pending | pending |
+| `rp.noHospital` | No hospital recorded. | कोई अस्पताल दर्ज नहीं। | કોઈ હૉસ્પિટલ નોંધાઈ નથી. | pending | pending |
+| `rp.escalations` | Escalations to the next hospital: | अगले अस्पताल को भेजे गए अलर्ट: | આગલી હૉસ્પિટલને મોકલેલા એલર્ટ: | pending | pending |
+| `rp.corridor` | Green corridor requested (simulated) | ग्रीन कॉरिडोर का अनुरोध (simulated) | ગ્રીન કૉરિડોરની વિનંતી (simulated) | pending | pending |
+| `rp.noneSent` | None sent | कोई नहीं भेजी गई | કોઈ મોકલી નથી | pending | pending |
+| `rp.team` | Assigned team | नियुक्त टीम | સોંપેલ ટીમ | pending | pending |
+| `rp.noneAssigned` | None assigned | कोई नियुक्त नहीं | કોઈને સોંપ્યું નથી | pending | pending |
+| `rp.durations` | Step durations | चरणों का समय | પગલાંનો સમય | pending | pending |
+| `rp.notReached` | Not reached | नहीं पहुँचा | પહોંચ્યું નથી | pending | pending |
+| `rp.total` | Total, alert to handed over | कुल, अलर्ट से हैंडओवर तक | કુલ, એલર્ટથી હેન્ડઓવર સુધી | pending | pending |
+| `rp.totalCancelled` | Alert to cancelled | अलर्ट से रद्द तक | એલર્ટથી રદ સુધી | pending | pending |
+| `rp.timeline` | Timeline | टाइमलाइन | ટાઇમલાઇન | pending | pending |
+| `rp.sampleChecklist` | Sample checklist. Pending medical review. | नमूना चेकलिस्ट। चिकित्सीय समीक्षा बाकी है। | નમૂનારૂપ ચેકલિસ્ટ. તબીબી સમીક્ષા બાકી છે. | pending | pending |
+| `rp.noHandover` | No handover note. | कोई हैंडओवर नोट नहीं। | કોઈ હેન્ડઓવર નોંધ નથી. | pending | pending |
+| `rp.deskNotes` | Desk notes | डेस्क नोट्स | ડેસ્ક નોંધો | pending | pending |
+| `rp.notes` | Notes | नोट्स | નોંધો | pending | pending |
+| `rp.noNotes` | No notes. | कोई नोट नहीं। | કોઈ નોંધ નથી. | pending | pending |
+| `rv.reviewed` | Reviewed by {who} on {date} | {who} द्वारा {date} को समीक्षा की गई | {who} દ્વારા {date} ના રોજ સમીક્ષા કરી | pending | pending |
+| `rv.partial` | Partly reviewed ({n} of {m} items). Sample checklist. | आंशिक समीक्षा ({m} में से {n} आइटम)। नमूना चेकलिस्ट। | આંશિક સમીક્ષા ({m} માંથી {n} આઇટમ). નમૂનારૂપ ચેકલિસ્ટ. | pending | pending |
+| `act.ticked` | Ticked | टिक किया | ટિક કર્યું | pending | pending |
+| `act.unticked` | Unticked | टिक हटाया | ટિક હટાવ્યું | pending | pending |
+| `act.nk.handover` | Handover note | हैंडओवर नोट | હેન્ડઓવર નોંધ | pending | pending |
+| `act.nk.desk` | Desk note | डेस्क नोट | ડેસ્ક નોંધ | pending | pending |
+| `act.nk.note` | Note | नोट | નોંધ | pending | pending |
+| `map.demoLoc` | Demo patient location | डेमो मरीज़ की लोकेशन | ડેમો દર્દીનું લોકેશન | pending | pending |
+| `map.sampleTag` | (sample) | (नमूना) | (નમૂનો) | pending | pending |

@@ -44,37 +44,37 @@ export default function Checklist({ emergency }) {
           data-review={reviewSummary(items).state}
           className={`rounded-full border px-2.5 py-0.5 text-sm font-semibold ${reviewSummary(items).state === 'reviewed' ? 'border-emerald-600 bg-emerald-100 text-emerald-900' : 'border-amber-500 bg-amber-100 text-amber-800'}`}
         >
-          {reviewBadge(items)}
+          {reviewBadge(items, t)}
         </span>
       </div>
       <div className="mb-3 h-2.5 overflow-hidden rounded-full bg-slate-200">
         <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${(done / items.length) * 100}%` }} />
       </div>
-      {readOnly && <p className="mb-2 font-semibold text-slate-600">Cancelled: the checklist is read-only.</p>}
+      {readOnly && <p className="mb-2 font-semibold text-slate-600">{t('ck.readOnly')}</p>}
 
       <ul className="space-y-2">
         {items.map((item) => {
-          const t = ticks[item.id];
+          const tick = ticks[item.id];
           return (
             <li key={item.id}>
               <label
                 className={`flex items-start gap-3 rounded-xl border-2 p-3 ${
-                  t?.done ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white'
+                  tick?.done ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white'
                 } ${readOnly ? 'opacity-60' : 'cursor-pointer hover:border-sky-400'}`}
               >
                 <input
                   type="checkbox"
                   data-item={item.id}
                   className="mt-0.5 h-7 w-7 shrink-0 accent-emerald-600"
-                  checked={Boolean(t?.done)}
+                  checked={Boolean(tick?.done)}
                   disabled={readOnly || busy === item.id}
                   onChange={() => toggle(item)}
                 />
                 <span>
-                  <span className={`text-lg ${t?.done ? 'font-semibold' : ''}`}>{item.text}</span>
-                  {t?.done && (
+                  <span className={`text-lg ${tick?.done ? 'font-semibold' : ''}`}>{item.text}</span>
+                  {tick?.done && (
                     <span className="block text-sm text-slate-500">
-                      Ticked by {t.by || 'staff'} at {formatTime(t.at)}
+                      {t('ck.tickedBy', { who: tick.by || t('ck.staff'), time: formatTime(tick.at) })}
                     </span>
                   )}
                 </span>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip, Circle, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import { USE_MOCK } from '../services/config.js';
 import { originFor } from '../services/adapters.js';
@@ -18,6 +18,9 @@ import responderData from '../data/responders.json';
 import { nearestAeds, respondersNear, withDistanceFrom } from '../services/nearby.js';
 import { useT } from '../i18n/index.js';
 import { typeText } from '../i18n/phrases.js';
+
+// Shown when no patient is selected. Kept as an English marker here and translated where it is displayed.
+const MIDDLE_LABEL = 'Middle of the hospitals (no patient selected)';
 
 // Custom HTML markers (avoids Leaflet's default-icon image path problem in Vite).
 function hospitalIcon(h, selected, isTop, t) {
@@ -50,7 +53,7 @@ export default function MapPage() {
   const [showAed, setShowAed] = useState(false);
   const [showResponders, setShowResponders] = useState(false);
   // Mock mode keeps the sample patient. With a real backend the map starts from the middle of the hospitals, not a fixed city.
-  const origin = useMemo(() => (USE_MOCK ? DEMO_LOCATION : { ...(originFor(null, stored) || DEMO_LOCATION), label: 'Middle of the hospitals (no patient selected)' }), [stored]);
+  const origin = useMemo(() => (USE_MOCK ? DEMO_LOCATION : { ...(originFor(null, stored) || DEMO_LOCATION), label: MIDDLE_LABEL }), [stored]);
 
   // Distance and capability match are worked out here, so colours and details change at once.
   const hospitals = useMemo(
@@ -102,13 +105,14 @@ export default function MapPage() {
               {t('map.loading')}
             </div>
           )}
-          <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={12} className="h-full w-full">
+          <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={12} zoomControl={false} className="h-full w-full">
+            <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <Marker position={[origin.lat, origin.lng]} icon={patientIcon}>
-              <Tooltip direction="top" offset={[0, -12]}>{t('map.patientTip', { label: origin.label })}</Tooltip>
+              <Tooltip direction="top" offset={[0, -12]}>{t('map.patientTip', { label: origin.label === MIDDLE_LABEL ? t('map.middle') : origin.label === DEMO_LOCATION.label ? t('map.demoLoc') : origin.label })}</Tooltip>
             </Marker>
             <Circle
               center={[origin.lat, origin.lng]}
@@ -117,12 +121,12 @@ export default function MapPage() {
             />
             {showAed && aedList.map((a) => (
               <Marker key={a.id} position={[a.lat, a.lng]} icon={aedIcon}>
-                <Tooltip direction="top" offset={[0, -14]}>{a.name} · {a.distance_km} km (sample)</Tooltip>
+                <Tooltip direction="top" offset={[0, -14]}>{a.name} · {t('u.km', { n: a.distance_km })} {t('map.sampleTag')}</Tooltip>
               </Marker>
             ))}
             {showResponders && nearResponders.map((r) => (
               <Marker key={r.id} position={[r.lat, r.lng]} icon={responderIcon}>
-                <Tooltip direction="top" offset={[0, -14]}>{r.name} · {r.distance_km} km (sample)</Tooltip>
+                <Tooltip direction="top" offset={[0, -14]}>{r.name} · {t('u.km', { n: r.distance_km })} {t('map.sampleTag')}</Tooltip>
               </Marker>
             ))}
             {hospitals.map((h) => (

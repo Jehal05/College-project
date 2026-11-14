@@ -59,7 +59,7 @@ export default function Timeline({ events = [], createdAt, t }) {
     return () => clearInterval(timer);
   }, [finished]);
 
-  if (!startMs) return <p className="text-slate-500">No timeline yet.</p>;
+  if (!startMs) return <p className="text-slate-500">{L('tl.none', 'No timeline yet.')}</p>;
 
   const lastStage = Math.max(-1, ...sorted.map((e) => STAGES.indexOf(e.state)));
   const pending = cancelled ? [] : STAGES.slice(lastStage + 1);

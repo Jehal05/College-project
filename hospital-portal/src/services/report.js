@@ -16,6 +16,18 @@ export function formatSeconds(totalSeconds) {
   return m < 60 ? `${m} min ${s % 60} s` : `${Math.floor(m / 60)} h ${m % 60} min`;
 }
 
+// English outcome texts (downloads stay English). The page shows them through the keys rp.o.<key>.
+const OUTCOMES = {
+  cancelledEarly: 'Cancelled by the patient before the SOS was sent',
+  cancelled: 'Cancelled by the patient (false alarm)',
+  handed: 'Handed over to the hospital team',
+  open: 'Still open (not finished)',
+};
+function outcomeKey(e, events) {
+  if (e.state === 'CANCELLED') return events.some((x) => x.state === 'SOS_SENT') ? 'cancelled' : 'cancelledEarly';
+  return e.state === 'HANDOVER_DONE' ? 'handed' : 'open';
+}
+
 /**
  * @param emergency  a finished emergency with status_events
  * @param context    { hospitals, rankingConfig, checklists, ambulances }
@@ -55,14 +67,15 @@ export function buildReport(emergency, context = {}) {
     severity: e.severity,
     state: e.state,
     state_label: STATE_LABELS[e.state] || e.state,
-    outcome: e.state === 'CANCELLED' ? (!events.some((x) => x.state === 'SOS_SENT') ? 'Cancelled by the patient before the SOS was sent' : 'Cancelled by the patient (false alarm)') : e.state === 'HANDOVER_DONE' ? 'Handed over to the hospital team' : 'Still open (not finished)',
+    outcome: OUTCOMES[outcomeKey(e, events)],
+    outcome_key: outcomeKey(e, events),
     created_at: e.created_at,
     sample: Boolean(e.sample),
     symptoms: e.symptoms || [],
     vitals: e.vitals || null,
     location: e.location || null,
     hospital: hospital
-      ? { id: hospital.id, name: hospital.name, role: acknowledged ? 'Chosen hospital' : 'Alerted hospital (no one acknowledged)', ...(rank || {}) }
+      ? { id: hospital.id, name: hospital.name, role: acknowledged ? 'Chosen hospital' : 'Alerted hospital (no one acknowledged)', role_key: acknowledged ? 'chosen' : 'alerted', ...(rank || {}) }
       : null,
     escalations: escalationCount(e),
     ambulance: unit ? { id: unit.id, call_sign: unit.call_sign || unit.id, crew: unit.crew || null } : null,

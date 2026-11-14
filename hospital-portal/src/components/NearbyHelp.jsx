@@ -50,7 +50,7 @@ export default function NearbyHelp({ emergency }) {
             {nearAeds.map((a, i) => (
               <li key={a.id} data-testid="aed-row" data-id={a.id} className={`rounded-lg p-2 ${i === 0 ? 'bg-emerald-50 font-semibold' : 'bg-slate-50'}`}>
                 {i === 0 && <span className="mr-2 rounded-full bg-emerald-600 px-2 py-0.5 text-sm text-white">{t('nb.nearest')}</span>}
-                {a.name}: <b>{a.distance_km} km</b> · {t('nb.walk', { min: a.walk_min })}
+                {a.name}: <b>{t('u.km', { n: a.distance_km })}</b> · {t('nb.walk', { min: a.walk_min })}
                 <span className="block text-sm font-normal text-slate-500">{a.note}</span>
               </li>
             ))}
@@ -68,7 +68,7 @@ export default function NearbyHelp({ emergency }) {
               const sent = notified.includes(p.id);
               return (
                 <li key={p.id} data-testid="responder-row" data-id={p.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-50 p-2">
-                  <span className="flex-1">{p.name} · {p.skill} · <b>{p.distance_km} km</b></span>
+                  <span className="flex-1">{p.name} · {p.skill} · <b>{t('u.km', { n: p.distance_km })}</b></span>
                   <button
                     data-testid="notify-responder"
                     disabled={sent || closed || busy !== null}

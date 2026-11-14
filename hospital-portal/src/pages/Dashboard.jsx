@@ -63,7 +63,7 @@ export default function Dashboard() {
     <div className="flex h-full flex-col">
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-3 border-b border-slate-300 bg-white px-6 py-3">
-        <h1 className="text-2xl font-bold">{hospital?.name || 'Hospital'}</h1>
+        <h1 className="text-2xl font-bold">{hospital?.name || t('map.l.hospital')}</h1>
         <SimulatedBadge text={t('dash.simulatedEvent')} />
         <ConnectionBadge />
         <button

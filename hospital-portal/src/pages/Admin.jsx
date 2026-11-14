@@ -106,7 +106,7 @@ function Integration() {
       <p data-testid="connection-mode" className="text-lg">
         {t('admin.int.mode')} <b>{USE_MOCK ? t('admin.int.mock') : t('admin.int.real', { url: API_BASE_URL })}</b>
       </p>
-      <p className="text-slate-600">To switch, set <code className="rounded bg-slate-100 px-1">VITE_USE_MOCK=false</code> in <code className="rounded bg-slate-100 px-1">.env</code> (and the two address settings), then restart <code className="rounded bg-slate-100 px-1">npm run dev</code>.</p>
+      <p className="text-slate-600">{t('admin.int.sw1')} <code className="rounded bg-slate-100 px-1">VITE_USE_MOCK=false</code> {t('admin.int.sw2')} <code className="rounded bg-slate-100 px-1">.env</code> {t('admin.int.sw3')} <code className="rounded bg-slate-100 px-1">npm run dev</code>.</p>
       <div className="overflow-x-auto"><table className="w-full text-left"><thead className="text-sm uppercase text-slate-500"><tr><th className="px-3 py-2">{t('admin.int.endpoint')}</th><th className="px-3 py-2">{t('admin.int.usedFor')}</th><th className="px-3 py-2">{t('admin.int.status')}</th><th className="px-3 py-2">{t('admin.int.fallback')}</th></tr></thead>
         <tbody>
           {integration.rest.map((r) => <Row key={r.method + r.path} a={`${r.method} ${r.path}`} b={r.used_for} fallback={r.fallback} status={r.status} />)}

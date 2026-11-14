@@ -16,6 +16,9 @@ import { originFor, placeSampleFleet } from '../services/adapters.js';
 import { routeForEmergency } from './tripRoute.js';
 import { USE_MOCK, PORTAL_SIMULATES_AMBULANCE } from '../services/config.js';
 import { subscribe } from '../services/socket.js';
+
+/** English marker for "sample fleet"; the Fleet page shows it translated. */
+export const SAMPLE_FLEET_NOTE = 'The backend has no ambulance list yet, so a sample fleet is shown (not real units).';
 import { decideTrip, parseMode, movementSource, classifyLocationEvent, BACKEND_WAIT_MS } from '../services/movement.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useEmergencies } from './EmergencyProvider.jsx';
@@ -58,7 +61,7 @@ export function AmbulanceProvider({ children }) {
       .getAmbulances()
       .then((list) => {
         setUnits(list);
-        setError(list.some((u) => u.sample) ? 'The backend has no ambulance list yet, so a sample fleet is shown (not real units).' : '');
+        setError(list.some((u) => u.sample) ? SAMPLE_FLEET_NOTE : '');
       })
       .catch((err) => setError(`Could not load ambulances (${err.message}).`));
   }, [isLoggedIn, stopAll]);

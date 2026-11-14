@@ -34,6 +34,12 @@ export const ruledOutText = (t, reason) =>
 /** Severity word (EMERGENCY, URGENT, WATCH). An unknown word stays as it is. */
 export const severityText = (t, severity) => withFallback(t, `sev.${severity}`, severity);
 
+/** A readiness warning sentence (see services/capacity.js). Unknown codes keep the English text. */
+export const warningText = (t, w) => withFallback(t, `warn.c.${w.code}`, w.text);
+
+/** The desk role shown in the nav bar (staff, admin). Unknown roles stay as they are. */
+export const roleText = (t, role) => withFallback(t, `role.${role}`, role ?? '');
+
 /** Emergency type name (Heart attack, Stroke, ...). An unknown type stays as it is. */
 export const typeText = (t, type) => withFallback(t, `type.${type}`, TYPE_LABELS[type] || type);
 
@@ -43,4 +49,12 @@ export function durationText(t, totalSeconds) {
   if (s < 60) return t('dur.sec', { s });
   const m = Math.floor(s / 60);
   return m < 60 ? t('dur.minSec', { m, s: s % 60 }) : t('dur.hourMin', { h: Math.floor(m / 60), m: m % 60 });
+}
+
+/** One Activity row in the chosen language. Notes, checklist items and actor names are case data and stay as written. */
+export function activityText(t, x) {
+  if (x.kind === 'state' && x.state) return `${stateText(t, x.state)}${x.note ? ` (${x.note})` : ''}`;
+  if (x.kind === 'checklist' && x.item !== undefined) return `${t(x.done ? 'act.ticked' : 'act.unticked')}: ${x.item}`;
+  if (x.kind === 'note' && x.note !== null && x.note !== undefined) return `${withFallback(t, `act.nk.${x.note_kind}`, t('act.nk.note'))}: ${x.note}`;
+  return x.text;
 }

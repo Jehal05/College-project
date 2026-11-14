@@ -23,7 +23,7 @@ export default function HospitalDetails({ hospital, type, onClose }) {
           <p className="text-slate-600">{hospital.address}</p>
           <p className="text-slate-600">{hospital.phone}</p>
         </div>
-        <button onClick={onClose} className="text-2xl text-slate-400 hover:text-slate-700" aria-label="Close">
+        <button onClick={onClose} className="text-2xl text-slate-400 hover:text-slate-700" aria-label={t('common.close')}>
           ×
         </button>
       </div>
@@ -35,7 +35,7 @@ export default function HospitalDetails({ hospital, type, onClose }) {
         </div>
         <div className="rounded-xl bg-slate-100 p-3">
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            {t('hd.travel')} <SimulatedBadge text="Simulated ETA" className="!text-xs" />
+            {t('hd.travel')} <SimulatedBadge text={t('hd.simEta')} className="!text-xs" />
           </div>
           <div className="text-2xl font-bold">{t('u.min', { n: hospital.eta_min })}</div>
         </div>
@@ -54,17 +54,17 @@ export default function HospitalDetails({ hospital, type, onClose }) {
       )}
 
       <div>
-        <h3 className="mb-2 font-semibold">Capabilities</h3>
+        <h3 className="mb-2 font-semibold">{t('hd.capabilities')}</h3>
         <CapabilityBadges capabilities={hospital.capabilities} />
       </div>
 
       <div>
-        <h3 className="mb-2 font-semibold">Availability</h3>
+        <h3 className="mb-2 font-semibold">{t('hd.availability')}</h3>
         <ul className="grid grid-cols-2 gap-2 text-lg">
-          <li>Beds free: <b>{a.beds_free ?? '–'}</b></li>
-          <li>ICU free: <b>{a.icu_free ?? '–'}</b></li>
-          <li>Cath lab ready: <b>{a.cath_lab_ready ? 'Yes' : 'No'}</b></li>
-          <li>Stroke unit ready: <b>{a.stroke_unit_ready ? 'Yes' : 'No'}</b></li>
+          <li>{t('hd.bedsFree')} <b>{a.beds_free ?? '–'}</b></li>
+          <li>{t('hd.icuFree')} <b>{a.icu_free ?? '–'}</b></li>
+          <li>{t('hd.cathReady')} <b>{a.cath_lab_ready ? t('common.yes') : t('common.no')}</b></li>
+          <li>{t('hd.strokeReady')} <b>{a.stroke_unit_ready ? t('common.yes') : t('common.no')}</b></li>
         </ul>
       </div>
     </div>

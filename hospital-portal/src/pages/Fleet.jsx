@@ -1,7 +1,7 @@
 import { movementText } from '../services/movement.js';
 import { USE_MOCK } from '../services/config.js';
 // Ambulance fleet dashboard (feature #44) with live tracking of every active trip (feature #25).
-import { useAmbulances } from '../components/AmbulanceProvider.jsx';
+import { useAmbulances, SAMPLE_FLEET_NOTE } from '../components/AmbulanceProvider.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import TrackingMap, { formatEta } from '../components/TrackingMap.jsx';
@@ -38,7 +38,7 @@ export default function Fleet() {
       <p data-testid="fleet-movement" className="text-slate-600">
         {movementText(movementMode === 'true' ? 'portal' : movementMode === 'false' ? 'backend' : USE_MOCK ? 'portal' : 'auto', t)}
       </p>
-      {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
+      {error && <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error === SAMPLE_FLEET_NOTE ? t('fleet.sampleNote') : error}</p>}
 
       <div className="overflow-x-auto rounded-2xl bg-white shadow">
         <table className="w-full text-left text-lg">

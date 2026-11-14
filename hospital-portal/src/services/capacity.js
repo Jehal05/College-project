@@ -60,5 +60,8 @@ export function readinessWarnings(emergency, hospital) {
   return out;
 }
 
+/** The code of the warning the alert card shows (for the translated card sentence), or null. */
+export const cardWarningCode = (emergency, hospital) => readinessWarnings(emergency, hospital).find((w) => w.level === 'warning')?.code || null;
+
 /** The one short line for an alert card, or null. Only real warnings (not "not shared" notes). */
 export const cardWarning = (emergency, hospital) => readinessWarnings(emergency, hospital).find((w) => w.level === 'warning')?.text.replace(/ for this alert\.$/, '.').replace(/^Your /, '') || null;

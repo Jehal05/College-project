@@ -19,9 +19,13 @@ export function reviewSummary(items = []) {
 }
 
 /** Short badge text for the checklist. Draft keeps the original wording. */
-export function reviewBadge(items = []) {
+export function reviewBadge(items = [], t) {
   const s = reviewSummary(items);
-  if (s.state === 'reviewed') return `Reviewed by ${s.reviewers.join(', ')} on ${s.date}`;
-  if (s.state === 'partial') return `Partly reviewed (${items.filter(isReviewed).length} of ${items.length} items). Sample checklist.`;
-  return 'Sample checklist. Pending medical review.';
+  const L = (key, english, vars) => {
+    const v = t ? t(key, vars) : key;
+    return !t || v === key ? english : v;
+  };
+  if (s.state === 'reviewed') return L('rv.reviewed', `Reviewed by ${s.reviewers.join(', ')} on ${s.date}`, { who: s.reviewers.join(', '), date: s.date });
+  if (s.state === 'partial') return L('rv.partial', `Partly reviewed (${items.filter(isReviewed).length} of ${items.length} items). Sample checklist.`, { n: items.filter(isReviewed).length, m: items.length });
+  return L('rp.sampleChecklist', 'Sample checklist. Pending medical review.');
 }

@@ -129,7 +129,7 @@ export default function ActionButtons({ emergency }) {
                       {i === 0 && <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-sm font-semibold text-emerald-800">{t('dispatch.nearest')}</span>}
                       <span className="block text-sm text-slate-600">{t('dispatch.crew')} {u.crew?.driver}, {u.crew?.paramedic}</span>
                     </span>
-                    <span className="text-lg font-semibold tabular-nums">{u.distance_km} km</span>
+                    <span className="text-lg font-semibold tabular-nums">{t('u.km', { n: u.distance_km })}</span>
                   </label>
                 ))}
               </fieldset>

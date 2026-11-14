@@ -35,12 +35,12 @@ export function buildActivity(cases = [], checklists = {}) {
       const text = isNote
         ? `${NOTE_KIND_LABELS[ev.kind] || 'Note'}: ${redact(ev.note)}`
         : `${STATE_LABELS[ev.state] || ev.state}${ev.note ? ` (${redact(ev.note)})` : ''}`;
-      out.push({ ...base, id: `${base.case_key}|s|${i}`, ts, kind: isNote ? 'note' : 'state', actor: ev.actor || null, who: actorGroup(ev.actor), text, local_only: Boolean(ev.local_only) });
+      out.push({ ...base, id: `${base.case_key}|s|${i}`, ts, kind: isNote ? 'note' : 'state', actor: ev.actor || null, who: actorGroup(ev.actor), text, state: isNote ? null : ev.state, note: ev.note ? redact(ev.note) : null, note_kind: isNote ? ev.kind || 'note' : null, local_only: Boolean(ev.local_only) });
     });
     const items = new Map((checklists[e.type] || []).map((it) => [it.id, it.text]));
     for (const [itemId, tick] of Object.entries(e.checklist || {})) {
       if (!tick || !Number.isFinite(Date.parse(tick.at))) continue;
-      out.push({ ...base, id: `${base.case_key}|c|${itemId}`, ts: tick.at, kind: 'checklist', actor: tick.by || null, who: actorGroup(tick.by), text: `${tick.done ? 'Ticked' : 'Unticked'}: ${items.get(itemId) || itemId}`, local_only: false });
+      out.push({ ...base, id: `${base.case_key}|c|${itemId}`, ts: tick.at, kind: 'checklist', actor: tick.by || null, who: actorGroup(tick.by), text: `${tick.done ? 'Ticked' : 'Unticked'}: ${items.get(itemId) || itemId}`, done: Boolean(tick.done), item: items.get(itemId) || itemId, local_only: false });
     }
   }
   return out.sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts) || (a.id < b.id ? 1 : -1)); // newest first

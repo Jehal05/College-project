@@ -31,7 +31,7 @@ export default function ReadinessCard({ emergency: e }) {
 
   return (
     <section data-testid="readiness-card" aria-label={t('rc.title')} className="rounded-2xl border-2 border-slate-300 bg-white p-4">
-      <h3 className="mb-3 text-xl font-bold">{t('rc.title')} <span className="text-sm font-normal text-slate-500">(simulated)</span></h3>
+      <h3 className="mb-3 text-xl font-bold">{t('rc.title')} <span className="text-sm font-normal text-slate-500">{t('rc.sim')}</span></h3>
       <dl className="grid gap-3 sm:grid-cols-2">
         <div><dt className="text-sm text-slate-500">{t('rc.eta')}</dt><dd data-testid="ready-eta" data-known={card.eta.known} className="text-lg font-bold">{card.eta.text}</dd></div>
         <div><dt className="text-sm text-slate-500">{t('rc.checklist')}</dt><dd data-testid="ready-checklist" className="text-lg font-bold">{card.checklist.text}</dd></div>
