@@ -96,7 +96,7 @@ def _tables() -> tuple:
 PHASES = [
     Phase("Phase 1: Foundation", "contract, repo, models, login",
           ["tests/test_startup_key.py", "tests/test_states_roles.py", "tests/test_models_foundation.py", "tests/test_ids.py",
-           "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_hardening.py", "tests/test_startup_seed.py",
+           "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_hardening.py", "tests/test_write_limiter.py", "tests/test_raw_body_guard.py", "tests/test_startup_seed.py",
            "tests/test_access_tokens.py", "tests/test_login_limiter.py", "tests/test_login_api.py", "tests/test_error_shape.py",
            "tests/test_role_dependencies.py", "tests/test_patient_record_service.py", "tests/test_patients_api.py",
            "tests/test_contacts_api.py"], [33], [
