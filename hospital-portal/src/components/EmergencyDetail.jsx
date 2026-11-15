@@ -12,6 +12,8 @@ import ChatPanel from './ChatPanel.jsx';
 import NearbyHelp from './NearbyHelp.jsx';
 import PatientMiniMap from './PatientMiniMap.jsx';
 import Timeline from './Timeline.jsx';
+import CommandSummary from './CommandSummary.jsx';
+import ResponseLog from './ResponseLog.jsx';
 import DetailHeader from './detail/DetailHeader.jsx';
 import PatientFacts from './detail/PatientFacts.jsx';
 import SymptomList from './detail/SymptomList.jsx';
@@ -39,6 +41,7 @@ export default function EmergencyDetail({ emergency }) {
     <div data-testid="detail-panel" className="space-y-6">
       <DetailHeader emergency={e} escalatedTo={escalatedTo} reach={reach} />
       <ReadinessWarning emergency={e} />
+      <CommandSummary emergency={e} />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-5">
@@ -66,6 +69,8 @@ export default function EmergencyDetail({ emergency }) {
             <h3 className="mb-2 font-semibold">{t('sec.timeline')}</h3>
             <Timeline events={e.status_events} createdAt={e.created_at} t={t} />
           </div>
+
+          <ResponseLog emergency={e} />
 
           <div>
             <h3 className="mb-2 font-semibold">{t('sec.notes')}</h3>
