@@ -13,6 +13,10 @@ import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import AvailabilityForm from '../components/AvailabilityForm.jsx';
 import OwnCapacity from '../components/OwnCapacity.jsx';
+import Button from '../components/ui/Button.jsx';
+import ErrorState from '../components/ui/ErrorState.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import Skeleton from '../components/ui/Skeleton.jsx';
 import StatsStrip from '../components/StatsStrip.jsx';
 import { useAmbulances } from '../components/AmbulanceProvider.jsx';
 import { useT } from '../i18n/index.js';
@@ -69,29 +73,13 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold">{hospital?.name || t('map.l.hospital')}</h1>
         <SimulatedBadge text={t('dash.simulatedEvent')} />
         <ConnectionBadge />
-        <button
-          data-testid="toggle-availability"
-          onClick={() => setShowAvailability((v) => !v)}
-          className="ml-auto rounded-lg border-2 border-slate-300 bg-white px-4 py-2 font-semibold hover:bg-slate-50"
-        >
+        <Button variant="secondary" data-testid="toggle-availability" onClick={() => setShowAvailability((v) => !v)} className="ml-auto">
           {showAvailability ? t('dash.hideBeds') : t('dash.updateBeds')}
-        </button>
+        </Button>
         {USE_MOCK && !presenting && (
           <>
-            <button
-              data-testid="mock-new-alert"
-              onClick={() => mockCreateEmergency()}
-              className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-white hover:bg-slate-700"
-            >
-              {t('dash.simNew')}
-            </button>
-            <button
-              data-testid="mock-early"
-              onClick={() => mockCreateEarlyNotice('HEART')}
-              className="rounded-lg border-2 border-slate-700 px-4 py-2 font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              {t('dash.simEarly')}
-            </button>
+            <Button data-testid="mock-new-alert" onClick={() => mockCreateEmergency()}>{t('dash.simNew')}</Button>
+            <Button variant="secondary" data-testid="mock-early" onClick={() => mockCreateEarlyNotice('HEART')}>{t('dash.simEarly')}</Button>
           </>
         )}
       </div>
@@ -105,8 +93,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {hospitalError && <p role="alert" className="mx-6 mt-4 rounded-lg bg-red-100 p-3 font-semibold text-red-800">{hospitalError}</p>}
-      {error && <p role="alert" className="mx-6 mt-4 rounded-lg bg-red-100 p-3 font-semibold text-red-800">{error}</p>}
+      {hospitalError && <ErrorState message={hospitalError} className="mx-6 mt-4" />}
+      {error && <ErrorState message={error} className="mx-6 mt-4" />}
 
       <div className="grid flex-1 gap-6 p-6 lg:grid-cols-[440px_1fr]">
         {/* Left: alert queue */}
@@ -143,8 +131,13 @@ export default function Dashboard() {
               </button>
             )}
           </div>
-          {loading && emergencies.length === 0 && <p className="text-slate-500">{t('dash.loading')}</p>}
-          {!loading && emergencies.length === 0 && <p data-testid="queue-empty" className="text-slate-500">{scope === 'mine' ? t('dash.emptyMine') : t('dash.emptyAll')}</p>}
+          {loading && emergencies.length === 0 && (
+            <div className="space-y-3">
+              <Skeleton label={t('dash.loading')} className="h-24 w-full" />
+              <Skeleton aria-hidden="true" role="presentation" className="h-24 w-full" />
+            </div>
+          )}
+          {!loading && emergencies.length === 0 && <EmptyState data-testid="queue-empty" title={scope === 'mine' ? t('dash.emptyMine') : t('dash.emptyAll')} />}
           <ul ref={listRef} aria-label={t('dash.queueLabel')} onKeyDown={onListKeyDown} className="space-y-3">
             {emergencies.map((e) => (
               <li key={e.emergency_id}>
