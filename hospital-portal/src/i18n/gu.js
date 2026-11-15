@@ -736,4 +736,6 @@ export default {
   'card.unread': 'વાંચ્યા વગરનું',
   'card.received': 'પ્રાપ્ત',
   'card.distance': 'અંતર {n} કિમી',
+  'map.tilesDown': 'નકશાની પૃષ્ઠભૂમિ લોડ થઈ નથી (ઑફલાઇન?). માર્કર, માર્ગ અને નીચેની યાદી ચાલુ છે.',
+  'tk.toGoKm': '{km} કિમી બાકી (Simulated માર્ગ)',
 };

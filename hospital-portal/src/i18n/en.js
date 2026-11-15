@@ -737,4 +737,6 @@ export default {
   'card.unread': 'Unread',
   'card.received': 'Received',
   'card.distance': 'Distance {n} km',
+  'map.tilesDown': 'Map background could not load (offline?). Markers, routes and the list below still work.',
+  'tk.toGoKm': '{km} km to go (simulated route)',
 };

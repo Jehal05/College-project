@@ -12,6 +12,8 @@ import { EMERGENCY_TYPES, hasCapabilities } from '../services/contract.js';
 import HospitalDetails from '../components/HospitalDetails.jsx';
 import CapabilityBadges from '../components/CapabilityBadges.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
+import TileNotice from '../components/TileNotice.jsx';
+import { useTileHealth } from '../components/useTileHealth.js';
 import { patientIcon, aedIcon, responderIcon } from '../components/mapIcons.js';
 import aedData from '../data/aed.json';
 import responderData from '../data/responders.json';
@@ -50,6 +52,7 @@ export default function MapPage() {
   const { session } = useAuth();
   const [type, setType] = useState('');
   const [selectedId, setSelectedId] = useState(null);
+  const tiles = useTileHealth();
   const [showAed, setShowAed] = useState(false);
   const [showResponders, setShowResponders] = useState(false);
   // Mock mode keeps the sample patient. With a real backend the map starts from the middle of the hospitals, not a fixed city.
@@ -110,6 +113,7 @@ export default function MapPage() {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              eventHandlers={tiles.handlers}
             />
             <Marker position={[origin.lat, origin.lng]} icon={patientIcon}>
               <Tooltip direction="top" offset={[0, -12]}>{t('map.patientTip', { label: origin.label === MIDDLE_LABEL ? t('map.middle') : origin.label === DEMO_LOCATION.label ? t('map.demoLoc') : origin.label })}</Tooltip>
@@ -144,6 +148,7 @@ export default function MapPage() {
           </MapContainer>
         </div>
 
+        <TileNotice down={tiles.down} />
         <div className="flex flex-wrap gap-4 text-sm text-slate-600">
           <span><b className="text-sky-600">●</b> {t('map.l.hospital')}</span>
           <span><b className="text-emerald-600">●</b> {t('map.l.has')}</span>

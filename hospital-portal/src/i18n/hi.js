@@ -736,4 +736,6 @@ export default {
   'card.unread': 'अपठित',
   'card.received': 'प्राप्त',
   'card.distance': 'दूरी {n} किमी',
+  'map.tilesDown': 'मानचित्र की पृष्ठभूमि लोड नहीं हुई (ऑफ़लाइन?)। मार्कर, मार्ग और नीचे की सूची काम करती हैं।',
+  'tk.toGoKm': '{km} किमी बाकी (Simulated मार्ग)',
 };

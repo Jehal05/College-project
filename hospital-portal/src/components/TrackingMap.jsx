@@ -17,6 +17,9 @@ import { useEmergencies } from './EmergencyProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useAuth } from './AuthProvider.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
+import TileNotice from './TileNotice.jsx';
+import { useTileHealth } from './useTileHealth.js';
+import { remainingKm } from '../services/mapHealth.js';
 import { useT } from '../i18n/index.js';
 import { formatEta, legText } from '../services/eta.js';
 
@@ -28,6 +31,7 @@ export default function TrackingMap({ emergency, compact = false }) {
   const { hospitals } = useHospitals();
   const { units, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip, movementFor } = useAmbulances();
   const { addNote } = useEmergencies();
+  const tiles = useTileHealth();
   const [message, setMessage] = useState('');
   const e = emergency;
   const id = e.emergency_id;
@@ -50,6 +54,7 @@ export default function TrackingMap({ emergency, compact = false }) {
   const progress = arrived ? 1 : live ? e.ambulance.progress || 0 : 0;
   const position = arrived ? route.hospital : live ? e.ambulance : route.points[0];
   const { done, remaining } = splitPath(route.points, route.cumulative, progress);
+  const toGo = remainingKm({ totalKm: route.totalKm, progress, live, arrived }); // along the simulated route; null when no live position
   const toLatLng = (p) => [p.lat, p.lng];
   const trip = trips[id];
   const moving = e.state === 'AMBULANCE_DISPATCHED' || e.state === 'EN_ROUTE';
@@ -75,6 +80,9 @@ export default function TrackingMap({ emergency, compact = false }) {
             {arrived ? t('tk.arrived') : live ? t('tk.eta', { time: formatEta(e.ambulance.eta_seconds, t) }) : t('tk.etaWait')}
           </div>
           <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id), t)}</div>
+          {toGo !== null && !arrived && (
+            <div data-testid="distance-left" data-km={toGo} className="text-slate-700">{t('tk.toGoKm', { km: toGo })}</div>
+          )}
           <div data-testid="trip-leg" className="font-semibold text-slate-700">
             {legText({ arrived, live, ambulance: e.ambulance }, t)}
           </div>
@@ -91,6 +99,7 @@ export default function TrackingMap({ emergency, compact = false }) {
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            eventHandlers={tiles.handlers}
           />
           <Polyline positions={done.map(toLatLng)} pathOptions={{ color: '#94a3b8', weight: 6 }} />
           <Polyline positions={remaining.map(toLatLng)} pathOptions={{ color: '#2563eb', weight: 6, dashArray: '2 10' }} />
@@ -105,6 +114,7 @@ export default function TrackingMap({ emergency, compact = false }) {
           </Marker>
         </MapContainer>
       </div>
+      <TileNotice down={tiles.down} />
       <div className="mt-1 flex flex-wrap gap-4 text-sm text-slate-600">
         <span><b className="text-slate-400">━</b> {t('tk.driven')}</span>
         <span><b className="text-blue-600">┅</b> {t('tk.toGo')}</span>
