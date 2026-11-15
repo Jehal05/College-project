@@ -13,6 +13,8 @@ import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import AvailabilityForm from '../components/AvailabilityForm.jsx';
 import OwnCapacity from '../components/OwnCapacity.jsx';
+import StatsStrip from '../components/StatsStrip.jsx';
+import { useAmbulances } from '../components/AmbulanceProvider.jsx';
 import { useT } from '../i18n/index.js';
 
 export default function Dashboard() {
@@ -25,6 +27,7 @@ export default function Dashboard() {
   const hidden = hiddenCount(everyAlert, session?.hospital_id, scope);
   const listRef = useRef(null);
   const { hospitals, error: hospitalError } = useHospitals();
+  const { units } = useAmbulances();
   const hospital = hospitals.find((h) => h.id === session?.hospital_id) || hospitals[0] || null;
   const [selectedId, setSelectedId] = useState(null);
   const [showAvailability, setShowAvailability] = useState(false);
@@ -93,6 +96,7 @@ export default function Dashboard() {
         )}
       </div>
 
+      <StatsStrip emergencies={emergencies} hospital={hospitals.find((h) => String(h.id) === String(session?.hospital_id)) || null} units={units} loaded={!loading} />
       <OwnCapacity />
 
       {showAvailability && (
