@@ -39,7 +39,7 @@ def test_report_file_name_is_ciphertext_in_the_database(patients):
     patients.add(Report(id="rep_001", patient_id="pat_001", file_name="ECG_Demo_Patient.pdf"))
     patients.commit()
     stored = raw(patients, "SELECT file_name FROM reports")[0][0]
-    assert "ECG" not in stored
+    assert "ECG_Demo" not in stored      # a long needle: "ECG" alone can appear in random ciphertext by chance
     assert patients.get(Report, "rep_001").file_name == "ECG_Demo_Patient.pdf"
 
 

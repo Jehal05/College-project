@@ -3,7 +3,7 @@
 An emergency in SOS_SENT that nobody acknowledged for ESCALATION_TIMEOUT_SECONDS (default 30) goes
 SOS_SENT -> ESCALATED -> SOS_SENT, and the next hospital in the ranking (the one the SOS stored) is alerted.
 Both moves go through `emergency_state.transition()`. The old alert is marked ESCALATED_AWAY.
-If there is no next hospital the alert simply stays where it is (and is not retried every second).
+If there is no next hospital the alert stays where it is and is looked at again after another timeout (not every second).
 
 Nothing here talks to a socket: events are queued and sent after the commit, like everywhere else.
 """
@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models.emergencies import Emergency, HospitalAlert
 from app.models.enums import EmergencyState
 from app.models.hospitals import Hospital
+from app.services import hospital_match
 from app.services import emergencies as emergency_svc
 from app.services import emergency_state, events
 
@@ -50,7 +51,9 @@ def escalate(session: Session, emergency: Emergency) -> bool:
     hospital = None
     for candidate_id in ranking:                    # the next one that was not alerted yet and is still verified
         candidate = session.get(Hospital, candidate_id) if candidate_id not in already else None
-        if candidate is not None and candidate.verified:
+        # Verified AND able to treat this emergency type: a heart attack is never escalated to a hospital without a
+        # cath lab (the portal rules such hospitals out too). The ranking keeps them last as a fallback for the first alert only.
+        if candidate is not None and candidate.verified and hospital_match.is_suitable(candidate, emergency.type):
             hospital = candidate
             break
     if current is None or hospital is None:

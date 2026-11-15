@@ -114,15 +114,34 @@ def _entries(session: Session, emergency: Emergency, kind: str) -> List[DeskEntr
             .order_by(DeskEntry.id).all())
 
 
-def checklist(session: Session, emergency: Emergency) -> Dict[str, dict]:
-    """The latest tick for each item: { item_id: { done, by, at } }."""
+def _checklist_of(entries: List[DeskEntry]) -> Dict[str, dict]:
     state: Dict[str, dict] = {}
-    for entry in _entries(session, emergency, "check"):
+    for entry in entries:                                   # oldest first, so the latest tick wins
         state[entry.label] = {"done": bool(entry.content["done"]), "by": entry.actor, "at": _iso(entry.created_at)}
     return state
 
 
+def checklist(session: Session, emergency: Emergency) -> Dict[str, dict]:
+    """The latest tick for each item: { item_id: { done, by, at } }."""
+    return _checklist_of(_entries(session, emergency, "check"))
+
+
+def _view_of(entries: List[DeskEntry]) -> dict:
+    return {"checklist": _checklist_of([e for e in entries if e.kind == "check"]),
+            "notes": [note_view(e) for e in entries if e.kind == "note"],
+            "chat": [chat_view(e) for e in entries if e.kind == "chat"]}
+
+
 def desk_view(session: Session, emergency: Emergency) -> dict:
-    return {"checklist": checklist(session, emergency),
-            "notes": [note_view(e) for e in _entries(session, emergency, "note")],
-            "chat": [chat_view(e) for e in _entries(session, emergency, "chat")]}
+    return _view_of(session.query(DeskEntry).filter(DeskEntry.emergency_id == emergency.id)
+                    .order_by(DeskEntry.id).all())
+
+
+def desk_views(session: Session, emergencies: List[Emergency]) -> Dict[str, dict]:
+    """desk_view for many emergencies with ONE query (the list screen). Same answer as desk_view for each."""
+    by_id: Dict[str, List[DeskEntry]] = {e.id: [] for e in emergencies}
+    if by_id:
+        for entry in (session.query(DeskEntry).filter(DeskEntry.emergency_id.in_(list(by_id)))
+                      .order_by(DeskEntry.id).all()):
+            by_id[entry.emergency_id].append(entry)
+    return {eid: _view_of(entries) for eid, entries in by_id.items()}

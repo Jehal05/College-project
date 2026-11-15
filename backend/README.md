@@ -68,6 +68,7 @@ Then open <http://localhost:8000/docs> for the interactive API page, and <http:/
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login lasts | 480 |
 | `LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS` | Login rate limit (wrong attempts per login, per address, and the window in seconds) | 5, 30, 60 |
 | `PASSPORT_TOKEN_EXPIRE_MINUTES` | How long a passport link lasts | 30 |
+| `DISPATCH_OWN_AMBULANCE_ONLY` | PROPOSED, not agreed: `true` lets a desk dispatch only ambulances based at its own hospital (403 otherwise). Off means any available ambulance, the old behaviour | off |
 | `ESCALATION_TIMEOUT_SECONDS`, `ESCALATION_SWEEP_SECONDS` | How long an alert may wait for a hospital to acknowledge before it goes to the next hospital, and how often the server checks | 30, 1 |
 
 ## Demo logins (demo mode only, all fictional)

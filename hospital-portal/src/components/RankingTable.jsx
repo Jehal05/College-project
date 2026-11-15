@@ -6,7 +6,7 @@
 import rankingConfig from '../data/ranking-config.json';
 import SimulatedBadge from './SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
-import { ruledOutText } from '../i18n/phrases.js';
+import { ruledOutText, whyText } from '../i18n/phrases.js';
 
 const PARTS = [
   ['capability', 'Capability', 'bg-emerald-500'],
@@ -89,7 +89,7 @@ export default function RankingTable({ ranking, statuses, ownHospitalId, onSelec
                 </div>
 
                 <p className="mt-3 text-slate-700">
-                  <b>{t('rk.why')}</b> {row.why}
+                  <b>{t('rk.why')}</b> {whyText(t, row.why)}
                   {row.distance_km !== null && <span className="text-slate-500"> · {t('u.km', { n: row.distance_km })}</span>}
                 </p>
               </Tag>

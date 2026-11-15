@@ -46,7 +46,11 @@ async def _pump(websocket: WebSocket, conn: ws_hub.Connection, actor: Actor, db:
     while True:
         event = await conn.queue.get()
         db.expire_all()                            # see what the requests just saved
-        if ws_hub.visible(db, actor, event):
+        try:
+            allowed = ws_hub.visible(db, actor, event)
+        finally:
+            db.rollback()                          # end the read transaction: a long-lived socket must not hold a pooled connection
+        if allowed:
             await websocket.send_json(ws_hub.public(event))
 
 
@@ -65,6 +69,7 @@ async def live(websocket: WebSocket, db: Session = Depends(get_db)) -> None:
     if actor is None:
         await websocket.close(code=POLICY_VIOLATION)
         return
+    db.rollback()                                  # the login lookup is done; give the connection back
     conn = ws_hub.hub.register(asyncio.get_running_loop(), actor.patient_id if actor.role == "PATIENT" else None)
     tasks = []
     try:

@@ -109,7 +109,15 @@ if ($state.staff -and $state.emergency) {
 
   foreach ($step in @('EN_ROUTE', 'ARRIVED', 'HANDOVER_DONE')) {
     $r = Call 'POST' ("/emergencies/$id/status") $tok @{ state = $step }
-    if ($r.ok) { Record 'PASS' "status $step" 'accepted' } else { Record 'FAIL' "status $step" $r.error }
+    if ($r.ok) { Record 'PASS' "status $step" 'accepted' }
+    elseif ($step -eq 'EN_ROUTE') {
+      # Jehal's mock moves the ambulance to EN_ROUTE by itself right after dispatch, so asking again is a 409.
+      $now = Call 'GET' '/emergencies?status=active' $tok $null
+      $cur = $null
+      if ($now.ok) { foreach ($e in @($now.body)) { if ($e.id -eq $id -or $e.emergency_id -eq $id) { $cur = $e.state } } }
+      if ($cur -in @('EN_ROUTE', 'ARRIVED')) { Record 'PASS' 'status EN_ROUTE' "already $cur (the server moved it by itself)" } else { Record 'FAIL' 'status EN_ROUTE' ($r.error + ' (state now: ' + $cur + ')') }
+    }
+    else { Record 'FAIL' "status $step" $r.error }
   }
 
   $r = Call 'GET' '/emergencies?status=finished' $tok $null
