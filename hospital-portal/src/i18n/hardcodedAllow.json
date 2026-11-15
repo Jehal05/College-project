@@ -158,5 +158,11 @@
       "text": "Middle of the hospitals (no patient selected)",
       "reason": "Marker value in code; the screen shows t(\"map.middle\")."
     }
+  ],
+  "components/NavBar.jsx": [
+    {
+      "text": "Escape",
+      "reason": "A keyboard key name compared in code, not text shown to anyone."
+    }
   ]
 }

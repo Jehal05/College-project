@@ -739,4 +739,11 @@ export default {
   'card.distance': 'Distance {n} km',
   'map.tilesDown': 'Map background could not load (offline?). Markers, routes and the list below still work.',
   'tk.toGoKm': '{km} km to go (simulated route)',
+  'nav.g.ops': 'Operations',
+  'nav.g.mgmt': 'Management',
+  'nav.g.insights': 'Insights',
+  'nav.g.admin': 'Administration',
+  'nav.aria': 'Main menu',
+  'nav.menu': 'Menu',
+  'nav.menuClose': 'Close menu',
 };

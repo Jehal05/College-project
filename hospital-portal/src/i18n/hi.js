@@ -738,4 +738,11 @@ export default {
   'card.distance': 'दूरी {n} किमी',
   'map.tilesDown': 'मानचित्र की पृष्ठभूमि लोड नहीं हुई (ऑफ़लाइन?)। मार्कर, मार्ग और नीचे की सूची काम करती हैं।',
   'tk.toGoKm': '{km} किमी बाकी (Simulated मार्ग)',
+  'nav.g.ops': 'संचालन',
+  'nav.g.mgmt': 'प्रबंधन',
+  'nav.g.insights': 'विश्लेषण',
+  'nav.g.admin': 'प्रशासन',
+  'nav.aria': 'मुख्य मेनू',
+  'nav.menu': 'मेनू',
+  'nav.menuClose': 'मेनू बंद करें',
 };
