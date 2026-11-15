@@ -187,6 +187,11 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | GET, POST /patients/{id}/reports | List the reports (no file bytes) / upload one: raw PDF, JPG or PNG body, file name in `?name=` | PATIENT (own) | Jehal |
 | GET /patients/{id}/reports/{rid}/file | Download one report | PATIENT (own) | Jehal |
 | DELETE /patients/{id}/reports/{rid} | Delete one report | PATIENT (own) | Jehal |
+| POST /predictions/{model} | Educational risk estimate for `heart` or `diabetes`; optional `scenario` for a what-if. PROPOSED, not agreed (see docs/API_CONTRACT.md) | PATIENT (own) | Puneet |
+| GET /patients/{id}/organs/{organ} | The readings that belong to one organ (a fixed table); no data gives `has_data: false`. PROPOSED, not agreed | PATIENT (own) | Puneet |
+| POST /reports/extract | Propose lab values from a text PDF; saves nothing. PROPOSED, not agreed | PATIENT | Puneet |
+| GET, POST /patients/{id}/lab-values | List / save lab values the patient confirmed (max 20 per save). PROPOSED, not agreed | PATIENT (own) | Puneet |
+| DELETE /patients/{id}/lab-values/{lab_id} | Delete one stored lab value. PROPOSED, not agreed | PATIENT (own) | Puneet |
 | GET, POST /patients/{id}/reminders | List / add a medication reminder | PATIENT (own) | Jehal |
 | PUT, DELETE /patients/{id}/reminders/{rid} | Change / delete a reminder | PATIENT (own) | Jehal |
 | POST /patients/{id}/reminders/{rid}/shown, /taken | Log that a dose reminder was shown / marked taken | PATIENT (own) | Jehal |

@@ -232,3 +232,187 @@ Demo logins (password `demo1234`): `family@demo.test` (FAMILY, not linked yet), 
 Audit rows added (visible to admin at `GET /audit`): `family.invite_created`, `family.link`, `family.checkin`, `responder.register`, `responder.accept`, `admin.user_update`, `content.update`, `privacy.export_request`, `privacy.delete_request`.
 
 States used by these endpoints (from Daksh's table): `SOS_SENT`, `HOSPITAL_ACKNOWLEDGED`, `AMBULANCE_DISPATCHED`, `EN_ROUTE`, `ARRIVED` count as "live".
+
+## Proposed: predictions, organs, report extraction
+
+**PROPOSED, NOT AGREED. BUILT ON BRANCH `Puneet` ONLY (not merged to `main`, not in the mock).** Written 15 Nov 2026 by Puneet for review by Daksh (backend) and Jehal (patient app and mock). The routes below exist in `backend/app` on that branch (Phase 2 and Phase 3 builds, notes under each section), so the endpoint counts elsewhere in the docs (for example "77 contract endpoints") do **not** include them. When a route is agreed, move it into the sections above and update the counts. The rows in `backend/CONTRACT.md` marked PROPOSED exist only so the backend's contract test, which compares the served routes with that file, keeps passing.
+
+Rules for all three: they are simulated estimates for a prototype, not medical advice. Errors use the real backend's shape `{ "error": "plain text", "detail": "same text" }` (the older conventions line at the top says only `error`; the real backend sends both). `401` = login missing, bad or expired; `403` = logged in but not allowed; an unknown id answers `404`, the same as a patient who is not yours, so ids cannot be probed. Every access to a patient's data is written to the audit log.
+
+### 1. Predictions: `POST /predictions/{model}`
+
+`model` is `heart` or `diabetes`. Who may call: PATIENT (own data only). Clinical roles are not decided yet (open question 3).
+
+Request: `{ "patient_id"?: "PT-...", "inputs"?: { ...model features... } }`. If `inputs` is missing, the server fills what it can from the patient's own record and answers `400` listing the **names** of the missing features. If `inputs` is given (the what-if case for the Simulator) the server scores exactly those.
+
+Answer `200`:
+
+```json
+{
+  "model": "heart",
+  "risk": 0.23,
+  "band": "low",
+  "top_factors": [
+    { "feature": "systolic_bp", "direction": "raises", "contribution": 0.08 }
+  ],
+  "model_card": {
+    "name": "heart-logreg", "version": "0.1.0",
+    "dataset": "TO FILL (see docs/ML_DATASETS.md)", "dataset_source": "TO FILL",
+    "trained_on": "YYYY-MM-DD",
+    "metrics": { "precision": null, "recall": null, "f1": null, "roc_auc": null, "calibration": null }
+  },
+  "limits": "Plain text shown next to the score: small public dataset, not validated on Indian patients, not a diagnosis.",
+  "notice": "Estimate, not a diagnosis. In an emergency call 112.",
+  "simulated": true
+}
+```
+
+- `risk` is 0 to 1. `band` is `low`, `medium` or `high`; the cut-offs are stored with the model card, not invented in the screen.
+- `top_factors`: 3 to 5 entries, ordered by size. `direction` is `raises` or `lowers`. `contribution` is in the same units as `risk`.
+- Errors: `404` unknown model name; `403` not your patient; `400` missing or out-of-range features (field names only, never the values; the real backend answers validation errors with 400); `503` if the model file is not loaded.
+- The score never delays or replaces an emergency: the SOS flow does not call this route.
+
+**Phase 2 build notes (deviations from the text above; to be agreed).** `top_factors[].contribution` is the change in risk if that input sat at the training average (so it is in the same units as `risk`), and each factor also carries `log_odds` (coefficient times the standardised value). `model_card` also carries `confusion_matrix`, `threshold` and `synthetic`. Unknown input names are refused with `400`. Until real model files replace the shipped ones, the `notice` starts with "PRACTICE MODEL trained on invented data". The route is built in `backend/app/api/predictions.py` on branch `Puneet` only. Only `age` and `sex` are taken from the patient's record; everything else must be sent.
+
+**Phase 3 build notes (what-if).** `POST /predictions/{model}` also accepts an optional `scenario`: an object of model-input names to new values, laid over the inputs the request or the record gives. Without `scenario` the answer is exactly the Phase 2 answer. With it the answer is:
+
+```json
+{
+  "model": "heart",
+  "current":  { "risk": 0.5067, "band": "high" },
+  "scenario": { "risk": 0.3886, "band": "high" },
+  "difference": -0.1181,
+  "changed_inputs": [
+    { "feature": "resting_bp", "from": 138.0, "to": 120.0, "risk_if_only_this_changes": 0.4359, "change": -0.0708 }
+  ],
+  "interaction": 0.0014,
+  "note": "These models are logistic: the effect of one change depends on the other inputs, so the single-change numbers do not add up to the total. `interaction` is the part that does not add up.",
+  "notice": "Hypothetical. Not a prediction of what will happen. (plus the practice-model sentence while the model is synthetic)",
+  "limits": "...", "model_card": { "...": "..." }, "simulated": true
+}
+```
+
+- `change` is the risk with only that input changed minus the current risk. `interaction` is `difference` minus the sum of the single changes. `current` is what the plain call would answer for the same inputs. `current` and `scenario` hold no `top_factors`.
+- Only the model's own inputs can change, inside the model's accepted range. An unknown name, a value that is not a number or is out of range, an empty scenario and a scenario that changes nothing are each `400` naming the field(s), never the values. Real missing inputs are reported first.
+- **`exercise`, `smoking`, `sleep` and `diet` are not model inputs, so they cannot be changed here and no coefficient was invented for them.** The patient app's Simulator controls (`heart_rate`, `spo2`, `bp`, `glucose`) do not line up with the model inputs either: `bp` (systolic) could feed `heart.resting_bp` but the diabetes model's `blood_pressure` is a diastolic value; the diabetes `glucose` is a lab glucose, not the simulated live glucose; `max_heart_rate` is a stress-test peak, not the live heart rate; `spo2` has no input. The screen must therefore offer the model inputs themselves, not map the four sliders silently. Which mapping is clinically acceptable is for the doctor review.
+
+
+### 2. Organ data: `GET /patients/{id}/organs/{organ}`
+
+`organ` is `heart`, `lungs`, `kidneys` or `liver`. Who may call: PATIENT (own); a linked FAMILY user and hospital staff only where the existing consent rules already release the same fields (open question 4).
+
+Answer `200`:
+
+```json
+{
+  "organ": "kidneys",
+  "has_data": true,
+  "items": [
+    {
+      "key": "creatinine", "kind": "lab", "value": 1.1, "unit": "mg/dL",
+      "source": "entered", "last_updated": "2026-11-14T09:30:00Z",
+      "reference_range": { "low": 0.6, "high": 1.3 },
+      "trend": [ { "at": "2026-08-02T00:00:00Z", "value": 1.0 } ]
+    }
+  ],
+  "mapping_note": "Which readings belong to which organ is a fixed table, documented in the backend.",
+  "label": "Educational representation, not a medical image."
+}
+```
+
+- `source` is one of `entered`, `imported`, `simulated`. Every item carries it, and `last_updated`.
+- **No data:** `{ "organ": "...", "has_data": false, "items": [] }`. Never `0` or a made-up value.
+- `trend` holds the last N values (N is set by the server, at most 12).
+- Errors: `404` unknown organ or patient; `403` not allowed; fields the patient has not consented to are left out, not blanked.
+
+**Phase 3 build notes (organs; deviations from the text above, to be agreed).**
+
+- Built in `backend/app/api/organs.py` and `backend/app/services/organs.py`. PATIENT, own record only: everybody else gets `403` (audited) before any `404`. The contract's "family and staff where consent allows" is **not** built (open question 4).
+- The organs are the patient app's own six: `heart`, `lungs`, `kidneys`, `liver`, `pancreas`, `brain`. The text above names four. `pancreas` is added because the app's Twin screen and `labs.js` use it (HbA1c, fasting glucose, and the glucose reading); `brain` is answered but has **no mapped reading**, so it always says `has_data: false`. Any other name is `404`.
+- `source` is `simulated`, `entered` or `report_extracted` (the text above says `entered`, `imported`, `simulated`; there is no import route, and `report_extracted` says where a confirmed value came from).
+- `mapping_note` and `label` are at the top of the answer, as above. Each item has `key`, `kind` (`vital` or `lab`), `value`, `unit`, `source`, `last_updated`, `reference_range` (or `null`) and `trend`.
+- **Vitals** are one current simulated reading with **no trend** (`trend: []`): the simulator keeps no history. They always exist, so an organ with a vital always has `has_data: true`. **Labs** carry the newest value, its unit, source and printed range, and `trend` holds up to the last 12 values, oldest first, as `{ "at": "<taken_on>T00:00:00Z", "value": n }`. Only labs that have a stored value are listed.
+- `reference_range` is only ever a range the patient saved from a report. The server never invents one, so vitals have `null`.
+
+The fixed mapping (`app/services/organs.py`, pinned by a test that spells the table out):
+
+| organ | vitals (simulated, no trend) | labs (stored, with trend) |
+|---|---|---|
+| heart | `heart_rate` (bpm), `bp_sys` (mmHg), `bp_dia` (mmHg) | `cholesterol`, `ldl` (mg/dL) |
+| lungs | `spo2` (%), `resp_rate` (breaths/min) | none |
+| kidneys | none | `creatinine` (mg/dL), `egfr` (mL/min/1.73 m2) |
+| liver | none | `alt`, `ast` (U/L), `bilirubin` (mg/dL, total) |
+| pancreas | `glucose` (mg/dL) | `hba1c` (%), `fasting_glucose` (mg/dL) |
+| brain | none | none |
+
+### 3. Report extraction: `POST /reports/extract`
+
+Who may call: PATIENT (own). Request: the file as the raw body, `Content-Type` `application/pdf`, `image/jpeg` or `image/png`, max 2 MB (the same limits as the existing upload). `?patient_id=` is optional and defaults to the caller's own.
+
+Answer `200`. **Nothing is saved by this call.**
+
+```json
+{
+  "status": "proposed",
+  "values": [
+    {
+      "test": "HbA1c", "value": 6.4, "unit": "%",
+      "reference_range": { "low": 4.0, "high": 5.6 },
+      "flag": "high", "confidence": 0.82, "raw_text": "HbA1c 6.4 %"
+    }
+  ],
+  "unreadable": ["page 2 could not be read"],
+  "notice": "Read by software. Please check each value against your report before saving."
+}
+```
+
+- `flag` is `low`, `normal` or `high`, or `unknown` when no range was found. `confidence` is 0 to 1.
+- Only a short list of tests is supported at first; anything else is left out and named in `unreadable`.
+- Errors: `415` wrong type; `413` too big; `400` empty, unreadable or nothing recognised (the same code as an unreadable file; the message tells them apart).
+
+**Saving confirmed values is a separate step, and it does not exist yet.** The existing report endpoints store files only, not values. The proposal is a new route, `POST /patients/{id}/lab-values { values: [ { test, value, unit, reference_range, taken_on } ] }`, which stores each value with `status: "confirmed_by_patient"`, `source: "report_extracted"` and an audit entry. The patient app calls it only after the person has reviewed and, if needed, corrected the values. Extracted values are never saved automatically.
+
+**Phase 3 build notes (extraction; deviations from the text above, to be agreed).**
+
+- Built in `backend/app/api/report_extract.py` and `backend/app/services/report_text.py` (pure standard library). PATIENT only, always the caller's own record (`?patient_id=` is not read). Nothing is saved; a test counts the rows before and after.
+- **Only PDFs with selectable text are read.** `image/jpeg` and `image/png` answer `400` ("Scanned images need OCR, which is not available yet"), and so does a PDF with no text layer. `415` for any other type, `413` over 2 MB, `400` for an empty body or a file that is not a PDF, exactly as the existing upload.
+- Reading PDF text needs the optional package `pypdf`. It is **not** added to `requirements.txt`. If it is not installed the route answers `503` ("Text reading is not installed on this server") and nothing else is affected. Proposal for Daksh: add `pypdf` (pure Python, BSD licence) to `requirements.txt` and the lock, or leave extraction switched off.
+- Supported tests, as the patient app's keys: `hba1c`, `fasting_glucose`, `creatinine`, `egfr`, `alt`, `ast`, `bilirubin` (total only), `cholesterol` (total), `ldl`. `test` is this key, not the display name in the example above.
+- `value` and `unit` are in the app's unit. A report in other units is converted (HbA1c mmol/mol to % by the IFCC-NGSP master equation, glucose mmol/L x 18.016, creatinine umol/L / 88.4, cholesterol and LDL mmol/L x 38.67, bilirubin umol/L / 17.1) and the printed range with it. `raw_text` is the matched line, and each value also carries `original_value` and `original_unit`.
+- `flag` is `low`, `normal` or `high` **only against a range printed on the report**; otherwise `unknown`. `confidence` is a documented rule, not a probability: 0.6 for a label, a number and a recognised unit, plus 0.3 for a printed range, plus 0.1 when nothing unexpected is left on the line.
+- `unreadable` is a list of objects, not strings: `{ "test": key or null, "raw_text": "...", "reason": "test_not_supported" | "unit_missing_or_unknown" | "ambiguous_number" | "value_not_positive" }`. A value with a missing or unknown unit is listed there, never guessed.
+- One result per line, label first. A value on the line below its label is not read. A decimal comma is read as a decimal point; a comma followed by exactly three digits (`1,200`) is ambiguous and not read. The first result for a test wins.
+- The answer also has `notice`: "Read from the text of your report by a simple program, so it can be wrong. Check every value against the report. Nothing has been saved."
+
+### 4. Lab values: `POST` and `GET /patients/{id}/lab-values`, `DELETE /patients/{id}/lab-values/{lab_id}`
+
+The step that saves what the patient confirmed. PATIENT, own record only; `403` (audited) comes before `404`.
+
+`POST` body (`extra` fields are refused):
+
+```json
+{ "values": [ {
+    "test": "hba1c", "value": 6.4, "unit": "%",
+    "reference_range": { "low": 4.0, "high": 5.6 },
+    "taken_on": "2026-11-01",
+    "source": "report_extracted", "report_id": "REP-..."
+} ] }
+```
+
+- 1 to 20 values per call, more is `400`. `test` is one of the nine keys above. `unit` must be the app unit for that test. `value` is a number above 0. `reference_range` is optional, each side optional, low not above high. `taken_on` is a date, not in the future. `source` is `entered` (default) or `report_extracted`; `report_id` is optional and must be one of the caller's reports. All values are checked first and saved together or not at all. At most 1000 values are stored per patient.
+- `201` `{ "values": [ { "id": "LAB-...", "test", "value", "unit", "reference_range": {low, high} or null, "taken_on", "status": "confirmed_by_patient", "source", "report_id", "created_at" } ] }`.
+- `GET ?test=hba1c` answers `200` `{ "values": [...] }`, newest first (by `taken_on`, then by when it was saved); an unknown `test` is `400`.
+- `DELETE` answers `204`; an id that is not the patient's is `404`.
+- The value and the range are stored **encrypted** (a test reads the raw column). Every save, read and delete is audited with test names only (`hba1c` appears as `hba_c`, because the audit log accepts letters and underscores only). Extracted values are never saved by `/reports/extract`; the app calls this route after the person has checked them.
+- Errors name the field and position (`values[1].unit`), never the value.
+
+### Open questions for review
+
+1. **Daksh:** do you accept the three routes and the lab-values route in `backend/app/api`, and should the model files live in the repo or be loaded from a path in `.env`?
+2. **Daksh:** I used `400` for validation failures because that is what `app/errors.py` does today (not FastAPI's `422`). Confirm.
+3. **Team:** may hospital staff or a doctor call `/predictions`? Not decided; for now PATIENT only.
+4. **Team:** may family and hospital staff read organ data, and under which consent keys?
+5. **Jehal:** can the mock return fixed examples of all three answers so the screens can be built first?
+6. **Team:** the patient app has six organs, this contract had four. Phase 3 serves `pancreas` and an empty `brain`. Confirm, or tell the app to drop them.
+7. **Daksh:** add `pypdf` to `requirements.txt` (and the lock) so `/reports/extract` works, or keep it off? Scanned reports need OCR (Tesseract), which is a heavier decision.
+8. **Jehal:** `test` is the app's key (`hba1c`), the lab-values and extract routes use the same nine keys, and `unreadable` is a list of objects. Can the Report and Twin screens read that?
