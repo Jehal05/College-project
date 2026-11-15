@@ -23,6 +23,10 @@ describe('design tokens', () => {
       it('accent, healthy, caution and emergency colours are readable as text on the cards and background', () => {
         for (const bg of ['bg', 'card']) for (const fg of ['accent', 'accent2', 'warning', 'emergencytext']) expect(ratio(c[fg], c[bg]), fg + ' on ' + bg).toBeGreaterThanOrEqual(4.5);
       });
+      it('accent text stays readable on its own 10% and 15% tints (chips and selected buttons)', () => {
+        const mix = (fg, bg, a) => fg.map((v, i) => Math.round(bg[i] * (1 - a) + v * a));
+        for (const bg of ['bg', 'card']) for (const fg of ['accent', 'accent2']) for (const a of [0.1, 0.15]) expect(ratio(c[fg], mix(c[fg], c[bg], a)), fg + ' on ' + bg + ' tint ' + a).toBeGreaterThanOrEqual(4.5);
+      });
       it('the emergency colour works as a fill, border or icon (3:1) on the background and cards', () => {
         for (const bg of ['bg', 'card']) expect(ratio(c.emergency, c[bg]), 'emergency on ' + bg).toBeGreaterThanOrEqual(3);
       });
