@@ -10,9 +10,9 @@ Method: SANDBOX read-through of `hospital-portal/src` (no browser run in this st
 
 | # | Review recommendation | Status | File | Data | Notes |
 |---|---|---|---|---|---|
-| A1 | One shared UI parts set (Button, Card, Badge, Skeleton, EmptyState, ErrorState, PageHeader) | **missing** | `src/components/ui/` does not exist | n/a | Pages repeat long Tailwind class strings (buttons, cards, error `<p>`). `SimulatedBadge` and `BarChart` are the only shared visual parts. |
+| A1 | One shared UI parts set (Button, Card, Badge, StatusPill, Skeleton, EmptyState, ErrorState, PageHeader) | **missing at audit time; built in d62f792** | `src/components/ui/` | n/a | Pages repeat long Tailwind class strings (buttons, cards, error `<p>`). `SimulatedBadge` and `BarChart` are the only shared visual parts. |
 | A2 | Input, Select, Modal, Tooltip, Dropdown | **out of scope** | n/a | n/a | Phase 6A lists only 8 parts; forms and modals are not touched. |
-| A3 | "Design tokens `--ht-*` in index.css" | **review got it wrong for the portal** | `patient-app` only | n/a | The portal has no `--ht-*` tokens; it uses Tailwind slate/sky classes. We build the parts on those classes (no new tokens, no new dependency). |
+| A3 | "Design tokens `--ht-*` in index.css" | **partly right (correction to my first draft)** | `src/index.css` | n/a | The portal DOES define `--color-ht-*` tokens (bg, sidebar, card, accent, accent2) and uses them in the NavBar. Pages use Tailwind slate/sky classes. The shared parts use the Tailwind classes; no new tokens. |
 | A4 | Older vs themed screens (two visual systems) | **not applicable to the portal** | n/a | n/a | One visual language already; the inconsistency is repeated class strings, not two themes. |
 
 ## B. Dashboard (`pages/Dashboard.jsx`, 164 lines)
@@ -90,7 +90,7 @@ Method: SANDBOX read-through of `hospital-portal/src` (no browser run in this st
 
 | # | Recommendation | Status | Notes |
 |---|---|---|---|
-| G1 | Loading / empty / error / offline / refreshing states | **partly** | Pages have their own `<p>` states; `OfflineBanner`, `BackendHealthBanner` exist. **"Feedback.jsx" does not exist in the portal** (the review is wrong). Step 2 adds `Skeleton`, `EmptyState`, `ErrorState`. |
+| G1 | Loading / empty / error / offline / refreshing states | **partly** | Pages have their own `<p>` states; `OfflineBanner`, `BackendHealthBanner` exist. **"Feedback.jsx" is not in the portal, and I did not find it in the patient app components either** (the review is wrong or means another file). Step 2 adds `Skeleton`, `EmptyState`, `ErrorState`. |
 | G2 | Error boundaries with friendly message and retry | **done** | `ErrorBoundary.jsx` has Reload and Try again, translated; it logs only the message. It shows a short `detail` (the error message, not a stack). Keep. Error reporting service: not added (no new service). |
 | G3 | Lazy loading | **done** | `App.jsx` lazy routes. |
 | G4 | Split large screens | **not planned** | Dashboard is 164 lines; no split needed. |
@@ -101,7 +101,7 @@ Method: SANDBOX read-through of `hospital-portal/src` (no browser run in this st
 
 ## What is wrong or impossible in the review (summary)
 
-1. `--ht-*` tokens and Feedback.jsx are patient-app things (or do not exist); the portal has neither.
+1. `Feedback.jsx` does not exist in either app's components folder. (`--ht-*` tokens exist in both apps.)
 2. Speed, plate number and bed history have no data source. They will not be shown.
 3. "Distance" on the alert card exists only on some events.
 4. Page names like "Hospital Settings / Staff Management" are not the portal's routes.
@@ -119,3 +119,17 @@ say "not run in SANDBOX; CI result: ..." and nothing is claimed as seen by eye.
 1. Stats strip "critical alerts": I plan **unacknowledged + escalated** (no such thing as "critical" in the lifecycle). OK?
 2. Ambulance panel: leave speed and plate out entirely (recommended), or show the simulated 40 km/h inside a Simulated label?
 3. Add a recent-activity strip to the dashboard (B9)? I recommend no.
+
+
+## Outcome of Phase 6A (added at the end of the phase)
+
+| Step | Result | Commit |
+|---|---|---|
+| 2 shared parts | 8 parts in `components/ui/` on the current Tailwind classes; Dashboard now uses Button, ErrorState, EmptyState, Skeleton; AlertCard uses StatusPill; Analytics uses Button, ErrorState | d62f792, 178b140 |
+| 3 stats strip | Active, ambulances on a call, beds, unacknowledged (SOS_SENT), escalated (ESCALATED). Beds: 0 is shown as 0, not shared as "Not available". | df95f59 |
+| 4 alert card | Severity icon + word, status pill, "Unread" label + dot, received time, distance only if the event carried it, min height, 2-line symptoms | 5a7efdd |
+| 5 map | Tile-failure notice on all three maps, "km to go" on the tracking map (simulated route). Speed and plate left out as agreed. Zoom, legend, loading already existed. | 8d97a77 |
+| 6 navigation | Four groups, underline + arrow for the current page, Menu button under 768px with Escape to close | 35d8172 |
+| 7 analytics | n, average, median, P90 (median and P90 need 5+ cases), date filter, aggregate-only CSV | f29bf2b |
+
+Not done on purpose: speed, plate number, bed history, a recent-activity strip, smooth marker animation, keyboard shortcuts, Input/Select/Modal parts.

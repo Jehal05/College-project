@@ -116,3 +116,13 @@ Also new: `backend/scripts/perf_check.py` (standard library only, single-user lo
 
 Jehal, for the demo on the real backend: `docs/DEMO_ISSUES_PHASE4.md` lists what I expect to go wrong, and `docs/DEMO_RECORDING_CHECKLIST.md` is the checklist. Your items: (1) the SOS from **Emergency help** in the new design has never been pressed against the real backend (marked "not seen yet" in the run sheet); (2) the six planned screens must not be clicked while recording; (3) the browser test A1 (`phase10-apps.test.mjs`) failed once in CI and is treated as flaky; if you see it fail again the message already lists the pending requests. Ambulance: do you want your mock to keep moving it only in mock mode? That is what happens today. Please run `.\laptop-demo-check.cmd` once the backend is up, or tell me and I will.
 
+
+## Phase 6A build notes (15 Nov 2026, draft, not sent)
+
+### To Jehal
+
+Jehal, I polished the hospital portal (grouped menu, stats strip, clearer alert cards, analytics with median and P90). I did **not** touch `patient-app/` or the mock. Two small questions: (1) does your mock's `hospital.alerted` event carry `hospital.distance_km`? The alert card shows a distance only when it does. (2) `docs/FRONTEND_HANDOFF_PATIENT_APP.md` lists ideas from a frontend review for your app (design consistency, Overview layout, mobile navigation). They are suggestions only; one item I checked in your code: mobile Home goes to `/` and desktop Overview to `/overview`, which looks intentional. Take what helps.
+
+### To Daksh
+
+Daksh, no code of yours was touched. `docs/API_CONTRACT.md` has four PROPOSED rows (section "Phase 6A"): please confirm `hospital.distance_km` is sent on every read of an emergency, and say whether ambulances will ever get `registration` and `speed_kmh`. The portal works without all of them.

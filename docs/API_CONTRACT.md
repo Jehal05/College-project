@@ -416,3 +416,15 @@ The step that saves what the patient confirmed. PATIENT, own record only; `403` 
 6. **Team:** the patient app has six organs, this contract had four. Phase 3 serves `pancreas` and an empty `brain`. Confirm, or tell the app to drop them.
 7. **Daksh:** add `pypdf` to `requirements.txt` (and the lock) so `/reports/extract` works, or keep it off? Scanned reports need OCR (Tesseract), which is a heavier decision.
 8. **Jehal:** `test` is the app's key (`hba1c`), the lab-values and extract routes use the same nine keys, and `unreadable` is a list of objects. Can the Report and Twin screens read that?
+
+## Phase 6A: PROPOSED additions (portal polish, 15 Nov 2026)
+
+The portal works **without** every row below (the field is simply left out of the screen). Nothing here is built in the backend by this phase.
+
+| Where | Field | Why the portal wants it | Today |
+|---|---|---|---|
+| `GET /emergencies`, `GET /emergencies/{id}`, `hospital.alerted` | `hospital.distance_km` (km, number) for the alerted hospital | Distance on the alert card | The backend already puts `distance_km` in the hospital reference when it ranked hospitals (`services/emergencies.py` `_hospital_ref`). The portal shows it only when present and drops it when the alert moves to another hospital. Please confirm it is sent on every read, not only on create. |
+| `GET /ambulances` (list) | `registration` (string, optional) | A plate number on the unit panel | No such field; the panel shows call sign and id only. |
+| `GET /ambulances`, `ambulance.location` | live `speed_kmh` (optional) | Speed on the unit panel | Not sent. The portal will not show a speed it did not receive. |
+| `GET /hospitals/{id}/availability/history` | beds over time | Bed trend on Analytics | Does not exist. Analytics shows no bed history. |
+
