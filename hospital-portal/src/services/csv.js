@@ -44,3 +44,31 @@ export function timelineToCsv(events) {
     .map((x) => [x.timestamp ?? '', x.state ?? '', x.actor ?? '', x.note ?? '']);
   return csvText([TIMELINE_COLUMNS, ...rows]);
 }
+
+/**
+ * Analytics numbers as CSV. Totals and times only: no case or patient ids, no names.
+ * The first rows say the data is simulated and which dates were chosen.
+ */
+export function analyticsToCsv(summary, spreads, { from = '', to = '', stepLabel = (k) => k, generated = new Date().toISOString() } = {}) {
+  const sec = (v) => (v === null || v === undefined ? '' : v);
+  const rows = [
+    ['HealthTwin AI analytics (Simulated data: not real patients)'],
+    ['Generated (ISO time)', generated],
+    ['From', from || 'all'],
+    ['To', to || 'all'],
+    [],
+    ['Section', 'Metric', 'Value'],
+    ['Cases', 'Total', summary.total],
+    ['Cases', 'Still open', summary.open],
+    ['Cases', 'Handed over', summary.finished],
+    ['Cases', 'Cancelled', summary.cancelled],
+    ['Cases', 'Escalated cases', summary.escalations.cases],
+    [],
+    ['Step', 'Cases (n)', 'Average (s)', 'Median (s)', 'P90 (s)'],
+  ];
+  for (const key of Object.keys(spreads)) {
+    const s = spreads[key];
+    rows.push([stepLabel(key), s.n, sec(s.average), sec(s.median), sec(s.p90)]);
+  }
+  return csvText(rows);
+}

@@ -99,3 +99,57 @@ export function summarise(cases = [], ambulances = []) {
     ambulance: { trips: withUnit.length, units },
   };
 }
+
+// ---- Spread of response times (Phase 6A step 7) -------------------------------------------
+// An average hides slow cases. The median is the middle case; p90 is the time 9 in 10 cases beat.
+// All values come from the durations above (status_events only).
+
+/** With fewer cases than this, a median or p90 would mislead, so the screen says "not enough data". */
+export const MIN_SPREAD_N = 5;
+
+/** Percentile (0-100) of a list of numbers, by linear interpolation between neighbours. null for an empty list. */
+export function percentile(values, p) {
+  const v = (values || []).filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
+  if (v.length === 0) return null;
+  const pos = (Math.min(100, Math.max(0, p)) / 100) * (v.length - 1);
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  return Math.round(v[lo] + (v[hi] - v[lo]) * (pos - lo));
+}
+
+/** { n, average, median, p90, enough } in seconds. median and p90 are null while n is below MIN_SPREAD_N. */
+export function spread(values) {
+  const v = (values || []).filter((x) => Number.isFinite(x));
+  const enough = v.length >= MIN_SPREAD_N;
+  return {
+    n: v.length,
+    average: v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null,
+    median: enough ? percentile(v, 50) : null,
+    p90: enough ? percentile(v, 90) : null,
+    enough,
+  };
+}
+
+/** Spread for each step and for the whole case. */
+export function stepSpreads(cases = []) {
+  const durations = cases.map(stepDurations);
+  const out = {};
+  for (const step of STEPS) out[step.key] = spread(durations.map((d) => d[step.key]).filter((x) => x !== null));
+  out.total = spread(durations.map((d) => d.total).filter((x) => x !== null));
+  return out;
+}
+
+const dayStart = (iso) => new Date(`${iso}T00:00:00`).getTime();
+const dayEnd = (iso) => new Date(`${iso}T23:59:59.999`).getTime();
+
+/** Keep the cases created within [from, to] (inclusive local days, 'YYYY-MM-DD'; either may be empty). A case with no valid date is kept only when no filter is set. */
+export function filterByDate(cases = [], { from = '', to = '' } = {}) {
+  const lo = from ? dayStart(from) : null;
+  const hi = to ? dayEnd(to) : null;
+  if (lo === null && hi === null) return cases;
+  return cases.filter((c) => {
+    const t = new Date(c.created_at).getTime();
+    if (!Number.isFinite(t)) return false;
+    return (lo === null || t >= lo) && (hi === null || t <= hi);
+  });
+}
