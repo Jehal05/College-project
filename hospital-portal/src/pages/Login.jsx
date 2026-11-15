@@ -36,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-slate-900 p-6">
+    <div className="min-h-screen grid place-items-center bg-ht-bg p-6">
       <a href="#login-form" data-testid="skip-login" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-slate-900">{t('a11y.skipLogin')}</a>
       <form id="login-form" onSubmit={handleSubmit} className="w-full max-w-md space-y-5 rounded-2xl bg-white p-8 shadow-xl">
         <div>
