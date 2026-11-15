@@ -860,5 +860,21 @@
   "sim.uncertainty": "How much your readings vary",
   "sim.uncertaintyHelp": "Your real readings move around from moment to moment. A what-if inside this spread is not unusual for you.",
   "sim.spread": "{{min}} to {{max}} ({{n}} readings)",
-  "sim.noReadings": "no readings yet"
+  "sim.noReadings": "no readings yet",
+  "cc.intro": "The people who would be told if you send an alert, and what they could see.",
+  "cc.members": "Your circle",
+  "cc.loading": "Loading…",
+  "cc.loadError": "Could not load your contacts.",
+  "cc.empty": "Nobody is in your circle yet, so nobody would be told about an alert. Add at least one emergency contact.",
+  "cc.told": "Would get an alert message if you send an SOS (simulated).",
+  "cc.ackNote": "The prototype does not track whether a person saw or acknowledged a message.",
+  "cc.manage": "Add or edit contacts",
+  "cc.see": "What your circle could see",
+  "cc.seeHelp": "Only what you allow is shared. Anything switched off stays hidden.",
+  "cc.canSee": "Can see",
+  "cc.cannotSee": "Hidden",
+  "cc.sameForAll": "These choices are the same for everyone in your circle. Sharing per person is not available yet.",
+  "cc.seen": "When family last looked",
+  "cc.seenNone": "No family member has looked at your data yet.",
+  "cc.fullLog": "See the full list: who saw my data"
 }
