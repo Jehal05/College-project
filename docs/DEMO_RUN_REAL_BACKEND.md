@@ -63,7 +63,7 @@ If you want it shorter, do steps 1, 3 to 9 only.
 | Queue is empty | Click **All hospitals**. Check the badge says **Live**. |
 | Ambulance does not move | Check `VITE_PORTAL_SIMULATES_AMBULANCE=true` in the portal `.env`, restart the portal. |
 | Old cards from earlier tests | Refresh the portal (Ctrl+R). Do not reset the demo in the middle. |
-| Everything fails | Show the recorded video in `docs/demo/` and the screenshots in `docs/DEMO.md`. |
+| Everything fails | Show the recorded video or screenshots in `hospital-portal/docs/demo/`. |
 
 ## 6. Stop everything afterwards
 
