@@ -116,3 +116,10 @@ A doctor should check these before anyone outside the team sees them:
 - The circle is the emergency-contact list. Each member is described as one who "would get an alert message if you send an SOS (simulated)"; the screen says the prototype does not track whether anyone saw it.
 - "What your circle could see" lists only what is explicitly allowed in consent; an unknown consent is shown as Hidden. Sharing is the same for everyone in the circle.
 - "When family last looked" reuses the existing access log (relatives only).
+
+### 9. Health Copilot (UI phase 2c)
+
+- Not an AI model. Six fixed questions; each answer is a fixed rule over the person's own data. There is deliberately no free-text box, so it cannot guess or advise.
+- The whole screen says "not an AI chatbot and not a doctor", "no medical advice and no diagnosis", and shows a 112 / 108 line with a link to the Emergency Center.
+- A doctor should check: the six question texts, the "What could I ask my doctor?" lines (`cp.a.doctor.*`, all generic: medicines list, symptom diary, ask about readings outside the usual range), and the observation wording ("Outside your usual range ... not a diagnosis").
+- Every answer lists its sources and carries "Rule-based, not reviewed by a clinician".

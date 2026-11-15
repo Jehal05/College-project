@@ -28,6 +28,7 @@ const EmergencyCenter = screen(() => import('./screens/EmergencyCenter'));
 const ReportIntelligence = screen(() => import('./screens/ReportIntelligence'));
 const Simulator = screen(() => import('./screens/Simulator'));
 const CareCircle = screen(() => import('./screens/CareCircle'));
+const Copilot = screen(() => import('./screens/Copilot'));
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
 const Consent = screen(() => import('./screens/Consent'));
@@ -103,6 +104,7 @@ export default function AppRoutes() {
       <Route path="/diseases/:key" element={<Protected><DiseaseDetail /></Protected>} />
       <Route path="/monitor" element={<Protected><Monitor /></Protected>} />
       <Route path="/emergency-center" element={<Protected><EmergencyCenter /></Protected>} />
+      <Route path="/copilot" element={<Protected><Copilot /></Protected>} />
       <Route path="/care-circle" element={<Protected><CareCircle /></Protected>} />
       <Route path="/simulator" element={<Protected><Simulator /></Protected>} />
       <Route path="/report-intelligence" element={<Protected><ReportIntelligence /></Protected>} />

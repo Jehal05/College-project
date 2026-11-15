@@ -937,6 +937,58 @@ Drafts, not yet checked by a native speaker.
 | `cc.seenNone` | No family member has looked at your data yet. | किसी परिवार सदस्य ने अभी तक आपका डेटा नहीं देखा। | કોઈ પરિવારજને હજી તમારો ડેટા જોયો નથી. | [ ] |
 | `cc.fullLog` | See the full list: who saw my data | पूरी सूची देखें: मेरा डेटा किसने देखा | પૂરી યાદી જુઓ: મારો ડેટા કોણે જોયો | [ ] |
 
+## Health Copilot (UI phase 2c)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `nav.copilot` | Health Copilot | हेल्थ कोपायलट | હેલ્થ કોપાયલટ | [ ] |
+| `cp.intro` | Pick a question. The answer is worked out from your own data by simple rules. | एक सवाल चुनें। जवाब आपके अपने डेटा से सरल नियमों द्वारा निकाला जाता है। | એક પ્રશ્ન પસંદ કરો. જવાબ તમારા પોતાના ડેટામાંથી સરળ નિયમોથી કાઢવામાં આવે છે. | [ ] |
+| `cp.rules` | Rules only, no AI model | केवल नियम, कोई AI मॉडल नहीं | ફક્ત નિયમો, કોઈ AI મોડેલ નહીં | [ ] |
+| `cp.notAi` | This is not an AI chatbot and not a doctor. Every answer comes from a fixed rule applied to your own readings, profile and contacts. It gives no medical advice and no diagnosis. | यह AI चैटबॉट नहीं है और डॉक्टर नहीं है। हर जवाब आपकी अपनी रीडिंग, प्रोफ़ाइल और संपर्कों पर एक तय नियम लगाकर आता है। यह कोई चिकित्सीय सलाह या निदान नहीं देता। | આ AI ચેટબોટ નથી અને ડૉક્ટર નથી. દરેક જવાબ તમારી પોતાની રીડિંગ, પ્રોફાઇલ અને સંપર્કો પર નક્કી નિયમ લગાવીને આવે છે. તે કોઈ તબીબી સલાહ કે નિદાન આપતું નથી. | [ ] |
+| `cp.urgent` | If you feel very unwell or in danger, do not wait: call 112 or 108 now. | अगर आप बहुत बीमार महसूस करें या खतरे में हों, तो इंतज़ार न करें: अभी 112 या 108 पर कॉल करें। | જો તમે ખૂબ બીમાર લાગો કે જોખમમાં હો, તો રાહ ન જુઓ: હમણાં 112 અથવા 108 પર કૉલ કરો. | [ ] |
+| `cp.pick` | Choose a question | सवाल चुनें | પ્રશ્ન પસંદ કરો | [ ] |
+| `cp.noFreeText` | You cannot type your own question here on purpose, so the Copilot never guesses about your health. | यहाँ अपना सवाल लिखने की सुविधा जानबूझकर नहीं है, ताकि कोपायलट आपकी सेहत के बारे में अंदाज़ा न लगाए। | અહીં પોતાનો પ્રશ્ન લખવાની સુવિધા જાણી જોઈને નથી, જેથી કોપાયલટ તમારા સ્વાસ્થ્ય વિશે અંદાજ ન લગાવે. | [ ] |
+| `cp.answers` | Answers | जवाब | જવાબો | [ ] |
+| `cp.empty` | No question asked yet. | अभी कोई सवाल नहीं पूछा गया। | હજી કોઈ પ્રશ્ન પૂછાયો નથી. | [ ] |
+| `cp.from` | Worked out from: {{sources}} | इनसे निकाला गया: {{sources}} | આમાંથી કાઢ્યું: {{sources}} | [ ] |
+| `cp.badge` | Rule-based, not reviewed by a clinician | नियम आधारित, चिकित्सक द्वारा समीक्षित नहीं | નિયમ આધારિત, ચિકિત્સકે સમીક્ષા કરી નથી | [ ] |
+| `cp.src.vitals` | your live readings | आपकी लाइव रीडिंग | તમારી લાઇવ રીડિંગ | [ ] |
+| `cp.src.ranges` | your usual ranges | आपकी सामान्य सीमाएँ | તમારી સામાન્ય શ્રેણીઓ | [ ] |
+| `cp.src.profile` | your profile | आपकी प्रोफ़ाइल | તમારી પ્રોફાઇલ | [ ] |
+| `cp.src.contacts` | your contacts | आपके संपर्क | તમારા સંપર્કો | [ ] |
+| `cp.src.reports` | your reports | आपकी रिपोर्ट | તમારા રિપોર્ટ | [ ] |
+| `cp.src.consents` | your sharing choices | आपके साझा करने के चुनाव | તમારી શેરિંગ પસંદગીઓ | [ ] |
+| `cp.src.labs` | values you confirmed | आपके पुष्ट किए मान | તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `cp.q.readings` | How do my readings look right now? | मेरी रीडिंग अभी कैसी दिख रही हैं? | મારી રીડિંગ હમણાં કેવી દેખાય છે? | [ ] |
+| `cp.q.missing` | What is missing from my profile? | मेरी प्रोफ़ाइल में क्या कमी है? | મારી પ્રોફાઇલમાં શું ખૂટે છે? | [ ] |
+| `cp.q.changes` | How have my readings moved lately? | मेरी रीडिंग हाल में कैसे बदली हैं? | મારી રીડિંગ તાજેતરમાં કેવી બદલાઈ? | [ ] |
+| `cp.q.circle` | Who would be told in an emergency? | आपातकाल में किसे बताया जाएगा? | કટોકટીમાં કોને જણાવાશે? | [ ] |
+| `cp.q.records` | What records do I have? | मेरे पास कौन-से रिकॉर्ड हैं? | મારી પાસે કયા રેકોર્ડ છે? | [ ] |
+| `cp.q.doctor` | What could I ask my doctor? | मैं डॉक्टर से क्या पूछ सकता/सकती हूँ? | હું ડૉક્ટરને શું પૂછી શકું? | [ ] |
+| `cp.a.readings.none` | There are no readings to compare with your usual ranges yet. | अभी आपकी सामान्य सीमाओं से तुलना के लिए कोई रीडिंग नहीं है। | હજી તમારી સામાન્ય શ્રેણી સાથે સરખામણી માટે કોઈ રીડિંગ નથી. | [ ] |
+| `cp.a.readings.in` | Inside your usual range: {{names}}. | आपकी सामान्य सीमा के अंदर: {{names}}। | તમારી સામાન્ય શ્રેણીની અંદર: {{names}}. | [ ] |
+| `cp.a.readings.out` | Outside your usual range: {{names}}. This is an observation, not a diagnosis. | आपकी सामान्य सीमा से बाहर: {{names}}। यह अवलोकन है, निदान नहीं। | તમારી સામાન્ય શ્રેણીની બહાર: {{names}}. આ અવલોકન છે, નિદાન નથી. | [ ] |
+| `cp.a.readings.noRange` | No usual range or reading yet for: {{names}}. | इनके लिए अभी सामान्य सीमा या रीडिंग नहीं है: {{names}}। | આના માટે હજી સામાન્ય શ્રેણી કે રીડિંગ નથી: {{names}}. | [ ] |
+| `cp.a.missing.some` | Your profile is {{percent}}% complete. Missing: {{items}}. | आपकी प्रोफ़ाइल {{percent}}% पूरी है। कमी: {{items}}। | તમારી પ્રોફાઇલ {{percent}}% પૂરી છે. ખૂટે છે: {{items}}. | [ ] |
+| `cp.a.missing.item` | Add {{item}}. | {{item}} जोड़ें। | {{item}} ઉમેરો. | [ ] |
+| `cp.a.missing.none` | Nothing is missing from the profile checklist. | प्रोफ़ाइल की सूची में कुछ भी कम नहीं है। | પ્રોફાઇલની યાદીમાં કંઈ ખૂટતું નથી. | [ ] |
+| `cp.a.changes.row` | {{key}}: from {{first}} to {{last}} over {{n}} readings kept on this page. | {{key}}: इस पेज पर रखी {{n}} रीडिंग में {{first}} से {{last}}। | {{key}}: આ પેજ પર રાખેલી {{n}} રીડિંગમાં {{first}} થી {{last}}. | [ ] |
+| `cp.a.changes.none` | Not enough readings yet to compare. Keep the Monitoring page open to collect some. | तुलना के लिए अभी पर्याप्त रीडिंग नहीं हैं। कुछ इकट्ठा करने के लिए मॉनिटरिंग पेज खुला रखें। | સરખામણી માટે હજી પૂરતી રીડિંગ નથી. થોડી ભેગી કરવા મોનિટરિંગ પેજ ખુલ્લું રાખો. | [ ] |
+| `cp.a.circle.some` | {{n}} contact(s) would get an alert message if you send an SOS (simulated). | आप SOS भेजें तो {{n}} संपर्क को अलर्ट संदेश मिलेगा (सिमुलेटेड)। | તમે SOS મોકલો તો {{n}} સંપર્કને એલર્ટ સંદેશ મળશે (સિમ્યુલેટેડ). | [ ] |
+| `cp.a.circle.none` | Nobody is in your circle, so nobody would be told. | आपके सर्कल में कोई नहीं है, इसलिए किसी को नहीं बताया जाएगा। | તમારા સર્કલમાં કોઈ નથી, તેથી કોઈને જણાવાશે નહીં. | [ ] |
+| `cp.a.circle.shared` | They could see: {{items}}. | वे यह देख सकते हैं: {{items}}। | તેઓ આ જોઈ શકે: {{items}}. | [ ] |
+| `cp.a.circle.nothing` | You are not sharing any detail with them. | आप उनके साथ कोई जानकारी साझा नहीं कर रहे। | તમે તેમની સાથે કોઈ વિગત શેર કરતા નથી. | [ ] |
+| `cp.a.records.files` | Uploaded report files: {{n}}. | अपलोड की गई रिपोर्ट फ़ाइलें: {{n}}। | અપલોડ કરેલી રિપોર્ટ ફાઇલો: {{n}}. | [ ] |
+| `cp.a.records.labs` | Values you confirmed from reports: {{n}}. | रिपोर्ट से आपके पुष्ट किए मान: {{n}}। | રિપોર્ટમાંથી તમે પુષ્ટિ કરેલા મૂલ્યો: {{n}}. | [ ] |
+| `cp.a.records.review` | None of these have been reviewed by a clinician. | इनमें से किसी की चिकित्सक ने समीक्षा नहीं की है। | આમાંથી કોઈની ચિકિત્સકે સમીક્ષા કરી નથી. | [ ] |
+| `cp.a.doctor.out` | Ask about the readings that were outside your usual range: {{names}}. | जो रीडिंग आपकी सामान्य सीमा से बाहर थीं उनके बारे में पूछें: {{names}}। | જે રીડિંગ તમારી સામાન્ય શ્રેણીની બહાર હતી તેના વિશે પૂછો: {{names}}. | [ ] |
+| `cp.a.doctor.baseline` | Ask your doctor to help you set usual ranges that suit you. | डॉक्टर से अपने लिए उपयुक्त सामान्य सीमाएँ तय करने में मदद माँगें। | ડૉક્ટરને તમારા માટે યોગ્ય સામાન્ય શ્રેણીઓ નક્કી કરવામાં મદદ માટે કહો. | [ ] |
+| `cp.a.doctor.noReports` | Ask which tests or reports would be useful to keep on file. | पूछें कि कौन-सी जाँचें या रिपोर्ट रखना उपयोगी होगा। | પૂછો કે કયા ટેસ્ટ કે રિપોર્ટ રાખવા ઉપયોગી થશે. | [ ] |
+| `cp.a.doctor.meds` | Bring a list of all medicines you take, including supplements. | अपनी सभी दवाओं की सूची साथ ले जाएँ, सप्लीमेंट सहित। | તમે લો છો તે બધી દવાઓની યાદી સાથે લઈ જાઓ, સપ્લિમેન્ટ સહિત. | [ ] |
+| `cp.a.doctor.symptoms` | Write down any symptoms, when they started and what makes them better or worse. | कोई भी लक्षण, वह कब शुरू हुआ और क्या उसे बेहतर या बदतर करता है, लिख लें। | કોઈ પણ લક્ષણ, તે ક્યારે શરૂ થયું અને શું તેને સારું કે ખરાબ કરે છે, તે લખી રાખો. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.
