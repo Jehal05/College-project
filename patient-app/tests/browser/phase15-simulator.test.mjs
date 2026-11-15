@@ -22,9 +22,14 @@ const base = Number((await p.locator('[data-testid=sim-row-heart_rate] td').nth(
 check('S4 the baseline is the live heart rate and the what-if starts at the same value', Number.isFinite(base) && Number(await p.getByLabel('Heart rate value').inputValue()) === base);
 
 await p.getByLabel('Heart rate value').fill('190');
-let row = await p.locator('[data-testid=sim-row-heart_rate]').innerText();
+// The table updates after the slider value changes; wait for it instead of reading it at once (S5 and S6 failed once in CI on a race).
+const rowNow = () => p.locator('[data-testid=sim-row-heart_rate]').innerText();
+let row = await rowNow();
+for (let i = 0; i < 20 && !(/Outside your usual range/.test(row) && /\(\+\d+\)/.test(row)); i++) { await sleep(250); row = await rowNow(); }
 check('S5 a very high what-if heart rate is shown outside the usual range, with the change', /Outside your usual range/.test(row) && /\(\+\d+\)/.test(row));
-check('S6 the summary names it and adds that it says nothing about what would happen', /Heart rate/.test(await p.locator('[role=status]').last().innerText()) && body.length > 0 && (await p.innerText('body')).includes('says nothing about what would actually happen'));
+const summaryOk = async () => /Heart rate/.test(await p.locator('[role=status]').last().innerText()) && (await p.innerText('body')).includes('says nothing about what would actually happen');
+for (let i = 0; i < 20 && !(await summaryOk()); i++) await sleep(250);
+check('S6 the summary names it and adds that it says nothing about what would happen', body.length > 0 && await summaryOk());
 await p.getByLabel('Heart rate value').fill('9999');
 check('S7 values are clamped to the slider limit', (await p.getByLabel('Heart rate value').inputValue()) === '200');
 await p.getByRole('button', { name: 'Reset to my latest readings' }).click();
