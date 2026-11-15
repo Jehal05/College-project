@@ -36,6 +36,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
   const fromCheckIn = originText(alert);
   const ranking = useRanking(type, location);
   const hasNext = Boolean(ranking && nextHospital(ranking.ranked, alert));
+  const noHospital = Boolean(ranking && ranking.ranked.length === 0); // nobody suitable: say so on the card
   const unread = !alert._read && state !== 'CANCELLED' && state !== 'HANDOVER_DONE' && !early;
   const cancelled = state === 'CANCELLED';
   const finished = state === 'HANDOVER_DONE';
@@ -93,7 +94,7 @@ export default function AlertCard({ alert, selected, onSelect }) {
         <div data-testid="checkin-note" className="mt-2 text-sm text-slate-600">{t('card.checkin')}</div>
       )}
       <div className="mt-2 empty:hidden">
-        <EscalationCountdown emergency={alert} hasNext={hasNext} />
+        <EscalationCountdown emergency={alert} hasNext={hasNext} noHospital={noHospital} />
       </div>
     </button>
   );

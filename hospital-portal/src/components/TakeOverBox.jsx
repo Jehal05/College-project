@@ -37,6 +37,7 @@ export default function TakeOverBox({ emergency: e, heldBy }) {
     <div data-testid="takeover-box" role="group" aria-label={t('takeover.title', { name: heldBy })} className="mb-3 space-y-3 rounded-xl border-2 border-amber-500 bg-amber-50 p-4">
       <p className="text-lg font-bold text-amber-900">{t('takeover.title', { name: heldBy })}</p>
       <p className="text-slate-700">{t('takeover.body')}</p>
+      <p data-testid="takeover-why" className="text-sm text-slate-600">{t('takeover.why')}</p>
       <div className="flex flex-wrap items-end gap-3">
         <label className="block">
           <span className="text-sm font-semibold text-slate-700">{t('takeover.reason')}</span>

@@ -49,3 +49,15 @@ export function nextHospital(ranked, emergency) {
   const statuses = fallbackStatuses(ranked, emergency);
   return ranked.find((r) => statuses[r.hospital.id] === 'next')?.hospital || null;
 }
+
+/**
+ * Why the desk may need to act outside the system (calm messages, no alarm):
+ *   'no_hospital' – the list of suitable hospitals is empty, so nobody can be alerted
+ *   'last_hospital' – the alert is still waiting and there is no further hospital to move it to
+ * Returns null when the alert is not waiting, or when there is still a next hospital.
+ */
+export function reachGap(ranking, emergency) {
+  if (!ranking || !canEscalate(emergency.state)) return null;
+  if (ranking.ranked.length === 0) return 'no_hospital';
+  return nextHospital(ranking.ranked, emergency) ? null : 'last_hospital';
+}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { isFinal, isEarly } from '../services/stateMachine.js';
-import { fallbackStatuses, nextHospital } from '../services/escalation.js';
+import { fallbackStatuses, nextHospital, reachGap } from '../services/escalation.js';
 import { useAuth } from './AuthProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useRanking } from './useRanking.js';
@@ -31,12 +31,13 @@ export default function EmergencyDetail({ emergency }) {
   const ranking = useRanking(e.type, e.location);
   const statuses = ranking ? fallbackStatuses(ranking.ranked, e) : {};
   const next = ranking ? nextHospital(ranking.ranked, e) : null;
+  const reach = reachGap(ranking, e); // calm "call the control room" message when nobody is left to alert
   const escalatedTo = e.escalated_to_name || hospitals.find((h) => h.id === e.alerted_hospital_id)?.name;
   const hasAmbulance = Boolean(e.ambulance_id);
 
   return (
     <div data-testid="detail-panel" className="space-y-6">
-      <DetailHeader emergency={e} escalatedTo={escalatedTo} />
+      <DetailHeader emergency={e} escalatedTo={escalatedTo} reach={reach} />
       <ReadinessWarning emergency={e} />
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -59,7 +60,7 @@ export default function EmergencyDetail({ emergency }) {
         </div>
 
         <div className="space-y-5">
-          <ActionsPanel emergency={e} next={next} />
+          <ActionsPanel emergency={e} next={next} noHospital={reach === 'no_hospital'} />
 
           <div>
             <h3 className="mb-2 font-semibold">{t('sec.timeline')}</h3>

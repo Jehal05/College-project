@@ -4,8 +4,9 @@ import { originText } from '../../services/adapters.js';
 import { useT } from '../../i18n/index.js';
 import { stateText, severityText, typeText } from '../../i18n/phrases.js';
 
-/** Title row and the banners that explain the state (cancelled, early notice, safety check-in, escalated). */
-export default function DetailHeader({ emergency: e, escalatedTo }) {
+/** Title row and the banners that explain the state (cancelled, early notice, safety check-in, escalated).
+ *  `reach` is 'no_hospital' or 'last_hospital' (see reachGap) when the desk may have to call the control room. */
+export default function DetailHeader({ emergency: e, escalatedTo, reach = null }) {
   const t = useT();
   const cancelled = e.state === 'CANCELLED';
   const early = isEarly(e.state);
@@ -46,6 +47,12 @@ export default function DetailHeader({ emergency: e, escalatedTo }) {
       {e.state === 'ESCALATED' && (
         <p data-testid="escalation-banner" className="rounded-xl bg-orange-500 p-4 text-lg font-bold text-white">
           {t('banner.escalated', { name: escalatedTo || t('banner.nextOnList') })}
+        </p>
+      )}
+
+      {reach && (
+        <p data-testid="reach-banner" data-reach={reach} role="status" className="rounded-xl bg-slate-800 p-4 text-lg font-semibold text-white">
+          {reach === 'no_hospital' ? t('banner.noHospital') : t('banner.lastHospital')}
         </p>
       )}
     </>
