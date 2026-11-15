@@ -64,3 +64,55 @@ Please confirm or change, one line each:
 **Draft only. Not sent.**
 
 Jehal, two questions: (1) Your `TRANSLATION_REVIEW.md` still says "not reviewed by a native speaker". Who reviewed the Hindi and Gujarati text, and can you write their name in the file? Until then we say it is unreviewed. (2) The backend now has the hospital calls and a WebSocket, so we can try the apps against it. Do you want to try that with me on one laptop? Neither of us has run it yet.
+
+## Phase 1 review request (15 Nov 2026, not sent)
+
+### To Daksh
+
+Daksh, I added a PROPOSED section to `docs/API_CONTRACT.md` ("Proposed: predictions, organs, report extraction"). Nothing is built. Three routes (`POST /predictions/{model}`, `GET /patients/{id}/organs/{organ}`, `POST /reports/extract`) and one new route for saving confirmed lab values. The new code would live in your backend, so please say yes or no and answer the open questions at the end of that section. In particular: where the model files should live. Separately, I will send the WebSocket review findings (the token is checked only when the socket opens).
+
+### To Jehal
+
+Jehal, the same section describes the answers for the model card, the organ panel and the report review screen. Could your mock return one fixed example of each so you can build the screens first? Please tell me if a field you need is missing. The shapes are a proposal, not agreed.
+
+## Phase 3 build notes (15 Nov 2026, drafts, not sent)
+
+Everything below is on branch `Puneet` only (not merged, not pushed until Puneet says so). Nothing is agreed until each person answers in writing.
+
+### To Daksh
+
+Daksh, the routes I proposed are now built on `Puneet` in your `backend/app`, so you can read them as code instead of as a plan:
+
+- `POST /predictions/{model}` (heart, diabetes; now with an optional `scenario` for a what-if)
+- `GET /patients/{id}/organs/{organ}`, `POST /reports/extract`, `POST` and `GET /patients/{id}/lab-values`, `DELETE /patients/{id}/lab-values/{lab_id}`
+- one new table, `lab_values` (the value and the printed range are encrypted; created by `create_all`, no migration)
+- `backend/CONTRACT.md` has PROPOSED rows for all of them, because `test_contract_conformance.py` fails for any served route that is not listed there. (`/predictions/{model}` was missing since Phase 2; I only noticed now.)
+
+Please answer: (1) the six routes and the table: accept, change or drop; (2) `pypdf` for `/reports/extract`: I did **not** add it to `requirements.txt` or the lock. Without it the route answers 503 and nothing else is affected. Add it (pure Python, BSD) or keep extraction off? (3) the model files: kept in the repo under `app/ml/models/`. They are practice models trained on invented data, so every answer says so. Real data is still missing. (4) FYI the WebSocket token is only checked when the socket opens (details in my Phase 1 message). I did not run any of the new endpoint tests on a machine with FastAPI; they run in CI.
+
+### To Jehal
+
+Jehal, the answers for your Twin, Report and Simulator screens exist now, with examples in `docs/examples/phase3/*.json` (the extract and what-if ones are real function output; the others are written from the code, not captured from a server). The shapes to read: `docs/API_CONTRACT.md`, "Phase 3 build notes" under sections 2, 3 and 4 and the what-if note under section 1.
+
+Things that differ from what you may expect: (1) the organ list is your six (heart, lungs, kidneys, liver, pancreas, brain) but brain always answers `has_data: false`; (2) vitals have **no trend** (the simulator keeps no history), only stored labs have one; (3) lab `test` values are your keys (`hba1c`, `fasting_glucose`, ...), units are your app units, and `/reports/extract` already converts mmol/L etc; (4) `unreadable` is a list of objects; (5) the what-if only changes the model's own inputs. Exercise, smoking, sleep and diet cannot be changed (no coefficients exist for them), and your four slider names do not map one to one onto the model inputs (reasons in the contract note). Please show the model inputs themselves on the Simulator. Your screens need to call `POST /patients/{id}/lab-values` after the person has checked the extracted values; the extract call saves nothing.
+
+To try it on one laptop, Puneet has `.\laptop-phase3-check.cmd` (no packages needed; it starts the backend by itself and writes `laptop-phase3-log.txt`). The done-when for you: your Twin, Report and Simulator screens show real answers from the real backend.
+
+## Phase 4 build notes (15 Nov 2026, drafts, not sent)
+
+Branch `Puneet` only. Nothing is agreed until each person answers in writing. The full evidence is in `docs/DECISIONS_PHASE4.md`.
+
+### To Daksh
+
+Daksh, three things for you, none of them changed by me in your code:
+
+1. **Ranking.** Your `rank_hospitals` picks the nearest suitable hospital; the portal's ranking scores capability, travel time and beds. On six test cases the first hospital differs in 4 (HEART at the demo location: portal Maninagar, backend Navrangpura). You can reproduce it with `python3 -I backend/scripts/compare_rankings.py`. My recommendation (option 2 in the note): the backend ranks like the portal, using the shared `ranking-config.json`, after a doctor has looked at the weights. Do you agree, or do you want the portal to follow the backend?
+2. **Ambulance.** The backend has no mover; only the portal (with `VITE_PORTAL_SIMULATES_AMBULANCE=true`) or Jehal's mock moves it. For the recording I suggest the portal does it. Long term: a small backend simulation. Your call.
+3. **Two gaps I only read, not tested.** (a) `GET /emergencies/{id}` sends `status_events` with `state` and `timestamp` only, so after a reload the command view cannot say who acknowledged ("Name not recorded"). Could the event carry a display name (not a user id)? (b) The WebSocket checks the token only when the socket opens (`api/ws.py`), so an expired token or a disabled account keeps hearing alerts. Suggested: close at expiry. I would write the test first.
+
+Also new: `backend/scripts/perf_check.py` (standard library only, single-user local check, not a load test) and `scripts/run-all-tests.ps1`. The full backend test run on a machine with FastAPI has still not happened for the Phase 1 to 3 tests: CI or my laptop is the first place.
+
+### To Jehal
+
+Jehal, for the demo on the real backend: `docs/DEMO_ISSUES_PHASE4.md` lists what I expect to go wrong, and `docs/DEMO_RECORDING_CHECKLIST.md` is the checklist. Your items: (1) the SOS from **Emergency help** in the new design has never been pressed against the real backend (marked "not seen yet" in the run sheet); (2) the six planned screens must not be clicked while recording; (3) the browser test A1 (`phase10-apps.test.mjs`) failed once in CI and is treated as flaky; if you see it fail again the message already lists the pending requests. Ambulance: do you want your mock to keep moving it only in mock mode? That is what happens today. Please run `.\laptop-demo-check.cmd` once the backend is up, or tell me and I will.
+
