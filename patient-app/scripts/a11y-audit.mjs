@@ -68,8 +68,13 @@ async function audit(browser, session, lang, screen, { theme = 'dark', width = 3
     return result.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, example: v.nodes[0].target.join(' ') }));
   }, TAGS);
   // Layout check: nothing may make the page scroll sideways (long Hindi or Gujarati words, wide tables).
-  const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  if (wide > 1) found.push({ id: 'horizontal-overflow', impact: 'serious', nodes: 1, example: wide + ' px wider than the window' });
+  const wide = await page.evaluate(() => {
+    const w = window.innerWidth;
+    const extra = document.documentElement.scrollWidth - w;
+    const culprit = [...document.querySelectorAll('body *')].find((e) => e.getBoundingClientRect().right > w + 1);
+    return { extra, culprit: culprit ? culprit.tagName + '.' + String(culprit.className).slice(0, 70) + ' right=' + Math.round(culprit.getBoundingClientRect().right) : '' };
+  });
+  if (wide.extra > 1) found.push({ id: 'horizontal-overflow', impact: 'serious', nodes: 1, example: wide.extra + ' px wider: ' + wide.culprit });
   await page.close();
   return found;
 }
