@@ -82,11 +82,18 @@ export function applyEvent(list, msg) {
   if (event === 'hospital.alerted') {
     const hospitalId = payload.hospital_id;
     if (!hospitalId) return list;
+    const km = typeof payload.distance_km === 'number' && Number.isFinite(payload.distance_km) ? payload.distance_km : null;
     if (hospitalId === current.alerted_hospital_id) {
-      // Same hospital: only fill in a name we did not have yet.
-      return payload.hospital_name && !current.alerted_hospital_name ? replace({ ...current, alerted_hospital_name: payload.hospital_name }) : list;
+      // Same hospital: only fill in a name or a distance we did not have yet.
+      const fill = {
+        ...(payload.hospital_name && !current.alerted_hospital_name ? { alerted_hospital_name: payload.hospital_name } : {}),
+        ...(km !== null && current.alerted_distance_km === undefined ? { alerted_distance_km: km } : {}),
+      };
+      return Object.keys(fill).length ? replace({ ...current, ...fill }) : list;
     }
-    return replace({ ...current, alerted_hospital_id: hospitalId, ...(payload.hospital_name ? { alerted_hospital_name: payload.hospital_name } : {}) });
+    const rest = { ...current }; // the old distance belonged to the hospital it left
+    delete rest.alerted_distance_km;
+    return replace({ ...rest, alerted_hospital_id: hospitalId, ...(payload.hospital_name ? { alerted_hospital_name: payload.hospital_name } : {}), ...(km !== null ? { alerted_distance_km: km } : {}) });
   }
 
   // No acknowledgement in time: the alert moved to the next hospital. Can happen more than once.
@@ -106,6 +113,8 @@ export function applyEvent(list, msg) {
       flash_from: receivedMs(msg),
       alerted_ids: from && !current.alerted_ids.includes(from) ? [...current.alerted_ids, from] : current.alerted_ids,
       alerted_hospital_id: payload.to_hospital_id || current.alerted_hospital_id,
+      // The distance belonged to the hospital it left; the next hospital's distance is not known from this event.
+      ...(payload.to_hospital_id ? { alerted_distance_km: undefined } : {}),
       // The old name belonged to the hospital it left: use the new one, or none (the label then looks it up by id).
       ...(payload.to_hospital_id ? { alerted_hospital_name: payload.to_hospital_name || null } : {}),
       escalated_to_name: payload.to_hospital_name || null,

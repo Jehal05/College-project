@@ -733,4 +733,7 @@ export default {
   'stats.loading': 'લોડ થઈ રહ્યું છે',
   'stats.aria': '{label}: {value}',
   'stats.bedsNote': 'તમારી હોસ્પિટલ',
+  'card.unread': 'વાંચ્યા વગરનું',
+  'card.received': 'પ્રાપ્ત',
+  'card.distance': 'અંતર {n} કિમી',
 };

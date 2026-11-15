@@ -734,4 +734,7 @@ export default {
   'stats.loading': 'Loading',
   'stats.aria': '{label}: {value}',
   'stats.bedsNote': 'Your hospital',
+  'card.unread': 'Unread',
+  'card.received': 'Received',
+  'card.distance': 'Distance {n} km',
 };

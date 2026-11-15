@@ -206,6 +206,9 @@ export function normaliseEmergency(src = {}) {
   delete out.id;
   if (out.alerted_hospital_id === undefined || out.alerted_hospital_id === null) delete out.alerted_hospital_id;
   if (out.ambulance_id === undefined) delete out.ambulance_id;
+  // Distance to the alerted hospital: only when the backend really sent one (it is never worked out here).
+  const dist = src.alerted_distance_km ?? src.hospital?.distance_km;
+  if (typeof dist === 'number' && Number.isFinite(dist)) out.alerted_distance_km = dist;
   if (src.ambulance && typeof src.ambulance !== 'object') delete out.ambulance;
   delete out.timeline;
   if (!timeline) delete out.status_events;

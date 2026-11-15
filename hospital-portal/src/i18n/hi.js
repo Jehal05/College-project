@@ -733,4 +733,7 @@ export default {
   'stats.loading': 'लोड हो रहा है',
   'stats.aria': '{label}: {value}',
   'stats.bedsNote': 'आपका अस्पताल',
+  'card.unread': 'अपठित',
+  'card.received': 'प्राप्त',
+  'card.distance': 'दूरी {n} किमी',
 };
