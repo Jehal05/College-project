@@ -33,16 +33,16 @@ Optional for the ML and report-reading tests: `numpy`, `pandas`, `scikit-learn`,
 
 ## 3. The parts, the exact commands, and what has been measured
 
-| # | Part | Command (from the repository root) | SANDBOX 15 Nov 2026 | LAPTOP |
-|---|---|---|---|---|
-| 1 | Backend tests | `cd backend` then `python -m pytest -q` | **NOT RUN as a whole.** FastAPI, SQLAlchemy, httpx and bcrypt are not installed in the sandbox and cannot be installed (no network). See the note under the table | |
-| 2 | Backend route and test accounting | `cd backend` then `python scripts/phase_check.py` | **NOT RUN** (imports the app) | |
-| 3 | Patient app, unit | `cd patient-app` then `npm run test:unit` | **NOT RUN** (vitest not installed) | |
-| 4 | Patient app, browser | `cd patient-app` then `npm run test:browser` | **NOT RUN** (no browser, no packages) | |
-| 5 | Portal, unit | `cd hospital-portal` then `npm test` | **485 tests, 485 pass, 0 fail, 0 skipped** (needs no installed packages) | |
-| 6 | Portal, lint | `cd hospital-portal` then `npm run lint` | **NOT RUN** (eslint not installed) | |
-| 7 | Portal, build | `cd hospital-portal` then `npm run build` | **NOT RUN** (vite not installed) | |
-| 8 | Portal, end to end (Playwright, mock data) | `cd hospital-portal` then `npm run e2e` | **NOT RUN** (no browser). 20 test cases are written (14 in `portal.spec.js`, 6 in `flow.spec.js`); that is a count of the files, not a result | |
+| # | Part | Command (from the repository root) | SANDBOX 15 Nov 2026 | CI, commit 48a81b7, 15 Nov 2026 | LAPTOP |
+|---|---|---|---|---|---|
+| 1 | Backend tests | `cd backend` then `python -m pytest -q` | **NOT RUN as a whole.** FastAPI, SQLAlchemy, httpx and bcrypt are not installed in the sandbox and cannot be installed (no network). See the note under the table | **2324 passed, 7 skipped, 0 failed** (both runs) | |
+| 2 | Backend route and test accounting | `cd backend` then `python scripts/phase_check.py` | **NOT RUN** (imports the app) | not a separate CI step | |
+| 3 | Patient app, unit | `cd patient-app` then `npm run test:unit` | **NOT RUN** (vitest not installed) | **28 files, 178 tests passed** | |
+| 4 | Patient app, browser | `cd patient-app` then `npm run test:browser` | **NOT RUN** (no browser, no packages) | push run: 20 of 22 files (A1, S5, S6 failed); pull-request run: **22 of 22 files, 505 checks** (flaky, Jehal's tests) | |
+| 5 | Portal, unit | `cd hospital-portal` then `npm test` | **485 tests, 485 pass, 0 fail, 0 skipped** (needs no installed packages) | **485 tests, 485 pass, 0 fail** (job "test-and-build") | |
+| 6 | Portal, lint | `cd hospital-portal` then `npm run lint` | **NOT RUN** (eslint not installed) | **pass** (job "lint") | |
+| 7 | Portal, build | `cd hospital-portal` then `npm run build` | **NOT RUN** (vite not installed) | **pass** (job "test-and-build") | |
+| 8 | Portal, end to end (Playwright, mock data) | `cd hospital-portal` then `npm run e2e` | **NOT RUN** (no browser). 20 test cases are written (14 in `portal.spec.js`, 6 in `flow.spec.js`); that is a count of the files, not a result | **pass** (job "e2e") | |
 
 **Part 1 in the sandbox, for the record.** Running `python3 -m pytest --noconftest --continue-on-collection-errors` there gave 665 passed, 6 failed, 69 errors. That is **not** a backend result: `--noconftest` removes the shared test setup (so the 6 crypto and passport-secret tests fail on a missing key, which is the sandbox's fault) and the 69 errors are test modules that cannot import FastAPI. What it does show is that the tests which need no web framework (the ML models, the report-text parser, the what-if code, the rules engine and similar) run and pass. The 2042 backend tests that CI reported on commit `4d1ebae` (`docs/PROJECT_STATUS.md`) were **before** Phases 1 to 4 and were **not re-run** by anyone for this report. The new endpoint tests from Phases 1 to 3 have therefore never run on a machine with FastAPI; CI or the laptop is the first place they will.
 
