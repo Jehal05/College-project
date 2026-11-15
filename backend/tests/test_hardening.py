@@ -52,8 +52,8 @@ def test_a_413_still_carries_cors_headers_for_an_allowed_origin(monkeypatch):
 
 def test_a_small_request_is_not_refused(monkeypatch):
     monkeypatch.setenv("MAX_BODY_BYTES", "100000")
-    r = client().post("/auth/login", json={"email": "nobody@example.test", "password": "wrong-password"})
-    assert r.status_code != 413
+    r = client().post("/no-such-route", json={"hello": "world"})
+    assert r.status_code == 404
 
 
 def test_limit_setting_falls_back_to_the_default_when_bad(monkeypatch):
