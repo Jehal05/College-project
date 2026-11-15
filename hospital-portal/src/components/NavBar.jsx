@@ -32,9 +32,14 @@ export default function NavBar() {
   const [confirmReset, setConfirmReset] = useState(false);
 
   return (
-    <header className="bg-slate-900 text-white">
+    <header className="border-b-4 border-ht-accent bg-ht-sidebar text-white">
       <div className="flex flex-wrap items-center gap-4 px-6 py-3">
-        <span className="text-xl font-bold">{t('app.title')}</span>
+        <span className="flex items-center gap-2 text-xl font-bold">
+          <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-lg bg-ht-accent2 text-ht-sidebar">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.3 5c1.9 0 3.4 1 4.4 2.5.4.5 1.2.5 1.6 0C13.3 6 14.8 5 16.7 5 20 5 22.1 8.4 21.6 11.8 19.5 16.4 12 21 12 21z" /></svg>
+          </span>
+          {t('app.title')}
+        </span>
         <SimulatedBadge text={t('app.simulated')} />
         <nav className="flex gap-1 ml-4">
           {links
@@ -44,7 +49,7 @@ export default function NavBar() {
                 key={l.to}
                 to={l.to}
                 className={({ isActive }) =>
-                  `rounded-lg px-3 py-1.5 font-medium ${isActive ? 'bg-white text-slate-900' : 'hover:bg-slate-700'}`
+                  `rounded-lg px-3 py-1.5 font-medium ${isActive ? 'bg-ht-accent text-ht-sidebar' : 'hover:bg-ht-card'}`
                 }
               >
                 {t(l.label)}

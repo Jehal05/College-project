@@ -29,9 +29,9 @@ await ctx.close();
 
 // --- admin verifies the volunteer, disables a relative, and cannot disable themselves ---
 ctx = await phone(browser, { bypassCSP: true }); p = await newPage(ctx);
-const net = []; p.on('response', (r) => { if (r.status() >= 400) net.push(r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '')); }); p.on('requestfailed', (r) => net.push('FAILED ' + r.url().replace(/^https?:\/\/[^/]+/, '') + ' ' + (r.failure() || {}).errorText));
+const net = []; const inflight = new Set(); p.on('request', (r) => inflight.add(r.method() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, ''))); p.on('requestfinished', (r) => inflight.delete(r.method() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, ''))); p.on('response', (r) => { if (r.status() >= 400) net.push(r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '')); }); p.on('requestfailed', (r) => net.push('FAILED ' + r.url().replace(/^https?:\/\/[^/]+/, '') + ' ' + (r.failure() || {}).errorText));
 await signIn(p, 'admin@demo.test'); await p.waitForURL(BASE + '/admin'); body = await waitText(p, (b) => b.includes(mail));
-check('A1 admin lands on /admin and sees the new volunteer as not verified', body.includes('Accounts') && body.includes('Not verified'), JSON.stringify(net) + ' ' + (await p.url()) + ' ' + JSON.stringify(body.slice(0, 400)));
+check('A1 admin lands on /admin and sees the new volunteer as not verified', body.includes('Accounts') && body.includes('Not verified'), JSON.stringify(net) + ' pending=' + JSON.stringify([...inflight]) + ' ' + (await p.url()) + ' ' + JSON.stringify(body.slice(0, 400)));
 const row = (email) => p.locator('[data-testid=admin-user][data-email="' + email + '"]');
 await row(mail).getByRole('button', { name: 'Verify' }).click(); body = await waitText(p, async () => true); await sleep(800);
 check('A2 Verify marks the volunteer as verified', (await row(mail).innerText()).includes('Verified') && !(await row(mail).innerText()).includes('Not verified'));

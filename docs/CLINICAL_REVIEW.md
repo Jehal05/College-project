@@ -79,3 +79,47 @@ The files are in `patient-app/src/config/` and `patient-app/src/i18n/`:
 ### 3. Symptom mapping used by the rules engine
 
 The app sends UPPER_SNAKE_CASE IDs (for example `CHEST_PAIN`); the rules use lower-case names (`chest_pain`). The only translation is in `mock-server/adapters.js` (and `patient-app/src/utils/adapters.js`). It is a first guess. App symptoms with no counterpart in the rules table are ignored by the engine: `NAUSEA`, `FAINTING`, `SEVERE_HEADACHE`, `DIA_SHAKING`, `DIA_FAINTING`, `CANNOT_SPEAK_SENTENCES`, `BLUE_LIPS`. A doctor (with Daksh) should decide whether rules are missing for them, and whether the other mappings (for example `ARM_JAW_PAIN` to `left_arm_pain`, `LIMB_WEAKNESS` to `arm_weakness`, `SHORT_BREATH` to `breathlessness`) are right.
+
+### 4. Disease Intelligence and Live Monitoring (UI phase 1d)
+
+A doctor should check these before anyone outside the team sees them:
+
+- Observation wording (`dis.obs.*`): "within your own usual range" / "outside your usual range. This is an observation, not a diagnosis." No risk score, no named condition.
+- Data-quality levels (`dis.quality.*`, `dis.confidence.*`, `dis.reason.*`): low / medium / good come from how many readings were shared (10 and 30 are the cut-offs), whether a usual range is set, and whether a report or condition is linked. The cut-offs are a first guess.
+- "General next steps to discuss with a doctor" (`dis.steps.<area>.1-3`): 18 general lines, for example keeping a blood-pressure log or keeping reports together. They are not advice for a case and need a doctor's review (or removal).
+- Neurological, kidney and liver areas have no live readings in this prototype; the screen says so instead of showing numbers.
+- The monitoring trace is a made-up wave drawn from the heart rate. It is labelled "Simulated ... not a real ECG" and must stay labelled.
+
+### 5. Emergency Response Center (UI phase 1e)
+
+- Every screen says SIMULATION: "no real ambulance, hospital or person is contacted by this prototype. In a real emergency call 112 / 108."
+- A step is shown as done only if its exact status event exists (an EN_ROUTE event never makes "Ambulance dispatched" appear). The ETA shows only after the dispatch event.
+- "Notification sent" and "acknowledged" are separate lines. Contact acknowledgement is stated as not tracked, because the backend has no such event (listed in docs/BACKEND_GAPS.md).
+- A doctor or emergency-services adviser should check the wording of the step names and the 112 / 108 line.
+
+### 6. Report Intelligence (UI phase 1f)
+
+- The prototype cannot read report files. The person types a value from the report, reviews it, and confirms. Only then does it appear on the Twin and in Disease Intelligence.
+- There is no built-in "normal range". A value is called "Inside / Outside the range on your report" only against the low and high the person typed from their own report; with no range it says "No range given".
+- Every value and file carries "Clinician review: not reviewed". No clinician workflow exists yet.
+- The nine tests offered (HbA1c, fasting glucose, creatinine, eGFR, ALT, AST, bilirubin, total cholesterol, LDL) were chosen by the team. A doctor should confirm the list and the units (%, mg/dL, mL/min, U/L).
+
+### 7. Health Simulator (UI phase 2a)
+
+- It is a "what if" range explorer, not a predictor: the person picks a value and the screen says whether it sits inside or outside their own saved usual range. It never estimates a risk, outcome or diagnosis.
+- Wording to check: "Hypothetical, not a prediction", the four assumptions (`sim.assume.1-4`), and the line "this says nothing about what would actually happen".
+- Slider limits (heart rate 30-200, SpO2 70-100, systolic 70-220, glucose 40-400) are only there to keep input sane; a clinician should confirm they are not misleading.
+- "How much your readings vary" shows the real min and max of the last readings kept in memory.
+
+### 8. Care Circle (UI phase 2b)
+
+- The circle is the emergency-contact list. Each member is described as one who "would get an alert message if you send an SOS (simulated)"; the screen says the prototype does not track whether anyone saw it.
+- "What your circle could see" lists only what is explicitly allowed in consent; an unknown consent is shown as Hidden. Sharing is the same for everyone in the circle.
+- "When family last looked" reuses the existing access log (relatives only).
+
+### 9. Health Copilot (UI phase 2c)
+
+- Not an AI model. Six fixed questions; each answer is a fixed rule over the person's own data. There is deliberately no free-text box, so it cannot guess or advise.
+- The whole screen says "not an AI chatbot and not a doctor", "no medical advice and no diagnosis", and shows a 112 / 108 line with a link to the Emergency Center.
+- A doctor should check: the six question texts, the "What could I ask my doctor?" lines (`cp.a.doctor.*`, all generic: medicines list, symptom diary, ask about readings outside the usual range), and the observation wording ("Outside your usual range ... not a diagnosis").
+- Every answer lists its sources and carries "Rule-based, not reviewed by a clinician".

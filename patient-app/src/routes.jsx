@@ -21,6 +21,14 @@ import NeedsConnection from './components/NeedsConnection';
 const screen = (load) => lazy(() => load().catch(() => ({ default: NeedsConnection })));
 const Overview = screen(() => import('./screens/Overview'));
 const Twin = screen(() => import('./screens/Twin'));
+const DiseaseHub = screen(() => import('./screens/DiseaseHub'));
+const DiseaseDetail = screen(() => import('./screens/DiseaseDetail'));
+const Monitor = screen(() => import('./screens/Monitor'));
+const EmergencyCenter = screen(() => import('./screens/EmergencyCenter'));
+const ReportIntelligence = screen(() => import('./screens/ReportIntelligence'));
+const Simulator = screen(() => import('./screens/Simulator'));
+const CareCircle = screen(() => import('./screens/CareCircle'));
+const Copilot = screen(() => import('./screens/Copilot'));
 const Passport = screen(() => import('./screens/Passport'));
 const PassportView = screen(() => import('./screens/PassportView'));
 const Consent = screen(() => import('./screens/Consent'));
@@ -89,9 +97,17 @@ export default function AppRoutes() {
       <Route path="/reminders" element={<Protected><Reminders /></Protected>} />
       <Route path="/summary/:id" element={<Protected><Summary /></Protected>} />
       <Route path="/twin" element={<Protected><Twin /></Protected>} />
-      {[['diseases', '/diseases'], ['monitor', '/monitor'], ['emergency', '/emergency-center'], ['simulator', '/simulator'], ['care', '/care-circle'], ['hospitals', '/hospitals']].map(([page, path]) => (
+      {[['hospitals', '/hospitals']].map(([page, path]) => (
         <Route key={path} path={path} element={<Protected><ComingSoon page={page} /></Protected>} />
       ))}
+      <Route path="/diseases" element={<Protected><DiseaseHub /></Protected>} />
+      <Route path="/diseases/:key" element={<Protected><DiseaseDetail /></Protected>} />
+      <Route path="/monitor" element={<Protected><Monitor /></Protected>} />
+      <Route path="/emergency-center" element={<Protected><EmergencyCenter /></Protected>} />
+      <Route path="/copilot" element={<Protected><Copilot /></Protected>} />
+      <Route path="/care-circle" element={<Protected><CareCircle /></Protected>} />
+      <Route path="/simulator" element={<Protected><Simulator /></Protected>} />
+      <Route path="/report-intelligence" element={<Protected><ReportIntelligence /></Protected>} />
       {DEMO_ENABLED && <Route path="/design" element={<Protected><Design /></Protected>} />}
       {DEMO_ENABLED && <Route path="/demo" element={<Protected><DemoTools /></Protected>} />}
       <Route path="*" element={<NotFound />} />

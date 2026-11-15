@@ -699,6 +699,296 @@ Files: `src/i18n/responder.*.json`, `src/i18n/admin.*.json`. `login.wrongRole` i
 | `admin.loadError` | Could not load. Please try again. | लोड नहीं हो सका। कृपया दोबारा कोशिश करें। | લોડ થઈ શક્યું નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
 | `login.volunteer` | Become a volunteer responder | आपातकालीन स्वयंसेवक बनें | કટોકટી સ્વયંસેવક બનો | [ ] |
 
+## Disease Intelligence and Live Monitoring screens (UI phase 1d)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `dis.intro` | Six health areas, each with a plain observation about your readings and how much data it is based on. | छह स्वास्थ्य क्षेत्र, हर एक में आपकी रीडिंग पर सरल अवलोकन और यह कि वह कितने डेटा पर आधारित है। | છ આરોગ્ય વિભાગ, દરેકમાં તમારી રીડિંગ પર સરળ અવલોકન અને તે કેટલા ડેટા પર આધારિત છે. | [ ] |
+| `dis.rules` | Observations come from simple rules that compare your readings with your own usual ranges. There is no risk score and no diagnosis. | ये अवलोकन सरल नियमों से बनते हैं जो आपकी रीडिंग की तुलना आपकी अपनी सामान्य सीमा से करते हैं। इसमें कोई जोखिम स्कोर या निदान नहीं है। | આ અવલોકનો સરળ નિયમોથી બને છે જે તમારી રીડિંગની સરખામણી તમારી પોતાની સામાન્ય શ્રેણી સાથે કરે છે. તેમાં કોઈ જોખમ સ્કોર કે નિદાન નથી. | [ ] |
+| `dis.open` | Open details | विवरण खोलें | વિગતો ખોલો | [ ] |
+| `dis.back` | Back to all areas | सभी क्षेत्रों पर वापस | બધા વિભાગો પર પાછા | [ ] |
+| `dis.status.within` | Within your usual range | आपकी सामान्य सीमा में | તમારી સામાન્ય શ્રેણીમાં | [ ] |
+| `dis.status.different` | Different from usual | सामान्य से अलग | સામાન્યથી અલગ | [ ] |
+| `dis.status.nodata` | No live readings | कोई लाइव रीडिंग नहीं | કોઈ લાઇવ રીડિંગ નથી | [ ] |
+| `dis.status.waiting` | Waiting for readings | रीडिंग का इंतज़ार | રીડિંગની રાહ | [ ] |
+| `dis.quality.title` | Data quality and confidence | डेटा की गुणवत्ता और भरोसा | ડેટાની ગુણવત્તા અને વિશ્વાસ | [ ] |
+| `dis.quality.low` | Data quality: low | डेटा गुणवत्ता: कम | ડેટા ગુણવત્તા: ઓછી | [ ] |
+| `dis.quality.medium` | Data quality: medium | डेटा गुणवत्ता: मध्यम | ડેટા ગુણવત્તા: મધ્યમ | [ ] |
+| `dis.quality.good` | Data quality: good | डेटा गुणवत्ता: अच्छी | ડેટા ગુણવત્તા: સારી | [ ] |
+| `dis.confidence.low` | Confidence is low: there is too little data to say much. | भरोसा कम है: ज़्यादा कुछ कहने के लिए डेटा बहुत कम है। | વિશ્વાસ ઓછો છે: વધુ કહેવા માટે ડેટા બહુ ઓછો છે. | [ ] |
+| `dis.confidence.medium` | Confidence is medium: some data is available, more would help. | भरोसा मध्यम है: कुछ डेटा है, और होता तो बेहतर होता। | વિશ્વાસ મધ્યમ છે: થોડો ડેટા છે, વધુ હોય તો સારું. | [ ] |
+| `dis.confidence.good` | Confidence is better here, but this is still an estimate and not a diagnosis. | यहाँ भरोसा बेहतर है, फिर भी यह अनुमान है, निदान नहीं। | અહીં વિશ્વાસ વધુ સારો છે, છતાં આ અંદાજ છે, નિદાન નથી. | [ ] |
+| `dis.reason.noLive` | This prototype has no live readings for this area. | इस प्रोटोटाइप में इस क्षेत्र की कोई लाइव रीडिंग नहीं है। | આ પ્રોટોટાઇપમાં આ વિભાગની કોઈ લાઇવ રીડિંગ નથી. | [ ] |
+| `dis.reason.fewReadings` | Fewer than 10 readings have been shared so far. | अब तक 10 से कम रीडिंग साझा हुई हैं। | હજુ સુધી 10 થી ઓછી રીડિંગ શેર થઈ છે. | [ ] |
+| `dis.reason.noBaseline` | Your usual range is not set yet. | आपकी सामान्य सीमा अभी तय नहीं है। | તમારી સામાન્ય શ્રેણી હજુ નક્કી નથી. | [ ] |
+| `dis.reason.noReports` | No related report is uploaded. | कोई संबंधित रिपोर्ट अपलोड नहीं है। | કોઈ સંબંધિત રિપોર્ટ અપલોડ નથી. | [ ] |
+| `dis.obs.title` | Automatic observation (rules, not a doctor) | स्वचालित अवलोकन (नियम, डॉक्टर नहीं) | સ્વચાલિત અવલોકન (નિયમો, ડૉક્ટર નહીં) | [ ] |
+| `dis.obs.within` | Your {{name}} readings are within your own usual range. | आपकी {{name}} रीडिंग आपकी अपनी सामान्य सीमा में हैं। | તમારી {{name}} રીડિંગ તમારી પોતાની સામાન્ય શ્રેણીમાં છે. | [ ] |
+| `dis.obs.different` | One or more readings are outside your usual range. This is an observation, not a diagnosis. Please talk to a doctor if you are worried. | एक या अधिक रीडिंग आपकी सामान्य सीमा से बाहर हैं। यह अवलोकन है, निदान नहीं। चिंता हो तो डॉक्टर से बात करें। | એક કે વધુ રીડિંગ તમારી સામાન્ય શ્રેણીની બહાર છે. આ અવલોકન છે, નિદાન નથી. ચિંતા હોય તો ડૉક્ટર સાથે વાત કરો. | [ ] |
+| `dis.obs.nodata` | No live readings exist for this area in the prototype, so nothing can be observed. | इस प्रोटोटाइप में इस क्षेत्र की कोई लाइव रीडिंग नहीं है, इसलिए कुछ देखा नहीं जा सकता। | આ પ્રોટોટાઇપમાં આ વિભાગની કોઈ લાઇવ રીડિંગ નથી, તેથી કંઈ જોઈ શકાતું નથી. | [ ] |
+| `dis.obs.waiting` | Waiting for the first readings to compare. | तुलना के लिए पहली रीडिंग का इंतज़ार। | સરખામણી માટે પહેલી રીડિંગની રાહ. | [ ] |
+| `dis.steps.title` | General next steps to discuss with a doctor | डॉक्टर से चर्चा के लिए सामान्य अगले कदम | ડૉક્ટર સાથે ચર્ચા માટે સામાન્ય આગળનાં પગલાં | [ ] |
+| `dis.steps.note` | General suggestions only. They are not advice for your case. | केवल सामान्य सुझाव। ये आपके मामले की सलाह नहीं हैं। | ફક્ત સામાન્ય સૂચનો. તે તમારા કેસની સલાહ નથી. | [ ] |
+| `mon.intro` | Live readings from the simulated wearable, as they arrive. | सिमुलेटेड वियरेबल की लाइव रीडिंग, जैसे-जैसे आती हैं। | સિમ્યુલેટેડ વેરેબલની લાઇવ રીડિંગ, જેમ આવે તેમ. | [ ] |
+| `mon.ecg.title` | Heart rhythm trace | हृदय लय की रेखा | હૃદય લયની રેખા | [ ] |
+| `mon.ecg.label` | Simulated heart rhythm trace at {{bpm}} beats per minute | {{bpm}} धड़कन प्रति मिनट पर सिमुलेटेड हृदय लय रेखा | {{bpm}} ધબકારા પ્રતિ મિનિટે સિમ્યુલેટેડ હૃદય લય રેખા | [ ] |
+| `mon.ecg.note` | Simulated: a made-up trace drawn on your device from the heart rate. It is not a recording and not a real ECG. | सिमुलेटेड: हृदय गति से आपके डिवाइस पर बनाई गई काल्पनिक रेखा। यह रिकॉर्डिंग नहीं है और असली ECG नहीं है। | સિમ્યુલેટેડ: હૃદય ગતિ પરથી તમારા ડિવાઇસ પર દોરેલી કાલ્પનિક રેખા. તે રેકોર્ડિંગ નથી અને સાચો ECG નથી. | [ ] |
+| `mon.conn.on` | Wearable connected | वियरेबल जुड़ा है | વેરેબલ જોડાયેલું છે | [ ] |
+| `mon.conn.off` | Wearable not connected | वियरेबल जुड़ा नहीं है | વેરેબલ જોડાયેલું નથી | [ ] |
+| `mon.latest` | Heart rate {{bpm}} bpm | हृदय गति {{bpm}} bpm | હૃદય ગતિ {{bpm}} bpm | [ ] |
+| `mon.waiting` | Waiting for a reading | रीडिंग का इंतज़ार | રીડિંગની રાહ | [ ] |
+| `mon.ago` | {{s}} s ago | {{s}} सेकंड पहले | {{s}} સેકન્ડ પહેલાં | [ ] |
+| `mon.noShare` | Vitals sharing is off, so the trends stay empty. Turn it on in Consent to see them. | वाइटल्स साझा करना बंद है, इसलिए ट्रेंड खाली रहेंगे। देखने के लिए सहमति में इसे चालू करें। | વાઇટલ્સ શેરિંગ બંધ છે, તેથી ટ્રેન્ડ ખાલી રહેશે. જોવા માટે સંમતિમાં તેને ચાલુ કરો. | [ ] |
+| `mon.events.title` | Recent events | हाल की घटनाएँ | તાજેતરની ઘટનાઓ | [ ] |
+| `mon.events.empty` | No changes yet. Events appear when a reading leaves or returns to your usual range, or the connection changes. | अभी कोई बदलाव नहीं। जब रीडिंग सामान्य सीमा से बाहर जाए या लौटे, या कनेक्शन बदले, तब घटनाएँ दिखेंगी। | હજુ કોઈ ફેરફાર નથી. રીડિંગ સામાન્ય શ્રેણીની બહાર જાય કે પાછી આવે, અથવા કનેક્શન બદલાય ત્યારે ઘટનાઓ દેખાશે. | [ ] |
+| `mon.events.note` | Kept only in this page, not saved. | केवल इसी पेज पर रखा गया, सहेजा नहीं गया। | ફક્ત આ પેજ પર રખાય છે, સાચવાતું નથી. | [ ] |
+| `mon.event.left` | {{name}} left your usual range | {{name}} आपकी सामान्य सीमा से बाहर गया | {{name}} તમારી સામાન્ય શ્રેણીની બહાર ગયું | [ ] |
+| `mon.event.back` | {{name}} is back in your usual range | {{name}} फिर सामान्य सीमा में है | {{name}} ફરી સામાન્ય શ્રેણીમાં છે | [ ] |
+| `mon.event.connected` | Wearable connected | वियरेबल जुड़ गया | વેરેબલ જોડાયું | [ ] |
+| `mon.event.disconnected` | Wearable connection lost | वियरेबल का कनेक्शन टूटा | વેરેબલનું કનેક્શન તૂટ્યું | [ ] |
+| `dis.mod.cardiac.name` | Cardiac | हृदय | હૃદય | [ ] |
+| `dis.mod.cardiac.about` | Heart rate and blood pressure compared with your usual ranges. | हृदय गति और रक्तचाप की तुलना आपकी सामान्य सीमा से। | હૃદય ગતિ અને બ્લડ પ્રેશરની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.cardiac.1` | Keep a regular log of blood pressure readings to show your doctor. | डॉक्टर को दिखाने के लिए रक्तचाप की रीडिंग का नियमित रिकॉर्ड रखें। | ડૉક્ટરને બતાવવા માટે બ્લડ પ્રેશર રીડિંગનો નિયમિત રેકોર્ડ રાખો. | [ ] |
+| `dis.steps.cardiac.2` | Ask your doctor how often your heart should be checked. | डॉक्टर से पूछें कि हृदय की जाँच कितनी बार होनी चाहिए। | ડૉક્ટરને પૂછો કે હૃદયની તપાસ કેટલી વાર કરવી. | [ ] |
+| `dis.steps.cardiac.3` | Bring your medicine list to every visit. | हर विज़िट पर अपनी दवाओं की सूची साथ ले जाएँ। | દરેક મુલાકાતે તમારી દવાઓની યાદી સાથે રાખો. | [ ] |
+| `dis.mod.neuro.name` | Neurological | तंत्रिका | ચેતાતંત્ર | [ ] |
+| `dis.mod.neuro.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.neuro.1` | Note any new headaches, weakness or speech changes and when they happened. | नया सिरदर्द, कमज़ोरी या बोलने में बदलाव कब हुआ, लिख लें। | નવો માથાનો દુખાવો, નબળાઈ કે બોલવામાં ફેરફાર ક્યારે થયો તે લખો. | [ ] |
+| `dis.steps.neuro.2` | Ask your doctor which scans or tests suit you. | डॉक्टर से पूछें कि कौन-सी स्कैन या जाँच आपके लिए ठीक है। | ડૉક્ટરને પૂછો કે કયા સ્કેન કે ટેસ્ટ તમારા માટે યોગ્ય છે. | [ ] |
+| `dis.steps.neuro.3` | Keep past scan reports together. | पुरानी स्कैन रिपोर्ट एक जगह रखें। | જૂના સ્કેન રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.mod.respiratory.name` | Respiratory | श्वसन | શ્વસન | [ ] |
+| `dis.mod.respiratory.about` | Oxygen level (SpO2) compared with your usual range. | ऑक्सीजन स्तर (SpO2) की तुलना आपकी सामान्य सीमा से। | ઓક્સિજન સ્તર (SpO2) ની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.respiratory.1` | Note when breathing feels harder and what you were doing. | लिख लें कि साँस कब भारी लगी और तब आप क्या कर रहे थे। | શ્વાસ ક્યારે ભારે લાગ્યો અને ત્યારે તમે શું કરતા હતા તે લખો. | [ ] |
+| `dis.steps.respiratory.2` | Ask your doctor about a lung check if you have a cough that lasts. | लंबी खाँसी हो तो डॉक्टर से फेफड़ों की जाँच के बारे में पूछें। | લાંબી ઉધરસ હોય તો ડૉક્ટરને ફેફસાંની તપાસ વિશે પૂછો. | [ ] |
+| `dis.steps.respiratory.3` | Keep your inhaler or medicines where you can reach them. | इनहेलर या दवाएँ ऐसी जगह रखें जहाँ आप पहुँच सकें। | ઇન્હેલર કે દવાઓ પહોંચી શકાય તેવી જગ્યાએ રાખો. | [ ] |
+| `dis.mod.diabetes.name` | Diabetes | मधुमेह | ડાયાબિટીસ | [ ] |
+| `dis.mod.diabetes.about` | Glucose readings compared with your usual range. | ग्लूकोज़ रीडिंग की तुलना आपकी सामान्य सीमा से। | ગ્લુકોઝ રીડિંગની સરખામણી તમારી સામાન્ય શ્રેણી સાથે. | [ ] |
+| `dis.steps.diabetes.1` | Note glucose readings with meal times to share with your doctor. | डॉक्टर को दिखाने के लिए ग्लूकोज़ रीडिंग खाने के समय के साथ लिखें। | ડૉક્ટરને બતાવવા ગ્લુકોઝ રીડિંગ જમવાના સમય સાથે લખો. | [ ] |
+| `dis.steps.diabetes.2` | Ask your doctor how often to test and what range is right for you. | डॉक्टर से पूछें कि कितनी बार जाँच करें और आपके लिए सही सीमा क्या है। | ડૉક્ટરને પૂછો કે કેટલી વાર તપાસ કરવી અને તમારા માટે યોગ્ય શ્રેણી શું છે. | [ ] |
+| `dis.steps.diabetes.3` | Keep your HbA1c reports together. | HbA1c रिपोर्ट एक जगह रखें। | HbA1c રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.mod.kidney.name` | Kidney | गुर्दा | કિડની | [ ] |
+| `dis.mod.kidney.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.kidney.1` | Keep recent kidney test reports (creatinine, eGFR) together. | हाल की गुर्दा जाँच रिपोर्ट (क्रिएटिनिन, eGFR) एक जगह रखें। | તાજેતરના કિડની ટેસ્ટ રિપોર્ટ (ક્રિએટિનિન, eGFR) એક જગ્યાએ રાખો. | [ ] |
+| `dis.steps.kidney.2` | Ask your doctor how often these tests are needed. | डॉक्टर से पूछें कि ये जाँच कितनी बार चाहिए। | ડૉક્ટરને પૂછો કે આ ટેસ્ટ કેટલી વાર જોઈએ. | [ ] |
+| `dis.steps.kidney.3` | Tell every doctor about all medicines you take. | हर डॉक्टर को अपनी सभी दवाओं के बारे में बताएँ। | દરેક ડૉક્ટરને તમારી બધી દવાઓ વિશે જણાવો. | [ ] |
+| `dis.mod.liver.name` | Liver | लिवर | લિવર | [ ] |
+| `dis.mod.liver.about` | No live readings in this prototype; reports and notes only. | इस प्रोटोटाइप में लाइव रीडिंग नहीं; केवल रिपोर्ट और नोट। | આ પ્રોટોટાઇપમાં લાઇવ રીડિંગ નથી; ફક્ત રિપોર્ટ અને નોંધ. | [ ] |
+| `dis.steps.liver.1` | Keep recent liver test reports together. | हाल की लिवर जाँच रिपोर्ट एक जगह रखें। | તાજેતરના લિવર ટેસ્ટ રિપોર્ટ એક જગ્યાએ રાખો. | [ ] |
+| `dis.steps.liver.2` | Ask your doctor how often these tests are needed. | डॉक्टर से पूछें कि ये जाँच कितनी बार चाहिए। | ડૉક્ટરને પૂછો કે આ ટેસ્ટ કેટલી વાર જોઈએ. | [ ] |
+| `dis.steps.liver.3` | Tell every doctor about all medicines and supplements you take. | हर डॉक्टर को अपनी सभी दवाओं और सप्लीमेंट के बारे में बताएँ। | દરેક ડૉક્ટરને તમારી બધી દવાઓ અને સપ્લિમેન્ટ વિશે જણાવો. | [ ] |
+
+## Emergency Response Center (UI phase 1e)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `emc.intro` | See what the alert flow is doing, who would be told and what would be shared. | देखें कि अलर्ट प्रक्रिया क्या कर रही है, किसे बताया जाएगा और क्या साझा होगा। | જુઓ કે એલર્ટ પ્રક્રિયા શું કરી રહી છે, કોને જણાવાશે અને શું શેર થશે. | [ ] |
+| `emc.sim` | SIMULATION: no real ambulance, hospital or person is contacted by this prototype. In a real emergency call 112 / 108. | सिमुलेशन: यह प्रोटोटाइप किसी असली एम्बुलेंस, अस्पताल या व्यक्ति से संपर्क नहीं करता। असली आपात स्थिति में 112 / 108 पर कॉल करें। | સિમ્યુલેશન: આ પ્રોટોટાઇપ કોઈ સાચી એમ્બ્યુલન્સ, હોસ્પિટલ કે વ્યક્તિનો સંપર્ક કરતું નથી. સાચી કટોકટીમાં 112 / 108 પર કૉલ કરો. | [ ] |
+| `emc.status` | Current emergency | मौजूदा आपातकाल | હાલની કટોકટી | [ ] |
+| `emc.none` | No emergency is running. | कोई आपातकाल चल नहीं रहा। | કોઈ કટોકટી ચાલુ નથી. | [ ] |
+| `emc.start` | Report symptoms | लक्षण बताएँ | લક્ષણો જણાવો | [ ] |
+| `emc.open` | Open the full emergency screen | पूरी आपातकालीन स्क्रीन खोलें | પૂરી કટોકટી સ્ક્રીન ખોલો | [ ] |
+| `emc.loading` | Loading… | लोड हो रहा है… | લોડ થઈ રહ્યું છે… | [ ] |
+| `emc.loadError` | Could not load this emergency. Please try again. | यह आपातकाल लोड नहीं हो सका। कृपया फिर कोशिश करें। | આ કટોકટી લોડ થઈ શકી નથી. કૃપા કરીને ફરી પ્રયત્ન કરો. | [ ] |
+| `emc.live` | Live updates on | लाइव अपडेट चालू | લાઇવ અપડેટ ચાલુ | [ ] |
+| `emc.offline` | Live updates paused | लाइव अपडेट रुके हैं | લાઇવ અપડેટ અટક્યા છે | [ ] |
+| `emc.stages` | Steps of the alert | अलर्ट के चरण | એલર્ટનાં પગલાં | [ ] |
+| `emc.notYet` | not happened yet | अभी हुआ नहीं | હજી થયું નથી | [ ] |
+| `emc.stage.detected` | Emergency detected | आपातकाल पहचाना गया | કટોકટી ઓળખાઈ | [ ] |
+| `emc.stage.sos` | Alert sent (simulated) | अलर्ट भेजा गया (सिमुलेटेड) | એલર્ટ મોકલાયું (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.ack` | Hospital acknowledged (simulated) | अस्पताल ने स्वीकार किया (सिमुलेटेड) | હોસ્પિટલે સ્વીકાર્યું (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.dispatched` | Ambulance dispatched (simulated) | एम्बुलेंस भेजी गई (सिमुलेटेड) | એમ્બ્યુલન્સ મોકલાઈ (સિમ્યુલેટેડ) | [ ] |
+| `emc.stage.enroute` | En route | रास्ते में | રસ્તામાં | [ ] |
+| `emc.stage.arrived` | Arrived | पहुँच गई | પહોંચી | [ ] |
+| `emc.stage.handover` | Handover done | हस्तांतरण पूरा | હસ્તાંતરણ પૂર્ણ | [ ] |
+| `emc.hospital` | Hospital chosen: {{name}} | चुना गया अस्पताल: {{name}} | પસંદ કરેલી હોસ્પિટલ: {{name}} | [ ] |
+| `emc.eta` | Estimated arrival (simulated): about {{min}} min | अनुमानित पहुँच (सिमुलेटेड): लगभग {{min}} मिनट | અંદાજિત પહોંચ (સિમ્યુલેટેડ): લગભગ {{min}} મિનિટ | [ ] |
+| `emc.sentHospital` | Hospital notification: sent. | अस्पताल को सूचना: भेजी गई। | હોસ્પિટલને સૂચના: મોકલાઈ. | [ ] |
+| `emc.notSentHospital` | Hospital notification: not sent yet. | अस्पताल को सूचना: अभी भेजी नहीं गई। | હોસ્પિટલને સૂચના: હજી મોકલાઈ નથી. | [ ] |
+| `emc.ackHospital` | Hospital acknowledgement: received. | अस्पताल की स्वीकृति: मिल गई। | હોસ્પિટલની સ્વીકૃતિ: મળી. | [ ] |
+| `emc.notAckHospital` | Hospital acknowledgement: not received yet. | अस्पताल की स्वीकृति: अभी नहीं मिली। | હોસ્પિટલની સ્વીકૃતિ: હજી મળી નથી. | [ ] |
+| `emc.sentContacts` | Contacts notification sent to: {{names}}. | संपर्कों को सूचना भेजी गई: {{names}}। | સંપર્કોને સૂચના મોકલાઈ: {{names}}. | [ ] |
+| `emc.notSentContacts` | Contacts notification: not sent. | संपर्कों को सूचना: भेजी नहीं गई। | સંપર્કોને સૂચના: મોકલાઈ નથી. | [ ] |
+| `emc.ackContacts` | Contact acknowledgement: not tracked in this prototype. | संपर्क की स्वीकृति: इस प्रोटोटाइप में ट्रैक नहीं होती। | સંપર્કની સ્વીકૃતિ: આ પ્રોટોટાઇપમાં ટ્રેક થતી નથી. | [ ] |
+| `emc.share` | What would be shared | क्या साझा होगा | શું શેર થશે | [ ] |
+| `emc.shareHelp` | Only what you allow is sent with an alert. | अलर्ट के साथ केवल वही भेजा जाता है जिसकी आप अनुमति देते हैं। | એલર્ટ સાથે ફક્ત તમે મંજૂર કરેલું જ મોકલાય છે. | [ ] |
+| `emc.on` | Allowed | अनुमति है | મંજૂર | [ ] |
+| `emc.off` | Not shared | साझा नहीं | શેર નથી | [ ] |
+| `emc.changeShare` | Change sharing | साझा करना बदलें | શેરિંગ બદલો | [ ] |
+| `emc.contacts` | Your emergency contacts | आपके आपातकालीन संपर्क | તમારા કટોકટી સંપર્કો | [ ] |
+| `emc.noContacts` | No contacts yet. Add someone who should be told. | अभी कोई संपर्क नहीं। जिसे बताया जाना चाहिए उसे जोड़ें। | હજી કોઈ સંપર્ક નથી. જેને જણાવવું જોઈએ તેને ઉમેરો. | [ ] |
+| `emc.manageContacts` | Manage contacts | संपर्क प्रबंधित करें | સંપર્કો મેનેજ કરો | [ ] |
+| `emc.history` | Recent alerts | हाल के अलर्ट | તાજેતરના એલર્ટ | [ ] |
+| `emc.noHistory` | No earlier alerts. | पहले कोई अलर्ट नहीं। | અગાઉ કોઈ એલર્ટ નથી. | [ ] |
+| `emc.record` | View record | रिकॉर्ड देखें | રેકોર્ડ જુઓ | [ ] |
+| `emc.notService` | HealthTwin AI is a student prototype. It is not an emergency service and not a medical device. | HealthTwin AI एक छात्र प्रोटोटाइप है। यह आपातकालीन सेवा नहीं है और चिकित्सा उपकरण नहीं है। | HealthTwin AI વિદ્યાર્થી પ્રોટોટાઇપ છે. તે કટોકટી સેવા નથી અને તબીબી ઉપકરણ નથી. | [ ] |
+
+## Report Intelligence (UI phase 1f)
+
+Drafts, not yet checked by a native speaker. Lab test names should follow the wording on real Indian lab reports.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `ri.intro` | Add values from your medical reports. They update your Twin only after you confirm them. | अपनी मेडिकल रिपोर्ट के मान जोड़ें। आपके पुष्टि करने के बाद ही ये आपके ट्विन को अपडेट करते हैं। | તમારા મેડિકલ રિપોર્ટના મૂલ્યો ઉમેરો. તમે પુષ્ટિ કરો પછી જ તે તમારા ટ્વિનને અપડેટ કરે છે. | [ ] |
+| `ri.honest` | This prototype cannot read your files by itself. Read the number from your report and type it in. Nothing reaches your Twin until you confirm it, and no clinician has reviewed it. | यह प्रोटोटाइप आपकी फ़ाइलें खुद नहीं पढ़ सकता। रिपोर्ट से संख्या पढ़कर यहाँ लिखें। आपकी पुष्टि तक कुछ भी आपके ट्विन तक नहीं पहुँचता, और किसी चिकित्सक ने इसकी समीक्षा नहीं की है। | આ પ્રોટોટાઇપ તમારી ફાઇલો જાતે વાંચી શકતું નથી. રિપોર્ટમાંથી સંખ્યા વાંચીને અહીં લખો. તમારી પુષ્ટિ સુધી કંઈ તમારા ટ્વિન સુધી પહોંચતું નથી, અને કોઈ ચિકિત્સકે તેની સમીક્ષા કરી નથી. | [ ] |
+| `ri.files` | Your uploaded reports | आपकी अपलोड की गई रिपोर्ट | તમારા અપલોડ કરેલા રિપોર્ટ | [ ] |
+| `ri.loading` | Loading reports… | रिपोर्ट लोड हो रही हैं… | રિપોર્ટ લોડ થઈ રહ્યા છે… | [ ] |
+| `ri.loadError` | Could not load your reports. | आपकी रिपोर्ट लोड नहीं हो सकीं। | તમારા રિપોર્ટ લોડ થઈ શક્યા નથી. | [ ] |
+| `ri.noFiles` | No reports uploaded yet. | अभी कोई रिपोर्ट अपलोड नहीं हुई। | હજી કોઈ રિપોર્ટ અપલોડ થયો નથી. | [ ] |
+| `ri.manageFiles` | Upload or manage files | फ़ाइलें अपलोड या प्रबंधित करें | ફાઇલો અપલોડ કે મેનેજ કરો | [ ] |
+| `ri.notReviewed` | Clinician review: not reviewed | चिकित्सक समीक्षा: समीक्षा नहीं हुई | ચિકિત્સક સમીક્ષા: સમીક્ષા થઈ નથી | [ ] |
+| `ri.add` | Add a value from a report | रिपोर्ट से एक मान जोड़ें | રિપોર્ટમાંથી એક મૂલ્ય ઉમેરો | [ ] |
+| `ri.test` | Test | जाँच | તપાસ | [ ] |
+| `ri.value` | Value | मान | મૂલ્ય | [ ] |
+| `ri.low` | Lowest value printed on the report (optional) | रिपोर्ट में छपा सबसे कम मान (वैकल्पिक) | રિપોર્ટમાં છાપેલું સૌથી ઓછું મૂલ્ય (વૈકલ્પિક) | [ ] |
+| `ri.high` | Highest value printed on the report (optional) | रिपोर्ट में छपा सबसे अधिक मान (वैकल्पिक) | રિપોર્ટમાં છાપેલું સૌથી વધુ મૂલ્ય (વૈકલ્પિક) | [ ] |
+| `ri.rangeHelp` | Type the range printed on your own report if there is one. The app does not decide what is normal. | अगर आपकी अपनी रिपोर्ट में सीमा छपी है तो वही लिखें। ऐप तय नहीं करता कि क्या सामान्य है। | તમારા પોતાના રિપોર્ટમાં શ્રેણી છાપેલી હોય તો તે લખો. એપ નક્કી કરતી નથી કે શું સામાન્ય છે. | [ ] |
+| `ri.date` | Date of the test | जाँच की तारीख | તપાસની તારીખ | [ ] |
+| `ri.fromReport` | From which report (optional) | किस रिपोर्ट से (वैकल्पिक) | કયા રિપોર્ટમાંથી (વૈકલ્પિક) | [ ] |
+| `ri.noneReport` | Not linked to a file | किसी फ़ाइल से जुड़ा नहीं | કોઈ ફાઇલ સાથે જોડાયેલું નથી | [ ] |
+| `ri.review` | Review before adding | जोड़ने से पहले जाँचें | ઉમેરતા પહેલાં તપાસો | [ ] |
+| `ri.confirmTitle` | Please check this value | कृपया यह मान जाँचें | કૃપા કરીને આ મૂલ્ય તપાસો | [ ] |
+| `ri.confirmText` | Compare it with your report. It is added to your Twin only when you press Confirm. | इसे अपनी रिपोर्ट से मिलाएँ। पुष्टि दबाने पर ही यह आपके ट्विन में जुड़ता है। | તેને તમારા રિપોર્ટ સાથે સરખાવો. પુષ્ટિ દબાવો ત્યારે જ તે તમારા ટ્વિનમાં ઉમેરાય છે. | [ ] |
+| `ri.confirm` | Confirm and add to my Twin | पुष्टि करें और मेरे ट्विन में जोड़ें | પુષ્ટિ કરો અને મારા ટ્વિનમાં ઉમેરો | [ ] |
+| `ri.edit` | Edit | बदलें | બદલો | [ ] |
+| `ri.added` | Added to your Twin. | आपके ट्विन में जोड़ दिया गया। | તમારા ટ્વિનમાં ઉમેરાયું. | [ ] |
+| `ri.saveError` | Could not save on this device. Storage may be blocked. | इस डिवाइस पर सहेजा नहीं जा सका। स्टोरेज बंद हो सकता है। | આ ડિવાઇસ પર સાચવી શકાયું નથી. સ્ટોરેજ બંધ હોઈ શકે. | [ ] |
+| `ri.confirmed` | Values you confirmed | आपके पुष्टि किए हुए मान | તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `ri.confirmedShort` | Values you confirmed from reports | रिपोर्ट से आपके पुष्टि किए हुए मान | રિપોર્ટમાંથી તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `ri.noneConfirmed` | You have not confirmed any values yet. | आपने अभी कोई मान पुष्ट नहीं किया है। | તમે હજી કોઈ મૂલ્ય પુષ્ટ કર્યું નથી. | [ ] |
+| `ri.deviceOnly` | Saved only on this device for now. They are not sent to the hospital. | अभी केवल इसी डिवाइस पर सहेजे गए हैं। ये अस्पताल को नहीं भेजे जाते। | હમણાં ફક્ત આ ડિવાઇસ પર સાચવાયા છે. તે હોસ્પિટલને મોકલાતા નથી. | [ ] |
+| `ri.measured` | Measured on {{date}} | {{date}} को जाँचा गया | {{date}} ના રોજ તપાસ્યું | [ ] |
+| `ri.printed` | Printed range {{low}} to {{high}} | छपी सीमा {{low}} से {{high}} | છાપેલી શ્રેણી {{low}} થી {{high}} | [ ] |
+| `ri.status.within` | Inside the range on your report | आपकी रिपोर्ट की सीमा के अंदर | તમારા રિપોર્ટની શ્રેણીની અંદર | [ ] |
+| `ri.status.outside` | Outside the range on your report | आपकी रिपोर्ट की सीमा के बाहर | તમારા રિપોર્ટની શ્રેણીની બહાર | [ ] |
+| `ri.status.norange` | No range given | कोई सीमा नहीं दी गई | કોઈ શ્રેણી આપી નથી | [ ] |
+| `ri.removeFor` | Delete {{name}} | {{name}} हटाएँ | {{name}} કાઢી નાખો | [ ] |
+| `ri.err.required` | Please fill this in. | कृपया यह भरें। | કૃપા કરીને આ ભરો. | [ ] |
+| `ri.err.range` | Enter a number above 0. | 0 से बड़ी संख्या लिखें। | 0 થી મોટી સંખ્યા લખો. | [ ] |
+| `ri.err.number` | Enter a number. | संख्या लिखें। | સંખ્યા લખો. | [ ] |
+| `ri.err.order` | The highest value must not be below the lowest. | सबसे अधिक मान सबसे कम मान से कम नहीं हो सकता। | સૌથી વધુ મૂલ્ય સૌથી ઓછા મૂલ્યથી ઓછું ન હોઈ શકે. | [ ] |
+| `ri.err.future` | The date cannot be in the future. | तारीख भविष्य की नहीं हो सकती। | તારીખ ભવિષ્યની ન હોઈ શકે. | [ ] |
+| `lab.hba1c` | HbA1c | HbA1c | HbA1c | [ ] |
+| `lab.fasting_glucose` | Fasting glucose | खाली पेट ग्लूकोज़ | ખાલી પેટે ગ્લુકોઝ | [ ] |
+| `lab.creatinine` | Creatinine | क्रिएटिनिन | ક્રિએટિનિન | [ ] |
+| `lab.egfr` | eGFR | eGFR | eGFR | [ ] |
+| `lab.alt` | ALT (SGPT) | ALT (SGPT) | ALT (SGPT) | [ ] |
+| `lab.ast` | AST (SGOT) | AST (SGOT) | AST (SGOT) | [ ] |
+| `lab.bilirubin` | Bilirubin | बिलीरुबिन | બિલિરુબિન | [ ] |
+| `lab.cholesterol` | Total cholesterol | कुल कोलेस्ट्रॉल | કુલ કોલેસ્ટ્રોલ | [ ] |
+| `lab.ldl` | LDL cholesterol | LDL कोलेस्ट्रॉल | LDL કોલેસ્ટ્રોલ | [ ] |
+
+## Health Simulator (UI phase 2a)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `sim.intro` | Try a "what if" value and see where it would sit compared with your own usual range. | एक "अगर ऐसा हो" मान आज़माएँ और देखें कि वह आपकी अपनी सामान्य सीमा की तुलना में कहाँ बैठता है। | એક "જો આમ થાય" મૂલ્ય અજમાવો અને જુઓ કે તે તમારી પોતાની સામાન્ય શ્રેણી સામે ક્યાં બેસે છે. | [ ] |
+| `sim.hypothetical` | Hypothetical, not a prediction | काल्पनिक, भविष्यवाणी नहीं | કાલ્પનિક, આગાહી નથી | [ ] |
+| `sim.notPrediction` | This is a what-if tool. It does not predict what will happen, does not estimate any risk and is not a diagnosis. It only compares a number you choose with your own usual range. | यह "अगर ऐसा हो" देखने का टूल है। यह नहीं बताता कि क्या होगा, किसी जोखिम का अनुमान नहीं लगाता और निदान नहीं है। यह केवल आपके चुने हुए मान की तुलना आपकी अपनी सामान्य सीमा से करता है। | આ "જો આમ થાય" જોવાનું સાધન છે. તે શું થશે તે કહેતું નથી, કોઈ જોખમનો અંદાજ કાઢતું નથી અને નિદાન નથી. તે ફક્ત તમે પસંદ કરેલા મૂલ્યની સરખામણી તમારી પોતાની સામાન્ય શ્રેણી સાથે કરે છે. | [ ] |
+| `sim.controls` | What if… | अगर ऐसा हो… | જો આમ થાય… | [ ] |
+| `sim.reset` | Reset to my latest readings | मेरी ताज़ा रीडिंग पर वापस | મારી તાજી રીડિંગ પર પાછા | [ ] |
+| `sim.valueLabel` | {{name}} value | {{name}} का मान | {{name}} નું મૂલ્ય | [ ] |
+| `sim.compare` | Baseline and hypothetical | आधार और काल्पनिक | આધાર અને કાલ્પનિક | [ ] |
+| `sim.col.metric` | Reading | रीडिंग | રીડિંગ | [ ] |
+| `sim.col.baseline` | Latest (baseline) | ताज़ा (आधार) | તાજી (આધાર) | [ ] |
+| `sim.col.hypo` | What-if value | काल्पनिक मान | કાલ્પનિક મૂલ્ય | [ ] |
+| `sim.col.usual` | Your usual range | आपकी सामान्य सीमा | તમારી સામાન્ય શ્રેણી | [ ] |
+| `sim.col.where` | What-if is | काल्पनिक मान है | કાલ્પનિક મૂલ્ય છે | [ ] |
+| `sim.where.within` | Inside your usual range | आपकी सामान्य सीमा में | તમારી સામાન્ય શ્રેણીમાં | [ ] |
+| `sim.where.outside` | Outside your usual range | आपकी सामान्य सीमा से बाहर | તમારી સામાન્ય શ્રેણીની બહાર | [ ] |
+| `sim.noRange` | No usual range set | सामान्य सीमा तय नहीं | સામાન્ય શ્રેણી નક્કી નથી | [ ] |
+| `sim.summaryIn` | With these values, nothing would be outside your usual range. | इन मानों से कुछ भी आपकी सामान्य सीमा से बाहर नहीं होगा। | આ મૂલ્યોથી કંઈ તમારી સામાન્ય શ્રેણીની બહાર નહીં હોય. | [ ] |
+| `sim.summaryOut` | With these values, these would be outside your usual range: {{names}}. This says nothing about what would actually happen. | इन मानों से ये आपकी सामान्य सीमा से बाहर होंगे: {{names}}। इससे यह पता नहीं चलता कि असल में क्या होगा। | આ મૂલ્યોથી આ તમારી સામાન્ય શ્રેણીની બહાર હશે: {{names}}. આનાથી ખરેખર શું થશે તે કહી શકાતું નથી. | [ ] |
+| `sim.assumptions` | Assumptions | मान्यताएँ | ધારણાઓ | [ ] |
+| `sim.assume.1` | The baseline is your latest shared reading. With no reading yet, the sliders start in the middle of your usual range. | आधार आपकी ताज़ा साझा रीडिंग है। रीडिंग न हो तो स्लाइडर आपकी सामान्य सीमा के बीच से शुरू होते हैं। | આધાર તમારી તાજી શેર કરેલી રીડિંગ છે. રીડિંગ ન હોય તો સ્લાઇડર તમારી સામાન્ય શ્રેણીની વચ્ચેથી શરૂ થાય છે. | [ ] |
+| `sim.assume.2` | "Usual range" is the range saved in your profile. The app does not know what is normal for anyone else. | "सामान्य सीमा" वही है जो आपकी प्रोफ़ाइल में सहेजी है। ऐप नहीं जानता कि किसी और के लिए क्या सामान्य है। | "સામાન્ય શ્રેણી" એટલે તમારી પ્રોફાઇલમાં સાચવેલી શ્રેણી. એપ જાણતી નથી કે બીજા કોઈ માટે શું સામાન્ય છે. | [ ] |
+| `sim.assume.3` | Each value is looked at on its own. Combinations and effects on each other are not modelled. | हर मान को अलग से देखा जाता है। आपस के असर का मॉडल नहीं बनाया गया। | દરેક મૂલ્ય અલગથી જોવાય છે. એકબીજા પરની અસરનું મોડેલ બનાવ્યું નથી. | [ ] |
+| `sim.assume.4` | No medicines, activity, sleep or illness are taken into account. | दवाएँ, गतिविधि, नींद या बीमारी का ध्यान नहीं रखा गया। | દવાઓ, પ્રવૃત્તિ, ઊંઘ કે બીમારીને ધ્યાનમાં લેવાઈ નથી. | [ ] |
+| `sim.uncertainty` | How much your readings vary | आपकी रीडिंग कितनी बदलती हैं | તમારી રીડિંગ કેટલી બદલાય છે | [ ] |
+| `sim.uncertaintyHelp` | Your real readings move around from moment to moment. A what-if inside this spread is not unusual for you. | आपकी असली रीडिंग पल-पल बदलती रहती हैं। इस दायरे के अंदर का काल्पनिक मान आपके लिए असामान्य नहीं है। | તમારી સાચી રીડિંગ ક્ષણે ક્ષણે બદલાય છે. આ વિસ્તારની અંદરનું કાલ્પનિક મૂલ્ય તમારા માટે અસામાન્ય નથી. | [ ] |
+| `sim.spread` | {{min}} to {{max}} ({{n}} readings) | {{min}} से {{max}} ({{n}} रीडिंग) | {{min}} થી {{max}} ({{n}} રીડિંગ) | [ ] |
+| `sim.noReadings` | no readings yet | अभी कोई रीडिंग नहीं | હજી કોઈ રીડિંગ નથી | [ ] |
+
+## Care Circle (UI phase 2b)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `cc.intro` | The people who would be told if you send an alert, and what they could see. | वे लोग जिन्हें आपके अलर्ट भेजने पर बताया जाएगा, और वे क्या देख सकते हैं। | જે લોકોને તમે એલર્ટ મોકલો ત્યારે જણાવાશે, અને તેઓ શું જોઈ શકે. | [ ] |
+| `cc.members` | Your circle | आपका सर्कल | તમારું સર્કલ | [ ] |
+| `cc.loading` | Loading… | लोड हो रहा है… | લોડ થઈ રહ્યું છે… | [ ] |
+| `cc.loadError` | Could not load your contacts. | आपके संपर्क लोड नहीं हो सके। | તમારા સંપર્કો લોડ થઈ શક્યા નથી. | [ ] |
+| `cc.empty` | Nobody is in your circle yet, so nobody would be told about an alert. Add at least one emergency contact. | आपके सर्कल में अभी कोई नहीं है, इसलिए अलर्ट की सूचना किसी को नहीं जाएगी। कम से कम एक आपातकालीन संपर्क जोड़ें। | તમારા સર્કલમાં હજી કોઈ નથી, તેથી એલર્ટની જાણ કોઈને નહીં થાય. ઓછામાં ઓછો એક કટોકટી સંપર્ક ઉમેરો. | [ ] |
+| `cc.told` | Would get an alert message if you send an SOS (simulated). | आप SOS भेजें तो अलर्ट संदेश मिलेगा (सिमुलेटेड)। | તમે SOS મોકલો તો એલર્ટ સંદેશ મળશે (સિમ્યુલેટેડ). | [ ] |
+| `cc.ackNote` | The prototype does not track whether a person saw or acknowledged a message. | प्रोटोटाइप यह ट्रैक नहीं करता कि किसी ने संदेश देखा या स्वीकार किया। | પ્રોટોટાઇપ ટ્રેક કરતું નથી કે કોઈએ સંદેશ જોયો કે સ્વીકાર્યો. | [ ] |
+| `cc.manage` | Add or edit contacts | संपर्क जोड़ें या बदलें | સંપર્કો ઉમેરો કે બદલો | [ ] |
+| `cc.see` | What your circle could see | आपका सर्कल क्या देख सकता है | તમારું સર્કલ શું જોઈ શકે | [ ] |
+| `cc.seeHelp` | Only what you allow is shared. Anything switched off stays hidden. | केवल वही साझा होता है जिसकी आप अनुमति देते हैं। बंद की हुई चीज़ें छिपी रहती हैं। | ફક્ત તમે મંજૂર કરેલું જ શેર થાય છે. બંધ કરેલું છુપાયેલું રહે છે. | [ ] |
+| `cc.canSee` | Can see | देख सकते हैं | જોઈ શકે | [ ] |
+| `cc.cannotSee` | Hidden | छिपा | છુપાયેલું | [ ] |
+| `cc.sameForAll` | These choices are the same for everyone in your circle. Sharing per person is not available yet. | ये चुनाव आपके सर्कल में सभी के लिए एक जैसे हैं। हर व्यक्ति के लिए अलग साझा करना अभी उपलब्ध नहीं है। | આ પસંદગીઓ તમારા સર્કલમાં બધા માટે સરખી છે. દરેક વ્યક્તિ માટે અલગ શેરિંગ હજી ઉપલબ્ધ નથી. | [ ] |
+| `cc.seen` | When family last looked | परिवार ने आखिरी बार कब देखा | પરિવારે છેલ્લે ક્યારે જોયું | [ ] |
+| `cc.seenNone` | No family member has looked at your data yet. | किसी परिवार सदस्य ने अभी तक आपका डेटा नहीं देखा। | કોઈ પરિવારજને હજી તમારો ડેટા જોયો નથી. | [ ] |
+| `cc.fullLog` | See the full list: who saw my data | पूरी सूची देखें: मेरा डेटा किसने देखा | પૂરી યાદી જુઓ: મારો ડેટા કોણે જોયો | [ ] |
+
+## Health Copilot (UI phase 2c)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `nav.copilot` | Health Copilot | हेल्थ कोपायलट | હેલ્થ કોપાયલટ | [ ] |
+| `cp.intro` | Pick a question. The answer is worked out from your own data by simple rules. | एक सवाल चुनें। जवाब आपके अपने डेटा से सरल नियमों द्वारा निकाला जाता है। | એક પ્રશ્ન પસંદ કરો. જવાબ તમારા પોતાના ડેટામાંથી સરળ નિયમોથી કાઢવામાં આવે છે. | [ ] |
+| `cp.rules` | Rules only, no AI model | केवल नियम, कोई AI मॉडल नहीं | ફક્ત નિયમો, કોઈ AI મોડેલ નહીં | [ ] |
+| `cp.notAi` | This is not an AI chatbot and not a doctor. Every answer comes from a fixed rule applied to your own readings, profile and contacts. It gives no medical advice and no diagnosis. | यह AI चैटबॉट नहीं है और डॉक्टर नहीं है। हर जवाब आपकी अपनी रीडिंग, प्रोफ़ाइल और संपर्कों पर एक तय नियम लगाकर आता है। यह कोई चिकित्सीय सलाह या निदान नहीं देता। | આ AI ચેટબોટ નથી અને ડૉક્ટર નથી. દરેક જવાબ તમારી પોતાની રીડિંગ, પ્રોફાઇલ અને સંપર્કો પર નક્કી નિયમ લગાવીને આવે છે. તે કોઈ તબીબી સલાહ કે નિદાન આપતું નથી. | [ ] |
+| `cp.urgent` | If you feel very unwell or in danger, do not wait: call 112 or 108 now. | अगर आप बहुत बीमार महसूस करें या खतरे में हों, तो इंतज़ार न करें: अभी 112 या 108 पर कॉल करें। | જો તમે ખૂબ બીમાર લાગો કે જોખમમાં હો, તો રાહ ન જુઓ: હમણાં 112 અથવા 108 પર કૉલ કરો. | [ ] |
+| `cp.pick` | Choose a question | सवाल चुनें | પ્રશ્ન પસંદ કરો | [ ] |
+| `cp.noFreeText` | You cannot type your own question here on purpose, so the Copilot never guesses about your health. | यहाँ अपना सवाल लिखने की सुविधा जानबूझकर नहीं है, ताकि कोपायलट आपकी सेहत के बारे में अंदाज़ा न लगाए। | અહીં પોતાનો પ્રશ્ન લખવાની સુવિધા જાણી જોઈને નથી, જેથી કોપાયલટ તમારા સ્વાસ્થ્ય વિશે અંદાજ ન લગાવે. | [ ] |
+| `cp.answers` | Answers | जवाब | જવાબો | [ ] |
+| `cp.empty` | No question asked yet. | अभी कोई सवाल नहीं पूछा गया। | હજી કોઈ પ્રશ્ન પૂછાયો નથી. | [ ] |
+| `cp.from` | Worked out from: {{sources}} | इनसे निकाला गया: {{sources}} | આમાંથી કાઢ્યું: {{sources}} | [ ] |
+| `cp.badge` | Rule-based, not reviewed by a clinician | नियम आधारित, चिकित्सक द्वारा समीक्षित नहीं | નિયમ આધારિત, ચિકિત્સકે સમીક્ષા કરી નથી | [ ] |
+| `cp.src.vitals` | your live readings | आपकी लाइव रीडिंग | તમારી લાઇવ રીડિંગ | [ ] |
+| `cp.src.ranges` | your usual ranges | आपकी सामान्य सीमाएँ | તમારી સામાન્ય શ્રેણીઓ | [ ] |
+| `cp.src.profile` | your profile | आपकी प्रोफ़ाइल | તમારી પ્રોફાઇલ | [ ] |
+| `cp.src.contacts` | your contacts | आपके संपर्क | તમારા સંપર્કો | [ ] |
+| `cp.src.reports` | your reports | आपकी रिपोर्ट | તમારા રિપોર્ટ | [ ] |
+| `cp.src.consents` | your sharing choices | आपके साझा करने के चुनाव | તમારી શેરિંગ પસંદગીઓ | [ ] |
+| `cp.src.labs` | values you confirmed | आपके पुष्ट किए मान | તમે પુષ્ટિ કરેલા મૂલ્યો | [ ] |
+| `cp.q.readings` | How do my readings look right now? | मेरी रीडिंग अभी कैसी दिख रही हैं? | મારી રીડિંગ હમણાં કેવી દેખાય છે? | [ ] |
+| `cp.q.missing` | What is missing from my profile? | मेरी प्रोफ़ाइल में क्या कमी है? | મારી પ્રોફાઇલમાં શું ખૂટે છે? | [ ] |
+| `cp.q.changes` | How have my readings moved lately? | मेरी रीडिंग हाल में कैसे बदली हैं? | મારી રીડિંગ તાજેતરમાં કેવી બદલાઈ? | [ ] |
+| `cp.q.circle` | Who would be told in an emergency? | आपातकाल में किसे बताया जाएगा? | કટોકટીમાં કોને જણાવાશે? | [ ] |
+| `cp.q.records` | What records do I have? | मेरे पास कौन-से रिकॉर्ड हैं? | મારી પાસે કયા રેકોર્ડ છે? | [ ] |
+| `cp.q.doctor` | What could I ask my doctor? | मैं डॉक्टर से क्या पूछ सकता/सकती हूँ? | હું ડૉક્ટરને શું પૂછી શકું? | [ ] |
+| `cp.a.readings.none` | There are no readings to compare with your usual ranges yet. | अभी आपकी सामान्य सीमाओं से तुलना के लिए कोई रीडिंग नहीं है। | હજી તમારી સામાન્ય શ્રેણી સાથે સરખામણી માટે કોઈ રીડિંગ નથી. | [ ] |
+| `cp.a.readings.in` | Inside your usual range: {{names}}. | आपकी सामान्य सीमा के अंदर: {{names}}। | તમારી સામાન્ય શ્રેણીની અંદર: {{names}}. | [ ] |
+| `cp.a.readings.out` | Outside your usual range: {{names}}. This is an observation, not a diagnosis. | आपकी सामान्य सीमा से बाहर: {{names}}। यह अवलोकन है, निदान नहीं। | તમારી સામાન્ય શ્રેણીની બહાર: {{names}}. આ અવલોકન છે, નિદાન નથી. | [ ] |
+| `cp.a.readings.noRange` | No usual range or reading yet for: {{names}}. | इनके लिए अभी सामान्य सीमा या रीडिंग नहीं है: {{names}}। | આના માટે હજી સામાન્ય શ્રેણી કે રીડિંગ નથી: {{names}}. | [ ] |
+| `cp.a.missing.some` | Your profile is {{percent}}% complete. Missing: {{items}}. | आपकी प्रोफ़ाइल {{percent}}% पूरी है। कमी: {{items}}। | તમારી પ્રોફાઇલ {{percent}}% પૂરી છે. ખૂટે છે: {{items}}. | [ ] |
+| `cp.a.missing.item` | Add {{item}}. | {{item}} जोड़ें। | {{item}} ઉમેરો. | [ ] |
+| `cp.a.missing.none` | Nothing is missing from the profile checklist. | प्रोफ़ाइल की सूची में कुछ भी कम नहीं है। | પ્રોફાઇલની યાદીમાં કંઈ ખૂટતું નથી. | [ ] |
+| `cp.a.changes.row` | {{key}}: from {{first}} to {{last}} over {{n}} readings kept on this page. | {{key}}: इस पेज पर रखी {{n}} रीडिंग में {{first}} से {{last}}। | {{key}}: આ પેજ પર રાખેલી {{n}} રીડિંગમાં {{first}} થી {{last}}. | [ ] |
+| `cp.a.changes.none` | Not enough readings yet to compare. Keep the Monitoring page open to collect some. | तुलना के लिए अभी पर्याप्त रीडिंग नहीं हैं। कुछ इकट्ठा करने के लिए मॉनिटरिंग पेज खुला रखें। | સરખામણી માટે હજી પૂરતી રીડિંગ નથી. થોડી ભેગી કરવા મોનિટરિંગ પેજ ખુલ્લું રાખો. | [ ] |
+| `cp.a.circle.some` | {{n}} contact(s) would get an alert message if you send an SOS (simulated). | आप SOS भेजें तो {{n}} संपर्क को अलर्ट संदेश मिलेगा (सिमुलेटेड)। | તમે SOS મોકલો તો {{n}} સંપર્કને એલર્ટ સંદેશ મળશે (સિમ્યુલેટેડ). | [ ] |
+| `cp.a.circle.none` | Nobody is in your circle, so nobody would be told. | आपके सर्कल में कोई नहीं है, इसलिए किसी को नहीं बताया जाएगा। | તમારા સર્કલમાં કોઈ નથી, તેથી કોઈને જણાવાશે નહીં. | [ ] |
+| `cp.a.circle.shared` | They could see: {{items}}. | वे यह देख सकते हैं: {{items}}। | તેઓ આ જોઈ શકે: {{items}}. | [ ] |
+| `cp.a.circle.nothing` | You are not sharing any detail with them. | आप उनके साथ कोई जानकारी साझा नहीं कर रहे। | તમે તેમની સાથે કોઈ વિગત શેર કરતા નથી. | [ ] |
+| `cp.a.records.files` | Uploaded report files: {{n}}. | अपलोड की गई रिपोर्ट फ़ाइलें: {{n}}। | અપલોડ કરેલી રિપોર્ટ ફાઇલો: {{n}}. | [ ] |
+| `cp.a.records.labs` | Values you confirmed from reports: {{n}}. | रिपोर्ट से आपके पुष्ट किए मान: {{n}}। | રિપોર્ટમાંથી તમે પુષ્ટિ કરેલા મૂલ્યો: {{n}}. | [ ] |
+| `cp.a.records.review` | None of these have been reviewed by a clinician. | इनमें से किसी की चिकित्सक ने समीक्षा नहीं की है। | આમાંથી કોઈની ચિકિત્સકે સમીક્ષા કરી નથી. | [ ] |
+| `cp.a.doctor.out` | Ask about the readings that were outside your usual range: {{names}}. | जो रीडिंग आपकी सामान्य सीमा से बाहर थीं उनके बारे में पूछें: {{names}}। | જે રીડિંગ તમારી સામાન્ય શ્રેણીની બહાર હતી તેના વિશે પૂછો: {{names}}. | [ ] |
+| `cp.a.doctor.baseline` | Ask your doctor to help you set usual ranges that suit you. | डॉक्टर से अपने लिए उपयुक्त सामान्य सीमाएँ तय करने में मदद माँगें। | ડૉક્ટરને તમારા માટે યોગ્ય સામાન્ય શ્રેણીઓ નક્કી કરવામાં મદદ માટે કહો. | [ ] |
+| `cp.a.doctor.noReports` | Ask which tests or reports would be useful to keep on file. | पूछें कि कौन-सी जाँचें या रिपोर्ट रखना उपयोगी होगा। | પૂછો કે કયા ટેસ્ટ કે રિપોર્ટ રાખવા ઉપયોગી થશે. | [ ] |
+| `cp.a.doctor.meds` | Bring a list of all medicines you take, including supplements. | अपनी सभी दवाओं की सूची साथ ले जाएँ, सप्लीमेंट सहित। | તમે લો છો તે બધી દવાઓની યાદી સાથે લઈ જાઓ, સપ્લિમેન્ટ સહિત. | [ ] |
+| `cp.a.doctor.symptoms` | Write down any symptoms, when they started and what makes them better or worse. | कोई भी लक्षण, वह कब शुरू हुआ और क्या उसे बेहतर या बदतर करता है, लिख लें। | કોઈ પણ લક્ષણ, તે ક્યારે શરૂ થયું અને શું તેને સારું કે ખરાબ કરે છે, તે લખી રાખો. | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

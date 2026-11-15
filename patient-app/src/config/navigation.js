@@ -6,7 +6,8 @@ export const NAV = [
   { key: 'diseases', to: '/diseases', icon: 'activity', themed: true },
   { key: 'monitor', to: '/monitor', icon: 'heart', themed: true },
   { key: 'emergency', to: '/emergency-center', icon: 'alert', themed: true },
-  { key: 'reports', to: '/reports', icon: 'file' },
+  { key: 'reports', to: '/report-intelligence', icon: 'file', themed: true },
+  { key: 'copilot', to: '/copilot', icon: 'info', themed: true },
   { key: 'simulator', to: '/simulator', icon: 'bolt', themed: true },
   { key: 'medications', to: '/reminders', icon: 'pill' },
   { key: 'care', to: '/care-circle', icon: 'users', themed: true },
@@ -16,5 +17,5 @@ export const NAV = [
 // Phone bottom bar: Home, Twin, Monitor, Reports, Profile.
 export const BOTTOM = ['overview', 'twin', 'monitor', 'reports', 'settings'];
 export const BOTTOM_TO = { overview: '/' }; // on the phone, Home is the original home screen
-export const THEMED_ROUTES = ['/overview', '/twin', '/diseases', '/monitor', '/emergency-center', '/simulator', '/care-circle', '/hospitals', '/design'];
+export const THEMED_ROUTES = ['/overview', '/twin', '/diseases', '/monitor', '/emergency-center', '/report-intelligence', '/simulator', '/copilot', '/care-circle', '/hospitals', '/design'];
 export const isThemed = (pathname) => THEMED_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
