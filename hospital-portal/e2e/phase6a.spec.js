@@ -111,12 +111,13 @@ test.describe('analytics', () => {
     await expect(page.locator('[data-testid=spread]')).toBeVisible();
     await expect(page.locator('[data-testid=spread-alert_to_ack] [data-testid=spread-n]')).toBeVisible();
     const shown = page.locator('[data-testid=date-shown]');
-    const total = await shown.innerText();
+    // "Showing N of M cases": read the two numbers (the history may still be loading, so wait until they settle).
+    const counts = async () => (await shown.innerText()).match(/\d+/g).map(Number);
+    await expect.poll(async () => { const [n, m] = await counts(); return m > 0 && n === m; }).toBe(true);
     await page.fill('[data-testid=date-from]', '2099-01-01');
-    await expect(shown).toContainText('0');
-    expect(await shown.innerText()).not.toBe(total);
+    await expect.poll(async () => (await counts())[0]).toBe(0);
     await expect(page.locator('[data-testid=analytics-csv]')).toBeDisabled();
     await page.click('[data-testid=date-clear]');
-    await expect(shown).toHaveText(total);
+    await expect.poll(async () => { const [n, m] = await counts(); return m > 0 && n === m; }).toBe(true);
   });
 });

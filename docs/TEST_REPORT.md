@@ -96,13 +96,17 @@ On a clean checkout, `cd hospital-portal && npm test` needs only Node. A teammat
 
 ## Phase 6A (hospital portal polish), 15 Nov 2026
 
-| Check | SANDBOX | CI |
+CI column = GitHub Actions on commit 2df527c (pushed to `Puneet`). Each commit ran twice (push and pull_request events).
+
+| Check | SANDBOX | CI (2df527c) |
 |---|---|---|
-| `npm test` (portal unit tests) | 514 pass, 0 fail | NOT RUN YET (nothing pushed) |
-| JSX syntax of all pages and components (esbuild parse) | pass | n/a |
-| `e2e/*.spec.js`, 22 older + 12 new in `phase6a.spec.js` | 34/34 pass in a **private shim runner** (Chrome, esbuild bundle, hand-built Tailwind CSS, a stand-in router and map). This is NOT the real Playwright + Vite run. | NOT RUN YET |
-| Widths 360, 768, 1366, 1920: no sideways page scroll on dashboard, map, fleet, history, analytics | pass in the shim (tables scroll inside their own box on phones, the page does not) | NOT RUN YET |
-| Keyboard: menu button, Escape, focus return, arrow keys in the queue | pass in the shim | NOT RUN YET |
-| Reduced motion: no flash, NEW text and border stay | the older e2e test passes in the shim | NOT RUN YET |
-| ESLint, Vite build, real Playwright | NOT RUN (not installed in the sandbox) | NOT RUN YET |
+| Portal unit tests (`npm test`) | 514 pass, 0 fail | 514 pass, 0 fail (both runs) |
+| ESLint (`npm run lint`) | NOT RUN (not installed here) | success (both runs) |
+| Vite build (`npm run build`) | NOT RUN (not installed here) | success (both runs) |
+| Real Playwright e2e (34 tests: 22 older + 12 new in `phase6a.spec.js`) | 34/34 in a private shim runner (Chrome + esbuild + hand-built Tailwind; not the real Playwright/Vite) | success, but **33 passed + 1 flaky** in both runs: my new analytics test failed on its first try and passed on retry (it read the case count before the history had finished loading: 7 vs 10). Fixed afterwards in the next commit (waits for the numbers to settle); not yet re-run in CI at the time of writing. |
+| Widths 360 / 768 / 1366 / 1920, no sideways page scroll (5 pages) | pass in the shim | pass in CI (4 width tests, both runs) |
+| Keyboard menu (open, Escape, focus return), 44px targets, arrow keys in queue | pass in the shim | pass in CI |
+| Backend tests (pytest) | not run here (no FastAPI) | 2324 passed, 7 skipped (unchanged; success) |
+| Patient-app unit tests | not run here | 28 files, 180 tests passed |
+| Patient-app browser tests | not run here | push run: success. pull_request run: **failed**, 21/22 files, 505 checks: test A1 (`phase10-apps`, admin page: pending GET /admin/users and /content/first_aid_basics). Same commit passed in the push run. Patient-app was not touched by Phase 6A. |
 | Hindi and Gujarati wrapping, 200% zoom, landscape phone, screen reader | NOT CHECKED | NOT CHECKED |
