@@ -63,8 +63,8 @@ export default function AlertCard({ alert, selected, onSelect }) {
         selected ? 'ring-4 ring-sky-400' : ''
       } ${cancelled || finished ? 'opacity-70' : ''} ${early ? 'bg-slate-50' : ''} ${flash ? 'ht-flash' : ''}`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className={`flex items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className={`flex flex-wrap items-center gap-2 text-xl font-bold ${cancelled ? 'line-through' : ''}`}>
           {unread && <span data-testid="unread-marker" title={t('card.notOpened')} className="inline-flex shrink-0 items-center gap-1 rounded border border-sky-600 bg-sky-50 px-1.5 py-0.5 text-xs font-bold text-sky-900"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-sky-500" />{t('card.unread')}</span>}
           {typeText(t, type)}
           {isNew && <span data-testid="new-badge" className="rounded bg-sky-600 px-1.5 py-0.5 text-xs font-bold text-white">{t('card.new')}</span>}

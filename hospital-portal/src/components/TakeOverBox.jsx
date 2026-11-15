@@ -41,7 +41,7 @@ export default function TakeOverBox({ emergency: e, heldBy }) {
       <div className="flex flex-wrap items-end gap-3">
         <label className="block">
           <span className="text-sm font-semibold text-slate-700">{t('takeover.reason')}</span>
-          <select data-testid="takeover-reason" value={kind} onChange={(ev) => setKind(ev.target.value)} className="mt-1 block rounded-lg border-2 border-slate-300 bg-white px-3 py-2 text-lg">
+          <select data-testid="takeover-reason" value={kind} onChange={(ev) => setKind(ev.target.value)} className="mt-1 block w-full max-w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2 text-lg">
             {!kind && <option value="">{t('takeover.choose')}</option>}
             {REASONS.map((r) => (
               <option key={r} value={r}>{t(`takeover.r.${r}`)}</option>

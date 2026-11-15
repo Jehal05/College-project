@@ -72,8 +72,8 @@ export default function MapPage() {
   const byDistance = useMemo(() => [...hospitals].sort((a, b) => a.distance_km - b.distance_km), [hospitals]);
 
   return (
-    <div className="grid gap-6 p-6 lg:grid-cols-[1fr_420px]">
-      <section className="space-y-4">
+    <div className="grid gap-6 p-6 grid-cols-1 lg:grid-cols-[1fr_420px]">
+      <section className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">{t('map.title')}</h1>
           <SimulatedBadge text={t('map.badge', { kmh: ASSUMED_SPEED_KMH })} />
@@ -90,7 +90,7 @@ export default function MapPage() {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg"
+              className="max-w-[55vw] rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg"
             >
               <option value="">{t('map.allTypes')}</option>
               {EMERGENCY_TYPES.map((ty) => (

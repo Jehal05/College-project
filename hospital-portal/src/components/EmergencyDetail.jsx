@@ -43,7 +43,7 @@ export default function EmergencyDetail({ emergency }) {
       <ReadinessWarning emergency={e} />
       <CommandSummary emergency={e} />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-5">
           <PatientFacts emergency={e} />
           <SymptomList emergency={e} />
@@ -105,7 +105,7 @@ export default function EmergencyDetail({ emergency }) {
         <NearbyHelp emergency={e} />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div>
           <h3 className="mb-2 text-xl font-bold">{t('sec.checklist')}</h3>
           <Checklist emergency={e} />

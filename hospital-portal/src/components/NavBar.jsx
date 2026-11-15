@@ -51,15 +51,15 @@ export default function NavBar() {
             aria-expanded={menuOpen}
             aria-controls="site-menu"
             onClick={() => setMenuOpen((v) => !v)}
-            className="min-h-11 rounded-lg border border-slate-400 px-4 py-1.5 font-semibold md:hidden"
+            className="min-h-11 rounded-lg border border-slate-400 px-4 py-1.5 font-semibold lg:hidden"
           >
             {menuOpen ? t('nav.menuClose') : t('nav.menu')}
           </button>
-          <div id="site-menu" className={`${menuOpen ? 'mt-2 flex' : 'hidden'} flex-col gap-3 md:mt-0 md:flex md:flex-row md:items-start md:gap-5`}>
+          <div id="site-menu" className={`${menuOpen ? 'mt-2 flex' : 'hidden'} flex-col gap-3 lg:mt-0 lg:flex lg:flex-row lg:items-start lg:gap-5`}>
             {visibleGroups(role).map((g) => (
               <div key={g.id} role="group" aria-labelledby={`nav-g-${g.id}`}>
                 <div id={`nav-g-${g.id}`} className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-300">{t(g.label)}</div>
-                <div className="flex flex-col gap-1 md:flex-row">
+                <div className="flex flex-col gap-1 lg:flex-row">
                   {g.links.map((l) => (
                     <NavLink
                       key={l.to}
@@ -81,7 +81,7 @@ export default function NavBar() {
             ))}
           </div>
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex flex-wrap items-center gap-3">
           {USE_MOCK && !presenting && !confirmReset && (
             <button data-testid="reset-demo" onClick={() => setConfirmReset(true)} className="rounded-lg border border-amber-400 px-3 py-1.5 text-amber-200 hover:bg-slate-700">
               {t('nav.resetDemo')}

@@ -80,7 +80,7 @@ export default function Analytics() {
         <Tile testId="tile-escalations" label={t('an.escalated')} value={s.escalations.cases} note={s.escalations.times === 1 ? t('an.timesOne') : t('an.timesMany', { n: s.escalations.times })} />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <BarChart
           testId="chart-type"
           title={t('an.byType')}

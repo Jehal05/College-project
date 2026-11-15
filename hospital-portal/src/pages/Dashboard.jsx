@@ -96,9 +96,9 @@ export default function Dashboard() {
       {hospitalError && <ErrorState message={hospitalError} className="mx-6 mt-4" />}
       {error && <ErrorState message={error} className="mx-6 mt-4" />}
 
-      <div className="grid flex-1 gap-6 p-6 lg:grid-cols-[440px_1fr]">
+      <div className="grid flex-1 grid-cols-1 gap-6 p-6 lg:grid-cols-[440px_1fr]">
         {/* Left: alert queue */}
-        <section id="alert-queue" tabIndex={-1} aria-labelledby="queue-heading" className="focus:outline-none">
+        <section id="alert-queue" tabIndex={-1} aria-labelledby="queue-heading" className="min-w-0 focus:outline-none">
           <h2 id="queue-heading" className="mb-3 text-xl font-bold">
             {t('dash.queue')} <span data-testid="open-count" className="text-slate-500">{t('dash.open', { n: openCount })}</span>
             {unreadCount > 0 && (
@@ -152,7 +152,7 @@ export default function Dashboard() {
         </section>
 
         {/* Right: detail panel */}
-        <section className="rounded-2xl bg-white p-6 shadow">
+        <section className="min-w-0 rounded-2xl bg-white p-6 shadow">
           {selected ? <EmergencyDetail emergency={selected} /> : <p className="text-slate-500">{t('dash.selectAlert')}</p>}
         </section>
       </div>

@@ -93,3 +93,16 @@ It times six calls (login, GET vitals, POST emergency, GET emergency list as sta
 ## 8. Reproducing one number
 
 On a clean checkout, `cd hospital-portal && npm test` needs only Node. A teammate should see `# tests 485`, `# pass 485`, `# fail 0` (the count rises when anyone adds tests; compare with the commit you are on). For the backend, the first full run on a machine with the packages installed is the number that belongs in the LAPTOP column.
+
+## Phase 6A (hospital portal polish), 15 Nov 2026
+
+| Check | SANDBOX | CI |
+|---|---|---|
+| `npm test` (portal unit tests) | 514 pass, 0 fail | NOT RUN YET (nothing pushed) |
+| JSX syntax of all pages and components (esbuild parse) | pass | n/a |
+| `e2e/*.spec.js`, 22 older + 12 new in `phase6a.spec.js` | 34/34 pass in a **private shim runner** (Chrome, esbuild bundle, hand-built Tailwind CSS, a stand-in router and map). This is NOT the real Playwright + Vite run. | NOT RUN YET |
+| Widths 360, 768, 1366, 1920: no sideways page scroll on dashboard, map, fleet, history, analytics | pass in the shim (tables scroll inside their own box on phones, the page does not) | NOT RUN YET |
+| Keyboard: menu button, Escape, focus return, arrow keys in the queue | pass in the shim | NOT RUN YET |
+| Reduced motion: no flash, NEW text and border stay | the older e2e test passes in the shim | NOT RUN YET |
+| ESLint, Vite build, real Playwright | NOT RUN (not installed in the sandbox) | NOT RUN YET |
+| Hindi and Gujarati wrapping, 200% zoom, landscape phone, screen reader | NOT CHECKED | NOT CHECKED |
