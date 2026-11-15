@@ -199,7 +199,7 @@ and then `hospital.alerted` for the new hospital (`payload: { hospital_id, rank,
 
 **Mock-only:** `POST /demo/no-ack { enabled, escalate_after_seconds? }` makes the fake hospital stay silent so the alert escalates (`NO_ACK_DEMO=1` does the same from the start). Not needed on a real backend; the contract test skips that check when it gets 404, 405 or 501.
 
-**Built in the real backend (14 Nov, CI run 43601645853) but PROPOSED, not agreed with Daksh in writing; the mock may differ:** `POST /emergencies/{id}/notes`, `POST /emergencies/{id}/chat`, checklist ticks, hospital add, edit and verify.
+**Built in the real backend (14 Nov, still built on `4d1ebae`) but PROPOSED, not agreed with Daksh in writing; the mock may differ:** `POST /emergencies/{id}/notes`, `POST /emergencies/{id}/chat`, checklist ticks, hospital add, edit and verify.
 
 **Always shown, whatever the consents (Phase 9 follow-up):** name, age, sex and blood group (`patient`, `patient_summary` and the passport page agree). Allergies, conditions, medications and contacts need the `history` consent. Doctor review of this minimum is still pending.
 

@@ -11,7 +11,7 @@ Related pages: `RUN_WITH_JEHALS_MOCK.md` (the same setup as a checklist with wha
 |---|---|---|
 | **A. Portal alone, built-in sample data** | the portal only | quick look, practice the walk-through |
 | **B. Portal + patient app on Jehal's mock** | portal, Jehal's branch, patient app | the real two-screen demo |
-| **C. Portal + Daksh's backend** | Daksh's backend running | not ready yet, see the end of this page |
+| **C. Portal + Daksh's backend** | Daksh's backend running | works on the laptop (14 to 15 Nov), see the end of this page |
 
 ## What you need (all ways)
 
@@ -139,9 +139,9 @@ The real portal sends a **username** (not an email) to the login call; Jehal's m
 - `auto` (default): with a backend that sends no `ambulance.location` after Dispatch, the portal waits 3 s and then moves the ambulance. If the backend starts sending positions, the portal stops.
 - `true`: always the portal. `false`: never the portal (use with Jehal's mock in manual mode, or with Daksh's backend once it simulates the trip).
 
-## C. Portal + Daksh's backend (not ready yet)
+## C. Portal + Daksh's backend (run on the laptop 14 to 15 Nov)
 
-Daksh's `backend/README.md` on branch `Daksh` said earlier that the emergency lifecycle, the WebSocket and hospitals/ambulances were not built. They are now built on that branch (CI run 43601645853) and the socket path is `/ws?token=`, but nobody has run the apps against it on a laptop yet, so the live demo still uses the mock. To try it:
+Daksh's `backend/README.md` on branch `Daksh` said earlier that the emergency lifecycle, the WebSocket and hospitals/ambulances were not built. They are now built on that branch (Backend checks on `4d1ebae`) and the socket path is `/ws?token=`, and the portal and patient app were run against it on Puneet's laptop on 14 to 15 Nov (`docs/LAPTOP_RUN_2026-11-14.md`). Which one the live demo uses is a team decision. To try it:
 - Install and start it as his README says (Python 3.12, `.venv`, `.env` with real keys, `uvicorn app.main:app --port 8000`). Health check: http://localhost:8000/health. **CHECK ON LAPTOP.**
 - Portal `.env`: `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000`, `VITE_WS_URL=ws://localhost:8000/ws` (these are the defaults in `.env.example`). His contract names the socket `/ws/hospitals/{hospital_id}`, but the built one is `/ws?token=`; Daksh has not confirmed which stays.
 - Add `VITE_PORTAL_SIMULATES_AMBULANCE=true`: checked on Puneet's laptop on 14 Nov, the real backend does not move the ambulance by itself, but with `true` the portal moves it (ETA counted down, tracking said "simulated by the portal"). Use `false` only once Daksh's backend simulates the trip.
