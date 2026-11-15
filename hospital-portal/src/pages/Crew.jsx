@@ -14,7 +14,7 @@ export default function Crew() {
   const e = emergencies.find((x) => x.emergency_id === emergencyId);
 
   return (
-    <div className="min-h-screen bg-slate-900 p-6">
+    <div className="min-h-screen bg-ht-bg p-6">
       <div className="mx-auto max-w-2xl space-y-4 rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">{t('crew.title')}</h1>
