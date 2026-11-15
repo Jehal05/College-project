@@ -28,6 +28,13 @@ jobs:
           cache-dependency-path: backend/requirements.lock.txt
       - name: Install the pinned packages
         run: pip install -r requirements.lock.txt
+      # Lint (ruff): looks for real mistakes only (see backend/ruff.toml). 23 findings exist today (17 unused imports,
+      # 6 unused variables), so this step reports them but does not fail the check yet. Remove continue-on-error after cleanup.
+      - name: Lint (ruff, informational for now)
+        run: |
+          pip install ruff==0.16.9
+          ruff check . --config ruff.toml
+        continue-on-error: true
       - name: Run all the tests
         run: python -m pytest -q
       - name: Contract status (information only, never fails the check)

@@ -1,0 +1,10 @@
+# Ruff (Python linter) settings for the backend. Small on purpose: it only looks for real mistakes
+# (E = pycodestyle errors, F = pyflakes: unused names, undefined names, bad imports).
+# Style rules (sorting imports, modern type hints) are left off so nobody has to rewrite working code.
+line-length = 120
+target-version = "py312"
+
+[lint]
+select = ["E", "F"]
+# Style rules left off: very long lines (E501), several statements on one line (E702), short names like l (E741).
+ignore = ["E501", "E702", "E741"]

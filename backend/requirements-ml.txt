@@ -1,0 +1,5 @@
+# Only for TRAINING the two risk models (python -m ml.train / ml.verify). The server does NOT need these.
+# Install with:  pip install -r requirements-ml.txt   (inside backend\.venv)
+-r requirements.txt
+pandas>=2.2
+scikit-learn>=1.5

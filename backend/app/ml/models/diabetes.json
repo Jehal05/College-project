@@ -1,0 +1,194 @@
+{
+  "name": "diabetes-logreg",
+  "version": "0.1.0",
+  "condition": "diabetes",
+  "title": "Diabetes risk",
+  "synthetic": true,
+  "dataset": "SYNTHETIC practice data (ml.make_synthetic)",
+  "dataset_source": "generated in this repository, seed 20261115",
+  "licence": "none (invented numbers)",
+  "data_sha256": "f13c9b5b8206bb63f07d1cf6176f709415611c89db7c6d43edf5994d4e83bfd2",
+  "data_report": {
+    "rows_read": 401,
+    "duplicates_dropped": 1,
+    "rows_used": 400,
+    "zeros_treated_as_missing": {
+      "glucose": 4,
+      "blood_pressure": 4,
+      "skin_thickness": 4,
+      "insulin": 4,
+      "bmi": 4
+    },
+    "missing_per_column": {
+      "glucose": 6,
+      "blood_pressure": 6,
+      "skin_thickness": 6,
+      "insulin": 6,
+      "bmi": 6,
+      "diabetes_pedigree": 1,
+      "age": 1
+    },
+    "positives": 144,
+    "negatives": 256,
+    "positive_share": 0.36
+  },
+  "trained_on": "2026-11-15",
+  "random_seed": 42,
+  "test_size": 0.2,
+  "cv_folds": 5,
+  "regularisation_C": 1.0,
+  "libraries": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "scikit_learn": "1.9.1"
+  },
+  "features": [
+    {
+      "name": "pregnancies",
+      "unit": "count",
+      "min": 0,
+      "max": 20,
+      "train_median": 3.0,
+      "mean": 3.3125,
+      "std": 1.780756510587565,
+      "coef": 0.25364833336777914
+    },
+    {
+      "name": "glucose",
+      "unit": "mg/dL",
+      "min": 40,
+      "max": 300,
+      "train_median": 125.0,
+      "mean": 124.528125,
+      "std": 29.931366640772946,
+      "coef": 1.2705379699555428
+    },
+    {
+      "name": "blood_pressure",
+      "unit": "mmHg",
+      "min": 40,
+      "max": 140,
+      "train_median": 73.0,
+      "mean": 72.984375,
+      "std": 11.30084646649865,
+      "coef": 0.007440723094829983
+    },
+    {
+      "name": "skin_thickness",
+      "unit": "mm",
+      "min": 5,
+      "max": 100,
+      "train_median": 29.0,
+      "mean": 29.246875,
+      "std": 9.42296013651629,
+      "coef": 0.12157711740362953
+    },
+    {
+      "name": "insulin",
+      "unit": "mu U/mL",
+      "min": 10,
+      "max": 900,
+      "train_median": 103.0,
+      "mean": 118.55625,
+      "std": 77.70261794777258,
+      "coef": 0.1108007121300945
+    },
+    {
+      "name": "bmi",
+      "unit": "kg/m2",
+      "min": 15,
+      "max": 70,
+      "train_median": 32.5,
+      "mean": 32.603437500000005,
+      "std": 6.5959945750124565,
+      "coef": 0.3233088809104619
+    },
+    {
+      "name": "diabetes_pedigree",
+      "unit": "score",
+      "min": 0.05,
+      "max": 2.5,
+      "train_median": 0.396,
+      "mean": 0.46442187499999976,
+      "std": 0.31175140359986236,
+      "coef": 0.16380909015510445
+    },
+    {
+      "name": "age",
+      "unit": "years",
+      "min": 18,
+      "max": 100,
+      "train_median": 33.0,
+      "mean": 34.709375,
+      "std": 12.68561831797627,
+      "coef": 0.3398946829777932
+    }
+  ],
+  "intercept": -0.7897281017946929,
+  "threshold": 0.21199650654791322,
+  "threshold_info": {
+    "rule": "highest precision with recall >= 0.85",
+    "reached": true,
+    "cv_recall": 0.8521739130434782,
+    "cv_precision": 0.47572815533980584
+  },
+  "bands": {
+    "low_below": 0.10599825327395661,
+    "high_from": 0.21199650654791322,
+    "reason": "high from the chosen threshold (which keeps recall high); low below half of it; medium between"
+  },
+  "train_rows": 320,
+  "test_rows": 80,
+  "metrics": {
+    "accuracy": 0.6625,
+    "precision": 0.5217391304347826,
+    "recall": 0.8275862068965517,
+    "f1": 0.64,
+    "roc_auc": 0.7958079783637594,
+    "brier": 0.17724600685755165
+  },
+  "confusion_matrix": {
+    "tn": 29,
+    "fp": 22,
+    "fn": 5,
+    "tp": 24
+  },
+  "calibration": [
+    {
+      "from": 0.0,
+      "to": 0.2,
+      "n": 32,
+      "mean_predicted": 0.0976010311431694,
+      "observed_rate": 0.125
+    },
+    {
+      "from": 0.2,
+      "to": 0.4,
+      "n": 27,
+      "mean_predicted": 0.27960745799518594,
+      "observed_rate": 0.4074074074074074
+    },
+    {
+      "from": 0.4,
+      "to": 0.6000000000000001,
+      "n": 11,
+      "mean_predicted": 0.4772090938270091,
+      "observed_rate": 0.45454545454545453
+    },
+    {
+      "from": 0.6000000000000001,
+      "to": 0.8,
+      "n": 8,
+      "mean_predicted": 0.7151616458950685,
+      "observed_rate": 0.875
+    },
+    {
+      "from": 0.8,
+      "to": 1.0,
+      "n": 2,
+      "mean_predicted": 0.8338163581413953,
+      "observed_rate": 1.0
+    }
+  ]
+}

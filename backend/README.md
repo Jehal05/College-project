@@ -46,6 +46,7 @@ Open `.env` in a text editor and replace the two placeholders. Generate the valu
 
 The app **refuses to start** with a placeholder or empty key (unless `DEMO_MODE=true`, which uses throw-away keys
 and prints a warning). Never commit `.env`.
+`.env.example` ships with `DEMO_MODE=false` on purpose: demo accounts and weak demo passwords load only when you set it to `true` yourself.
 
 Start the server:
 
@@ -67,6 +68,7 @@ Then open <http://localhost:8000/docs> for the interactive API page, and <http:/
 | `BCRYPT_ROUNDS` | Password hashing cost. Keep 12 or more for anything real | 12 |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login lasts | 480 |
 | `LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS` | Login rate limit (wrong attempts per login, per address, and the window in seconds) | 5, 30, 60 |
+| `MAX_BODY_BYTES` | Largest request body accepted; bigger ones get 413 (checked from the Content-Length header). Report uploads keep their own 2 MB limit | 8388608 |
 | `PASSPORT_TOKEN_EXPIRE_MINUTES` | How long a passport link lasts | 30 |
 | `DISPATCH_OWN_AMBULANCE_ONLY` | PROPOSED, not agreed: `true` lets a desk dispatch only ambulances based at its own hospital (403 otherwise). Off means any available ambulance, the old behaviour | off |
 | `ESCALATION_TIMEOUT_SECONDS`, `ESCALATION_SWEEP_SECONDS` | How long an alert may wait for a hospital to acknowledge before it goes to the next hospital, and how often the server checks | 30, 1 |
@@ -110,6 +112,10 @@ contract is wrong, tell Jehal and Puneet first, change the contract text, then t
 
 `docker compose up` is set up (it reads `.env`), but it has **not yet been built and run on a real machine**.
 Treat it as untested until someone has done it.
+
+## Database and migrations
+
+The tables are created with `Base.metadata.create_all` on a local SQLite file (`healthtwin.db`). There are **no migrations**. If a model changes, an existing database file is not updated: delete the local `.db` file and let the app create it again (the demo data is seeded again when `DEMO_MODE=true`), or add Alembic before keeping real data. This is acceptable for a simulated prototype only.
 
 ## Blocks built by Puneet (P1 to P4)
 

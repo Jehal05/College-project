@@ -9,3 +9,6 @@ __pycache__/
 *.db-shm
 venv/
 .venv/
+# not needed inside the image (the repository still has them)
+tests/
+docs/
