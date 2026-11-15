@@ -881,6 +881,39 @@ Drafts, not yet checked by a native speaker. Lab test names should follow the wo
 | `lab.cholesterol` | Total cholesterol | कुल कोलेस्ट्रॉल | કુલ કોલેસ્ટ્રોલ | [ ] |
 | `lab.ldl` | LDL cholesterol | LDL कोलेस्ट्रॉल | LDL કોલેસ્ટ્રોલ | [ ] |
 
+## Health Simulator (UI phase 2a)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `sim.intro` | Try a "what if" value and see where it would sit compared with your own usual range. | एक "अगर ऐसा हो" मान आज़माएँ और देखें कि वह आपकी अपनी सामान्य सीमा की तुलना में कहाँ बैठता है। | એક "જો આમ થાય" મૂલ્ય અજમાવો અને જુઓ કે તે તમારી પોતાની સામાન્ય શ્રેણી સામે ક્યાં બેસે છે. | [ ] |
+| `sim.hypothetical` | Hypothetical, not a prediction | काल्पनिक, भविष्यवाणी नहीं | કાલ્પનિક, આગાહી નથી | [ ] |
+| `sim.notPrediction` | This is a what-if tool. It does not predict what will happen, does not estimate any risk and is not a diagnosis. It only compares a number you choose with your own usual range. | यह "अगर ऐसा हो" देखने का टूल है। यह नहीं बताता कि क्या होगा, किसी जोखिम का अनुमान नहीं लगाता और निदान नहीं है। यह केवल आपके चुने हुए मान की तुलना आपकी अपनी सामान्य सीमा से करता है। | આ "જો આમ થાય" જોવાનું સાધન છે. તે શું થશે તે કહેતું નથી, કોઈ જોખમનો અંદાજ કાઢતું નથી અને નિદાન નથી. તે ફક્ત તમે પસંદ કરેલા મૂલ્યની સરખામણી તમારી પોતાની સામાન્ય શ્રેણી સાથે કરે છે. | [ ] |
+| `sim.controls` | What if… | अगर ऐसा हो… | જો આમ થાય… | [ ] |
+| `sim.reset` | Reset to my latest readings | मेरी ताज़ा रीडिंग पर वापस | મારી તાજી રીડિંગ પર પાછા | [ ] |
+| `sim.valueLabel` | {{name}} value | {{name}} का मान | {{name}} નું મૂલ્ય | [ ] |
+| `sim.compare` | Baseline and hypothetical | आधार और काल्पनिक | આધાર અને કાલ્પનિક | [ ] |
+| `sim.col.metric` | Reading | रीडिंग | રીડિંગ | [ ] |
+| `sim.col.baseline` | Latest (baseline) | ताज़ा (आधार) | તાજી (આધાર) | [ ] |
+| `sim.col.hypo` | What-if value | काल्पनिक मान | કાલ્પનિક મૂલ્ય | [ ] |
+| `sim.col.usual` | Your usual range | आपकी सामान्य सीमा | તમારી સામાન્ય શ્રેણી | [ ] |
+| `sim.col.where` | What-if is | काल्पनिक मान है | કાલ્પનિક મૂલ્ય છે | [ ] |
+| `sim.where.within` | Inside your usual range | आपकी सामान्य सीमा में | તમારી સામાન્ય શ્રેણીમાં | [ ] |
+| `sim.where.outside` | Outside your usual range | आपकी सामान्य सीमा से बाहर | તમારી સામાન્ય શ્રેણીની બહાર | [ ] |
+| `sim.noRange` | No usual range set | सामान्य सीमा तय नहीं | સામાન્ય શ્રેણી નક્કી નથી | [ ] |
+| `sim.summaryIn` | With these values, nothing would be outside your usual range. | इन मानों से कुछ भी आपकी सामान्य सीमा से बाहर नहीं होगा। | આ મૂલ્યોથી કંઈ તમારી સામાન્ય શ્રેણીની બહાર નહીં હોય. | [ ] |
+| `sim.summaryOut` | With these values, these would be outside your usual range: {{names}}. This says nothing about what would actually happen. | इन मानों से ये आपकी सामान्य सीमा से बाहर होंगे: {{names}}। इससे यह पता नहीं चलता कि असल में क्या होगा। | આ મૂલ્યોથી આ તમારી સામાન્ય શ્રેણીની બહાર હશે: {{names}}. આનાથી ખરેખર શું થશે તે કહી શકાતું નથી. | [ ] |
+| `sim.assumptions` | Assumptions | मान्यताएँ | ધારણાઓ | [ ] |
+| `sim.assume.1` | The baseline is your latest shared reading. With no reading yet, the sliders start in the middle of your usual range. | आधार आपकी ताज़ा साझा रीडिंग है। रीडिंग न हो तो स्लाइडर आपकी सामान्य सीमा के बीच से शुरू होते हैं। | આધાર તમારી તાજી શેર કરેલી રીડિંગ છે. રીડિંગ ન હોય તો સ્લાઇડર તમારી સામાન્ય શ્રેણીની વચ્ચેથી શરૂ થાય છે. | [ ] |
+| `sim.assume.2` | "Usual range" is the range saved in your profile. The app does not know what is normal for anyone else. | "सामान्य सीमा" वही है जो आपकी प्रोफ़ाइल में सहेजी है। ऐप नहीं जानता कि किसी और के लिए क्या सामान्य है। | "સામાન્ય શ્રેણી" એટલે તમારી પ્રોફાઇલમાં સાચવેલી શ્રેણી. એપ જાણતી નથી કે બીજા કોઈ માટે શું સામાન્ય છે. | [ ] |
+| `sim.assume.3` | Each value is looked at on its own. Combinations and effects on each other are not modelled. | हर मान को अलग से देखा जाता है। आपस के असर का मॉडल नहीं बनाया गया। | દરેક મૂલ્ય અલગથી જોવાય છે. એકબીજા પરની અસરનું મોડેલ બનાવ્યું નથી. | [ ] |
+| `sim.assume.4` | No medicines, activity, sleep or illness are taken into account. | दवाएँ, गतिविधि, नींद या बीमारी का ध्यान नहीं रखा गया। | દવાઓ, પ્રવૃત્તિ, ઊંઘ કે બીમારીને ધ્યાનમાં લેવાઈ નથી. | [ ] |
+| `sim.uncertainty` | How much your readings vary | आपकी रीडिंग कितनी बदलती हैं | તમારી રીડિંગ કેટલી બદલાય છે | [ ] |
+| `sim.uncertaintyHelp` | Your real readings move around from moment to moment. A what-if inside this spread is not unusual for you. | आपकी असली रीडिंग पल-पल बदलती रहती हैं। इस दायरे के अंदर का काल्पनिक मान आपके लिए असामान्य नहीं है। | તમારી સાચી રીડિંગ ક્ષણે ક્ષણે બદલાય છે. આ વિસ્તારની અંદરનું કાલ્પનિક મૂલ્ય તમારા માટે અસામાન્ય નથી. | [ ] |
+| `sim.spread` | {{min}} to {{max}} ({{n}} readings) | {{min}} से {{max}} ({{n}} रीडिंग) | {{min}} થી {{max}} ({{n}} રીડિંગ) | [ ] |
+| `sim.noReadings` | no readings yet | अभी कोई रीडिंग नहीं | હજી કોઈ રીડિંગ નથી | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.

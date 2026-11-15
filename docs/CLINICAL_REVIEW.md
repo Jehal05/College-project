@@ -103,3 +103,10 @@ A doctor should check these before anyone outside the team sees them:
 - There is no built-in "normal range". A value is called "Inside / Outside the range on your report" only against the low and high the person typed from their own report; with no range it says "No range given".
 - Every value and file carries "Clinician review: not reviewed". No clinician workflow exists yet.
 - The nine tests offered (HbA1c, fasting glucose, creatinine, eGFR, ALT, AST, bilirubin, total cholesterol, LDL) were chosen by the team. A doctor should confirm the list and the units (%, mg/dL, mL/min, U/L).
+
+### 7. Health Simulator (UI phase 2a)
+
+- It is a "what if" range explorer, not a predictor: the person picks a value and the screen says whether it sits inside or outside their own saved usual range. It never estimates a risk, outcome or diagnosis.
+- Wording to check: "Hypothetical, not a prediction", the four assumptions (`sim.assume.1-4`), and the line "this says nothing about what would actually happen".
+- Slider limits (heart rate 30-200, SpO2 70-100, systolic 70-220, glucose 40-400) are only there to keep input sane; a clinician should confirm they are not misleading.
+- "How much your readings vary" shows the real min and max of the last readings kept in memory.
