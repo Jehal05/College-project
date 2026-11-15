@@ -645,6 +645,8 @@ Added in 0.7.5 (P2, proposed): `desk_entries` (desk notes, chat lines and checkl
 
 Added in 0.7.5: `location_shares` (location encrypted).
 
+Added in Phase 3 (P5, proposed): `lab_values` (the value and the printed range are encrypted).
+
 Added in 0.7.4 (J4): `family_invites`, `family_links`, `family_checkins`, `responder_profiles`, `responder_acceptances`, `content_items`, `feedback` (comment encrypted), `privacy_requests`.
 
 ---

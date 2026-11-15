@@ -77,5 +77,6 @@ export function responseLog(emergency, checklistItems = []) {
     if (!tick || ms(tick.at) === null) continue;
     rows.push({ at: tick.at, kind: 'check', item: id, label: names.get(id) || id, done: Boolean(tick.done), by: tick.by || null });
   }
-  return rows.map((r, i) => ({ ...r, i })).sort((a, b) => ms(a.at) - ms(b.at) || a.i - b.i).map(({ i, ...r }) => r);
+  // Array.prototype.sort is stable, so rows with the same time keep the order they were added in.
+  return rows.sort((a, b) => ms(a.at) - ms(b.at));
 }

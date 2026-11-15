@@ -60,7 +60,8 @@ def test_a_missing_input_is_a_400_with_names_only(demo):
     assert r.status_code == 400
     assert "99999" not in r.text
     text = r.json()["error"]
-    assert r.json()["detail"] == text and "glucose" in text
+    assert r.json()["detail"] == text
+    assert text.startswith("missing inputs:") and "pregnancies" in text   # it names what is MISSING; glucose was sent
 
 
 def test_nothing_is_guessed_when_the_request_is_empty(demo):

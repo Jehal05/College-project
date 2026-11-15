@@ -26,8 +26,9 @@ class LabError(ValueError):
 
 
 def audit_name(test: str) -> str:
-    """The audit log accepts letters and underscores only, so 'hba1c' is written as 'hba_c'."""
-    return test.replace("1", "_")
+    """The audit log accepts letters and underscores only, so every run of digits becomes one underscore
+    ('hba1c' is written as 'hba_c') and a trailing underscore is dropped ('spo2' is written as 'spo')."""
+    return re.sub(r"_+", "_", re.sub(r"[0-9]+", "_", test)).strip("_")
 
 
 def stamp(moment: Optional[datetime]) -> Optional[str]:

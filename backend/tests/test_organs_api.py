@@ -114,6 +114,7 @@ def test_an_unknown_organ_is_404(demo):
 def test_a_lab_value_never_appears_under_another_patient(demo, engine):
     with Session(engine) as s:
         s.add(Patient(id="PT-OTHER-0001", name="Other", age=40, language="en"))
+        s.flush()                                    # the patient row must exist before the lab value (no ORM link orders them)
         s.add(LabValue(id="LAB-OTHERS", patient_id="PT-OTHER-0001", test="creatinine", value=9.9, unit="mg/dL",
                        taken_on=date(2026, 1, 1), source="entered"))
         s.commit()
