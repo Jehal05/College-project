@@ -20,7 +20,7 @@ check('O1 desktop "/" opens the Overview', p.url().endsWith('/overview'), p.url(
 await p.getByText('Data completeness').waitFor({ timeout: 10000 });
 let body = await p.innerText('body');
 check('O2 shows the data-source badge, tiles, completeness and observations', body.includes('Simulated demo data') && body.includes('Heart rate') && body.includes('Data completeness') && body.includes('Observations from your usual ranges'));
-check('O3 the sidebar lists the sections and marks the current page', (await p.getByRole('navigation', { name: 'Sections' }).getByRole('link').count()) === 11 && (await p.locator('nav[aria-label=Sections] a[aria-current=page]').innerText()).includes('Overview'));
+check('O3 the sidebar lists the sections and marks the current page', (await p.getByRole('navigation', { name: 'Sections' }).getByRole('link').count()) === 12 && (await p.locator('nav[aria-label=Sections] a[aria-current=page]').innerText()).includes('Overview'));
 check('O4 steps say they are not tracked (no invented number)', body.includes('Not tracked in this prototype'));
 check('O5 no horizontal scrolling on desktop', await noOverflow(p));
 await sleep(5000);
