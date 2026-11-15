@@ -12,6 +12,10 @@ const CHROME = process.env.CHROME_PATH || '/usr/bin/google-chrome';
 const axeSource = fs.readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 const LANGS = ['en', 'hi', 'gu'];
 const GET_HELP = LANGS.map((l) => JSON.parse(fs.readFileSync(new URL('../src/i18n/' + l + '.json', import.meta.url), 'utf8'))['symptoms.getHelp']);
+// Redesigned screens: each is checked at 360 px and at desktop width, in the dark theme (all three languages) and the light theme (English).
+const THEMED = [['overview', '/overview', 5000], ['twin', '/twin', 5000], ['disease hub', '/diseases'], ['disease detail', '/diseases/cardiac', 5000], ['monitor', '/monitor', 5000],
+  ['emergency center', '/emergency-center'], ['report intelligence', '/report-intelligence'], ['simulator', '/simulator', 5000], ['care circle', '/care-circle'], ['copilot', '/copilot'], ['design system', '/design']];
+const ONLY = process.env.AUDIT_ONLY; // 'themed' or 'legacy' to run half of the screens
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'];
 
 const call = (path, token, body) => fetch(API + path, {
@@ -43,16 +47,17 @@ async function screens(token) {
     { name: 'passport', path: '/passport' }, { name: 'responder page', path: '/p/' + passport.token, signedIn: false },
     { name: 'emergency (countdown)', path: '/emergency/' + countdown.id },
     { name: 'emergency (response)', path: '/emergency/' + running.id }, { name: 'cancelled', path: '/cancelled' },
-  ];
+  ].concat(THEMED.map(([name, path, wait]) => ({ name: name + ' [themed]', path, wait: wait || 3500, themed: true })));
 }
 
-async function audit(browser, session, lang, screen) {
+async function audit(browser, session, lang, screen, { theme = 'dark', width = 360 } = {}) {
   const page = await browser.newPage();
-  await page.setViewport({ width: 360, height: 740 });
-  await page.evaluateOnNewDocument((code, saved) => {
+  await page.setViewport({ width, height: width > 600 ? 900 : 740 });
+  await page.evaluateOnNewDocument((code, saved, th) => {
     localStorage.setItem('ht.lang', code);
+    localStorage.setItem('ht.theme', th);
     if (saved) sessionStorage.setItem('healthtwin_session', JSON.stringify(saved));
-  }, lang, screen.signedIn === false ? null : session);
+  }, lang, screen.signedIn === false ? null : session, theme);
   await page.goto(APP + screen.path, { waitUntil: 'load' });
   await new Promise((r) => setTimeout(r, screen.wait || 1800));
   if (screen.click) await page.click(screen.click);
@@ -69,15 +74,19 @@ async function audit(browser, session, lang, screen) {
 const session = { ...(await call('/auth/login', null, { email: 'patient@demo.test', password: 'demo1234' })) };
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox'] });
 const rows = [];
-for (const screen of await screens(session.token)) {
-  for (const lang of LANGS) {
-    for (const v of await audit(browser, session, lang, screen)) rows.push({ screen: screen.name, lang, ...v });
+const all = (await screens(session.token)).filter((x) => !ONLY || (ONLY === 'themed') === !!x.themed);
+for (const screen of all) {
+  const variants = screen.themed
+    ? [...LANGS.flatMap((l) => [[l, 'dark', 360], [l, 'dark', 1440]]), ['en', 'light', 360], ['en', 'light', 1440]]
+    : LANGS.map((l) => [l, 'dark', 360]);
+  for (const [lang, theme, width] of variants) {
+    for (const v of await audit(browser, session, lang, screen, { theme, width })) rows.push({ screen: screen.name, lang: lang + (screen.themed ? ' ' + theme + ' ' + width : ''), ...v });
   }
 }
 await browser.close();
 
 const blocking = rows.filter((r) => r.impact === 'serious' || r.impact === 'critical');
-console.log('screens x languages checked:', (await screens(session.token)).length, 'x', LANGS.length);
+console.log('screens x languages checked:', all.length, 'screens');
 console.table(rows);
 console.log(blocking.length ? 'FAIL: ' + blocking.length + ' serious/critical problems' : 'PASS: no serious or critical problems');
 if (process.env.AUDIT_JSON) fs.writeFileSync(process.env.AUDIT_JSON, JSON.stringify(rows, null, 2));
