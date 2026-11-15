@@ -103,10 +103,14 @@ CI column = GitHub Actions on commit 2df527c (pushed to `Puneet`). Each commit r
 | Portal unit tests (`npm test`) | 514 pass, 0 fail | 514 pass, 0 fail (both runs) |
 | ESLint (`npm run lint`) | NOT RUN (not installed here) | success (both runs) |
 | Vite build (`npm run build`) | NOT RUN (not installed here) | success (both runs) |
-| Real Playwright e2e (34 tests: 22 older + 12 new in `phase6a.spec.js`) | 34/34 in a private shim runner (Chrome + esbuild + hand-built Tailwind; not the real Playwright/Vite) | success, but **33 passed + 1 flaky** in both runs: my new analytics test failed on its first try and passed on retry (it read the case count before the history had finished loading: 7 vs 10). Fixed afterwards in the next commit (waits for the numbers to settle); not yet re-run in CI at the time of writing. |
+| Real Playwright e2e (34 tests: 22 older + 12 new in `phase6a.spec.js`) | 34/34 in a private shim runner (Chrome + esbuild + hand-built Tailwind; not the real Playwright/Vite) | success, but **33 passed + 1 flaky** in both runs: my new analytics test failed on its first try and passed on retry (it read the case count before the history had finished loading: 7 vs 10). Fixed in 09fd6b7 (waits for the numbers to settle). On 09fd6b7 both runs: **34 passed, 0 flaky**. |
 | Widths 360 / 768 / 1366 / 1920, no sideways page scroll (5 pages) | pass in the shim | pass in CI (4 width tests, both runs) |
 | Keyboard menu (open, Escape, focus return), 44px targets, arrow keys in queue | pass in the shim | pass in CI |
 | Backend tests (pytest) | not run here (no FastAPI) | 2324 passed, 7 skipped (unchanged; success) |
 | Patient-app unit tests | not run here | 28 files, 180 tests passed |
 | Patient-app browser tests | not run here | push run: success. pull_request run: **failed**, 21/22 files, 505 checks: test A1 (`phase10-apps`, admin page: pending GET /admin/users and /content/first_aid_basics). Same commit passed in the push run. Patient-app was not touched by Phase 6A. |
 | Hindi and Gujarati wrapping, 200% zoom, landscape phone, screen reader | NOT CHECKED | NOT CHECKED |
+
+### CI on 09fd6b7 (the test fix)
+
+Portal unit tests, lint, build and e2e (34 passed) succeeded in both runs; backend checks succeeded; patient-app unit tests succeeded. Patient-app browser tests: push run success, pull_request run **failed on A1 again** (21/22 files, 505 checks), the same test as on 2df527c. Over the last 14 CI runs A1 failed in 6 of 8 pull_request runs and 1 of 7 push runs, on three branches (Puneet, ui-phase3b), so it is not caused by Phase 6A and not yet root-caused. It is a patient-app test (Jehal's); no patient-app file was changed in Phase 6A.
