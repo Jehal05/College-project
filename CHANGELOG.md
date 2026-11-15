@@ -1,5 +1,13 @@
 # Changelog
 
+## UI phases 0-3: digital-twin dashboard (patient app, hospital portal styling)
+- New design system (`--ht-*` dark and light tokens), 12-item sidebar, themed screens: Overview, Twin (2D and 3D), Diseases and detail, Monitor, Emergency Center, Report Intelligence (lab values you enter), Simulator, Care Circle, Copilot (rule-based).
+- Safety: every value is labelled simulated or entered; no diagnosis wording; "Ambulance dispatched" only from the exact event; clinician review shown as not reviewed.
+- i18n: new keys in en/hi/gu (hi/gu unreviewed drafts). Hospital portal got matching navy and teal styling.
+- Accessibility: `npm run audit` covers themed screens in dark and light, 360 and 1440 px, three languages, plus a sideways-scroll check; light-theme accent colours darkened; "Simulated" banner is a labelled region; Simulator table is keyboard-reachable.
+- Tests: 180 unit tests, 22 browser files / 505 checks.
+- Known limits are listed in the README under "Status and honest limits".
+
 ## Phase 10: family, responder and admin endpoints (mock server)
 - New `mock-server/otherApps.js`: family invite and link, family status and check-in, volunteer sign-up, responder alerts and accept, admin users, approved content, feedback, privacy requests. Details in `docs/API_CONTRACT.md` (Phase 10).
 - Family and responder WebSockets receive reduced events only (`family.status`, `responder.alert`).

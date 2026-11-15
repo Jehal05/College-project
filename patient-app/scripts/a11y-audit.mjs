@@ -67,6 +67,9 @@ async function audit(browser, session, lang, screen, { theme = 'dark', width = 3
     const result = await axe.run(document, { runOnly: { type: 'tag', values: tags } });
     return result.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, example: v.nodes[0].target.join(' ') }));
   }, TAGS);
+  // Layout check: nothing may make the page scroll sideways (long Hindi or Gujarati words, wide tables).
+  const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  if (wide > 1) found.push({ id: 'horizontal-overflow', impact: 'serious', nodes: 1, example: wide + ' px wider than the window' });
   await page.close();
   return found;
 }
