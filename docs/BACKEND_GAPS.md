@@ -71,3 +71,4 @@ Daksh's `backend/FREEZE.md` still shows the older count (17 of 42); the local co
 | Live readings for brain, kidney and liver areas (for example lab values over time) | Disease Intelligence (these areas show "no live readings") | missing; reports and notes only |
 | Server-side vitals history (the screens keep the last 60 readings in memory only) | Overview, Twin, Monitor, Disease Intelligence | missing; lost on page close |
 | Endpoints to store confirmed lab values (and a clinician-review status) per patient | Report Intelligence (values live in localStorage on one device) | missing |
+| Per-person sharing choices for each circle member (today consent applies to everyone) | Care Circle | missing |

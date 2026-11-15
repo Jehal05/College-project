@@ -110,3 +110,9 @@ A doctor should check these before anyone outside the team sees them:
 - Wording to check: "Hypothetical, not a prediction", the four assumptions (`sim.assume.1-4`), and the line "this says nothing about what would actually happen".
 - Slider limits (heart rate 30-200, SpO2 70-100, systolic 70-220, glucose 40-400) are only there to keep input sane; a clinician should confirm they are not misleading.
 - "How much your readings vary" shows the real min and max of the last readings kept in memory.
+
+### 8. Care Circle (UI phase 2b)
+
+- The circle is the emergency-contact list. Each member is described as one who "would get an alert message if you send an SOS (simulated)"; the screen says the prototype does not track whether anyone saw it.
+- "What your circle could see" lists only what is explicitly allowed in consent; an unknown consent is shown as Hidden. Sharing is the same for everyone in the circle.
+- "When family last looked" reuses the existing access log (relatives only).

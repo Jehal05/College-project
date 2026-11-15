@@ -914,6 +914,29 @@ Drafts, not yet checked by a native speaker.
 | `sim.spread` | {{min}} to {{max}} ({{n}} readings) | {{min}} से {{max}} ({{n}} रीडिंग) | {{min}} થી {{max}} ({{n}} રીડિંગ) | [ ] |
 | `sim.noReadings` | no readings yet | अभी कोई रीडिंग नहीं | હજી કોઈ રીડિંગ નથી | [ ] |
 
+## Care Circle (UI phase 2b)
+
+Drafts, not yet checked by a native speaker.
+
+| Key | English | Hindi | Gujarati | Checked |
+|---|---|---|---|---|
+| `cc.intro` | The people who would be told if you send an alert, and what they could see. | वे लोग जिन्हें आपके अलर्ट भेजने पर बताया जाएगा, और वे क्या देख सकते हैं। | જે લોકોને તમે એલર્ટ મોકલો ત્યારે જણાવાશે, અને તેઓ શું જોઈ શકે. | [ ] |
+| `cc.members` | Your circle | आपका सर्कल | તમારું સર્કલ | [ ] |
+| `cc.loading` | Loading… | लोड हो रहा है… | લોડ થઈ રહ્યું છે… | [ ] |
+| `cc.loadError` | Could not load your contacts. | आपके संपर्क लोड नहीं हो सके। | તમારા સંપર્કો લોડ થઈ શક્યા નથી. | [ ] |
+| `cc.empty` | Nobody is in your circle yet, so nobody would be told about an alert. Add at least one emergency contact. | आपके सर्कल में अभी कोई नहीं है, इसलिए अलर्ट की सूचना किसी को नहीं जाएगी। कम से कम एक आपातकालीन संपर्क जोड़ें। | તમારા સર્કલમાં હજી કોઈ નથી, તેથી એલર્ટની જાણ કોઈને નહીં થાય. ઓછામાં ઓછો એક કટોકટી સંપર્ક ઉમેરો. | [ ] |
+| `cc.told` | Would get an alert message if you send an SOS (simulated). | आप SOS भेजें तो अलर्ट संदेश मिलेगा (सिमुलेटेड)। | તમે SOS મોકલો તો એલર્ટ સંદેશ મળશે (સિમ્યુલેટેડ). | [ ] |
+| `cc.ackNote` | The prototype does not track whether a person saw or acknowledged a message. | प्रोटोटाइप यह ट्रैक नहीं करता कि किसी ने संदेश देखा या स्वीकार किया। | પ્રોટોટાઇપ ટ્રેક કરતું નથી કે કોઈએ સંદેશ જોયો કે સ્વીકાર્યો. | [ ] |
+| `cc.manage` | Add or edit contacts | संपर्क जोड़ें या बदलें | સંપર્કો ઉમેરો કે બદલો | [ ] |
+| `cc.see` | What your circle could see | आपका सर्कल क्या देख सकता है | તમારું સર્કલ શું જોઈ શકે | [ ] |
+| `cc.seeHelp` | Only what you allow is shared. Anything switched off stays hidden. | केवल वही साझा होता है जिसकी आप अनुमति देते हैं। बंद की हुई चीज़ें छिपी रहती हैं। | ફક્ત તમે મંજૂર કરેલું જ શેર થાય છે. બંધ કરેલું છુપાયેલું રહે છે. | [ ] |
+| `cc.canSee` | Can see | देख सकते हैं | જોઈ શકે | [ ] |
+| `cc.cannotSee` | Hidden | छिपा | છુપાયેલું | [ ] |
+| `cc.sameForAll` | These choices are the same for everyone in your circle. Sharing per person is not available yet. | ये चुनाव आपके सर्कल में सभी के लिए एक जैसे हैं। हर व्यक्ति के लिए अलग साझा करना अभी उपलब्ध नहीं है। | આ પસંદગીઓ તમારા સર્કલમાં બધા માટે સરખી છે. દરેક વ્યક્તિ માટે અલગ શેરિંગ હજી ઉપલબ્ધ નથી. | [ ] |
+| `cc.seen` | When family last looked | परिवार ने आखिरी बार कब देखा | પરિવારે છેલ્લે ક્યારે જોયું | [ ] |
+| `cc.seenNone` | No family member has looked at your data yet. | किसी परिवार सदस्य ने अभी तक आपका डेटा नहीं देखा। | કોઈ પરિવારજને હજી તમારો ડેટા જોયો નથી. | [ ] |
+| `cc.fullLog` | See the full list: who saw my data | पूरी सूची देखें: मेरा डेटा किसने देखा | પૂરી યાદી જુઓ: મારો ડેટા કોણે જોયો | [ ] |
+
 ## Not translated on purpose
 
 - `src/config/instructions.json`: condition-specific first-aid text stays hidden until a doctor sets `reviewed: true` (see `docs/CLINICAL_REVIEW.md`). Translate it only after that review.
