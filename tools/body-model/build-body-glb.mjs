@@ -20,6 +20,22 @@ const concept = (name) => atlas.concepts.find((c) => c.name.toLowerCase() === na
 const conceptParts = (name) => concept(name).elements.map((e) => byId.get(e)).filter(Boolean);
 const diag = (p) => Math.hypot(...p.bounds[1].map((v, i) => v - p.bounds[0][i]));
 
+// Simplifies every part on its own (to `ratio` of its triangles, at least `min`) and then merges them. Used for the skeleton: simplifying
+// 296 separate bones as one mesh made sharp shards between them.
+function mergeReduced(parts, ratio, min = 80) {
+  const outP = []; const outI = []; let base = 0;
+  for (const part of parts) {
+    const { positions, indices } = merge([part]);
+    const target = Math.max(min, Math.round((indices.length / 3) * ratio));
+    let ind = indices;
+    if (indices.length / 3 > target) { MeshoptSimplifier.useExperimentalFeatures = true; [ind] = MeshoptSimplifier.simplify(indices, positions, 3, target * 3, 0.02, ['ErrorAbsolute'].slice(0, 0)); }
+    for (const v of positions) outP.push(v);
+    for (const i of ind) outI.push(i + base);
+    base += positions.length / 3;
+  }
+  return { positions: Float32Array.from(outP), indices: Uint32Array.from(outI) };
+}
+
 // Reads the parts' geometry (float32 positions, uint32 indices) and merges it into one mesh.
 function merge(parts) {
   const pos = []; const idx = []; let base = 0;
@@ -76,7 +92,7 @@ const largeVessels = (system) => atlas.parts.filter((p) => p.system === system &
 // name, colour, opacity, parts, triangle budget
 const NODES = [
   ['skin', [0.85, 0.72, 0.62], 1, named('FJ2810'), 12000],
-  ['skeleton', [0.9, 0.87, 0.78], 1, atlas.parts.filter((p) => p.system === 'skeletal'), 36000],
+  ['skeleton', [0.9, 0.87, 0.78], 1, atlas.parts.filter((p) => p.system === 'skeletal'), 1e9, (parts) => mergeReduced(parts, 0.17)],
   ['organ_brain', [0.86, 0.66, 0.66], 1, conceptParts('brain'), 18000],
   ['organ_heart', [0.72, 0.2, 0.22], 1, conceptParts('heart'), 14000],
   ['organ_lungs_right', [0.9, 0.62, 0.64], 1, conceptParts('right lung'), 9000, lungOutline],
