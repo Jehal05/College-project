@@ -123,6 +123,7 @@ The tables are created with `Base.metadata.create_all` on a local SQLite file (`
 - **Ambulances**: `GET /ambulances` and `POST /ambulances/{id}/location` (staff of the hospital the ambulance belongs to or is working for).
 - **Hospital desk** (`app/api/hospital_desk.py`): acknowledge, dispatch, status and the `GET /emergencies?status=` lists, all through `emergency_state.transition()`. Also the proposed notes, chat and checklist calls and `GET /emergencies/{id}/desk` (new table `desk_entries`).
 - **Live events** (`app/api/ws.py`, `app/services/ws_hub.py`): one WebSocket at `/ws?token=`, filtered by role. **Escalation** (`app/services/escalation.py`): no acknowledgement in time, the next verified hospital is alerted.
+- WebSocket logins are re-checked while a socket is open (`WS_RECHECK_SECONDS`, default 30, and before every event); a dead login is closed with 1008 (16 Nov 2026).
 - Not built: a desk taking over another hospital's alert, a once-a-second `vitals.update` stream, WebSocket replay, a Docker build check. The path of the socket is not agreed with Daksh and Jehal.
 
 ## Where things are

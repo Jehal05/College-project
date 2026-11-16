@@ -138,3 +138,9 @@ Jehal, PR #15 has the hospital portal work (Phase 4 command view, Phase 6A share
 ### Backend and Daksh
 
 No message to Daksh while he is off the project. The backend part of PR #15 (about 5,600 lines: hardening, rate limit, PROPOSED lab values, organ answers, report text and what-if routes, practice ML models on invented data) is now Puneet's. It still needs a second reviewer; decide who. Backend CI passed at `fdf955f`.
+
+## Phase 7B: WebSocket token fix (16 Nov 2026, draft, not sent)
+
+### To Jehal
+
+Jehal, I (Puneet, backend) plan to change `backend/app/api/ws.py` so the server re-checks the login while a socket is open (on a timer and before each event) and closes it with code 1008 if the token has expired or the account was disabled. Today it checks only when the socket opens (`docs/DEMO_ISSUES_PHASE4.md` item 5). I will not touch the frontend, the `/ws` URL or the message shapes. Two questions: (1) Does your AI/security work touch `ws.py` or the token checks? If yes, tell me and I will wait. (2) A frontend point I found by reading only: `hospital-portal/src/services/socket.js` reconnects after any close and resets its wait to 2 s as soon as the socket opens, and the server opens (accepts) a socket before it closes it with 1008. So a desk with a dead token would retry about every 2 s forever and never show "log in again". This already happens today for a bad token at connect. The fix would be on your side (for example, after a 1008 close, stop retrying and ask for a new login). I am not changing it.
