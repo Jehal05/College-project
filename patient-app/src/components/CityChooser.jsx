@@ -21,7 +21,7 @@ export default function CityChooser({ themed = false, className = '' }) {
               <input type="radio" name="city" value={c.city_id} checked={!!on} onChange={() => select(c.city_id)} className="peer sr-only" />
               <span className={'flex min-h-[44px] cursor-pointer items-center rounded-xl border-2 px-4 font-semibold peer-focus-visible:outline peer-focus-visible:outline-4 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-700 '
                 + (on ? 'border-brand-700 bg-brand-700 text-white' : (themed ? 'border-ht-line bg-ht-card text-ht-text' : 'border-slate-300 bg-white text-slate-900'))}>
-                <span data-source="data">{c.city_name}</span><span data-source="data" className="ml-2 text-sm font-normal opacity-80">{c.state}</span>
+                <span data-source="data">{c.city_name}</span><span data-source="data" className="ml-2 text-sm font-normal">{c.state}</span>
               </span>
             </label>
           );
