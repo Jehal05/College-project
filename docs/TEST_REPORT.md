@@ -114,3 +114,15 @@ CI column = GitHub Actions on commit 2df527c (pushed to `Puneet`). Each commit r
 ### CI on 09fd6b7 (the test fix)
 
 Portal unit tests, lint, build and e2e (34 passed) succeeded in both runs; backend checks succeeded; patient-app unit tests succeeded. Patient-app browser tests: push run success, pull_request run **failed on A1 again** (21/22 files, 505 checks), the same test as on 2df527c. Over the last 14 CI runs A1 failed in 6 of 8 pull_request runs and 1 of 7 push runs, on three branches (Puneet, ui-phase3b), so it is not caused by Phase 6A and not yet root-caused. It is a patient-app test (Jehal's); no patient-app file was changed in Phase 6A.
+
+### Phase 7A: CI on ed3b56b (docs only, 16 Nov 2026)
+
+Docs-only push (ownership map and drafts). All runs finished with success:
+
+| Workflow | Event | Conclusion |
+|---|---|---|
+| Hospital portal checks (test-and-build, lint, e2e) | push and pull_request | success |
+| Backend checks (pytest) | pull_request | success (no push-event run was listed for this sha; the workflow seems to run on pull requests for this change, GUESS) |
+| CI (patient-app unit, contract, audit, browser) | push and pull_request | success |
+
+A1 (`phase10-apps.test.mjs`): passed on both events at ed3b56b (22/22 browser files, 505 checks). Run count so far since `main` was merged: 2 commits (`fdf955f`, `ed3b56b`) x 2 events = 4 CI runs, all passing. Four runs are not proof the flake is fixed. No code changed in this phase, so no new SANDBOX test was needed; the decisions commit changes docs only (the backend contract test reads route tables only, and no table row changed).

@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.7 (in progress) | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.7 (in progress) | Owner: Puneet (backend, from 16 Nov 2026; Daksh before) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -96,7 +96,7 @@ Rules:
 
 Emergency records start at `EMERGENCY_DETECTED`. `MONITORING` and `SYMPTOMS_REPORTED` describe the patient state and feed the digital twin bar.
 
-**Decision (0.7, Jehal; pending confirmation by Daksh and Puneet): who moves `EMERGENCY_DETECTED → SOS_SENT`?** The patient app does, with `POST /emergencies/{id}/sos`, when its own cancel countdown ends (as the mock server already works). The backend has no timer for it. The call is idempotent: a second call, or a call after the hospital answered, returns `200` with the current state and changes nothing. A cancelled emergency answers `409` with `from` and `to`. The earlier proposal (a backend countdown, `COUNTDOWN_SECONDS`) is dropped unless the team decides otherwise.
+**Decision (0.7, Jehal; pending confirmation by Puneet (backend)): who moves `EMERGENCY_DETECTED → SOS_SENT`?** The patient app does, with `POST /emergencies/{id}/sos`, when its own cancel countdown ends (as the mock server already works). The backend has no timer for it. The call is idempotent: a second call, or a call after the hospital answered, returns `200` with the current state and changes nothing. A cancelled emergency answers `409` with `from` and `to`. The earlier proposal (a backend countdown, `COUNTDOWN_SECONDS`) is dropped unless the team decides otherwise.
 
 ---
 

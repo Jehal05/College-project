@@ -1,6 +1,6 @@
 # Backend gaps: what the apps call and what Daksh's backend has
 
-**Draft for Daksh. Nothing here has been agreed with him.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's J1 to J4 commits, last `fe52ee4`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend suite was run on 14 Nov 2026 with J1 to J4 and Puneet's P1 to P3: **1893 passed**; contract status **70 built, 1 not built**. "Built" means a route exists and is tested.
+**Draft for Puneet (backend; Daksh was the owner until 16 Nov 2026). Nothing here has been agreed with the team.** Measured from the code on **14 Nov 2026** (updated after merging Daksh's J1 to J4 commits, last `fe52ee4`): the routes found in `backend/app/` (`main.py` and `api/*.py`) compared with the calls in `hospital-portal/src/services/api.js` and `patient-app/src/services/api.js`, and with `backend/CONTRACT.md` (v0.6.1/0.7 notes). The backend suite was run on 14 Nov 2026 with J1 to J4 and Puneet's P1 to P3: **1893 passed**; contract status **70 built, 1 not built**. "Built" means a route exists and is tested.
 
 Status words: **built** = a route with that method and path exists. **not built** = no such route. **differs** = a similar route exists but the path or shape is different.
 "In contract?" = the path appears in `backend/CONTRACT.md`.

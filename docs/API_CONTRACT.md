@@ -180,7 +180,7 @@ An invalid move answers `409 { error, detail: "Invalid transition", from, to }`.
 
 **Not in the mock (the portal keeps these local):** notes, chat, checklist ticks, hospital onboarding and edits, availability updates, responders, AED. Ids and the realistic-name choice: see the IDs row above.
 
-## Phase 9: what Puneet asked for (mock only, Daksh must agree for the real backend)
+## Phase 9: what Puneet asked for (mock only, Puneet (backend) must agree for the real backend)
 **Staff passport.** `GET /passport/{patient_id}` with a `HOSPITAL_STAFF` or `ADMIN` bearer token returns the same fields as the QR page, only for the groups the patient's consents allow (`history` off: no `allergies`, `conditions`, `medications`, `contacts`; `reports` on: `reports: [{ name, content_type }]`). Answer shape: `{ name, age, blood_group, patient_id, shared: { history, reports }, ...groups }`. No login: 401. Patient token for another patient: 403. Unknown patient id with a staff token: 404 "No passport found for this patient". A random QR token in the same place still works as before (public). Every staff read is written to the audit log (`passport.staff_view`).
 
 **`passport_available`** (boolean) in the `emergency.created` payload: `true` when the history consent is on. No token, no data.
@@ -235,13 +235,13 @@ States used by these endpoints (from Daksh's table): `SOS_SENT`, `HOSPITAL_ACKNO
 
 ## Proposed: predictions, organs, report extraction
 
-**PROPOSED, NOT AGREED. BUILT ON BRANCH `Puneet` ONLY (not merged to `main`, not in the mock).** Written 15 Nov 2026 by Puneet for review by Daksh (backend) and Jehal (patient app and mock). The routes below exist in `backend/app` on that branch (Phase 2 and Phase 3 builds, notes under each section), so the endpoint counts elsewhere in the docs (for example "77 contract endpoints") do **not** include them. When a route is agreed, move it into the sections above and update the counts. The rows in `backend/CONTRACT.md` marked PROPOSED exist only so the backend's contract test, which compares the served routes with that file, keeps passing.
+**PROPOSED, NOT AGREED. BUILT ON BRANCH `Puneet` ONLY (not merged to `main`, not in the mock).** Written 15 Nov 2026 by Puneet for review by Puneet (backend; Daksh until 16 Nov 2026) and Jehal (patient app and mock). The routes below exist in `backend/app` on that branch (Phase 2 and Phase 3 builds, notes under each section), so the endpoint counts elsewhere in the docs (for example "77 contract endpoints") do **not** include them. When a route is agreed, move it into the sections above and update the counts. The rows in `backend/CONTRACT.md` marked PROPOSED exist only so the backend's contract test, which compares the served routes with that file, keeps passing.
 
 Rules for all three: they are simulated estimates for a prototype, not medical advice. Errors use the real backend's shape `{ "error": "plain text", "detail": "same text" }` (the older conventions line at the top says only `error`; the real backend sends both). `401` = login missing, bad or expired; `403` = logged in but not allowed; an unknown id answers `404`, the same as a patient who is not yours, so ids cannot be probed. Every access to a patient's data is written to the audit log.
 
 ### 1. Predictions: `POST /predictions/{model}`
 
-`model` is `heart` or `diabetes`. Who may call: PATIENT (own data only). Clinical roles are not decided yet (open question 3).
+`model` is `heart` or `diabetes`. Who may call: PATIENT (own data only). Clinical roles are not decided yet (open question 3: decided 16 Nov 2026, PATIENT only for now).
 
 Request: `{ "patient_id"?: "PT-...", "inputs"?: { ...model features... } }`. If `inputs` is missing, the server fills what it can from the patient's own record and answers `400` listing the **names** of the missing features. If `inputs` is given (the what-if case for the Simulator) the server scores exactly those.
 
@@ -408,14 +408,37 @@ The step that saves what the patient confirmed. PATIENT, own record only; `403` 
 
 ### Open questions for review
 
+Status on 16 Nov 2026: Puneet owns the backend (Daksh is off the project), Jehal owns the frontend. The original questions are kept; the status and decision follow each one.
+
 1. **Daksh:** do you accept the three routes and the lab-values route in `backend/app/api`, and should the model files live in the repo or be loaded from a path in `.env`?
+   **DECIDED 16 Nov 2026 (Puneet, backend):** accept the PROPOSED routes (predictions, organs, lab values, report extract, what-if) as built. Model files stay in the repo.
 2. **Daksh:** I used `400` for validation failures because that is what `app/errors.py` does today (not FastAPI's `422`). Confirm.
+   **DECIDED 16 Nov 2026 (Puneet, backend):** validation failures stay `400`.
 3. **Team:** may hospital staff or a doctor call `/predictions`? Not decided; for now PATIENT only.
+   **DECIDED for now 16 Nov 2026 (Puneet, backend):** PATIENT only. Staff and doctor access is **DEFERRED** to a later phase.
 4. **Team:** may family and hospital staff read organ data, and under which consent keys?
+   **DECIDED for now 16 Nov 2026 (Puneet, backend):** the patient's own record only. Family and hospital staff access and the consent keys are **DEFERRED**.
 5. **Jehal:** can the mock return fixed examples of all three answers so the screens can be built first?
+   **DEFERRED, owner Jehal** (the mock is part of the frontend).
 6. **Team:** the patient app has six organs, this contract had four. Phase 3 serves `pancreas` and an empty `brain`. Confirm, or tell the app to drop them.
+   **DECIDED 16 Nov 2026 (Puneet, backend):** keep serving `pancreas` and an empty `brain`. Jehal can ask for a change.
 7. **Daksh:** add `pypdf` to `requirements.txt` (and the lock) so `/reports/extract` works, or keep it off? Scanned reports need OCR (Tesseract), which is a heavier decision.
+   **DEFERRED, owner Puneet (backend):** no new dependency for now; `pypdf` stays optional and OCR is not decided.
 8. **Jehal:** `test` is the app's key (`hba1c`), the lab-values and extract routes use the same nine keys, and `unreadable` is a list of objects. Can the Report and Twin screens read that?
+   **DEFERRED, owner Jehal** (frontend screens).
+
+#### Decisions (16 Nov 2026)
+
+| # | Topic | Status | Decision | Owner |
+|---|---|---|---|---|
+| 1 | PROPOSED routes and model files | DECIDED | Accept as built; model files stay in the repo | Puneet (backend) |
+| 2 | Validation error code | DECIDED | `400` | Puneet (backend) |
+| 3 | Who may call `/predictions` | DECIDED for now | PATIENT only; staff deferred | Puneet (backend) |
+| 4 | Who may read organ data | DECIDED for now | Own record only; family and staff and consent keys deferred | Puneet (backend) |
+| 5 | Mock examples for the three answers | DEFERRED | Not decided | Jehal |
+| 6 | Six organs | DECIDED | Keep `pancreas` and empty `brain` | Puneet (backend) |
+| 7 | `pypdf` and OCR | DEFERRED | No new dependency now | Puneet (backend) |
+| 8 | Report and Twin screens read the keys | DEFERRED | Not decided | Jehal |
 
 ## Phase 6A: PROPOSED additions (portal polish, 15 Nov 2026)
 
