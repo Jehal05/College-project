@@ -17,5 +17,5 @@ export const NAV = [
 // Phone bottom bar: Home, Twin, Monitor, Reports, Profile.
 export const BOTTOM = ['overview', 'twin', 'monitor', 'reports', 'settings'];
 export const BOTTOM_TO = { overview: '/' }; // on the phone, Home is the original home screen
-export const THEMED_ROUTES = ['/overview', '/twin', '/diseases', '/monitor', '/emergency-center', '/report-intelligence', '/simulator', '/copilot', '/care-circle', '/hospitals', '/design'];
+export const THEMED_ROUTES = ['/overview', '/twin', '/diseases', '/monitor', '/emergency-center', '/report-intelligence', '/simulator', '/about', '/copilot', '/care-circle', '/hospitals', '/design'];
 export const isThemed = (pathname) => THEMED_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
