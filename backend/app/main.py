@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
-    access_log, admin_users, audit, auth, consents, contacts, content, demo_panel, demo_vitals, emergencies, family, feedback,
+    access_log, admin_users, audit, auth, cities, consents, contacts, content, demo_panel, demo_vitals, emergencies, family, feedback,
     hospital_desk, hospitals, insights, location_shares, passport, passport_links, patients, reminders, reports,
     responders, ws,
 )
@@ -87,6 +87,7 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
         )
 
     application.include_router(auth.router)
+    application.include_router(cities.router)
     application.include_router(demo_vitals.router)
     application.include_router(demo_panel.router)
     application.include_router(patients.router)

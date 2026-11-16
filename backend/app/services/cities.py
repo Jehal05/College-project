@@ -14,6 +14,10 @@ def load_city_config() -> List[dict]:
     return json.loads(CITIES_FILE.read_text(encoding="utf-8"))["cities"]
 
 
+def known_city_ids() -> set:
+    return {c["city_id"] for c in load_city_config()}
+
+
 def ensure_cities(session: Session) -> int:
     """Insert missing cities and bring existing ones in line with the file. Safe to call any number of times.
 
