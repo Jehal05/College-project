@@ -10,3 +10,5 @@ dist-joint-cities/
 dist-shots/
 dist-audit/
 phase1-results.txt
+backend/healthtwin.db-shm
+backend/healthtwin.db-wal
