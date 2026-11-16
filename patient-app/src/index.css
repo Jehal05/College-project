@@ -13,9 +13,11 @@
   --emergency: #b91c1c;
 }
 
-/* ---- HealthTwin theme tokens (Phase 0). Space-separated RGB so Tailwind can add opacity. Dark is the main look. ---- */
-:root, [data-theme='dark'] {
+/* ---- HealthTwin theme tokens (Phase 0). Space-separated RGB so Tailwind can add opacity. Light is the default (hospital look); dark is a choice. ---- */
+[data-theme='dark'] {
   --ht-bg: 8 19 33;          /* #081321 main background */
+  --ht-bg2: 12 31 52;        /* top of the page gradient */
+  --ht-navy: 6 17 30;        /* utility bar and footer */
   --ht-sidebar: 13 27 42;    /* #0D1B2A */
   --ht-card: 18 38 58;       /* #12263A */
   --ht-line: 44 70 96;       /* card borders */
@@ -28,8 +30,10 @@
   --ht-muted: 169 188 207;   /* secondary text */
   --ht-onaccent: 8 19 33;    /* text on an accent-coloured button */
 }
-[data-theme='light'] {
-  --ht-bg: 244 247 251;
+:root:not([data-theme='dark']), [data-theme='light'] {
+  --ht-bg: 242 246 251;
+  --ht-bg2: 223 236 247;      /* pale clinical blue at the top of the page */
+  --ht-navy: 11 42 74;        /* utility bar and footer: hospital navy */
   --ht-sidebar: 255 255 255;
   --ht-card: 255 255 255;
   --ht-line: 205 217 230;
@@ -45,6 +49,13 @@
 html { -webkit-text-size-adjust: 100%; color-scheme: light; }
 html[data-theme='dark'] { color-scheme: dark; }
 /* Themed screens use the focus ring colour of the theme; old screens keep the teal ring. */
+/* Hospital-site background: a soft gradient from the top and a very faint plus-sign pattern (an inline SVG, so no extra request). */
+.ht-themed {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 22v12M22 28h12' stroke='%23808080' stroke-width='2' stroke-linecap='round' fill='none' opacity='0.16'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgb(var(--ht-bg2)) 0, rgb(var(--ht-bg)) 460px);
+  background-repeat: repeat, no-repeat;
+}
 .ht-themed :focus-visible { outline-color: rgb(var(--ht-accent)); }
 /* Old screens always sit on a light surface, even when the theme is dark. */
 .ht-legacy { color: #0f172a; }

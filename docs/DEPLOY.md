@@ -13,7 +13,7 @@
    - `VITE_WS_URL` only if live events are on another address.
 5. Deploy. Open the site, sign in, create a passport, scan it with a phone.
 
-The build adds a Content-Security-Policy that allows only the site itself plus the API and WebSocket addresses from step 4. If you change those variables, rebuild.
+The build adds a Content-Security-Policy that allows only the site itself plus the API and WebSocket addresses from step 4 (and WebAssembly, which the 3D body model decoder needs; it does not allow eval of text as JavaScript). If you change those variables, rebuild.
 
 ## After deploying, check
 

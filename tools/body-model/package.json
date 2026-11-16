@@ -1,0 +1,12 @@
+{
+  "name": "body-model-tools",
+  "private": true,
+  "type": "module",
+  "description": "Builds patient-app/public/models/body.glb from the BodyParts3D data (CC BY 4.0). Run: npm install && node build-body-glb.mjs <folder with atlas.json and body-*.bin>",
+  "dependencies": {
+    "@gltf-transform/core": "^4.1.0",
+    "@gltf-transform/extensions": "^4.1.0",
+    "convex-hull": "^1.0.3",
+    "meshoptimizer": "^0.22.0"
+  }
+}

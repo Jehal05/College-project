@@ -15,7 +15,8 @@ import useVitalsHistory from '../hooks/useVitalsHistory';
 import useReplay from '../hooks/useReplay';
 import { getPatient } from '../services/api';
 import { ORGANS, organByKey, relatedConditions, relatedReports } from '../config/organs';
-import { inRange } from '../utils/twin';
+import { inRange, organStatuses } from '../utils/twin';
+import { DEFAULT_LAYERS, LAYERS } from '../config/bodyModel';
 import { bpText } from '../utils/overview';
 import Panel from '../components/ui/Panel';
 import StatusChip from '../components/ui/StatusChip';
@@ -47,6 +48,8 @@ export default function Twin() {
   const [focus, setFocus] = useState(false);
   const [view, setView] = useState(defaultView); // '3d' only when this device can draw it and motion is not reduced
   const [failed3d, setFailed3d] = useState(false);
+  const [layers, setLayers] = useState(DEFAULT_LAYERS); // skin, skeleton, organs, vessels
+  const [side, setSide] = useState(null); // 'front' | 'back' | null (free)
   const { theme } = useTheme();
   const can3d = canWebGL() && !failed3d;
   const show3d = view === '3d' && can3d;
@@ -54,6 +57,7 @@ export default function Twin() {
   const replay = useReplay(total);
   useEffect(() => { getPatient(id).then(setPatient).catch(() => {}); }, [id]);
 
+  const statuses = organStatuses(ORGANS, vitals, baseline);
   const organ = organByKey(selected);
   const upTo = (k) => (history[k] || []).slice(0, replay.shown + 1);
   const at = (k) => { const v = history[k] || []; return v.length ? v[Math.min(replay.shown, v.length - 1)] : null; };
@@ -88,7 +92,8 @@ export default function Twin() {
                 <button type="button" aria-pressed={selected === o.key} onClick={() => setSelected(o.key)}
                   className={'flex min-h-[44px] w-full items-center gap-2 rounded-xl border px-3 text-left text-sm font-semibold transition-colors duration-ht ' +
                     (selected === o.key ? 'border-ht-accent bg-ht-accent/15 text-ht-accent' : 'border-ht-line bg-ht-card text-ht-text hover:border-ht-accent')}>
-                  <Icon name={selected === o.key ? 'check' : 'chevron'} size={16} />{t('dtwin.organ.' + o.key + '.name')}
+                  <Icon name={selected === o.key ? 'check' : 'chevron'} size={16} /><span className="flex-1">{t('dtwin.organ.' + o.key + '.name')}</span>
+                  <span className={'text-xs font-bold ' + (statuses[o.key] === 'different' ? 'text-ht-warning' : 'text-ht-muted')}>{t('dtwin.status.' + statuses[o.key])}</span>
                 </button>
               </li>
             ))}
@@ -100,9 +105,23 @@ export default function Twin() {
           {view === '3d' && !can3d && <p role="status" className="mb-2 text-sm text-ht-muted">{t('dtwin.fallback2d')}</p>}
           {show3d ? (
             <Suspense fallback={<p role="status" className="text-ht-muted">{t('dtwin.loading3d')}</p>}>
-              <Twin3D selected={selected} onSelect={setSelected} focus={focus} theme={theme} onError={() => setFailed3d(true)} />
+              <Twin3D selected={selected} onSelect={setSelected} focus={focus} theme={theme} layers={layers} statuses={statuses} side={side} onError={() => setFailed3d(true)} />
             </Suspense>
           ) : <BodyMap selected={selected} onSelect={setSelected} focus={focus} />}
+          {show3d && (
+            <div className="mt-3 w-full">
+              <div role="group" aria-label={t('dtwin.layers')} className="flex flex-wrap justify-center gap-2">
+                {LAYERS.map((l) => (
+                  <button key={l} type="button" aria-pressed={layers[l]} onClick={() => setLayers({ ...layers, [l]: !layers[l] })} className={toggle(layers[l])}>{t('dtwin.layer.' + l)}</button>
+                ))}
+              </div>
+              <div role="group" aria-label={t('dtwin.side')} className="mt-2 flex justify-center gap-2">
+                <button type="button" aria-pressed={side === 'front'} onClick={() => setSide('front')} className={toggle(side === 'front')}>{t('dtwin.front')}</button>
+                <button type="button" aria-pressed={side === 'back'} onClick={() => setSide('back')} className={toggle(side === 'back')}>{t('dtwin.back')}</button>
+              </div>
+              <p className="mt-3 text-center text-xs text-ht-muted">{t('dtwin.generic')} <Link to="/about" className="font-semibold text-ht-accent underline">{t('dtwin.credits')}</Link></p>
+            </div>
+          )}
         </Panel>
 
         <Panel aria-live="polite" aria-labelledby="organ-name">

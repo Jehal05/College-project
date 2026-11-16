@@ -136,6 +136,16 @@ Family invite code for the demo: `FAM-0417`. A 3-minute walk-through is in [`doc
 
 GitHub Actions runs the backend, patient-app and hospital-portal checks on every pull request.
 
+### Hospital look and a real human body model
+
+The patient app now opens in a light, hospital-website style (utility bar with 112 / 108 links, breadcrumb, hero banner, quick actions, footer with the simulated notice); dark mode is still available. The hospital portal matches it with a soft background, a header bar on the login page and a footer notice.
+
+The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from BodyParts3D, licensed CC BY 4.0. Credits, adaptations and rebuild steps: [`docs/MODEL_CREDITS.md`](docs/MODEL_CREDITS.md); the in-app About screen lists them too. You can tap an organ, switch layers (skin, skeleton, organs), and see front or back. Organ colour and a status word (within range / different from your baseline) come from the existing rule-based logic, not from the model. The note "Generic anatomy illustration. It is not a scan of your body." is always shown.
+
+| Hospital overview | Body model | Portal login | Portal dashboard |
+|---|---|---|---|
+| <img src="docs/images/ui/phase4-hospital-overview-light-desktop.png" width="200" alt="Hospital style overview"> | <img src="docs/images/ui/phase4-body-twin-light-desktop.png" width="200" alt="Human body model"> | <img src="docs/images/ui/phase4-portal-login.png" width="200" alt="Portal login"> | <img src="docs/images/ui/phase4-portal-dashboard.png" width="200" alt="Portal dashboard"> |
+
 ## Docs index
 
 **Two files share a name on purpose.** `docs/DEMO_SCRIPT.md` is the full 5-minute demo on the mock server (patient app and portal); `hospital-portal/docs/DEMO_SCRIPT.md` is the 3-minute portal-side script; `docs/DEMO_RUN_REAL_BACKEND.md` is the run-through for the real backend. `TRANSLATION_REVIEW.md` also exists in both folders (patient app and portal strings).
@@ -199,6 +209,9 @@ GitHub Actions runs the backend, patient-app and hospital-portal checks on every
 | Lab values on the dashboard | Stored on the device only; no backend endpoint yet (see [`docs/BACKEND_GAPS.md`](docs/BACKEND_GAPS.md)) |
 | Clinician review of report values | Shown as "not reviewed"; no review workflow exists |
 | Hospital portal | Restyled but light theme only |
+| Body model contents | No muscles, nerves or reproductive organs; the lungs are a generic outline shape built around the airways (source has none); organ shapes are not personal |
+| 3D model file | About 2.6 MB, not cached offline; offline or without WebGL a hand-drawn 2D body map is shown (a soft figure with organ shapes, simpler than the 3D model) |
+| Model licence | CC BY 4.0 (attribution required, no share-alike); licence page re-check advised before public release |
 | One admin browser test (A1) | Occasionally fails on CI and passes on rerun; cause not found |
 
 More detail: [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) · [`docs/VIVA_QA.md`](docs/VIVA_QA.md) · [`docs/DEPLOY.md`](docs/DEPLOY.md) · [`CHANGELOG.md`](CHANGELOG.md)

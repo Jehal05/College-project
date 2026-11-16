@@ -24,6 +24,7 @@ export default {
   'offline.back': 'ફરી જોડાઈ ગયું. {n} એલર્ટ લોડ થયા.',
   'login.title': 'હોસ્પિટલ પોર્ટલ',
   'login.subtitle': 'HealthTwin AI · સ્ટાફ લૉગિન',
+  'footer.simulated': 'Simulated ડેમો. આ તબીબી સલાહ નથી. આ તબીબી ઉપકરણ નથી. કોઈ વાસ્તવિક હૉસ્પિટલ કે એમ્બ્યુલન્સનો સંપર્ક થતો નથી.',
   'login.simulated': 'Simulated પ્રોટોટાઇપ. કોઈ સાચી હોસ્પિટલનો સંપર્ક થતો નથી.',
   'login.email': 'ઇમેઇલ',
   'login.username': 'યુઝરનેમ',

@@ -48,7 +48,7 @@ function Shell({ children }) {
     target.focus();
   };
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="ht-page min-h-screen flex flex-col">
       <a href="#main" onClick={skipMain} data-testid="skip-main" className={skipClass}>{t('a11y.skipMain')}</a>
       {pathname === '/dashboard' && (
         <a href="#alert-queue" onClick={skip} data-testid="skip-link" className={`${skipClass}`}>{t('a11y.skipQueue')}</a>
@@ -64,6 +64,9 @@ function Shell({ children }) {
         {/* A screen error shows a message here; the navigation stays usable and a new page starts clean. */}
         <ErrorBoundary key={pathname}><Suspense fallback={<PageLoading />}>{children}</Suspense></ErrorBoundary>
       </main>
+      <footer data-testid="site-footer" className="no-print border-t border-slate-300 bg-white/80 px-6 py-3 text-sm text-slate-700">
+        {t('footer.simulated')}
+      </footer>
     </div>
   );
 }
