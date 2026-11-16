@@ -1,19 +1,19 @@
 # PR #15 ownership map (Puneet to main)
 
-Status: draft for review, written 16 Nov 2026 at `fdf955f`. The sample data in this project is simulated and this is not a medical device.
+Status: draft for review, written 16 Nov 2026 at `fdf955f`, updated the same day for the new split: **Puneet owns the backend, Jehal owns the whole frontend (patient app, hospital portal, mock server), Daksh is off the project for now.** The sample data in this project is simulated and this is not a medical device.
 Counts come from `git diff origin/main...HEAD`. "Reviewer" is who should read that part before it merges.
 
 ## Summary
 
 | Owner of the area | Paths | Reviewer |
 |---|---|---|
-| Puneet | `hospital-portal/` (src, e2e, docs, scripts) | Puneet (self); a team member for the UI |
-| Daksh | `backend/` (app, ml, scripts, tests, config files) | **Daksh** |
-| Jehal | `patient-app/` (3 files) | **Jehal** |
-| Jehal | `mock-server/` | none changed (main's keep-alive fix is already in main) |
+| Jehal (frontend) | `hospital-portal/` (src, e2e, docs, scripts); `patient-app/` (3 files); `mock-server/` (no change) | **Jehal** |
+| Puneet (backend) | `backend/` (app, ml, scripts, tests, config files) | A second person is needed: Daksh is off, and Puneet wrote the code with Claude |
 | Shared | `docs/`, `scripts/`, `.github/`, root docs, `laptop-*` | whoever reads the matching docs |
 
-## Needs review by Jehal (patient-app, 3 files)
+Before this update the hospital portal was Puneet's and the backend was Daksh's. Commits keep their history, so the portal commits below were written when the portal was Puneet's area.
+
+## Needs review by Jehal: patient-app (3 files)
 
 | File | Commit | What changed | Why |
 |---|---|---|---|
@@ -23,7 +23,7 @@ Counts come from `git diff origin/main...HEAD`. "Reviewer" is who should read th
 
 No source file of the patient app and nothing in `mock-server/` is changed by this branch. Open question for Jehal: A1 passed on both CI events at `fdf955f`, but it failed on the pull_request run at `2df527c` and `09fd6b7`. The root cause is still unknown.
 
-## Needs review by Daksh (backend)
+## Backend (now Puneet's area; needs a reviewer)
 
 | Area | Files | Commit | What changed |
 |---|---|---|---|
@@ -38,11 +38,11 @@ No source file of the patient app and nothing in `mock-server/` is changed by th
 | Tests and fixtures | `tests/` (16 files plus fixtures, 2 synthetic CSVs of 403 lines) | several | Tests for all of the above |
 | Config | `Dockerfile`, `ruff.toml`, `requirements-ml.txt`, `README.md`, `CONTRACT.md`, `.dockerignore` | `c5239e9`, `cc490d3` | Build and lint setup, contract text |
 
-The "PROPOSED" routes are listed in `docs/API_CONTRACT.md` and need Daksh's confirmation before anyone depends on them. CI result at `fdf955f`: Backend checks `test` passed (SEEN).
+The "PROPOSED" routes are listed in `docs/API_CONTRACT.md` and need a decision from the backend owner (Puneet) before anyone depends on them. CI result at `fdf955f`: Backend checks `test` passed (SEEN).
 
-## Puneet's own area (hospital portal)
+## Hospital portal (now Jehal's area; needs Jehal's review)
 
-Phase 4 command view, Phase 6A shared UI parts, stats strip, alert cards, map tile notice, grouped navigation, analytics median/p90/n and date filter, plus the e2e specs. CI at `fdf955f`: test-and-build, lint and e2e passed. Hindi and Gujarati strings are unreviewed drafts.
+Phase 4 command view, Phase 6A shared UI parts, stats strip, alert cards, map tile notice, grouped navigation, analytics median/p90/n and date filter, plus the e2e specs. CI at `fdf955f`: test-and-build, lint and e2e passed. Hindi and Gujarati strings are unreviewed drafts. The portal's PROPOSED backend asks (`hospital.distance_km`, ambulance `registration` and `speed_kmh`) are now a decision for the backend owner.
 
 ## Shared (docs, scripts, CI)
 

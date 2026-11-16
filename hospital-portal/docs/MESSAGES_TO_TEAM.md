@@ -127,14 +127,14 @@ Jehal, I polished the hospital portal (grouped menu, stats strip, clearer alert 
 
 Daksh, no code of yours was touched. `docs/API_CONTRACT.md` has four PROPOSED rows (section "Phase 6A"): please confirm `hospital.distance_km` is sent on every read of an emergency, and say whether ambulances will ever get `registration` and `speed_kmh`. The portal works without all of them.
 
-## PR #15 review requests (16 Nov 2026, drafts, not sent)
+## PR #15 review requests (16 Nov 2026, drafts, not sent; updated for the new split)
 
-Full table: `docs/PR15_OWNERSHIP.md`. This replaces the "I did not touch patient-app/" line in the Phase 6A draft above: that line was true for Phase 6A only, not for the whole branch.
+New split: Puneet owns the backend, Jehal owns the whole frontend, Daksh is off the project. Full table: `docs/PR15_OWNERSHIP.md`. This replaces the "I did not touch patient-app/" line in the Phase 6A draft above: that line was true for Phase 6A only, not for the whole branch.
 
 ### To Jehal
 
-Jehal, PR #15 changes 3 files in `patient-app/` and nothing in `mock-server/`. Please look at: (1) `tests/browser/phase10-apps.test.mjs` (commits `b2f30ff`, `15a91bc`): A1 reloads up to 3 times when `GET /admin/users` stays pending; (2) `tests/browser/phase15-simulator.test.mjs` (`15a91bc`): S5 and S6 wait for the table; (3) `eslint.config.js` (`c5239e9`): new, not yet run in CI. A1 passed on both CI events at `fdf955f` (after merging your UI phase 3), but failed on the pull_request run twice before that. I have not found the root cause. Tell me if you want any of these changed or moved into your own branch.
+Jehal, PR #15 has the hospital portal work (Phase 4 command view, Phase 6A shared UI parts, stats strip, alert cards, grouped navigation, analytics median/p90/n, map tile notice, 12 new e2e tests) and 3 files in `patient-app/`; nothing in `mock-server/`. As you now own the frontend, please review: (1) the portal changes (`hospital-portal/`, commits listed in the ownership table); (2) `patient-app/tests/browser/phase10-apps.test.mjs` (`b2f30ff`, `15a91bc`): A1 reloads up to 3 times when `GET /admin/users` stays pending; (3) `phase15-simulator.test.mjs` (`15a91bc`): S5 and S6 wait for the table; (4) `patient-app/eslint.config.js` (`c5239e9`), new and not run in CI. A1 passed on both CI events at `fdf955f` but failed on the pull_request run twice before; the root cause is unknown. The portal's Hindi and Gujarati strings are unreviewed drafts.
 
-### To Daksh
+### Backend and Daksh
 
-Daksh, PR #15 has about 5,600 lines in `backend/`, written while I worked on the portal. Please review: hardening and the rate limit (`21a0922`, `69eaf1f`); the PROPOSED lab values, organ answers, report text and what-if routes (`cc490d3`, `48a81b7`, listed in `docs/API_CONTRACT.md`); and the practice ML models in `backend/ml` and `backend/app/ml` (`c5239e9`, invented data, simulated). Tell me which of these you want kept, renamed or dropped. Backend CI passed at `fdf955f`.
+No message to Daksh while he is off the project. The backend part of PR #15 (about 5,600 lines: hardening, rate limit, PROPOSED lab values, organ answers, report text and what-if routes, practice ML models on invented data) is now Puneet's. It still needs a second reviewer; decide who. Backend CI passed at `fdf955f`.
