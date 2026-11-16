@@ -36,7 +36,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-ht-bg p-6">
+    <div className="ht-page min-h-screen flex flex-col">
+      <div className="border-b-4 border-ht-accent bg-ht-sidebar px-6 py-3 text-lg font-bold text-white">{t('login.title')}</div>
+      <div className="grid flex-1 place-items-center p-6">
       <a href="#login-form" data-testid="skip-login" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-slate-900">{t('a11y.skipLogin')}</a>
       <form id="login-form" onSubmit={handleSubmit} className="w-full max-w-md space-y-5 rounded-2xl bg-white p-8 shadow-xl">
         <div>
@@ -81,6 +83,8 @@ export default function Login() {
           <p className="text-sm text-slate-500">{t('login.demoAccounts')}</p>
         )}
       </form>
+      </div>
+      <footer data-testid="site-footer" className="border-t border-slate-300 bg-white/80 px-6 py-3 text-sm text-slate-700">{t('footer.simulated')}</footer>
     </div>
   );
 }

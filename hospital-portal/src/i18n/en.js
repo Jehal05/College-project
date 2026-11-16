@@ -25,6 +25,7 @@ export default {
   'offline.back': 'Reconnected. Reloaded {n} alerts.',
   'login.title': 'Hospital Portal',
   'login.subtitle': 'HealthTwin AI · staff login',
+  'footer.simulated': 'Simulated demo. Not medical advice. Not a medical device. No real hospital or ambulance is contacted.',
   'login.simulated': 'Simulated prototype. No real hospital is contacted.',
   'login.email': 'Email',
   'login.username': 'Username',
