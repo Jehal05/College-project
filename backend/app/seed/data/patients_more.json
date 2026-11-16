@@ -1,0 +1,330 @@
+{
+  "_comment": "Five more fictional patients (3 per city with PT-2026-0417). Names, contacts and phone numbers are invented; phones are non-routable.",
+  "patients": [
+    {
+      "id": "PT-2026-0418",
+      "name": "Fatima Sheikh",
+      "age": 41,
+      "sex": "F",
+      "blood_group": "O+",
+      "blood_group_verified": false,
+      "allergies": [
+        "Dust mites"
+      ],
+      "conditions": [
+        "Asthma"
+      ],
+      "medications": [
+        "Salbutamol inhaler",
+        "Budesonide inhaler"
+      ],
+      "language": "gu",
+      "home_city_id": "AMD",
+      "contacts": [
+        {
+          "id": "C-3",
+          "name": "Imran Sheikh",
+          "relation": "Spouse",
+          "phone": "+91 00000 00003",
+          "is_primary": true
+        },
+        {
+          "id": "C-4",
+          "name": "Nasreen Sheikh",
+          "relation": "Mother",
+          "phone": "+91 00000 00004",
+          "is_primary": false
+        }
+      ],
+      "consents": {
+        "location": true,
+        "history": true,
+        "vitals": true,
+        "reports": true
+      },
+      "baseline": {
+        "heart_rate": {
+          "min": 62,
+          "max": 90
+        },
+        "spo2": {
+          "min": 94,
+          "max": 99
+        },
+        "bp_systolic": {
+          "min": 95,
+          "max": 125
+        },
+        "bp_diastolic": {
+          "min": 60,
+          "max": 80
+        },
+        "glucose": {
+          "min": 75,
+          "max": 125
+        },
+        "updated_at": "2026-11-01T08:00:00.000Z"
+      }
+    },
+    {
+      "id": "PT-2026-0419",
+      "name": "Harpreet Singh Gill",
+      "age": 63,
+      "sex": "M",
+      "blood_group": "A+",
+      "blood_group_verified": false,
+      "allergies": [],
+      "conditions": [
+        "Hypertension",
+        "Coronary artery disease"
+      ],
+      "medications": [
+        "Atorvastatin",
+        "Aspirin",
+        "Metoprolol"
+      ],
+      "language": "hi",
+      "home_city_id": "AMD",
+      "contacts": [
+        {
+          "id": "C-5",
+          "name": "Simran Gill",
+          "relation": "Child",
+          "phone": "+91 00000 00005",
+          "is_primary": true
+        },
+        {
+          "id": "C-6",
+          "name": "Jaspal Gill",
+          "relation": "Sibling",
+          "phone": "+91 00000 00006",
+          "is_primary": false
+        }
+      ],
+      "consents": {
+        "location": true,
+        "history": true,
+        "vitals": true,
+        "reports": true
+      },
+      "baseline": {
+        "heart_rate": {
+          "min": 56,
+          "max": 80
+        },
+        "spo2": {
+          "min": 95,
+          "max": 100
+        },
+        "bp_systolic": {
+          "min": 105,
+          "max": 135
+        },
+        "bp_diastolic": {
+          "min": 65,
+          "max": 85
+        },
+        "glucose": {
+          "min": 85,
+          "max": 140
+        },
+        "updated_at": "2026-11-01T08:00:00.000Z"
+      }
+    },
+    {
+      "id": "PT-2026-0420",
+      "name": "Aarav Deshpande",
+      "age": 29,
+      "sex": "M",
+      "blood_group": "B+",
+      "blood_group_verified": false,
+      "allergies": [
+        "Sulfa drugs"
+      ],
+      "conditions": [
+        "Type 1 Diabetes"
+      ],
+      "medications": [
+        "Insulin glargine",
+        "Insulin lispro"
+      ],
+      "language": "en",
+      "home_city_id": "PNQ",
+      "contacts": [
+        {
+          "id": "C-7",
+          "name": "Medha Deshpande",
+          "relation": "Mother",
+          "phone": "+91 00000 00007",
+          "is_primary": true
+        },
+        {
+          "id": "C-8",
+          "name": "Rohan Kulkarni",
+          "relation": "Friend",
+          "phone": "+91 00000 00008",
+          "is_primary": false
+        }
+      ],
+      "consents": {
+        "location": true,
+        "history": true,
+        "vitals": true,
+        "reports": true
+      },
+      "baseline": {
+        "heart_rate": {
+          "min": 55,
+          "max": 85
+        },
+        "spo2": {
+          "min": 96,
+          "max": 100
+        },
+        "bp_systolic": {
+          "min": 100,
+          "max": 130
+        },
+        "bp_diastolic": {
+          "min": 60,
+          "max": 80
+        },
+        "glucose": {
+          "min": 80,
+          "max": 180
+        },
+        "updated_at": "2026-11-01T08:00:00.000Z"
+      }
+    },
+    {
+      "id": "PT-2026-0421",
+      "name": "Meenakshi Iyer",
+      "age": 67,
+      "sex": "F",
+      "blood_group": "AB+",
+      "blood_group_verified": false,
+      "allergies": [
+        "Iodine contrast"
+      ],
+      "conditions": [
+        "Hypertension",
+        "Atrial fibrillation"
+      ],
+      "medications": [
+        "Apixaban",
+        "Amlodipine"
+      ],
+      "language": "en",
+      "home_city_id": "PNQ",
+      "contacts": [
+        {
+          "id": "C-9",
+          "name": "Venkatesh Iyer",
+          "relation": "Spouse",
+          "phone": "+91 00000 00009",
+          "is_primary": true
+        },
+        {
+          "id": "C-10",
+          "name": "Lakshmi Narayanan",
+          "relation": "Sibling",
+          "phone": "+91 00000 00010",
+          "is_primary": false
+        }
+      ],
+      "consents": {
+        "location": true,
+        "history": true,
+        "vitals": true,
+        "reports": false
+      },
+      "baseline": {
+        "heart_rate": {
+          "min": 60,
+          "max": 95
+        },
+        "spo2": {
+          "min": 94,
+          "max": 99
+        },
+        "bp_systolic": {
+          "min": 105,
+          "max": 135
+        },
+        "bp_diastolic": {
+          "min": 65,
+          "max": 85
+        },
+        "glucose": {
+          "min": 80,
+          "max": 130
+        },
+        "updated_at": "2026-11-01T08:00:00.000Z"
+      }
+    },
+    {
+      "id": "PT-2026-0422",
+      "name": "Joseph D'Souza",
+      "age": 58,
+      "sex": "M",
+      "blood_group": "O-",
+      "blood_group_verified": false,
+      "allergies": [],
+      "conditions": [
+        "Type 2 Diabetes",
+        "High cholesterol"
+      ],
+      "medications": [
+        "Metformin",
+        "Rosuvastatin"
+      ],
+      "language": "en",
+      "home_city_id": "PNQ",
+      "contacts": [
+        {
+          "id": "C-11",
+          "name": "Maria D'Souza",
+          "relation": "Spouse",
+          "phone": "+91 00000 00011",
+          "is_primary": true
+        },
+        {
+          "id": "C-12",
+          "name": "Anita D'Souza",
+          "relation": "Child",
+          "phone": "+91 00000 00012",
+          "is_primary": false
+        }
+      ],
+      "consents": {
+        "location": true,
+        "history": false,
+        "vitals": true,
+        "reports": true
+      },
+      "baseline": {
+        "heart_rate": {
+          "min": 58,
+          "max": 82
+        },
+        "spo2": {
+          "min": 95,
+          "max": 100
+        },
+        "bp_systolic": {
+          "min": 108,
+          "max": 135
+        },
+        "bp_diastolic": {
+          "min": 68,
+          "max": 86
+        },
+        "glucose": {
+          "min": 90,
+          "max": 150
+        },
+        "updated_at": "2026-11-01T08:00:00.000Z"
+      }
+    }
+  ]
+}

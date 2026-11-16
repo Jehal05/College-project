@@ -77,6 +77,7 @@ def reset_everything(session: Session) -> Dict[str, object]:
         else:
             connection.execute(table.delete())
     session.commit()
+    session.expunge_all()            # the rows were deleted underneath the session, so forget the cached copies
     seeded = seed_demo(session)
     wearable_registry.reset_all()
     reset_limiter()

@@ -79,7 +79,7 @@ def test_reset_answers_in_both_spellings(demo):
     r = reset(demo)
     assert r.status_code == 200
     assert r.json()["status"] == "reset" and r.json()["ok"] is True and r.json()["simulated"] is True
-    assert r.json()["seeded"]["hospitals"] == 5
+    assert r.json()["seeded"]["hospitals"] == 10
 
 
 def test_reset_works_for_every_role(demo):
@@ -120,7 +120,7 @@ def test_reset_restores_the_seed_data_and_removes_everything_else(demo, engine):
         assert s.get(Hospital, "HSP-AMD-002").beds_free > 0
         assert [c.name for c in s.query(Contact).filter(Contact.patient_id == PID).order_by(Contact.position)] == [
             "Sunita Mehta", "Karan Mehta"]
-        assert s.query(User).count() == 12 and s.query(Hospital).count() == 5
+        assert s.query(User).count() == 12 and s.query(Hospital).count() == 10
 
 
 def test_reset_puts_the_consents_and_the_audit_log_back_to_the_start(demo, engine):
@@ -134,7 +134,7 @@ def test_reset_puts_the_consents_and_the_audit_log_back_to_the_start(demo, engin
     assert count(engine, AuditLog) == 0
     with Session(engine) as s:
         assert consent_service.current_consents(s, PID) == {"location": True, "history": True, "vitals": True, "reports": True}
-        assert s.query(ConsentLedger).count() == 4
+        assert s.query(ConsentLedger).count() == 24
 
 
 def test_reset_keeps_the_append_only_protection(demo, engine):

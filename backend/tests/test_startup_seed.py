@@ -21,7 +21,7 @@ def test_a_demo_start_loads_the_demo_data(file_db, monkeypatch):
     monkeypatch.setenv("DEMO_MODE", "true")
     with TestClient(create_app()):
         pass
-    assert counts(file_db) == (12, 5, 5, 1)
+    assert counts(file_db) == (12, 10, 10, 6)
 
 
 def test_a_second_demo_start_does_not_load_it_again(file_db, monkeypatch):
@@ -29,7 +29,7 @@ def test_a_second_demo_start_does_not_load_it_again(file_db, monkeypatch):
     for _ in range(2):
         with TestClient(create_app()):
             pass
-    assert counts(file_db) == (12, 5, 5, 1)
+    assert counts(file_db) == (12, 10, 10, 6)
 
 
 def test_a_demo_start_does_not_touch_a_database_that_already_has_users(file_db, monkeypatch):

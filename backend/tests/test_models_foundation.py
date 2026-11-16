@@ -43,7 +43,7 @@ def test_every_table_in_the_contract_exists(engine):
 
 
 def test_there_is_exactly_one_helper_table(engine):
-    assert set(inspect(engine).get_table_names()) - contract.contract_tables() == {"counters"}
+    assert set(inspect(engine).get_table_names()) - contract.contract_tables() == {"counters", "cities"}
 
 
 def test_the_vitals_table_has_a_patient_and_time_index(engine):
