@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, CheckConstraint, Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.db import Base
 
@@ -17,6 +18,8 @@ class Hospital(Base):
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
     verified = Column(Boolean, nullable=False, default=False)      # only verified hospitals are ever alerted
+    city_id = Column(String, ForeignKey("cities.city_id"), index=True)   # AMD or PNQ; empty only for a record from before the city network
+    city = relationship("City", lazy="joined")
     # What the hospital can do (capabilities)
     cap_emergency = Column(Boolean, nullable=False, default=False)
     cap_cath_lab = Column(Boolean, nullable=False, default=False)
@@ -28,6 +31,14 @@ class Hospital(Base):
     cath_lab_ready = Column(Boolean, nullable=False, default=False)
     stroke_unit_ready = Column(Boolean, nullable=False, default=False)
     updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+
+    @property
+    def city_name(self):
+        return self.city.city_name if self.city else None
+
+    @property
+    def state(self):
+        return self.city.state if self.city else None
 
     @property
     def capabilities(self) -> dict:
@@ -52,6 +63,16 @@ class Ambulance(Base):
     crew_driver = Column(String)                           # fictional names
     crew_paramedic = Column(String)
     base_hospital_id = Column(String, ForeignKey("hospitals.id"))
+    city_id = Column(String, ForeignKey("cities.city_id"), index=True)   # the city the ambulance works in
+    city = relationship("City", lazy="joined")
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
     status = Column(String, nullable=False, default="available")
+
+    @property
+    def city_name(self):
+        return self.city.city_name if self.city else None
+
+    @property
+    def state(self):
+        return self.city.state if self.city else None

@@ -20,6 +20,7 @@ from app.models.consent import CONSENT_FIELDS, ConsentLedger
 from app.models.hospitals import Ambulance, Hospital
 from app.models.patient_data import Contact, Patient
 from app.security.passwords import hash_password
+from app.services.cities import ensure_cities
 
 DATA_DIR = Path(__file__).parent / "data"
 DEMO_PATIENT_ID = "PT-2026-0417"
@@ -74,11 +75,13 @@ def seed_demo(session: Session) -> Dict[str, object]:
     if is_seeded(session):
         return {"already_seeded": True}
 
+    ensure_cities(session)                  # the cities come first: hospitals, ambulances and patients point at them
+
     for h in _load("hospitals.json")["hospitals"]:
         caps, avail = h["capabilities"], h["availability"]
         session.add(Hospital(
             id=h["id"], portal_id=h.get("portal_id"), name=h["name"], address=h.get("address"), phone=h.get("phone"),
-            lat=h["lat"], lng=h["lng"], verified=bool(h["verified"]),
+            lat=h["lat"], lng=h["lng"], verified=bool(h["verified"]), city_id=h.get("city_id"),
             cap_emergency=bool(caps["emergency"]), cap_cath_lab=bool(caps["cath_lab"]),
             cap_stroke_unit=bool(caps["stroke_unit"]), cap_icu=bool(caps["icu"]),
             beds_free=avail["beds_free"], icu_free=avail["icu_free"],
@@ -91,20 +94,23 @@ def seed_demo(session: Session) -> Dict[str, object]:
         session.add(Ambulance(
             id=a["id"], portal_id=a.get("portal_id"), call_sign=a["call_sign"], crew_driver=crew.get("driver"),
             crew_paramedic=crew.get("paramedic"), base_hospital_id=a.get("base_hospital_id"),
-            lat=a["lat"], lng=a["lng"], status=a.get("status", "available"),
+            lat=a["lat"], lng=a["lng"], status=a.get("status", "available"), city_id=a.get("city_id"),
         ))
 
     p = _load("patient.json")
-    session.add(Patient(
-        id=p["id"], name=p["name"], age=p["age"], sex=p.get("sex"), blood_group=p.get("blood_group"),
-        blood_group_verified=bool(p.get("blood_group_verified")), language=p.get("language", "en"),
-        conditions=p.get("conditions", []), allergies=p.get("allergies", []), medications=p.get("medications", []),
-        baseline=_load("baseline.json"),
-    ))
+    patients = [dict(p, baseline=_load("baseline.json"))] + _load("patients_more.json")["patients"]
+    for q in patients:
+        session.add(Patient(
+            id=q["id"], name=q["name"], age=q["age"], sex=q.get("sex"), blood_group=q.get("blood_group"),
+            blood_group_verified=bool(q.get("blood_group_verified")), language=q.get("language", "en"),
+            home_city_id=q.get("home_city_id"), conditions=q.get("conditions", []), allergies=q.get("allergies", []),
+            medications=q.get("medications", []), baseline=q["baseline"],
+        ))
     session.flush()
-    for position, c in enumerate(p.get("contacts", []), start=1):
-        session.add(Contact(id=c["id"], patient_id=p["id"], name=c["name"], relation=c.get("relation"),
-                            phone=c["phone"], is_primary=bool(c.get("is_primary")), position=position))
+    for q in patients:
+        for position, c in enumerate(q.get("contacts", []), start=1):
+            session.add(Contact(id=c["id"], patient_id=q["id"], name=c["name"], relation=c.get("relation"),
+                                phone=c["phone"], is_primary=bool(c.get("is_primary")), position=position))
 
     for user_id, login, display, password, role, patient_id, hospital_id, label in DEMO_ACCOUNTS:
         session.add(User(id=user_id, login=login.lower(), display_name=display, password_hash=_hash(password),
@@ -119,10 +125,11 @@ def seed_demo(session: Session) -> Dict[str, object]:
     from app.services.content import seed_content
     seed_content(session)
 
-    # The demo patient shares everything, as in the mock server. Written through the append-only ledger.
-    for field in CONSENT_FIELDS:
-        session.add(ConsentLedger(patient_id=p["id"], field=field, granted=bool(p["consents"].get(field, False)),
-                                  actor="seed", actor_role="SYSTEM"))
+    # Every patient's consents are written through the append-only ledger. The first patient shares everything, as in the mock server.
+    for q in patients:
+        for field in CONSENT_FIELDS:
+            session.add(ConsentLedger(patient_id=q["id"], field=field, granted=bool(q["consents"].get(field, False)),
+                                      actor="seed", actor_role="SYSTEM"))
     session.commit()
     return {"hospitals": len(_load("hospitals.json")["hospitals"]), "ambulances": len(_load("ambulances.json")["ambulances"]),
-            "patients": 1, "contacts": len(p.get("contacts", [])), "users": len(DEMO_ACCOUNTS), "consents": len(CONSENT_FIELDS)}
+            "patients": len(patients), "contacts": sum(len(q.get("contacts", [])) for q in patients), "cities": len(_load("cities.json")["cities"]), "users": len(DEMO_ACCOUNTS), "consents": len(CONSENT_FIELDS)}

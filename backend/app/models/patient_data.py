@@ -27,6 +27,7 @@ class Patient(Base):
     blood_group = Column(String)
     blood_group_verified = Column(Boolean, nullable=False, default=False)
     language = Column(String, nullable=False, default="en")
+    home_city_id = Column(String, ForeignKey("cities.city_id"))    # the city the person lives in (simulation start and default city view)
     conditions = Column(EncryptedJSON)             # list of strings
     allergies = Column(EncryptedJSON)              # list of strings
     medications = Column(EncryptedJSON)            # list of strings

@@ -99,7 +99,7 @@ PHASES = [
            "tests/test_passwords.py", "tests/test_seed.py", "tests/test_cors.py", "tests/test_startup_seed.py",
            "tests/test_access_tokens.py", "tests/test_login_limiter.py", "tests/test_login_api.py", "tests/test_error_shape.py",
            "tests/test_role_dependencies.py", "tests/test_patient_record_service.py", "tests/test_patients_api.py",
-           "tests/test_contacts_api.py"], [33], [
+           "tests/test_contacts_api.py", "tests/test_cities.py"], [33], [
         ("CONTRACT.md present", lambda: has_file("CONTRACT.md")),
         (f"database tables from the contract: {_tables()[0]} of {_tables()[1]}", lambda: _tables()[0] == _tables()[1]),
         ("states, roles and the transition table (app/models/enums.py)", lambda: has_regex(r"ALLOWED_TRANSITIONS")),
