@@ -55,7 +55,7 @@ export default function Emergency() {
     setSending(true);
     setProblem('');
     try {
-      const location = await resolveLocation(!emergency.consents || emergency.consents.location !== false);
+      const location = await resolveLocation(!emergency.consents || emergency.consents.location !== false, emergency.patient_id);
       await sendSos(id, location);
       await reload();
     } catch {

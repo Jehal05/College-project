@@ -1,5 +1,5 @@
 import { usePresenting } from '../components/usePresenting.js';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getScope, setScope, setSelectedId as publishSelected, subscribeUi } from '../services/uiStore.js';
 import { hiddenCount } from '../services/queueScope.js';
 import { USE_MOCK, mockCreateEmergency, mockCreateEarlyNotice } from '../services/api.js';
@@ -11,6 +11,8 @@ import EmergencyDetail from '../components/EmergencyDetail.jsx';
 import ConnectionBadge from '../components/ConnectionBadge.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
+import { CityLabel } from '../components/CityBar.jsx';
+import { useCityScope } from '../components/useCityScope.js';
 import AvailabilityForm from '../components/AvailabilityForm.jsx';
 import OwnCapacity from '../components/OwnCapacity.jsx';
 import { useT } from '../i18n/index.js';
@@ -21,8 +23,9 @@ export default function Dashboard() {
   const { session } = useAuth();
   const { emergencies: everyAlert, visibleEmergencies, unreadCount, loading, error, refresh, markRead } = useEmergencies();
   const scope = useSyncExternalStore(subscribeUi, getScope);
-  const emergencies = visibleEmergencies;
-  const hidden = hiddenCount(everyAlert, session?.hospital_id, scope);
+  const cityScope = useCityScope();
+  const emergencies = useMemo(() => cityScope.alerts(visibleEmergencies), [cityScope, visibleEmergencies]);
+  const hidden = hiddenCount(cityScope.alerts(everyAlert), session?.hospital_id, scope);
   const listRef = useRef(null);
   const { hospitals, error: hospitalError } = useHospitals();
   const hospital = hospitals.find((h) => h.id === session?.hospital_id) || hospitals[0] || null;
@@ -64,6 +67,7 @@ export default function Dashboard() {
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-3 border-b border-slate-300 bg-white px-6 py-3">
         <h1 className="text-2xl font-bold">{hospital?.name || t('map.l.hospital')}</h1>
+        <CityLabel />
         <SimulatedBadge text={t('dash.simulatedEvent')} />
         <ConnectionBadge />
         <button

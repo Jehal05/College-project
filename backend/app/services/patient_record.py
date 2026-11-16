@@ -16,13 +16,14 @@ from sqlalchemy.orm import Session
 
 from app.models.consent import ConsentLedger
 from app.models.patient_data import Contact, Patient
+from app.services.cities import known_city_ids
 from app.services.consent import apply_consent, current_consents
 
 LANGUAGES = ("en", "hi", "gu")
 BLOOD_GROUPS = ("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
 SEX_CODES = ("M", "F", "O")
 RELATIONS = ("Mother", "Father", "Spouse", "Sibling", "Child", "Friend", "Other")
-EDITABLE = ("name", "age", "sex", "blood_group", "allergies", "conditions", "medications", "language")
+EDITABLE = ("name", "age", "sex", "blood_group", "allergies", "conditions", "medications", "language", "home_city_id")
 LIST_FIELDS = ("allergies", "conditions", "medications")
 MAX_CONTACTS = 5
 MAX_NAME = 100
@@ -84,6 +85,10 @@ def clean_patch(body: Any) -> Dict[str, Any]:
         if body["language"] not in LANGUAGES:
             raise RecordError("language must be one of: " + ", ".join(LANGUAGES))
         clean["language"] = body["language"]
+    if "home_city_id" in body:
+        if not isinstance(body["home_city_id"], str) or not body["home_city_id"] in known_city_ids():
+            raise RecordError("home_city_id must be one of: " + ", ".join(sorted(known_city_ids())))
+        clean["home_city_id"] = body["home_city_id"]
     for field in LIST_FIELDS:
         if field in body:
             items = body[field]
@@ -202,6 +207,9 @@ def patient_view(session: Session, patient: Patient, *, owner: bool) -> dict:
         "consents": consents,
     }
     view = full if owner else apply_consent(full, consents)
+    if owner:
+        if patient.home_city_id:
+            view["home_city_id"] = patient.home_city_id  # the owner's own choice; not sent to anyone else, left out when unset
     if view.get("sex") is None:
         view.pop("sex", None)                 # unknown is left out, never sent as null
     view["simulated"] = True

@@ -53,7 +53,7 @@ test('edit form round trip keeps the values', () => {
 
 test('an unverified hospital is never ranked, even if it is the best and nearest', () => {
   const config = load('ranking-config.json');
-  const hospitals = load('hospitals.json');
+  const hospitals = load('hospitals.json').filter((h) => h.city_id === 'AMD');
   const best = { ...hospitals[1], id: 'H9', name: 'New unverified', verified: false, lat: 23.0226, lng: 72.5715 };
   const out = rankHospitals([...hospitals, best], 'HEART', { lat: 23.0225, lng: 72.5714 }, config);
   assert.ok(!out.ranked.some((r) => r.hospital.id === 'H9'));

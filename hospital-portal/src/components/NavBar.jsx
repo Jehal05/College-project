@@ -11,6 +11,7 @@ import { useT } from '../i18n/index.js';
 import { roleText } from '../i18n/phrases.js';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
 import SoundControl from './SoundControl.jsx';
+import { CitySwitcher } from './CityBar.jsx';
 
 const links = [
   { to: '/dashboard', label: 'nav.dashboard' },
@@ -69,6 +70,7 @@ export default function NavBar() {
               <button data-testid="reset-no" onClick={() => setConfirmReset(false)} className="rounded bg-slate-300 px-3 py-1 font-semibold">{t('nav.resetNo')}</button>
             </span>
           )}
+          <CitySwitcher />
           {session?.hospital_from_login === false && hospitals.length > 0 && (
             <label className="flex items-center gap-2 text-sm text-slate-300">
               {t('nav.deskHospital')}

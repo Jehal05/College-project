@@ -50,14 +50,14 @@ def _hospital(db: Session, hospital_id: str) -> Hospital:
 
 @router.get("/hospitals")
 def list_hospitals(lat: Optional[str] = None, lng: Optional[str] = None, type: Optional[str] = None,
-                   actor: Actor = Depends(get_current_actor), db: Session = Depends(get_db)) -> list:
+                   city_id: Optional[str] = None, actor: Actor = Depends(get_current_actor), db: Session = Depends(get_db)) -> list:
     if actor.role not in ("HOSPITAL_STAFF", "ADMIN", "PATIENT"):
         _deny(db, actor, "hospital.list", "hospital", None)
     try:
-        where, kind = svc.parse_coordinates(lat, lng), svc.clean_type(type)
+        where, kind, city = svc.parse_coordinates(lat, lng), svc.clean_type(type), svc.clean_city(db, city_id)
     except svc.HospitalInputError as exc:
         raise _bad(exc) from None
-    return svc.list_hospitals(db, verified_only=actor.role == "PATIENT", where=where, emergency_type=kind)
+    return svc.list_hospitals(db, verified_only=actor.role == "PATIENT", where=where, emergency_type=kind, city_id=city)
 
 
 @router.patch("/hospitals/{hospital_id}/availability")
@@ -144,10 +144,18 @@ def _may_use_ambulance(db: Session, actor: Actor, amb: Ambulance) -> bool:
 
 
 @router.get("/ambulances")
-def list_ambulances(actor: Actor = Depends(get_current_actor), db: Session = Depends(get_db)) -> list:
+def list_ambulances(city_id: Optional[str] = None, actor: Actor = Depends(get_current_actor),
+                    db: Session = Depends(get_db)) -> list:
     if actor.role not in _STAFF:
         _deny(db, actor, "ambulance.list", "ambulance", None)
-    return [svc.ambulance_view(a) for a in db.query(Ambulance).order_by(Ambulance.id)]
+    try:
+        city = svc.clean_city(db, city_id)
+    except svc.HospitalInputError as exc:
+        raise _bad(exc) from None
+    query = db.query(Ambulance)
+    if city:
+        query = query.filter(Ambulance.city_id == city)
+    return [svc.ambulance_view(a) for a in query.order_by(Ambulance.id)]
 
 
 @router.post("/ambulances/{ambulance_id}/location")

@@ -1,5 +1,5 @@
 // Small helper functions: fake delay, auth check, distance maths, random vitals.
-const { tokens, hospitals } = require('./store');
+const { tokens, hospitals, cities } = require('./store');
 
 // Adds a 200-400 ms delay so loading states can be tested in the app.
 function delay(req, res, next) {
@@ -26,8 +26,20 @@ function distanceKm(lat1, lng1, lat2, lng2) {
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Demo location used when the patient app sends no location (same as the app's demo location).
-const DEMO_LOCATION = { lat: 23.0225, lng: 72.5714, accuracy: 50 }; // Ahmedabad (same as the portal's demo location)
+// The cities come from data/cities.json (a copy of backend/app/seed/data/cities.json). No coordinates are written in code.
+const cityById = (id) => cities.find((c) => c.city_id === id) || null;
+const DEFAULT_CITY = 'AMD';
+// Where a simulated emergency starts in a city: that city's simulation_start.
+const cityStart = (id) => { const c = cityById(id) || cityById(DEFAULT_CITY); return { lat: c.simulation_start.lat, lng: c.simulation_start.lng, accuracy: 50 }; };
+// The nearest city centre to a point, or null when the point is farther than FAR_KM from every city.
+const FAR_KM = 80;
+function nearestCity(point) {
+  if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return null;
+  const best = cities.map((c) => ({ c, d: distanceKm(point.lat, point.lng, c.lat, c.lng) })).sort((a, b) => a.d - b.d)[0];
+  return best && best.d <= FAR_KM ? best.c : null;
+}
+// Used when the patient app sends no location: the default city's start point (Ahmedabad, as before).
+const DEMO_LOCATION = cityStart(DEFAULT_CITY);
 
 // What each emergency type needs from a hospital: [capability key, availability key that must also be true].
 const REQUIRED = {
@@ -36,17 +48,26 @@ const REQUIRED = {
 
 // Ranks the verified hospitals: suitable ones first (capability present and ready), then by distance.
 // Stand-in for Puneet's ranking; rank 1 is the one alerted. Returns [{ ...hospital, distance_km, rank, suitable }].
-function rankHospitals(type, location, list = hospitals) {
+// cityId: the patient's current city. Hospitals of that city come first. A hospital of another city is ranked first only when
+// no hospital in the patient's own city can handle the emergency (then `other_city` is true and `note` says so).
+function rankHospitals(type, location, list = hospitals, cityId = null) {
   const where = location || DEMO_LOCATION;
   const [cap, ready] = REQUIRED[type] || ['emergency', null];
   const scored = list.filter((h) => h.verified).map((h) => ({
     ...h, distance_km: Number(distanceKm(where.lat, where.lng, h.lat, h.lng).toFixed(2)),
     suitable: Boolean(h.capabilities[cap] && (!ready || h.availability[ready]) && h.capabilities.emergency),
   }));
-  scored.sort((a, b) => (Number(b.suitable) - Number(a.suitable)) || (a.distance_km - b.distance_km));
-  return scored.map((h, i) => ({ ...h, rank: i + 1 }));
+  const ownOpen = cityId ? scored.some((h) => h.suitable && h.city_id === cityId) : true;
+  const home = (h) => (cityId && ownOpen && h.city_id !== cityId ? 1 : 0);        // the other city's hospitals come after
+  scored.sort((a, b) => (home(a) - home(b)) || (Number(b.suitable) - Number(a.suitable)) || (a.distance_km - b.distance_km));
+  const cityName = (cityById(cityId) || {}).city_name;
+  return scored.map((h, i) => {
+    const other = Boolean(cityId && h.city_id !== cityId);
+    const note = other && h.suitable && !ownOpen ? 'No suitable hospital is open in ' + cityName + ', so this one in ' + h.city_name + ' was chosen (simulated).' : undefined;
+    return { ...h, rank: i + 1, other_city: other, ...(note ? { note } : {}) };
+  });
 }
 
-function chooseHospital(type, location) { return rankHospitals(type, location)[0] || null; }
+function chooseHospital(type, location, cityId = null) { return rankHospitals(type, location, hospitals, cityId)[0] || null; }
 
-module.exports = { delay, requireAuth, distanceKm, chooseHospital, rankHospitals, DEMO_LOCATION };
+module.exports = { delay, requireAuth, distanceKm, chooseHospital, rankHospitals, DEMO_LOCATION, DEFAULT_CITY, cityById, cityStart, nearestCity };

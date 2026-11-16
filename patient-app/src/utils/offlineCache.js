@@ -3,7 +3,7 @@
 // Never uses localStorage or IndexedDB, and never stores report files (only the list).
 const PREFIX = 'ht.cache.';
 const memory = new Map();
-const CACHEABLE = [/^\/patients\/[^/]+$/, /^\/patients\/[^/]+\/(contacts|consents|reports|baseline)$/];
+const CACHEABLE = [/^\/cities$/, /^\/hospitals(\?.*)?$/, /^\/patients\/[^/]+$/, /^\/patients\/[^/]+\/(contacts|consents|reports|baseline)$/];
 
 export const isCacheable = (path) => CACHEABLE.some((rule) => rule.test(path));
 
@@ -29,7 +29,7 @@ export function clearCopies() {
   memory.clear();
   try {
     Object.keys(sessionStorage)
-      .filter((key) => key.startsWith(PREFIX) || key === 'ht.pending')
+      .filter((key) => key.startsWith(PREFIX) || key === 'ht.pending' || key === 'ht.city')
       .forEach((key) => sessionStorage.removeItem(key));
   } catch { /* storage blocked */ }
 }

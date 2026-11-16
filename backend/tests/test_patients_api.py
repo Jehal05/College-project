@@ -17,7 +17,7 @@ from app.sim.wearable import SimulatorRegistry, WearableSimulator
 
 ME = "/patients/PT-2026-0417"
 OWNER_KEYS = {"id", "name", "age", "sex", "blood_group", "blood_group_verified", "language", "allergies", "conditions",
-              "medications", "contacts", "consents", "simulated"}
+              "medications", "contacts", "consents", "simulated", "home_city_id"}
 STAFF = ("staff1", "demo-password")
 ADMIN = ("admin1", "demo-password")
 FAMILY = ("family1", "demo-password")

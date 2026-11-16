@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import useVitals from '../hooks/useVitals';
 import useBaseline from '../hooks/useBaseline';
+import useCity from '../hooks/useCity';
 import useConsents from '../hooks/useConsents';
 import useReports from '../hooks/useReports';
 import useReminders from '../hooks/useReminders';
@@ -35,6 +36,7 @@ export default function Overview() {
   const id = session.patient_id;
   const { vitals, connected } = useVitals();
   const { baseline } = useBaseline(id);
+  const { city } = useCity();
   const { consents } = useConsents(id);
   const sharing = !!consents && consents.vitals === true;
   const history = useVitalsHistory(vitals, sharing);
@@ -63,6 +65,7 @@ export default function Overview() {
       <div className="flex flex-wrap items-center gap-2">
         <StatusChip tone={connected ? 'ok' : 'caution'} icon={connected ? 'check' : 'alert'}>{connected ? t('overview.twinOnline') : t('overview.twinOffline')}</StatusChip>
         <DataSourceBadge source="simulated" />
+        {city && <Link to="/hospitals" className="rounded-full"><StatusChip tone="info" icon="pin">{t('city.chip', { name: city.city_name })}</StatusChip></Link>}
       </div>
       <QuickActions />
 

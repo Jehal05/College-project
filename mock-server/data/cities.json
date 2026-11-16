@@ -1,0 +1,35 @@
+{
+ "_comment": "Copied from backend/app/seed/data/cities.json (the truth). Fictional prototype data.",
+ "cities": [
+  {
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat",
+   "lat": 23.0225,
+   "lng": 72.5714,
+   "timezone": "Asia/Kolkata",
+   "zoom": 12,
+   "simulation_start": {
+    "lat": 23.0225,
+    "lng": 72.5714,
+    "label": "Ashram Road area"
+   },
+   "simulated": true
+  },
+  {
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra",
+   "lat": 18.5204,
+   "lng": 73.8567,
+   "timezone": "Asia/Kolkata",
+   "zoom": 12,
+   "simulation_start": {
+    "lat": 18.5204,
+    "lng": 73.8567,
+    "label": "Shivajinagar area"
+   },
+   "simulated": true
+  }
+ ]
+}

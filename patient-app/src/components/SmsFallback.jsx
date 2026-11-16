@@ -18,7 +18,7 @@ export default function SmsFallback() {
     let stop = false;
     getContacts(session.patient_id).then((c) => { if (!stop) setContacts(c); }).catch(() => { if (!stop) setContacts([]); });
     getConsents(session.patient_id)
-      .then((r) => (r.consents.location === true ? resolveLocation(true) : null)) // unknown consent counts as off
+      .then((r) => (r.consents.location === true ? resolveLocation(true, session.patient_id) : null)) // unknown consent counts as off
       .then((loc) => { if (!stop && loc && (loc.source === 'gps' || getUseDemo())) setLocation(loc); })
       .catch(() => {});
     return () => { stop = true; };

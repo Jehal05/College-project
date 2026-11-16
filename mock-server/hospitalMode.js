@@ -85,7 +85,11 @@ router.get('/emergencies', requireAuth, (req, res) => {
     ...(e.consents && e.consents.location && e.location ? {} : { location: undefined }) })));
 });
 
-router.get('/ambulances', requireAuth, (req, res) => res.json(store.ambulances));
+router.get('/ambulances', requireAuth, (req, res) => {
+  const cityId = req.query.city_id;
+  if (cityId !== undefined && !store.cities.some((c) => c.city_id === cityId)) return res.status(400).json({ error: 'city_id must be one of ' + store.cities.map((c) => c.city_id).join(', ') });
+  res.json(cityId ? store.ambulances.filter((a) => a.city_id === cityId) : store.ambulances);
+});
 // The portal's own simulator posts the ambulance position; the mock relays it as ambulance.location.
 router.post('/ambulances/:id/location', requireAuth, (req, res) => {
   const amb = store.ambulances.find((a) => a.id === req.params.id);

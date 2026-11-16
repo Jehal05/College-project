@@ -48,8 +48,8 @@ const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
 function seed() {
   if (seeded) return;
   seeded = true;
-  // Make the sample alerts look recent: 20, 12 and 5 seconds old.
-  const ages = [20, 12, 5];
+  // Make the sample alerts look recent: a few seconds old (three in Ahmedabad, two in Pune).
+  const ages = [20, 12, 5, 9, 3];
   mockAlerts.forEach((a, i) => {
     const created_at = new Date(Date.now() - (ages[i] ?? 5) * 1000).toISOString();
     records.set(a.emergency_id, {

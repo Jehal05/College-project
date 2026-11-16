@@ -9,7 +9,7 @@ const configure = ({ enabled, escalate_after_seconds: s }) => { demo.noAck = Boo
 
 // emit(emergency, type, state, payload, patch) and later(emergency, ms, fn) come from the simulator.
 function start(emergency, ranked, { emit, later }) {
-  const hospitalOf = (h) => ({ id: h.id, name: h.name, distance_km: h.distance_km });
+  const hospitalOf = (h) => ({ id: h.id, name: h.name, distance_km: h.distance_km, city_id: h.city_id, city_name: h.city_name, ...(h.other_city ? { other_city: true } : {}) });
   function step(level) {
     later(emergency, seconds() * 1000, () => {
       if (emergency.state !== 'SOS_SENT') return; // acknowledged, dispatched or cancelled: nothing to escalate
