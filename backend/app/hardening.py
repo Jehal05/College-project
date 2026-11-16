@@ -2,8 +2,9 @@
 
 - Security headers on every reply (no sniffing, no framing, no referrer leak, no caching of API replies).
 - A request whose Content-Length is above MAX_BODY_BYTES (default 8 MB) is refused with 413 before the
-  body is read. The report upload keeps its own, tighter 2 MB limit. A body sent without a
-  Content-Length (chunked) is not checked here; that is a known limit.
+  body is read. The report upload keeps its own, tighter 2 MB limit.
+- A body sent without a Content-Length (chunked) is counted as it is read; once it passes the same limit the
+  request is refused with 413 (if the answer has not started yet).
 Written as plain ASGI so WebSocket connections pass straight through untouched.
 """
 import json
@@ -28,6 +29,10 @@ def max_body_bytes() -> int:
     return value if value > 0 else DEFAULT_MAX_BODY_BYTES
 
 
+class _BodyTooLarge(Exception):
+    pass
+
+
 class SecurityMiddleware:
     def __init__(self, app: Callable[..., Awaitable[None]]) -> None:
         self.app = app
@@ -48,15 +53,36 @@ class SecurityMiddleware:
                     return
                 break
 
+        started = False
+
         async def send_with_headers(message: Dict[str, Any]) -> None:
+            nonlocal started
             if message["type"] == "http.response.start":
+                started = True
                 present = {name.lower() for name, _ in message.get("headers", [])}
                 headers = list(message.get("headers", []))
                 headers.extend((n, v) for n, v in SECURITY_HEADERS if n not in present)
                 message = {**message, "headers": headers}
             await send(message)
 
-        await self.app(scope, receive, send_with_headers)
+        seen = 0
+        limit = max_body_bytes()
+
+        async def counting_receive() -> Dict[str, Any]:
+            nonlocal seen
+            message = await receive()
+            if message["type"] == "http.request":
+                seen += len(message.get("body", b""))
+                if seen > limit:
+                    raise _BodyTooLarge()
+            return message
+
+        try:
+            await self.app(scope, counting_receive, send_with_headers)
+        except _BodyTooLarge:
+            if started:
+                raise  # the answer is already on its way; nothing honest can be added
+            await self._refuse(send)
 
     @staticmethod
     async def _refuse(send: Callable) -> None:

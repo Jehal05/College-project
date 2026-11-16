@@ -60,3 +60,33 @@ def test_limit_setting_falls_back_to_the_default_when_bad(monkeypatch):
     for bad in ("abc", "0", "-5", ""):
         monkeypatch.setenv("MAX_BODY_BYTES", bad)
         assert max_body_bytes() == DEFAULT_MAX_BODY_BYTES
+
+
+# ---- chunked bodies (no Content-Length): counted as they are read
+def _chunks(*sizes):
+    def gen():
+        for n in sizes:
+            yield b"x" * n
+    return gen()
+
+
+def test_a_chunked_body_over_the_limit_is_refused_with_413(monkeypatch):
+    monkeypatch.setenv("MAX_BODY_BYTES", "100")
+    r = client().post("/auth/login", content=_chunks(60, 60, 60),
+                      headers={"Content-Type": "application/json", "Origin": "http://localhost:5173"})
+    assert r.status_code == 413
+    assert r.json()["detail"] == "Request body is too large."
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+    assert r.headers["x-content-type-options"] == "nosniff"
+
+
+def test_a_chunked_body_under_the_limit_is_not_refused(monkeypatch):
+    monkeypatch.setenv("MAX_BODY_BYTES", "100000")
+    r = client().post("/no-such-route", content=_chunks(20, 20, 20))
+    assert r.status_code == 404
+
+
+def test_a_chunked_body_exactly_at_the_limit_is_not_refused(monkeypatch):
+    monkeypatch.setenv("MAX_BODY_BYTES", "100")
+    r = client().post("/no-such-route", content=_chunks(50, 50))
+    assert r.status_code == 404

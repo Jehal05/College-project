@@ -68,7 +68,7 @@ Then open <http://localhost:8000/docs> for the interactive API page, and <http:/
 | `BCRYPT_ROUNDS` | Password hashing cost. Keep 12 or more for anything real | 12 |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login lasts | 480 |
 | `LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS` | Login rate limit (wrong attempts per login, per address, and the window in seconds) | 5, 30, 60 |
-| `MAX_BODY_BYTES` | Largest request body accepted; bigger ones get 413 (checked from the Content-Length header). Report uploads keep their own 2 MB limit | 8388608 |
+| `MAX_BODY_BYTES` | Largest request body accepted; bigger ones get 413 (from the Content-Length header, or, for a chunked body, counted as it is read). Report uploads keep their own 2 MB limit | 8388608 |
 | `PASSPORT_TOKEN_EXPIRE_MINUTES` | How long a passport link lasts | 30 |
 | `DISPATCH_OWN_AMBULANCE_ONLY` | PROPOSED, not agreed: `true` lets a desk dispatch only ambulances based at its own hospital (403 otherwise). Off means any available ambulance, the old behaviour | off |
 | `ESCALATION_TIMEOUT_SECONDS`, `ESCALATION_SWEEP_SECONDS` | How long an alert may wait for a hospital to acknowledge before it goes to the next hospital, and how often the server checks | 30, 1 |
