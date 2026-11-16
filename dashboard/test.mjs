@@ -91,4 +91,31 @@ t("audit rows read both shapes and the CSV escapes", () => {
   assert.ok(csv[1].includes('"[""x""]"'));
 });
 
+t("most severe active emergency, and the tab title", () => {
+  const em = [
+    { id: "a", state: "SOS_SENT", severity: "URGENT", created_at: "2026-11-16T10:00:00Z" },
+    { id: "b", state: "SOS_SENT", severity: "EMERGENCY", created_at: "2026-11-16T09:00:00Z" },
+    { id: "c", state: "SOS_SENT", severity: "EMERGENCY", created_at: "2026-11-16T11:00:00Z" },
+    { id: "d", state: "CANCELLED", severity: "EMERGENCY", created_at: "2026-11-16T12:00:00Z" }];
+  assert.equal(L.mostSevere(em).id, "c", "highest severity, then newest, never a finished one");
+  assert.equal(L.mostSevere([]), null);
+  assert.equal(L.pageTitle(em), "(3) EMERGENCY - HealthTwin");
+  assert.equal(L.pageTitle([{ state: "CANCELLED" }]), "HealthTwin AI");
+});
+t("ambulance trail keeps order, skips repeats, stays bounded", () => {
+  let tr = [];
+  tr = L.appendTrail(tr, { lat: 1, lng: 1 }); tr = L.appendTrail(tr, { lat: 1, lng: 1 }); tr = L.appendTrail(tr, { lat: 2, lng: 1 });
+  assert.equal(tr.length, 2); assert.equal(tr[1].lat, 2);
+  let big = []; for (let i = 0; i < 12; i++) big = L.appendTrail(big, { lat: i, lng: 0 }, 5);
+  assert.equal(big.length, 5); assert.equal(big[0].lat, 7);
+});
+t("audit search needs every word and honours the outcome filter", () => {
+  const rows = [{ action: "emergency.list", role: "HOSPITAL_STAFF", outcome: "allowed" }, { action: "passport.view", role: "ADMIN", outcome: "denied", patient_id: "PT-1" }];
+  assert.equal(L.filterAudit(rows, "", "").length, 2);
+  assert.equal(L.filterAudit(rows, "passport admin", "").length, 1);
+  assert.equal(L.filterAudit(rows, "passport staff", "").length, 0);
+  assert.equal(L.filterAudit(rows, "", "denied").length, 1);
+  assert.equal(L.filterAudit(rows, "PT-1", "allowed").length, 0);
+});
+
 console.log("\n" + passed + " passed");

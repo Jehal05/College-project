@@ -153,3 +153,39 @@ export function auditCsv(rows) {
 }
 
 export const list = d => (Array.isArray(d) ? d : (d && (d.items || d.rows || d.results)) || []);
+
+// ---- added for the multi-view layout ----
+export const severityRank = s => SEVERITIES.indexOf(s);          // -1 when unknown
+
+/** The active emergency that needs a person first: highest severity, then newest. */
+export function mostSevere(emergencies) {
+  const act = (emergencies || []).filter(isActive);
+  if (!act.length) return null;
+  return act.slice().sort((a, b) => severityRank(b.severity) - severityRank(a.severity) || (parseTime(b.created_at) || 0) - (parseTime(a.created_at) || 0))[0];
+}
+
+/** Browser tab title: "(2) EMERGENCY - HealthTwin" when something is active, else "HealthTwin". */
+export function pageTitle(emergencies) {
+  const act = (emergencies || []).filter(isActive);
+  if (!act.length) return "HealthTwin AI";
+  const top = mostSevere(emergencies);
+  return "(" + act.length + ") " + (top.severity || "ALERT") + " - HealthTwin";
+}
+
+/** Remember where an ambulance has been. Same position twice in a row is stored once. */
+export function appendTrail(trail, point, max = 200) {
+  const last = trail[trail.length - 1];
+  if (last && last.lat === point.lat && last.lng === point.lng) return trail;
+  const next = trail.concat([point]);
+  return next.length > max ? next.slice(next.length - max) : next;
+}
+
+/** Audit search: every word must appear somewhere in the row, plus an optional outcome filter. */
+export function filterAudit(rows, text, outcome) {
+  const words = String(text || "").toLowerCase().split(/\s+/).filter(Boolean);
+  return rows.filter(r => {
+    if (outcome && r.outcome !== outcome) return false;
+    const hay = [r.timestamp, r.role, r.user_id, r.action, r.resource_id, r.patient_id, r.outcome, r.reason].join(" ").toLowerCase();
+    return words.every(w => hay.includes(w));
+  });
+}

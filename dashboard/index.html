@@ -3,85 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HealthTwin AI Operations Dashboard</title>
+<title>HealthTwin AI</title>
+<link id="fav" rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="bar">
-  <h1>HealthTwin AI</h1>
-  <span class="badge sim">SIMULATED DATA</span>
-  <span class="sp"></span>
-  <span id="chHealth" class="chip">system: -</span>
-  <span id="chLive" class="chip">offline</span>
-  <span id="chRole" class="chip" hidden></span>
-  <button class="ghost" id="btnTheme" aria-label="Switch light or dark mode">Theme</button>
-  <button class="ghost" id="btnOut" hidden>Log out</button>
-</header>
-
-<section id="login" class="panel narrow">
-  <h2>Log in</h2>
-  <label for="inUser">Username or email</label><input id="inUser" autocomplete="username" value="staff@demo.test">
-  <label for="inPass">Password</label><input id="inPass" type="password" autocomplete="current-password" value="demo1234">
-  <label for="inBase">Backend URL</label><input id="inBase">
-  <p><button id="btnGo">Log in</button></p>
-  <div id="loginMsg" class="note" role="status"></div>
-  <div class="note">Demo logins: staff@demo.test, admin@demo.test, patient@demo.test (password demo1234). Prototype only. Nothing here contacts real people, hospitals or ambulances.</div>
+<section id="login" class="login">
+  <div class="logincard">
+    <h1>HealthTwin AI</h1>
+    <p class="note">Simulated emergency-response prototype. Fake data only. Nothing real is contacted.</p>
+    <label for="inUser">Username or email</label><input id="inUser" autocomplete="username" value="staff@demo.test">
+    <label for="inPass">Password</label><input id="inPass" type="password" autocomplete="current-password" value="demo1234">
+    <label for="inBase">Backend URL</label><input id="inBase">
+    <p><button id="btnGo" class="primary">Log in</button></p>
+    <div id="loginMsg" class="note" role="status"></div>
+    <p class="note">Demo logins: staff@demo.test, admin@demo.test, patient@demo.test (password demo1234).</p>
+  </div>
 </section>
 
-<main id="app" hidden>
-  <div class="tiles" id="tiles"></div>
-
-  <div class="grid2">
-    <section class="panel">
-      <div class="phead"><h2>Emergency board</h2>
-        <label class="inl">Type <select id="fType"><option value="">All</option><option>HEART</option><option>STROKE</option><option>DIABETIC</option><option>ASTHMA</option><option>FALL</option></select></label>
-      </div>
-      <div id="board" class="state">Loading...</div>
-    </section>
-
-    <section class="panel">
-      <div class="phead"><h2>Map</h2><span class="note" id="mapNote"></span></div>
-      <div id="map" class="state">Loading...</div>
-      <div class="legend" aria-hidden="true"><span>&#9632; hospital</span><span>&#9679; ambulance</span><span>&#9670; patient</span></div>
-    </section>
+<div id="shell" class="shell" hidden>
+  <nav id="nav" class="nav" aria-label="Main">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span class="lbl">HealthTwin</span></div>
+    <div id="navItems" class="navitems"></div>
+    <button id="btnCollapse" class="navbtn collapse" aria-label="Collapse the menu"><span class="ic" id="icCollapse"></span><span class="lbl">Collapse</span></button>
+  </nav>
+  <div class="content">
+    <header class="top">
+      <span id="viewTitle" class="vtitle"></span>
+      <span class="badge sim">SIMULATED DATA</span>
+      <span class="sp"></span>
+      <span id="chHealth" class="chip">system: -</span>
+      <span id="chLive" class="chip">offline</span>
+      <span id="chRole" class="chip"></span>
+      <button class="ghost small" id="btnPalette" aria-label="Open the command palette">Search <kbd>Ctrl K</kbd></button>
+      <button class="ghost small" id="btnHelp" aria-label="Keyboard shortcuts">?</button>
+      <button class="ghost small" id="btnTheme" aria-label="Switch light or dark mode">Theme</button>
+      <button class="ghost small" id="btnOut">Log out</button>
+    </header>
+    <main id="view" class="view" tabindex="-1"></main>
+    <footer class="note foot">Simulated prototype. It supports escalation and never diagnoses. Hospital rules are drafts pending doctor review.</footer>
   </div>
+</div>
 
-  <div class="grid2">
-    <section class="panel">
-      <div class="phead"><h2>Vitals <span class="chip sim2">simulated</span></h2><span class="note" id="vSrc"></span></div>
-      <div id="vitals" class="state">Loading...</div>
-      <div class="note">Colours and words only compare a reading with the patient's own usual range. They are display aids, not a diagnosis. A person decides what to do next.</div>
-    </section>
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
 
-    <section class="panel">
-      <div class="phead"><h2>Hospital ranking</h2><span class="note" id="hNote"></span></div>
-      <div id="hospitals" class="state">Loading...</div>
-    </section>
-  </div>
-
-  <div class="grid3">
-    <section class="panel">
-      <h2>Live events</h2>
-      <div id="events" class="state">Waiting for events...</div>
-    </section>
-    <section class="panel">
-      <div class="phead"><h2 id="privTitle">Privacy and audit</h2></div>
-      <div id="privacy" class="state">Loading...</div>
-    </section>
-    <section class="panel" id="demoPanel" hidden>
-      <h2>Demo control <span class="chip sim2">demo mode</span></h2>
-      <div id="demo"></div>
-    </section>
-  </div>
-</main>
-
-<dialog id="dlg" aria-labelledby="dlgTitle">
-  <h2 id="dlgTitle"></h2>
-  <div id="dlgBody"></div>
-  <p><button class="ghost" id="dlgClose">Close</button></p>
+<dialog id="palette" aria-label="Command palette">
+  <input id="palIn" placeholder="Jump to a view or an emergency id..." aria-label="Search views and emergencies" autocomplete="off">
+  <ul id="palList" class="pal" role="listbox"></ul>
 </dialog>
-
-<footer class="note">Simulated emergency-response prototype. It supports escalation and never diagnoses. Hospital rules are drafts pending doctor review.</footer>
+<dialog id="help" aria-labelledby="helpT">
+  <h2 id="helpT">Keyboard shortcuts</h2>
+  <table><tbody>
+    <tr><td><kbd>Ctrl</kbd> <kbd>K</kbd></td><td>Search views and emergencies</td></tr>
+    <tr><td><kbd>1</kbd> to <kbd>7</kbd></td><td>Jump to a view (the number is shown in the menu)</td></tr>
+    <tr><td><kbd>J</kbd> / <kbd>K</kbd></td><td>Next / previous emergency</td></tr>
+    <tr><td><kbd>?</kbd></td><td>This sheet</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Close a sheet</td></tr>
+  </tbody></table>
+  <p><button class="ghost" id="helpClose">Close</button></p>
+</dialog>
 <script type="module" src="app.js"></script>
 </body>
 </html>
