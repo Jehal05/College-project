@@ -91,7 +91,8 @@ function sendSos(emergency, sent) {
   const patient = store.patients[emergency.patient_id] || {};
   const near = nearestCity(sent);
   const cityId = near ? near.city_id : (cityById(patient.home_city_id) ? patient.home_city_id : DEFAULT_CITY);
-  const location = near ? sent : { ...cityStart(cityId), source: 'simulated' };
+  const location = near ? sent : { ...cityStart(cityId), source: 'simulated' };   // used to rank and to route
+  const shared = sent ? location : null; // what is stored and announced: nothing when the person shares no location
   emergency.city_id = cityId; emergency.city_name = cityById(cityId).city_name;
   const ranked = rankHospitals(emergency.type, location, undefined, cityId);
   const top = ranked[0] || null;
@@ -100,7 +101,7 @@ function sendSos(emergency, sent) {
   const hospital = h && { id: h.id, name: h.name, distance_km: h.distance_km, city_id: top.city_id, city_name: top.city_name,
     ...(top.other_city ? { other_city: true } : {}), ...(top.note ? { note: top.note } : {}) };
   const first = emergency.state === 'EMERGENCY_DETECTED';
-  emergency.location = location || null;
+  emergency.location = shared;
   emergency.hospital = hospital || null;
   if (alertAt() === 'sos') {
     // The created event now carries the state SOS_SENT, the location and the hospital. Same state change as below.
@@ -109,7 +110,7 @@ function sendSos(emergency, sent) {
     announceCreated(emergency, hospital, top && top.rank);
     broadcast({ type: 'emergency.sos_sent', emergency_id: emergency.id, state: 'SOS_SENT', timestamp: new Date().toISOString(), payload: {} });
   } else {
-    emit(emergency, 'emergency.sos_sent', 'SOS_SENT', {}, { location, hospital });
+    emit(emergency, 'emergency.sos_sent', 'SOS_SENT', {}, { location: shared, hospital });
   }
   if (!first) return emergency;
 
