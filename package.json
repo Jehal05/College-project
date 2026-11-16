@@ -14,6 +14,7 @@
     "build": "npm run build -w patient-app",
     "contract": "node scripts/contract.mjs",
     "integration": "node scripts/integration.mjs",
+    "cities": "node scripts/cities-scenarios.mjs",
     "test": "npm test -w patient-app",
     "audit": "npm run audit -w patient-app"
   },

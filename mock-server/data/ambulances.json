@@ -13,7 +13,10 @@
    "lat": 23.0335,
    "lng": 72.569,
    "status": "available",
-   "simulated": true
+   "simulated": true,
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat"
   },
   {
    "id": "AMB-AMD-02",
@@ -27,7 +30,10 @@
    "lat": 23.039,
    "lng": 72.547,
    "status": "available",
-   "simulated": true
+   "simulated": true,
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat"
   },
   {
    "id": "AMB-AMD-03",
@@ -41,7 +47,10 @@
    "lat": 22.999,
    "lng": 72.6,
    "status": "available",
-   "simulated": true
+   "simulated": true,
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat"
   },
   {
    "id": "AMB-AMD-04",
@@ -55,7 +64,10 @@
    "lat": 23.04,
    "lng": 72.531,
    "status": "available",
-   "simulated": true
+   "simulated": true,
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat"
   },
   {
    "id": "AMB-AMD-05",
@@ -69,7 +81,95 @@
    "lat": 23.068,
    "lng": 72.652,
    "status": "available",
-   "simulated": true
+   "simulated": true,
+   "city_id": "AMD",
+   "city_name": "Ahmedabad",
+   "state": "Gujarat"
+  },
+  {
+   "id": "AMB-PNQ-01",
+   "portal_id": "AMB-6",
+   "call_sign": "Mutha 1",
+   "crew": {
+    "driver": "Sandeep Kulkarni",
+    "paramedic": "Pooja Deshmukh"
+   },
+   "base_hospital_id": "HSP-PNQ-001",
+   "lat": 18.5206,
+   "lng": 73.8439,
+   "status": "available",
+   "simulated": true,
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra"
+  },
+  {
+   "id": "AMB-PNQ-02",
+   "portal_id": "AMB-7",
+   "call_sign": "Bhima 2",
+   "crew": {
+    "driver": "Imran Shaikh",
+    "paramedic": "Anjali Pawar"
+   },
+   "base_hospital_id": "HSP-PNQ-002",
+   "lat": 18.501,
+   "lng": 73.859,
+   "status": "available",
+   "simulated": true,
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra"
+  },
+  {
+   "id": "AMB-PNQ-03",
+   "portal_id": "AMB-8",
+   "call_sign": "Indrayani 3",
+   "crew": {
+    "driver": "Vikram Jadhav",
+    "paramedic": "Rekha Nair"
+   },
+   "base_hospital_id": "HSP-PNQ-003",
+   "lat": 18.5545,
+   "lng": 73.9433,
+   "status": "available",
+   "simulated": true,
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra"
+  },
+  {
+   "id": "AMB-PNQ-04",
+   "portal_id": "AMB-9",
+   "call_sign": "Pavana 4",
+   "crew": {
+    "driver": "Ganesh Shinde",
+    "paramedic": "Tanvi Bhosale"
+   },
+   "base_hospital_id": "HSP-PNQ-004",
+   "lat": 18.6309,
+   "lng": 73.8039,
+   "status": "available",
+   "simulated": true,
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra"
+  },
+  {
+   "id": "AMB-PNQ-05",
+   "portal_id": "AMB-10",
+   "call_sign": "Ram 5",
+   "crew": {
+    "driver": "Nilesh Gaikwad",
+    "paramedic": "Farah Khan"
+   },
+   "base_hospital_id": "HSP-PNQ-005",
+   "lat": 18.562,
+   "lng": 73.7898,
+   "status": "available",
+   "simulated": true,
+   "city_id": "PNQ",
+   "city_name": "Pune",
+   "state": "Maharashtra"
   }
  ]
 }

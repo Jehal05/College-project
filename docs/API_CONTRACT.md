@@ -23,7 +23,7 @@ Conventions
 | Call | Body / answer |
 |---|---|
 | `GET /patients/:id` | `{ id, name, age, sex, blood_group, blood_group_verified, allergies[], conditions[], medications[], language ("en"\|"hi"\|"gu"), contacts[], consents{location,history,vitals,reports} }`; `404` if unknown |
-| `PATCH /patients/:id` | any of `name, age, sex, blood_group, allergies, conditions, medications, language, consents`; answers the updated patient |
+| `PATCH /patients/:id` | any of `name, age, sex, blood_group, allergies, conditions, medications, language, consents, home_city_id` (a known city id, otherwise `400`); answers the updated patient. `GET` carries `home_city_id` |
 | `GET /patients/:id/vitals` | `{ heart_rate, spo2, bp "120/80", glucose, resp_rate, timestamp }` |
 | `GET /patients/:id/baseline` | `{ heart_rate{min,max}, spo2{min,max}, bp_systolic{..}, bp_diastolic{..}, glucose{..}, updated_at }` |
 
@@ -62,7 +62,8 @@ Changes apply to the NEXT emergency and to the passport page immediately.
 | `POST /emergencies/:id/sos` | `{ location?: { lat, lng, accuracy, source } }` -> `200 { id, state, hospital }`. Sending twice is harmless. `409` if cancelled |
 | `POST /emergencies/:id/cancel` | `200 { id, state: "CANCELLED" }`; `409` if already finished |
 | `GET /emergencies/:id` | `{ id, patient_id, type, symptoms[], location, state, severity, hospital, ambulance, eta_seconds, status_events[ { state, timestamp } ], contacts_notified[] }`; `404` |
-| `GET /hospitals?lat=&lng=` | `[ { id, name, lat, lng, capabilities[], available, verified, distance_km } ]` nearest first |
+| `GET /hospitals?lat=&lng=&city_id=` | `[ { id, name, lat, lng, capabilities[], available, verified, distance_km, city_id, city_name, state } ]` nearest first. Optional `city_id` keeps one city (unknown id: `400`) |
+| `GET /cities` | `[ { city_id, city_name, state, lat, lng, timezone, zoom, simulation_start { lat, lng, label }, simulated } ]`, any logged-in role. Truth: `backend/app/seed/data/cities.json` (AMD Ahmedabad, PNQ Pune) |
 
 The location is stored only when the `location` consent is on. Symptom IDs per type: HEART `CHEST_PAIN, SHORT_BREATH, SWEATING, NAUSEA, ARM_JAW_PAIN, FAINTING`; STROKE `FACE_DROOP, LIMB_WEAKNESS, SLURRED_SPEECH, SUDDEN_CONFUSION, SEVERE_HEADACHE`; DIABETIC `DIA_CONFUSION, DIA_SHAKING, DIA_SWEATING, DIA_FAINTING, LOW_GLUCOSE_READING`; ASTHMA `WHEEZING, CANNOT_SPEAK_SENTENCES, SEVERE_SHORT_BREATH, BLUE_LIPS`.
 
@@ -232,3 +233,10 @@ Demo logins (password `demo1234`): `family@demo.test` (FAMILY, not linked yet), 
 Audit rows added (visible to admin at `GET /audit`): `family.invite_created`, `family.link`, `family.checkin`, `responder.register`, `responder.accept`, `admin.user_update`, `content.update`, `privacy.export_request`, `privacy.delete_request`.
 
 States used by these endpoints (from Daksh's table): `SOS_SENT`, `HOSPITAL_ACKNOWLEDGED`, `AMBULANCE_DISPATCHED`, `EN_ROUTE`, `ARRIVED` count as "live".
+
+## Two cities (Ahmedabad and Pune)
+
+- `GET /cities`, `city_id` / `city_name` / `state` on hospitals and ambulances, `?city_id=` on `GET /hospitals` and `GET /ambulances`, and `home_city_id` on the patient are the same on the mock server and on Daksh's backend. `scripts/contract.mjs` checks all of them.
+- Ids keep their city prefix: `HSP-AMD-001..005`, `HSP-PNQ-001..005`, `AMB-AMD-01..05`, `AMB-PNQ-01..05`. Pune patients `PT-2026-0420..0422` and Ahmedabad patients `PT-2026-0417..0419` are the same on both (mock: copied from `backend/app/seed/data/patients_more.json`).
+- **Mock only (the backend ranks across cities in a later phase).** The mock picks the patient's current city from the SOS location (nearest city centre within 80 km; otherwise the patient's `home_city_id`, and the location is replaced by that city's `simulation_start` with `source: "simulated"`). Hospitals of that city are ranked first. A hospital of another city is chosen only when no hospital in the patient's own city can handle the emergency. Then `emergency.hospital` has `other_city: true` and a plain `note`. `emergency.city_id` and `city_name` say which city the response ran in.
+- `POST /demo/scenario` accepts an optional `{ city_id, patient_id }`. The practice emergency starts at that city's `simulation_start` (default: the patient's home city).

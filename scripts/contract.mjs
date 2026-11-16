@@ -86,6 +86,27 @@ await test('GET /hospitals', async () => {
   const r = await call('GET', '/hospitals'); expectStatus(r, 200); if (!r.json.length) fail('no hospitals');
   expectShape(r.json[0], { id: 'string', name: 'string', lat: 'number', lng: 'number', capabilities: 'object', availability: 'object', verified: 'boolean', distance_km: 'number' });
 });
+await test('GET /cities -> [{ city_id, city_name, state, lat, lng, timezone, zoom, simulation_start }] (AMD and PNQ)', async () => {
+  const r = await call('GET', '/cities'); expectStatus(r, 200); if (!Array.isArray(r.json)) fail('should be a list');
+  for (const id of ['AMD', 'PNQ']) if (!r.json.some((c) => c.city_id === id)) fail('city ' + id + ' is missing');
+  for (const c of r.json) { expectShape(c, { city_id: 'string', city_name: 'string', state: 'string', lat: 'number', lng: 'number', timezone: 'string', zoom: 'number', simulation_start: 'object' }); expectShape(c.simulation_start, { lat: 'number', lng: 'number', label: 'string' }, 'simulation_start'); }
+  expectError(await call('GET', '/cities', { auth: false }), 401);
+});
+await test('city_id on hospitals and ambulances, and the ?city_id= filter (unknown id -> 400)', async () => {
+  const all = (await call('GET', '/hospitals')).json;
+  for (const h of all) expectShape(h, { city_id: 'string', city_name: 'string', state: 'string' }, 'hospital ' + h.id);
+  const pune = await call('GET', '/hospitals?city_id=PNQ'); expectStatus(pune, 200);
+  if (!pune.json.length || pune.json.some((h) => h.city_id !== 'PNQ')) fail('?city_id=PNQ should return only Pune hospitals');
+  if (!all.some((h) => h.id.startsWith('HSP-AMD-')) || !pune.json.every((h) => h.id.startsWith('HSP-PNQ-'))) fail('hospital ids should keep their city prefix');
+  if (all.length <= pune.json.length) fail('the unfiltered list should hold both cities');
+  expectError(await call('GET', '/hospitals?city_id=XYZ'), 400);
+});
+await test('PATCH /patients/:id home_city_id (known city saved, unknown -> 400) and back', async () => {
+  const before = (await call('GET', P())).json.home_city_id; if (typeof before !== 'string') fail('GET /patients/:id should carry home_city_id');
+  const to = before === 'PNQ' ? 'AMD' : 'PNQ'; const r = await call('PATCH', P(), { body: { home_city_id: to } }); expectStatus(r, 200);
+  if (r.json.home_city_id !== to) fail('home_city_id was not saved'); expectError(await call('PATCH', P(), { body: { home_city_id: 'XYZ' } }), 400);
+  await call('PATCH', P(), { body: { home_city_id: before } });
+});
 let emergencyId = null;
 await test('emergencies: create (201), invalid (400), get, sos, cancel, unknown (404)', async () => {
   const made = await call('POST', '/emergencies', { body: { patient_id: pid, type: 'HEART', symptoms: ['CHEST_PAIN', 'SHORT_BREATH'] } }); expectStatus(made, 201);
