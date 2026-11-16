@@ -163,7 +163,7 @@ The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from
 | Clinician review of report values | Shown as "not reviewed"; no review workflow exists |
 | Hospital portal | Restyled but light theme only |
 | Body model contents | No muscles, nerves or reproductive organs; the lungs are a generic outline shape built around the airways (source has none); organ shapes are not personal |
-| 3D model file | About 2.6 MB, not cached offline; offline or without WebGL a hand-drawn 2D body map is shown (a body outline with faint ribs and spine, simpler than the 3D model) |
+| 3D model file | About 2.6 MB, not cached offline; offline or without WebGL a hand-drawn 2D body map is shown (a soft figure with organ shapes, simpler than the 3D model) |
 | Model licence | CC BY 4.0 (attribution required, no share-alike); licence page re-check advised before public release |
 | One admin browser test (A1) | Occasionally fails on CI and passes on rerun; cause not found |
 

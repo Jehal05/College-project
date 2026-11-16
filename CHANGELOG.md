@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2D body map
-- The no-WebGL fallback now draws a body outline (head, neck, shoulders, waist, arms, legs) with faint ribs and spine. Organ positions unchanged. Still a simple drawing, not the 3D model.
+- The no-WebGL fallback is now a soft, friendly figure (no ribs or spine lines, which looked eerie) with organs drawn as recognisable shapes (heart, lungs, kidneys, liver, brain). Organ positions unchanged. Still a simple drawing, not the 3D model.
 
 ## UI phase 4: hospital look and a real human body model
 - Patient app: light hospital-website look by default (dark kept), utility bar, breadcrumb, hero banner, quick actions, footer, About/credits screen. Hospital portal: matching background, login header, simulated-demo footer. New text in en/hi/gu (hi/gu unreviewed drafts).
