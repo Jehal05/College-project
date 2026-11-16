@@ -125,4 +125,10 @@ Docs-only push (ownership map and drafts). All runs finished with success:
 | Backend checks (pytest) | pull_request | success (no push-event run was listed for this sha; the workflow seems to run on pull requests for this change, GUESS) |
 | CI (patient-app unit, contract, audit, browser) | push and pull_request | success |
 
-A1 (`phase10-apps.test.mjs`): passed on both events at ed3b56b (22/22 browser files, 505 checks). Run count so far since `main` was merged: 2 commits (`fdf955f`, `ed3b56b`) x 2 events = 4 CI runs, all passing. Four runs are not proof the flake is fixed. No code changed in this phase, so no new SANDBOX test was needed; the decisions commit changes docs only (the backend contract test reads route tables only, and no table row changed).
+A1 (`phase10-apps.test.mjs`): passed on both events at ed3b56b (22/22 browser files, 505 checks). Run count since `main` was merged: see the next section for the total. No code changed in this phase, so no new SANDBOX test was needed; the decisions commit changes docs only (the backend contract test reads route tables only, and no table row changed).
+
+### Phase 7A: CI on 5a347a7 (decisions commit, docs only) and A1 count
+
+Hospital portal checks (pull_request), Backend checks (push and pull_request): success. CI pull_request run: success, A1 passed, 22/22 browser files, 505 checks. **CI push run: failure, A1 failed again** (21/22 files, 505 checks; `GET /admin/users` and `GET /content/*` still pending), the same pending-request failure as before. No code changed in this commit.
+
+A1 since `main` was merged (3 commits `fdf955f`, `ed3b56b`, `5a347a7`, 2 events each = 6 CI runs): 5 passed, 1 failed. So merging `main` did **not** fix A1, and the earlier idea that the PR-merge tree was the cause is not supported (GUESS withdrawn). The root cause is still unknown. A1 is in the patient app, which is Jehal's area.
