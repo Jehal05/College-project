@@ -52,9 +52,9 @@ def pdf_text(data: bytes) -> str:
 @router.post("/reports/extract")
 async def extract_report(request: Request, actor: Actor = Depends(get_current_actor),
                          db: Session = Depends(get_db)) -> dict:
-    if actor.role != "PATIENT" or not actor.patient_id:
-        authorize_patient_record(db, actor, actor.patient_id or "none", "report.extract", "report")
-    authorize_patient_record(db, actor, actor.patient_id, "report.extract", "report")
+    # One check. Only a PATIENT with a record of their own passes; everyone else gets 403 (audited with id "none").
+    own = actor.patient_id if actor.role == "PATIENT" and actor.patient_id else "none"
+    authorize_patient_record(db, actor, own, "report.extract", "report")
     if db.get(Patient, actor.patient_id) is None:
         raise HTTPException(status_code=404, detail="Patient not found")
     try:

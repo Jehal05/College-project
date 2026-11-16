@@ -56,6 +56,7 @@ def test_staff_and_admin_are_403_and_audited(demo, engine, who):
     with Session(engine) as s:
         row = s.query(AuditLog).filter(AuditLog.action == "report.extract", AuditLog.outcome == "denied").first()
     assert row is not None and row.reason == "forbidden_role"
+    assert row.resource_id == "none"        # unchanged by the single-check cleanup: no patient id is revealed or guessed
 
 
 def test_a_refusal_comes_before_the_type_check(demo):
