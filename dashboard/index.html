@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HealthTwin AI Operations Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <h1>HealthTwin AI</h1>
+  <span class="badge sim">SIMULATED DATA</span>
+  <span class="sp"></span>
+  <span id="chHealth" class="chip">system: -</span>
+  <span id="chLive" class="chip">offline</span>
+  <span id="chRole" class="chip" hidden></span>
+  <button class="ghost" id="btnTheme" aria-label="Switch light or dark mode">Theme</button>
+  <button class="ghost" id="btnOut" hidden>Log out</button>
+</header>
+
+<section id="login" class="panel narrow">
+  <h2>Log in</h2>
+  <label for="inUser">Username or email</label><input id="inUser" autocomplete="username" value="staff@demo.test">
+  <label for="inPass">Password</label><input id="inPass" type="password" autocomplete="current-password" value="demo1234">
+  <label for="inBase">Backend URL</label><input id="inBase">
+  <p><button id="btnGo">Log in</button></p>
+  <div id="loginMsg" class="note" role="status"></div>
+  <div class="note">Demo logins: staff@demo.test, admin@demo.test, patient@demo.test (password demo1234). Prototype only. Nothing here contacts real people, hospitals or ambulances.</div>
+</section>
+
+<main id="app" hidden>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="grid2">
+    <section class="panel">
+      <div class="phead"><h2>Emergency board</h2>
+        <label class="inl">Type <select id="fType"><option value="">All</option><option>HEART</option><option>STROKE</option><option>DIABETIC</option><option>ASTHMA</option><option>FALL</option></select></label>
+      </div>
+      <div id="board" class="state">Loading...</div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Map</h2><span class="note" id="mapNote"></span></div>
+      <div id="map" class="state">Loading...</div>
+      <div class="legend" aria-hidden="true"><span>&#9632; hospital</span><span>&#9679; ambulance</span><span>&#9670; patient</span></div>
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="panel">
+      <div class="phead"><h2>Vitals <span class="chip sim2">simulated</span></h2><span class="note" id="vSrc"></span></div>
+      <div id="vitals" class="state">Loading...</div>
+      <div class="note">Colours and words only compare a reading with the patient's own usual range. They are display aids, not a diagnosis. A person decides what to do next.</div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Hospital ranking</h2><span class="note" id="hNote"></span></div>
+      <div id="hospitals" class="state">Loading...</div>
+    </section>
+  </div>
+
+  <div class="grid3">
+    <section class="panel">
+      <h2>Live events</h2>
+      <div id="events" class="state">Waiting for events...</div>
+    </section>
+    <section class="panel">
+      <div class="phead"><h2 id="privTitle">Privacy and audit</h2></div>
+      <div id="privacy" class="state">Loading...</div>
+    </section>
+    <section class="panel" id="demoPanel" hidden>
+      <h2>Demo control <span class="chip sim2">demo mode</span></h2>
+      <div id="demo"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <h2 id="dlgTitle"></h2>
+  <div id="dlgBody"></div>
+  <p><button class="ghost" id="dlgClose">Close</button></p>
+</dialog>
+
+<footer class="note">Simulated emergency-response prototype. It supports escalation and never diagnoses. Hospital rules are drafts pending doctor review.</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
