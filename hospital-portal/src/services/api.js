@@ -3,6 +3,7 @@
 // Daksh's real backend later only means setting VITE_USE_MOCK=false.
 import hospitalsSeed from '../data/hospitals.json';
 import ambulancesSeed from '../data/ambulances.json';
+import citiesSeed from '../data/cities.json';
 import * as mock from './mockBackend.js';
 import { USE_MOCK, API_BASE_URL } from './config.js';
 import { emitMock } from './socket.js';
@@ -184,6 +185,17 @@ export const mockCreateEmergency = (type) => mock.createEmergency(type);
  * PROPOSED endpoint, not in the contract yet: GET /ambulances
  * -> [{ id, call_sign, crew: { driver, paramedic }, base_hospital_id, lat, lng, status }]
  */
+/** GET /cities. In mock mode, and when the backend has no such endpoint yet, the saved list (src/data/cities.json) is used. */
+export async function getCities() {
+  if (USE_MOCK) return citiesSeed;
+  try {
+    return await request('GET', '/cities');
+  } catch (err) {
+    if (!isMissingEndpoint(err)) throw err;
+    return citiesSeed;
+  }
+}
+
 export async function getAmbulances() {
   if (USE_MOCK) return mock.listAmbulances();
   try {

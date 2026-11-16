@@ -8,6 +8,7 @@ import App from './App.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { EmergencyProvider } from './components/EmergencyProvider.jsx';
 import { HospitalProvider } from './components/HospitalProvider.jsx';
+import { CityProvider } from './components/CityProvider.jsx';
 import { AmbulanceProvider } from './components/AmbulanceProvider.jsx';
 import { HistoryProvider } from './components/HistoryProvider.jsx';
 
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <HospitalProvider>
+         <CityProvider>
           <EmergencyProvider>
             <AmbulanceProvider>
               <HistoryProvider>
@@ -24,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               </HistoryProvider>
             </AmbulanceProvider>
           </EmergencyProvider>
+         </CityProvider>
         </HospitalProvider>
       </AuthProvider>
     </BrowserRouter>

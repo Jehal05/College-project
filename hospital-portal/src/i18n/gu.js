@@ -686,4 +686,8 @@ export default {
   'act.nk.note': 'નોંધ',
   'map.demoLoc': 'ડેમો દર્દીનું લોકેશન',
   'map.sampleTag': '(નમૂનો)',
+  'city.label': 'શહેર',
+  'city.all': 'બધાં શહેરો',
+  'city.showing': 'બતાવી રહ્યા છીએ: {name}',
+  'city.yours': 'શહેર: {name}',
 };

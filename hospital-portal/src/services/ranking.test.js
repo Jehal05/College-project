@@ -5,7 +5,7 @@ import { rankHospitals } from './ranking.js';
 import { secondsLeft, fallbackStatuses, nextHospital } from './escalation.js';
 
 const load = (name) => JSON.parse(fs.readFileSync(new URL(`../data/${name}`, import.meta.url)));
-const hospitals = load('hospitals.json');
+const hospitals = load('hospitals.json').filter((h) => h.city_id === 'AMD'); // these tests were written for the five Ahmedabad hospitals; the cross-city ranking has its own tests
 const config = load('ranking-config.json');
 const PATIENT = { lat: 23.0225, lng: 72.5714 }; // demo location; H1 is the nearest hospital
 const ids = (rows) => rows.map((r) => r.hospital.id);

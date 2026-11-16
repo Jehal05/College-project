@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { useHistory } from '../components/HistoryProvider.jsx';
 import { useAmbulances } from '../components/AmbulanceProvider.jsx';
+import { CityLabel } from '../components/CityBar.jsx';
+import { useCityScope } from '../components/useCityScope.js';
 import BarChart, { PALETTE } from '../components/BarChart.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { summarise, STEPS } from '../services/analytics.js';
@@ -24,8 +26,11 @@ function Tile({ label, value, testId, note }) {
 
 export default function Analytics() {
   const t = useT();
-  const { cases, loading, error } = useHistory();
-  const { ambulances } = useAmbulances();
+  const { cases: allCases, loading, error } = useHistory();
+  const { ambulances: allAmbulances } = useAmbulances();
+  const cityScope = useCityScope();
+  const cases = useMemo(() => cityScope.alerts(allCases), [cityScope, allCases]);
+  const ambulances = useMemo(() => cityScope.byCity(allAmbulances), [cityScope, allAmbulances]);
   const s = useMemo(() => summarise(cases, ambulances), [cases, ambulances]);
   const samples = cases.filter((c) => c.sample).length;
 
@@ -37,6 +42,7 @@ export default function Analytics() {
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold">{t('an.title')}</h1>
+        <CityLabel />
         <SimulatedBadge text={t('an.badge')} />
         {loading && <span className="text-slate-500">{t('common.loading')}</span>}
       </div>

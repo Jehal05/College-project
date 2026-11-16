@@ -687,4 +687,8 @@ export default {
   'act.nk.note': 'Note',
   'map.demoLoc': 'Demo patient location',
   'map.sampleTag': '(sample)',
+  'city.label': 'City',
+  'city.all': 'All cities',
+  'city.showing': 'Showing: {name}',
+  'city.yours': 'City: {name}',
 };
