@@ -142,9 +142,13 @@ The patient app now opens in a light, hospital-website style (utility bar with 1
 
 The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from BodyParts3D, licensed CC BY 4.0. Credits, adaptations and rebuild steps: [`docs/MODEL_CREDITS.md`](docs/MODEL_CREDITS.md); the in-app About screen lists them too. You can tap an organ, switch layers (skin, skeleton, organs), and see front or back. Organ colour and a status word (within range / different from your baseline) come from the existing rule-based logic, not from the model. The note "Generic anatomy illustration. It is not a scan of your body." is always shown.
 
-| Hospital overview | Body model | Portal login | Portal dashboard |
-|---|---|---|---|
-| <img src="docs/images/ui/phase4-hospital-overview-light-desktop.png" width="200" alt="Hospital style overview"> | <img src="docs/images/ui/phase4-body-twin-light-desktop.png" width="200" alt="Human body model"> | <img src="docs/images/ui/phase4-portal-login.png" width="200" alt="Portal login"> | <img src="docs/images/ui/phase4-portal-dashboard.png" width="200" alt="Portal dashboard"> |
+| Overview | 3D body model | Organ focus (heart) |
+|---|---|---|
+| <img src="docs/images/ui/phase1-overview-desktop.png" width="260" alt="Hospital style overview"> | <img src="docs/images/ui/phase1-twin3d-desktop.png" width="260" alt="Human body model with organs"> | <img src="docs/images/ui/phase4-body-twin-heart-desktop.png" width="260" alt="Heart selected on the 3D body"> |
+
+| 2D fallback (no WebGL) | Hospital portal login | Hospital portal dashboard |
+|---|---|---|
+| <img src="docs/images/ui/phase4-body-2d-desktop.png" width="260" alt="2D body map"> | <img src="docs/images/ui/phase4-portal-login.png" width="260" alt="Portal login"> | <img src="docs/images/portal-dashboard.png" width="260" alt="Portal dashboard"> |
 
 ## Status and honest limits
 
