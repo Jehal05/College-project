@@ -4,9 +4,9 @@ The engine is created lazily so tests can point DATABASE_URL somewhere else.
 Phase 1 Task 2 will add the remaining tables to the same Base.
 """
 import os
-from typing import Iterator, Optional
+from typing import Iterator, List, Optional
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -81,6 +81,51 @@ def get_db() -> Iterator[Session]:
 
 def init_db(engine: Optional[Engine] = None) -> None:
     """Create all tables (and the ledger triggers)."""
-    from app.models import accounts, apps, audit, consent, emergencies, extras, hospitals, patient_data  # noqa: F401  (registers the tables)
+    from app.models import accounts, apps, audit, cities, consent, emergencies, extras, hospitals, patient_data  # noqa: F401  (registers the tables)
 
-    Base.metadata.create_all(engine or get_engine())
+    engine = engine or get_engine()
+    Base.metadata.create_all(engine)
+    add_missing_columns(engine)
+    from app.services.cities import ensure_cities
+    with Session(engine) as session:
+        ensure_cities(session)
+        session.commit()
+    backfill_cities(engine)
+
+
+def add_missing_columns(engine: Engine) -> List[str]:
+    """Additive migration: a table made by an older version gets the new NULLABLE columns (and their indexes).
+
+    It only ever adds. It never drops, renames or rewrites anything, so it is safe to run on every start and any number of
+    times. A new column that is NOT NULL without a default cannot be added to a table that has rows, so it is skipped here
+    and must have its own migration. Returns the "table.column" names it added.
+    """
+    added: List[str] = []
+    inspector = inspect(engine)
+    for table in Base.metadata.sorted_tables:
+        if not inspector.has_table(table.name):
+            continue
+        have = {c["name"] for c in inspector.get_columns(table.name)}
+        for column in table.columns:
+            if column.name in have or not column.nullable:
+                continue
+            ddl = column.type.compile(dialect=engine.dialect)
+            with engine.begin() as connection:
+                connection.execute(text('ALTER TABLE "%s" ADD COLUMN "%s" %s' % (table.name, column.name, ddl)))
+            added.append(table.name + "." + column.name)
+        for index in table.indexes:
+            index.create(engine, checkfirst=True)
+    return added
+
+
+def backfill_cities(engine: Engine) -> None:
+    """Rows from before the city network get their city from the id they already have (HSP-AMD-001 is Ahmedabad).
+
+    A row whose id prefix names no known city is left empty rather than given a wrong city.
+    """
+    with engine.begin() as c:
+        c.execute(text("UPDATE hospitals SET city_id = substr(id, 5, 3) WHERE city_id IS NULL AND id LIKE 'HSP-___-%' "
+                       "AND substr(id, 5, 3) IN (SELECT city_id FROM cities)"))
+        c.execute(text("UPDATE ambulances SET city_id = substr(id, 5, 3) WHERE city_id IS NULL AND id LIKE 'AMB-___-%' "
+                       "AND substr(id, 5, 3) IN (SELECT city_id FROM cities)"))
+        c.execute(text("UPDATE patients SET home_city_id = 'AMD' WHERE home_city_id IS NULL AND id = 'PT-2026-0417'"))

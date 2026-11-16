@@ -40,7 +40,7 @@ def test_staff_see_every_hospital_nearest_first_in_the_contract_shape(demo):
     r = demo.get("/hospitals?lat=23.02&lng=72.57", headers=demo.headers(*STAFF))
     assert r.status_code == 200
     body = r.json()
-    assert len(body) == 5
+    assert len(body) == 10          # both cities, ranked by distance from the point
     assert [h["distance_km"] for h in body] == sorted(h["distance_km"] for h in body)
     first = body[0]
     assert {"id", "name", "lat", "lng", "capabilities", "availability", "verified", "distance_km", "simulated"} <= set(first)
@@ -54,15 +54,15 @@ def test_a_type_puts_the_hospitals_that_can_handle_it_first(demo):
     flags = [h["suitable"] for h in body]
     assert flags == sorted(flags, reverse=True) and flags[0] is True and flags[-1] is False
     ids = {h["id"] for h in body if h["suitable"]}
-    assert ids == {"HSP-AMD-002", "HSP-AMD-004"}
+    assert ids == {"HSP-AMD-002", "HSP-AMD-004", "HSP-PNQ-001", "HSP-PNQ-003", "HSP-PNQ-004"}   # stroke units in both cities
 
 
 def test_a_patient_sees_only_verified_hospitals(demo, engine):
     with Session(engine) as s:
         s.get(Hospital, "HSP-AMD-005").verified = False
         s.commit()
-    assert len(demo.get("/hospitals", headers=demo.headers(*PATIENT)).json()) == 4
-    assert len(demo.get("/hospitals", headers=demo.headers(*STAFF)).json()) == 5
+    assert len(demo.get("/hospitals", headers=demo.headers(*PATIENT)).json()) == 9
+    assert len(demo.get("/hospitals", headers=demo.headers(*STAFF)).json()) == 10
 
 
 @pytest.mark.parametrize("who", [FAMILY, RESPONDER])
@@ -195,14 +195,14 @@ def test_a_bad_hospital_is_400_and_nothing_is_saved(demo, engine, change):
     r = demo.post("/hospitals", json={**NEW, **change}, headers=demo.headers(*ADMIN))
     assert r.status_code == 400
     with Session(engine) as s:
-        assert s.query(Hospital).count() == 5
+        assert s.query(Hospital).count() == 10
 
 
 # ------------------------------------------------------------ ambulances
 
 def test_staff_list_the_ambulances(demo):
     r = demo.get("/ambulances", headers=demo.headers(*STAFF))
-    assert r.status_code == 200 and len(r.json()) == 5
+    assert r.status_code == 200 and len(r.json()) == 10
     first = r.json()[0]
     assert {"id", "call_sign", "crew", "base_hospital_id", "lat", "lng", "status", "simulated"} <= set(first)
     assert set(first["crew"]) == {"driver", "paramedic"}

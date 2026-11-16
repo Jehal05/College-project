@@ -39,5 +39,6 @@
     "history": true,
     "vitals": true,
     "reports": true
-  }
+  },
+  "home_city_id": "AMD"
 }

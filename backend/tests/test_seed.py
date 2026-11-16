@@ -77,8 +77,8 @@ def test_the_command_line_seeds_in_demo_mode_and_prints_only_counts(file_db, mon
 # ------------------------------------------------------------ what gets loaded
 
 def test_the_counts(seeded):
-    assert seeded.counts == {"hospitals": 5, "ambulances": 5, "patients": 1, "contacts": 2, "users": 12, "consents": 4}
-    assert seeded.query(Hospital).count() == 5 and seeded.query(Ambulance).count() == 5 and seeded.query(Contact).count() == 2
+    assert seeded.counts == {"hospitals": 10, "ambulances": 10, "patients": 6, "contacts": 12, "users": 12, "consents": 4, "cities": 2}
+    assert seeded.query(Hospital).count() == 10 and seeded.query(Ambulance).count() == 10 and seeded.query(Contact).count() == 12
 
 
 def test_the_hospitals_match_the_portals_names_and_rules(seeded):
@@ -98,14 +98,14 @@ def test_the_ambulances_belong_to_real_hospitals(seeded):
     ids = {h.id for h in seeded.query(Hospital)}
     ambulances = seeded.query(Ambulance).all()
     assert all(a.base_hospital_id in ids and a.status == "available" and a.crew_driver for a in ambulances)
-    assert {a.id for a in ambulances} == {f"AMB-AMD-0{n}" for n in range(1, 6)}
+    assert {a.id for a in ambulances} == {f"AMB-{c}-0{n}" for c in ("AMD", "PNQ") for n in range(1, 6)}
 
 
 def test_the_demo_patient_and_contacts(seeded):
     p = seeded.get(Patient, "PT-2026-0417")
     assert (p.name, p.age, p.sex, p.blood_group, p.language) == ("Rahul Mehta", 54, "M", "B+", "en")
     assert "Penicillin" in p.allergies and p.baseline["heart_rate"] == {"min": 60, "max": 85}
-    contacts = seeded.query(Contact).order_by(Contact.position).all()
+    contacts = seeded.query(Contact).filter(Contact.patient_id == "PT-2026-0417").order_by(Contact.position).all()
     assert [(c.id, c.relation, c.is_primary, c.position) for c in contacts] == [("C-1", "Mother", True, 1), ("C-2", "Friend", False, 2)]
     assert contacts[0].phone == "+91 00000 00001"
 
@@ -113,7 +113,7 @@ def test_the_demo_patient_and_contacts(seeded):
 def test_the_demo_patient_shares_everything_through_the_ledger(seeded):
     assert current_consents(seeded, "PT-2026-0417") == {"location": True, "history": True, "vitals": True, "reports": True}
     rows = seeded.query(ConsentLedger).all()
-    assert len(rows) == 4 and all(r.actor == "seed" and r.actor_role == "SYSTEM" for r in rows)
+    assert len(rows) == 24 and all(r.actor == "seed" and r.actor_role == "SYSTEM" for r in rows)
 
 
 # ------------------------------------------------------------ the logins
@@ -171,7 +171,7 @@ def test_the_stored_hashes_are_bcrypt(seeded):
 
 def test_the_patients_health_data_and_the_contact_phones_are_ciphertext(seeded):
     seeded.commit()
-    conditions = seeded.execute(text("SELECT conditions FROM patients")).scalar_one()
+    conditions = seeded.execute(text("SELECT conditions FROM patients WHERE id = 'PT-2026-0417'")).scalar_one()
     phones = [r[0] for r in seeded.execute(text("SELECT phone FROM contacts"))]
     assert "Hypertension" not in conditions and conditions.startswith("gAAAA")
     assert all("00000" not in p and p.startswith("gAAAA") for p in phones)
@@ -186,7 +186,7 @@ def test_demo_passwords_appear_in_exactly_one_source_file():
 
 def test_seeding_twice_changes_nothing(seeded):
     assert seed_demo(seeded) == {"already_seeded": True}
-    assert (seeded.query(User).count(), seeded.query(Hospital).count(), seeded.query(ConsentLedger).count()) == (12, 5, 4)
+    assert (seeded.query(User).count(), seeded.query(Hospital).count(), seeded.query(ConsentLedger).count()) == (12, 10, 24)
 
 
 def test_each_demo_password_is_hashed_once_per_process(monkeypatch, engine):
