@@ -4,13 +4,13 @@ import { readFileSync } from 'node:fs';
 
 const css = readFileSync(new URL('../../src/index.css', import.meta.url), 'utf8');
 const block = (selector) => {
-  const m = css.match(new RegExp(selector.replace(/[[\]']/g, '\\$&') + '\\s*\\{([^}]*)\\}'));
+  const m = css.match(new RegExp(selector.replace(/[[\]'()]/g, '\\$&') + '\\s*\\{([^}]*)\\}'));
   return Object.fromEntries([...m[1].matchAll(/--ht-(\w+):\s*(\d+) (\d+) (\d+);/g)].map((x) => [x[1], [+x[2], +x[3], +x[4]]]));
 };
 const lum = ([r, g, b]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 
-const THEMES = { dark: block(":root, [data-theme='dark']"), light: block("[data-theme='light']") };
+const THEMES = { dark: block("[data-theme='dark']"), light: block(":root:not([data-theme='dark']), [data-theme='light']") };
 const NAMES = ['bg', 'sidebar', 'card', 'line', 'accent', 'accent2', 'warning', 'emergency', 'emergencytext', 'text', 'muted', 'onaccent'];
 
 describe('design tokens', () => {

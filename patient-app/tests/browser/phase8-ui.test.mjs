@@ -56,7 +56,7 @@ check('U6 Home: the Emergency help button is large and above the fold', hero.hei
 
 // ---- 3. Emergency screens: Call 112 / 108 >= 56 px and visible without scrolling
 await p.goto(BASE + '/symptoms'); await sleep(800);
-let call = await p.locator("a[href='tel:112']").first().boundingBox();
+let call = await p.locator("main a[href='tel:112']").first().boundingBox();
 check('U7 Symptoms: Call 112 / 108 is >= 56 px and visible without scrolling', call && call.height >= 56 && call.y + call.height <= 740, call);
 await p.locator('[role=radio]').first().click(); await p.locator('input[type=checkbox]').first().check(); await p.locator('input[type=checkbox]').nth(1).check();
 await p.getByRole('button').last().click(); await p.waitForURL(/\/emergency\//);
