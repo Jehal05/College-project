@@ -132,3 +132,9 @@ A1 (`phase10-apps.test.mjs`): passed on both events at ed3b56b (22/22 browser fi
 Hospital portal checks (pull_request), Backend checks (push and pull_request): success. CI pull_request run: success, A1 passed, 22/22 browser files, 505 checks. **CI push run: failure, A1 failed again** (21/22 files, 505 checks; `GET /admin/users` and `GET /content/*` still pending), the same pending-request failure as before. No code changed in this commit.
 
 A1 since `main` was merged (3 commits `fdf955f`, `ed3b56b`, `5a347a7`, 2 events each = 6 CI runs): 5 passed, 1 failed. So merging `main` did **not** fix A1, and the earlier idea that the PR-merge tree was the cause is not supported (GUESS withdrawn). The root cause is still unknown. A1 is in the patient app, which is Jehal's area.
+
+### CI on 3fa3aaa (merge of main into Puneet, 16 Nov 2026)
+
+Hospital portal checks, Backend checks (pull_request run): success. CI pull_request run: success (24/24 browser files, 530 checks; accessibility audit PASS). CI push run: **failure, A1 again** (23/24 files; only `GET /admin/users` still pending). No backend run was listed for the push event on this sha.
+
+A1 since `main` was first merged into Puneet (5 commits, 2 events each = 10 CI runs): 8 passed, 2 failed (both on push events, the other failure was on `5a347a7`). A1 also failed on `main` itself (`ad0a311`). It is a real, repeating flake whose root cause is still unknown; it is not caused by Puneet's changes.
