@@ -8,5 +8,5 @@ export function downloadText(filename, text, type = 'text/plain;charset=utf-8') 
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 10000); // not at once: some browsers (Firefox, Safari) cancel a download whose address was revoked too soon
 }
