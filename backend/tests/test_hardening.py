@@ -9,6 +9,7 @@ EXPECTED = {
     "x-frame-options": "DENY",
     "referrer-policy": "no-referrer",
     "cache-control": "no-store",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
 }
 
 
@@ -90,3 +91,38 @@ def test_a_chunked_body_exactly_at_the_limit_is_not_refused(monkeypatch):
     monkeypatch.setenv("MAX_BODY_BYTES", "100")
     r = client().post("/no-such-route", content=_chunks(50, 50))
     assert r.status_code == 404
+
+
+# ---- CSP everywhere; HSTS only over HTTPS
+def test_hsts_is_absent_on_plain_http():
+    assert "strict-transport-security" not in client().get("/health").headers
+
+
+def test_hsts_is_present_when_the_proxy_says_https():
+    r = client().get("/health", headers={"X-Forwarded-Proto": "https"})
+    assert r.headers["strict-transport-security"] == "max-age=31536000"
+
+
+def test_hsts_is_present_when_the_request_itself_is_https():
+    r = TestClient(create_app({"CORS_ALLOW_ORIGINS": "http://localhost:5173"}), base_url="https://testserver").get("/health")
+    assert r.headers["strict-transport-security"] == "max-age=31536000"
+
+
+def test_a_413_carries_csp_and_hsts_over_https(monkeypatch):
+    monkeypatch.setenv("MAX_BODY_BYTES", "100")
+    r = client().post("/auth/login", content=b"x" * 500,
+                      headers={"Content-Type": "application/json", "X-Forwarded-Proto": "https"})
+    assert r.status_code == 413
+    assert r.headers["content-security-policy"] == "default-src 'none'; frame-ancestors 'none'"
+    assert "strict-transport-security" in r.headers
+
+
+def test_x_forwarded_proto_http_does_not_add_hsts():
+    assert "strict-transport-security" not in client().get("/health", headers={"X-Forwarded-Proto": "http"}).headers
+
+
+def test_the_interactive_docs_page_is_not_given_the_csp_so_it_still_works():
+    r = client().get("/docs")
+    assert r.status_code == 200
+    assert "content-security-policy" not in r.headers
+    assert r.headers["x-content-type-options"] == "nosniff"      # the other headers stay

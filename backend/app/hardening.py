@@ -1,6 +1,9 @@
 """Small, additive protections for every HTTP response. They never change what an endpoint returns.
 
-- Security headers on every reply (no sniffing, no framing, no referrer leak, no caching of API replies).
+- Security headers on every reply (no sniffing, no framing, no referrer leak, no caching of API replies, and a
+  Content-Security-Policy that lets a reply load nothing: this is a JSON API). Strict-Transport-Security is added
+  only when the request came over HTTPS (the scheme, or X-Forwarded-Proto from a proxy), so plain-HTTP local
+  development is not told to remember "HTTPS only".
 - A request whose Content-Length is above MAX_BODY_BYTES (default 8 MB) is refused with 413 before the
   body is read. The report upload keeps its own, tighter 2 MB limit.
 - A body sent without a Content-Length (chunked) is counted as it is read; once it passes the same limit the
@@ -18,7 +21,29 @@ SECURITY_HEADERS: List[Tuple[bytes, bytes]] = [
     (b"x-frame-options", b"DENY"),
     (b"referrer-policy", b"no-referrer"),
     (b"cache-control", b"no-store"),
+    (b"content-security-policy", b"default-src 'none'; frame-ancestors 'none'"),
 ]
+HSTS = (b"strict-transport-security", b"max-age=31536000")
+CSP_NAME = b"content-security-policy"
+# The Swagger and ReDoc pages must load scripts, and a browser shows a stored PDF or image itself: no CSP for those.
+NO_CSP_PATHS = ("/docs", "/redoc")
+NO_CSP_TYPES = (b"application/pdf", b"image/")
+
+
+def _is_https(scope: Dict[str, Any]) -> bool:
+    if scope.get("scheme") == "https":
+        return True
+    for name, value in scope.get("headers", []):
+        if name == b"x-forwarded-proto":
+            return value.split(b",")[0].strip().lower() == b"https"
+    return False
+
+
+def skip_csp(scope: Dict[str, Any], headers: List[Tuple[bytes, bytes]]) -> bool:
+    if str(scope.get("path", "")).startswith(NO_CSP_PATHS):
+        return True
+    kind = next((v.lower() for n, v in headers if n.lower() == b"content-type"), b"")
+    return kind.startswith(NO_CSP_TYPES)
 
 
 def max_body_bytes() -> int:
@@ -42,6 +67,7 @@ class SecurityMiddleware:
             await self.app(scope, receive, send)
             return
 
+        https = _is_https(scope)
         for name, value in scope.get("headers", []):
             if name == b"content-length":
                 try:
@@ -49,7 +75,7 @@ class SecurityMiddleware:
                 except ValueError:
                     too_big = False
                 if too_big:
-                    await self._refuse(send)
+                    await self._refuse(send, https)
                     return
                 break
 
@@ -61,7 +87,10 @@ class SecurityMiddleware:
                 started = True
                 present = {name.lower() for name, _ in message.get("headers", [])}
                 headers = list(message.get("headers", []))
-                headers.extend((n, v) for n, v in SECURITY_HEADERS if n not in present)
+                extra = SECURITY_HEADERS + [HSTS] if https else SECURITY_HEADERS
+                if skip_csp(scope, message.get("headers", [])):
+                    extra = [h for h in extra if h[0] != CSP_NAME]
+                headers.extend((n, v) for n, v in extra if n not in present)
                 message = {**message, "headers": headers}
             await send(message)
 
@@ -82,13 +111,13 @@ class SecurityMiddleware:
         except _BodyTooLarge:
             if started:
                 raise  # the answer is already on its way; nothing honest can be added
-            await self._refuse(send)
+            await self._refuse(send, https)
 
     @staticmethod
-    async def _refuse(send: Callable) -> None:
+    async def _refuse(send: Callable, https: bool = False) -> None:
         text = "Request body is too large."
         body = json.dumps({"error": text, "detail": text}).encode()
         headers = [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())]
-        headers.extend(SECURITY_HEADERS)
+        headers.extend(SECURITY_HEADERS + [HSTS] if https else SECURITY_HEADERS)
         await send({"type": "http.response.start", "status": 413, "headers": headers})
         await send({"type": "http.response.body", "body": body})
