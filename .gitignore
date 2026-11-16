@@ -6,6 +6,7 @@ dist-test/
 dist-normal/
 /dist-audit/
 dist-joint/
+dist-joint-cities/
 dist-shots/
 dist-audit/
 phase1-results.txt

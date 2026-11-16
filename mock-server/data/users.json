@@ -13,6 +13,13 @@
     "hospital_id": "HSP-AMD-002"
   },
   {
+    "email": "staff.pune@demo.test",
+    "password": "demo1234",
+    "role": "HOSPITAL_STAFF",
+    "patient_id": null,
+    "hospital_id": "HSP-PNQ-001"
+  },
+  {
     "email": "admin@demo.test",
     "password": "demo1234",
     "role": "ADMIN",
