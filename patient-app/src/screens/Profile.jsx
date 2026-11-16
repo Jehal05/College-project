@@ -7,6 +7,7 @@ import { BLOOD_GROUPS, validateProfile, toList, fromList } from '../utils/valida
 import FormField from '../components/FormField';
 import ErrorMessage from '../components/ErrorMessage';
 import LanguageSelect from '../components/LanguageSelect';
+import CityChooser from '../components/CityChooser';
 import OfflineNote from '../components/OfflineNote';
 import useOnline from '../hooks/useOnline';
 import CheckInSetting from '../components/CheckInSetting';
@@ -82,6 +83,7 @@ export default function Profile() {
         </div>
       </Card>
       <LanguageSelect />
+      <Card className="mb-4"><CityChooser /></Card>
       <OfflineNote />
       <Card as="nav" aria-label={t('profile.links')} className="mb-5 !p-1">
         {LINKS.map(([to, key, icon]) => <ListRow key={to} to={to} icon={icon} title={t(key)} />)}

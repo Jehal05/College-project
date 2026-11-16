@@ -43,7 +43,9 @@ function Running({ id }) {
         {ended && <li className="flex items-center gap-2 text-sm font-semibold"><Icon name="alert" size={16} />{t('state.' + ended)}</li>}
       </ol>
       <div className="mt-4 space-y-1 text-sm">
-        {emergency.hospital && <p>{t('emc.hospital', { name: emergency.hospital.name })}</p>}
+        {emergency.hospital && <p>{emergency.hospital.city_name ? t('emc.hospitalIn', { name: emergency.hospital.name, city: emergency.hospital.city_name }) : t('emc.hospital', { name: emergency.hospital.name })}</p>}
+        {emergency.hospital && emergency.hospital.other_city && <p className="font-semibold">{t('emc.otherCity', { own: emergency.city_name, name: emergency.hospital.name, city: emergency.hospital.city_name })}</p>}
+        {emergency.location && emergency.location.source === 'simulated' && emergency.city_name && <p className="text-ht-muted">{t('emc.simLocation', { name: emergency.city_name })}</p>}
         {showEta(events, emergency.eta_seconds) && <p>{t('emc.eta', { min: Math.max(1, Math.round(emergency.eta_seconds / 60)) })}</p>}
         <p>{hasEvent(events, 'SOS_SENT') ? t('emc.sentHospital') : t('emc.notSentHospital')}</p>
         <p>{hasEvent(events, 'HOSPITAL_ACKNOWLEDGED') ? t('emc.ackHospital') : t('emc.notAckHospital')}</p>

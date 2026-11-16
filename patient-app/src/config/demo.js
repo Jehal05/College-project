@@ -1,5 +1,4 @@
-// Settings used for demos. The demo location is in Ahmedabad and matches the mock server.
-export const DEMO_LOCATION = { lat: 23.0225, lng: 72.5714, accuracy: 50 };
+// Settings for the practice mode. The simulated start point of each city comes from GET /cities (cities.json), not from here.
 
 // Seconds the user has to cancel a false alarm before the SOS is sent.
 export const COUNTDOWN_SECONDS = 10;
