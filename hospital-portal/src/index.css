@@ -18,6 +18,13 @@ body {
 }
 html[lang='hi'] body, html[lang='gu'] body { line-height: 1.6; }
 body { @apply text-slate-900 antialiased; background: #eaf0f6; }
+/* Hospital-website background: a soft blue-white gradient with a faint medical-cross pattern (same look as the patient app). */
+.ht-page {
+  background-color: #eaf0f6;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M33 28h6v5h5v6h-5v5h-6v-5h-5v-6h5z' fill='%230b5f8a' fill-opacity='0.045'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #f4f8fc 0%, #e3edf6 100%);
+}
 
 /* Leaflet divIcon wrapper: remove the default white square. */
 .ht-marker { background: transparent; border: none; }
