@@ -20,6 +20,8 @@ import Panel from '../components/ui/Panel';
 import StatusChip from '../components/ui/StatusChip';
 import { DataSourceBadge } from '../components/ui/Badge';
 import MetricTile from '../components/themed/MetricTile';
+import HeroBanner from '../components/themed/HeroBanner';
+import QuickActions from '../components/themed/QuickActions';
 import TrendChart from '../components/themed/TrendChart';
 import Icon from '../components/icons';
 
@@ -57,16 +59,12 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold">{patient ? t('home.greeting', { name: patient.name }) : t('overview.title')}</h1>
-          <p className="text-ht-muted">{t('overview.title')}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusChip tone={connected ? 'ok' : 'caution'} icon={connected ? 'check' : 'alert'}>{connected ? t('overview.twinOnline') : t('overview.twinOffline')}</StatusChip>
-          <DataSourceBadge source="simulated" />
-        </div>
-      </header>
+      <HeroBanner title={patient ? t('home.greeting', { name: patient.name }) : t('overview.title')} subtitle={t('hero.sub')} />
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusChip tone={connected ? 'ok' : 'caution'} icon={connected ? 'check' : 'alert'}>{connected ? t('overview.twinOnline') : t('overview.twinOffline')}</StatusChip>
+        <DataSourceBadge source="simulated" />
+      </div>
+      <QuickActions />
 
       <section aria-label={t('overview.live')} className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {TILES.map(([k, icon, unit]) => {

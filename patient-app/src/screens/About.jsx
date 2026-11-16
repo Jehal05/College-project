@@ -30,6 +30,14 @@ export default function About() {
           <li>{t('about.simulated')}</li>
         </ul>
       </Panel>
+      <Panel as="section" id="accessibility" aria-labelledby="about-acc">
+        <h2 id="about-acc" className="mb-2 text-lg font-bold">{t('about.accTitle')}</h2>
+        <ul className="list-disc space-y-1 pl-5 text-sm">
+          <li>{t('about.acc1')}</li>
+          <li>{t('about.acc2')}</li>
+          <li>{t('about.acc3')}</li>
+        </ul>
+      </Panel>
       <p><Link to="/twin" className={ext}>{t('about.back')}</Link></p>
     </div>
   );

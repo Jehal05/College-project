@@ -10,6 +10,8 @@ import BottomNav from './components/BottomNav';
 import ReminderBanner from './components/ReminderBanner';
 import SafetyCheckInHost from './components/SafetyCheckInHost';
 import DesktopShell from './components/shell/DesktopShell';
+import UtilityBar from './components/shell/UtilityBar';
+import SiteFooter from './components/shell/SiteFooter';
 import AppRoutes from './routes';
 import useIsDesktop from './hooks/useIsDesktop';
 import { isThemed } from './config/navigation';
@@ -43,6 +45,7 @@ export default function App() {
   return (
     <div className={'mx-auto flex min-h-screen max-w-md flex-col shadow-lift ' + (themed ? 'ht-themed bg-ht-bg text-ht-text' : 'bg-slate-50')}>
       <SkipLink />
+      {isPatient && !plain && <UtilityBar />}
       <SimulatedBanner />
       {!pathname.startsWith('/emergency') && !pathname.startsWith('/p/') && <AppHeader />}
       <main id="main" tabIndex={-1} className="flex-1 p-4">
@@ -50,6 +53,7 @@ export default function App() {
         {isPatient && !pathname.startsWith('/p/') && <ReminderBanner />}
         {content}
       </main>
+      {isPatient && !plain && <SiteFooter />}
       {showNav && <BottomNav />}
       {isPatient && <SafetyCheckInHost />}
     </div>
