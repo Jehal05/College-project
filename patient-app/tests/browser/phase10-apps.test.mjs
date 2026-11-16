@@ -2,7 +2,7 @@
 // until accepted, accepted details follow the patient's consent, a changed text is not approved until an admin approves it,
 // a disabled account cannot sign in, and every role stays on its own screens.
 import { createRequire } from 'node:module';
-import { BASE, api, check, finish, freshState, launch, newPage, phone, sleep } from './helpers.mjs';
+import { API, BASE, api, check, finish, freshState, launch, newPage, phone, sleep } from './helpers.mjs';
 
 const axePath = createRequire(import.meta.url).resolve('axe-core/axe.min.js');
 const serious = (page) => page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] } })).violations.filter((v) => ['serious', 'critical'].includes(v.impact)).map((v) => v.id));
@@ -30,10 +30,22 @@ await ctx.close();
 // --- admin verifies the volunteer, disables a relative, and cannot disable themselves ---
 ctx = await phone(browser, { bypassCSP: true }); p = await newPage(ctx);
 const net = []; const inflight = new Set(); p.on('request', (r) => inflight.add(r.method() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, ''))); p.on('requestfinished', (r) => inflight.delete(r.method() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, ''))); p.on('response', (r) => { if (r.status() >= 400) net.push(r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '')); }); p.on('requestfailed', (r) => net.push('FAILED ' + r.url().replace(/^https?:\/\/[^/]+/, '') + ' ' + (r.failure() || {}).errorText));
+// DIAGNOSTICS ONLY (A1 flake, 16 Nov 2026): when to start, answer and finish for each admin/content/ws request, kept in memory and
+// printed only if A1 fails. Nothing here changes what the test checks.
+const t0 = Date.now(); const timeline = new Map(); const mark = (r, field) => { const k = r.method() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, ''); if (!/^(GET|PATCH|PUT|POST|OPTIONS) \/(admin|content|ws)/.test(k)) return; const e = timeline.get(r) || { k }; e[field] = Date.now() - t0; timeline.set(r, e); };
+p.on('request', (r) => mark(r, 'start')); p.on('response', (r) => mark(r.request(), 'resp')); p.on('requestfinished', (r) => mark(r, 'fin')); p.on('requestfailed', (r) => mark(r, 'fail'));
+let attemptsUsed = 0; const attemptLog = [];
 await signIn(p, 'admin@demo.test'); await p.waitForURL(BASE + '/admin'); body = await waitText(p, (b) => b.includes(mail));
 // CI sometimes leaves the accounts request hanging on the first load (it showed GET /admin/users still pending). One reload and a second wait is the fix.
-for (let attempt = 0; attempt < 3 && !body.includes(mail); attempt++) { await p.reload(); await p.waitForURL(BASE + '/admin'); body = await waitText(p, (b) => b.includes(mail), 20000); } // up to three reloads: a reload with the accounts request still pending did not help in one CI run
-check('A1 admin lands on /admin and sees the new volunteer as not verified', body.includes('Accounts') && body.includes('Not verified'), JSON.stringify(net) + ' pending=' + JSON.stringify([...inflight]) + ' ' + (await p.url()) + ' ' + JSON.stringify(body.slice(0, 400)));
+for (let attempt = 0; attempt < 3 && !body.includes(mail); attempt++) { attemptsUsed++; attemptLog.push(Date.now() - t0); await p.reload(); await p.waitForURL(BASE + '/admin'); body = await waitText(p, (b) => b.includes(mail), 20000); } // up to three reloads: a reload with the accounts request still pending did not help in one CI run
+let diag = '';
+if (!(body.includes('Accounts') && body.includes('Not verified'))) { // only on failure: ask the server directly, from outside Chrome, how fast it answers
+  const probe = async (path, tokenValue) => { const s = Date.now(); try { const r = await fetch(API + path, { headers: tokenValue ? { Authorization: 'Bearer ' + tokenValue } : {}, signal: AbortSignal.timeout(8000) }); await r.text(); return path + ' ' + r.status + ' ' + (Date.now() - s) + 'ms'; } catch (e) { return path + ' ' + (e.name || 'error') + ' ' + (Date.now() - s) + 'ms'; } };
+  let adminToken = null; try { adminToken = (await api('POST', '/auth/login', null, { email: 'admin@demo.test', password: 'demo1234' })).token; } catch { /* reported by the probes below */ }
+  const resources = await p.evaluate(() => performance.getEntriesByType('resource').filter((e) => /\/(admin|content)\//.test(e.name)).map((e) => ({ n: e.name.replace(/^https?:\/\/[^/]+/, ''), fetchStart: Math.round(e.fetchStart), requestStart: Math.round(e.requestStart), responseStart: Math.round(e.responseStart), end: Math.round(e.responseEnd), proto: e.nextHopProtocol }))).catch(() => []);
+  diag = JSON.stringify({ attemptsUsed, attemptLog, elapsedMs: Date.now() - t0, timeline: [...timeline.values()], resources, probes: [await probe('/health'), await probe('/admin/users', adminToken), await probe('/content/emergency_numbers', adminToken)] });
+}
+check('A1 admin lands on /admin and sees the new volunteer as not verified', body.includes('Accounts') && body.includes('Not verified'), JSON.stringify(net) + ' pending=' + JSON.stringify([...inflight]) + ' diag=' + diag + ' ' + (await p.url()) + ' ' + JSON.stringify(body.slice(0, 400)));
 const row = (email) => p.locator('[data-testid=admin-user][data-email="' + email + '"]');
 await row(mail).getByRole('button', { name: 'Verify' }).click(); body = await waitText(p, async () => true); await sleep(800);
 check('A2 Verify marks the volunteer as verified', (await row(mail).innerText()).includes('Verified') && !(await row(mail).innerText()).includes('Not verified'));
