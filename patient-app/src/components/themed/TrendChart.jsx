@@ -32,8 +32,8 @@ export default function TrendChart({ name, unit, values, band, source = 'simulat
         <polyline points={pts} fill="none" stroke="rgb(var(--ht-accent))" strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
       </svg>
       <p className="mt-1 text-sm text-ht-muted">{summary}</p>
-      <table className="sr-only"><caption>{t('overview.trend.table', { name })}</caption>
-        <tbody>{values.map((v, i) => <tr key={i}><th scope="row">{i + 1}</th><td>{v} {unit}</td></tr>)}</tbody></table>
+      <div className="sr-only"><table><caption>{t('overview.trend.table', { name })}</caption>
+        <tbody>{values.map((v, i) => <tr key={i}><th scope="row">{i + 1}</th><td>{v} {unit}</td></tr>)}</tbody></table></div>
     </Panel>
   );
 }

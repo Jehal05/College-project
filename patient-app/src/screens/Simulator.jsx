@@ -53,7 +53,7 @@ export default function Simulator() {
 
       <Panel aria-labelledby="sim-compare">
         <h2 id="sim-compare" className="mb-2 text-lg font-bold">{t('sim.compare')}</h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0}>
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead><tr className="text-ht-muted"><th scope="col" className="py-1 pr-2">{t('sim.col.metric')}</th><th scope="col">{t('sim.col.baseline')}</th><th scope="col">{t('sim.col.hypo')}</th><th scope="col">{t('sim.col.usual')}</th><th scope="col">{t('sim.col.where')}</th></tr></thead>
             <tbody>

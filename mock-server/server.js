@@ -50,6 +50,10 @@ setInterval(() => {
   simulator.broadcast(event);
 }, 1000);
 
+// Node closes idle connections after 5 s; a browser that reuses one at that moment can see a request stall. Keep them open longer.
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
+
 server.listen(PORT, () => {
   console.log('Mock server (simulated data) running on http://localhost:' + PORT);
   console.log('WebSocket on ws://localhost:' + PORT + '/ws');

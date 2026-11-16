@@ -33,8 +33,8 @@
   --ht-sidebar: 255 255 255;
   --ht-card: 255 255 255;
   --ht-line: 205 217 230;
-  --ht-accent: 8 120 150;    /* darker so it passes contrast on white */
-  --ht-accent2: 13 125 94;
+  --ht-accent: 6 100 125;    /* darker so it passes contrast on white and on its own 15% tint */
+  --ht-accent2: 8 108 80;
   --ht-warning: 146 90 0;
   --ht-emergency: 185 28 28;
   --ht-emergencytext: 185 28 28;

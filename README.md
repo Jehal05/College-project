@@ -37,6 +37,29 @@ A patient app watches (simulated) wearable data, and when the patient sends an S
 |---|---|---|
 | <img src="docs/images/portal-alert-detail.png" width="260" alt="Alert detail"> | <img src="docs/images/portal-dispatch.png" width="260" alt="Dispatch"> | <img src="docs/images/portal-hindi.png" width="260" alt="Hindi portal"> |
 
+## Digital-twin dashboard (patient app)
+
+A dark, clinical-looking dashboard sits on top of the same data and hooks as the older screens. Everything on it is **simulated**: it never diagnoses, and each number is labelled as live-simulated, entered by you, or an assumption.
+
+| Overview | 3D twin | Disease intelligence |
+|---|---|---|
+| <img src="docs/images/ui/phase1-overview-desktop.png" width="260" alt="Overview"> | <img src="docs/images/ui/phase1-twin3d-desktop.png" width="260" alt="3D twin"> | <img src="docs/images/ui/phase1d-disease-cardiac-desktop.png" width="260" alt="Cardiac detail"> |
+
+| Emergency Center | Simulator | Care Circle |
+|---|---|---|
+| <img src="docs/images/ui/phase1e-emergency-center-desktop.png" width="260" alt="Emergency Center"> | <img src="docs/images/ui/phase2a-simulator-desktop.png" width="260" alt="Simulator"> | <img src="docs/images/ui/phase2b-care-circle-desktop.png" width="260" alt="Care Circle"> |
+
+| Screen | What it does | Rule it follows |
+|---|---|---|
+| Overview, Twin | 2D and 3D body with area status | Status is rule-based; 3D falls back to 2D without WebGL or with reduced motion |
+| Diseases, Monitor | Per-condition metrics, live ECG strip | Wording is "may need attention", never a diagnosis |
+| Emergency Center | Timeline of an emergency | "Ambulance dispatched" appears only after that exact event; sent and acknowledged are separate |
+| Reports | Lab values you type from a report | Twin changes only after you confirm; shows "not reviewed by a clinician" |
+| Simulator | "What if" comparison | Hypothetical, assumptions listed, no advice |
+| Care Circle, Copilot | Who sees what; rule-based helper | No AI model, answers come from fixed rules |
+
+Dark and light themes, English / Hindi / Gujarati. `npm run audit` (axe-core) checks every screen at 360 px and 1440 px in both themes and all languages: no serious, critical or moderate findings and no sideways scrolling. Motion stops when the device asks for reduced motion.
+
 ## How it fits together
 
 ```mermaid
@@ -171,6 +194,12 @@ GitHub Actions runs the backend, patient-app and hospital-portal checks on every
 | Native-speaker review of Hindi / Gujarati | Pending — see [`docs/TRANSLATION_REVIEW.md`](docs/TRANSLATION_REVIEW.md) |
 | Real-device and accessibility check | Plan in [`docs/review/DEVICE_TEST_PLAN.md`](docs/review/DEVICE_TEST_PLAN.md) |
 | Real SMS, calls, maps and wearables | Simulated on purpose |
+| Hindi / Gujarati text on the new dashboard | AI-written drafts, layout checked, wording not reviewed |
+| 3D twin | Tested in headless Chrome only; not on a real GPU or phone |
+| Lab values on the dashboard | Stored on the device only; no backend endpoint yet (see [`docs/BACKEND_GAPS.md`](docs/BACKEND_GAPS.md)) |
+| Clinician review of report values | Shown as "not reviewed"; no review workflow exists |
+| Hospital portal | Restyled but light theme only |
+| One admin browser test (A1) | Occasionally fails on CI and passes on rerun; cause not found |
 
 More detail: [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) · [`docs/VIVA_QA.md`](docs/VIVA_QA.md) · [`docs/DEPLOY.md`](docs/DEPLOY.md) · [`CHANGELOG.md`](CHANGELOG.md)
 
