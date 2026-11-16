@@ -14,6 +14,7 @@ export default {
   'nav.deskHospital': 'डेस्क अस्पताल',
   'conn.live': 'लाइव',
   'conn.reconnecting': 'फिर से जुड़ रहा है…',
+  'conn.signedOut': 'साइन आउट',
   'conn.connecting': 'जुड़ रहा है…',
   'conn.mock': 'नकली डेटा',
   'offline.lost': 'कनेक्शन {time} बजे टूट गया। नए अलर्ट छूट सकते हैं।',

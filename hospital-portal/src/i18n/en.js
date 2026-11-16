@@ -15,6 +15,7 @@ export default {
   'nav.deskHospital': 'Desk hospital',
   'conn.live': 'Live',
   'conn.reconnecting': 'Reconnecting…',
+  'conn.signedOut': 'Signed out',
   'conn.connecting': 'Connecting…',
   'conn.mock': 'Mock data',
   'offline.lost': 'Connection lost at {time}. New alerts may be missing.',

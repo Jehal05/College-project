@@ -5,6 +5,7 @@ import { getStatus, onStatus } from '../services/socket.js';
 const STYLES = {
   live: ['conn.live', 'bg-emerald-100 text-emerald-800 border-emerald-500', 'bg-emerald-500'],
   reconnecting: ['conn.reconnecting', 'bg-red-100 text-red-800 border-red-500', 'bg-red-500 animate-pulse'],
+  signed_out: ['conn.signedOut', 'bg-red-100 text-red-800 border-red-500', 'bg-red-500'],
   connecting: ['conn.connecting', 'bg-slate-100 text-slate-700 border-slate-400', 'bg-slate-400 animate-pulse'],
   mock: ['conn.mock', 'bg-amber-100 text-amber-800 border-amber-500', 'bg-amber-500'],
 };

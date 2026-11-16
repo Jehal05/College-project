@@ -14,6 +14,7 @@ export default {
   'nav.deskHospital': 'ડેસ્ક હોસ્પિટલ',
   'conn.live': 'લાઇવ',
   'conn.reconnecting': 'ફરી જોડાઈ રહ્યું છે…',
+  'conn.signedOut': 'સાઇન આઉટ',
   'conn.connecting': 'જોડાઈ રહ્યું છે…',
   'conn.mock': 'નકલી ડેટા',
   'offline.lost': 'કનેક્શન {time} વાગ્યે તૂટી ગયું. નવા એલર્ટ ચૂકી જવાય શકે છે.',

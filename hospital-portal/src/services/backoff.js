@@ -11,3 +11,6 @@ export function reconnectDelay(attempt, random = Math.random) {
   const jittered = plain * (1 - JITTER / 2 + JITTER * random());
   return Math.round(Math.min(MAX_MS, jittered));
 }
+
+export const STABLE_MS = 10000; // a socket must stay open this long before the wait starts again from 2 s
+export const POLICY_CLOSE = 1008; // the server's "this login is no longer valid": trying again cannot help
