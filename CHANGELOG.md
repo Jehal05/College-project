@@ -1,5 +1,8 @@
 # Changelog
 
+## 2D body map
+- The no-WebGL fallback now draws a body outline (head, neck, shoulders, waist, arms, legs) with faint ribs and spine. Organ positions unchanged. Still a simple drawing, not the 3D model.
+
 ## UI phase 4: hospital look and a real human body model
 - Patient app: light hospital-website look by default (dark kept), utility bar, breadcrumb, hero banner, quick actions, footer, About/credits screen. Hospital portal: matching background, login header, simulated-demo footer. New text in en/hi/gu (hi/gu unreviewed drafts).
 - 3D twin: real anatomy model (BodyParts3D, CC BY 4.0, `tools/body-model`, ~2.6 MB, meshopt-compressed) with layers, organ selection, front/back, camera focus and rule-based status words; 2D fallback and text alternative kept. CSP gained `'wasm-unsafe-eval'` for the mesh decoder.
