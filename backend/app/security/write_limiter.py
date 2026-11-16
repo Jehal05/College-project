@@ -63,16 +63,22 @@ class WriteLimiter:
 
 
 _emergency_limiter: Optional[WriteLimiter] = None
+_creation_lock = threading.Lock()
 
 
 def emergency_limiter() -> WriteLimiter:
+    """The one shared limiter. Created under a lock (checked again inside it), so two threads that arrive
+    together at startup cannot each build their own and double the limit."""
     global _emergency_limiter
     if _emergency_limiter is None:
-        _emergency_limiter = WriteLimiter()
+        with _creation_lock:
+            if _emergency_limiter is None:
+                _emergency_limiter = WriteLimiter()
     return _emergency_limiter
 
 
 def reset_write_limiters() -> None:
     """Forget the shared limiter (tests and changed settings)."""
     global _emergency_limiter
-    _emergency_limiter = None
+    with _creation_lock:
+        _emergency_limiter = None

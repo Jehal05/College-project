@@ -64,3 +64,37 @@ def test_a_refused_request_is_not_counted_against_the_limit(demo, monkeypatch):
     headers = demo.headers()
     assert demo.post("/emergencies", json={"type": "NOT_A_TYPE"}, headers=headers).status_code == 400
     assert demo.post("/emergencies", json=CHEST, headers=headers).status_code == 201
+
+
+def test_sixteen_threads_share_one_limiter(monkeypatch):
+    import threading
+    import time
+
+    import app.security.write_limiter as wl
+
+    built = []
+
+    class Slow(wl.WriteLimiter):
+        def __init__(self):
+            time.sleep(0.05)          # wide enough that an unlocked creator would be built twice
+            super().__init__(limit=5, window_seconds=60)
+            built.append(self)
+
+    wl.reset_write_limiters()
+    monkeypatch.setattr(wl, "WriteLimiter", Slow)
+    barrier = threading.Barrier(16)
+    got = []
+
+    def run():
+        barrier.wait()
+        got.append(wl.emergency_limiter())
+
+    threads = [threading.Thread(target=run) for _ in range(16)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    wl.reset_write_limiters()
+    assert len(got) == 16
+    assert len({id(x) for x in got}) == 1
+    assert len(built) == 1
