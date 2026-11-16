@@ -5,6 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { ORGANS } from '../../config/organs';
 
 const WHOLE = [0, 0, 200, 420];
+// Organ outlines in a unit box (-1..1); each is scaled to the organ's size from config/organs.js.
+const ORGAN_PATH = {
+  brain: 'M-1 .55 C-1.15 -.5 -.45 -1.1 0 -.95 C.45 -1.1 1.15 -.5 1 .55 C.75 1 .3 .75 0 .95 C-.3 .75 -.75 1 -1 .55 Z',
+  heart: 'M0 .9 C-1.1 .1 -1 -.9 -.4 -.8 C-.15 -.75 0 -.5 0 -.4 C0 -.5 .15 -.75 .4 -.8 C1 -.9 1.1 .1 0 .9 Z',
+  lungs: 'M.2 -1 C.9 -.9 1 .2 .8 .9 C.5 1 -.7 1 -.9 .8 C-1 0 -.6 -.9 .2 -1 Z',
+  kidneys: 'M.5 -1 C1 -.6 .8 .3 .4 .9 C0 1.1 -.8 .8 -.6 .2 C-.6 -.5 -.1 -1.1 .5 -1 Z',
+  liver: 'M-1 -.3 C-.6 -1 .6 -1 1 -.4 C1 .3 .2 1 -.5 .9 C-.9 .8 -1.1 .3 -1 -.3 Z',
+};
 
 export default function BodyMap({ selected, onSelect, focus }) {
   const { t } = useTranslation();
@@ -14,28 +22,32 @@ export default function BodyMap({ selected, onSelect, focus }) {
     <svg role="img" aria-label={t('dtwin.map.label', { organ: t('dtwin.organ.' + selected + '.name') })} viewBox={box.join(' ')}
       className="mx-auto h-[540px] w-full max-w-[330px]">
       <defs>
+        <linearGradient id="body-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(var(--ht-card))" /><stop offset="1" stopColor="rgb(var(--ht-bg2))" /></linearGradient>
         <filter id="organ-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
       </defs>
-      {/* Silhouette: head with jaw and neck, sloped shoulders, torso that narrows at the waist, arms with hands, legs with feet. */}
-      <g fill="rgb(var(--ht-card))" stroke="rgb(var(--ht-line))" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
-        <path d="M100 8 C119 8 128 22 127 38 C126 52 116 62 109 64 L109 74 C122 77 140 78 152 86 C160 91 162 100 160 112 L170 178 C172 190 176 198 178 206 C180 214 172 220 166 214 C160 208 156 196 152 184 L146 140 L150 200 C150 214 146 224 142 236 L130 392 C130 400 134 408 140 414 C144 418 138 420 126 420 L108 420 C103 420 102 412 102 404 L100 262 L98 404 C98 412 97 420 92 420 L74 420 C62 420 56 418 60 414 C66 408 70 400 70 392 L58 236 C54 224 50 214 50 200 L54 140 L48 184 C44 196 40 208 34 214 C28 220 20 214 22 206 C24 198 28 190 30 178 L40 112 C38 100 40 91 48 86 C60 78 78 77 91 74 L91 64 C84 62 74 52 73 38 C72 22 81 8 100 8 Z" />
-      </g>
-      {/* Faint bones (ribs, spine, collarbones) so the map reads as a body and not a blob. */}
-      <g fill="none" stroke="rgb(var(--ht-line))" strokeWidth="1.2" strokeOpacity="0.7" strokeLinecap="round" aria-hidden="true">
-        <path d="M100 80 L100 232" strokeDasharray="3 3" />
-        <path d="M100 84 Q74 82 58 92 M100 84 Q126 82 142 92" />
-        <path d="M100 100 Q72 102 62 124 M100 100 Q128 102 138 124 M100 116 Q76 118 66 142 M100 116 Q124 118 134 142 M100 132 Q80 134 72 156 M100 132 Q120 134 128 156" />
-        <path d="M70 212 Q100 232 130 212" />
+      {/* A friendly, simple figure (soft shapes, no face, no bones) with organs drawn as recognisable shapes. */}
+      <g fill="url(#body-fill)" stroke="rgb(var(--ht-line))" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M91 50 H109 V74 H91 Z" />
+        <path d="M54 84 Q40 86 38 104 L31 168 Q29 182 27 192 Q25 205 33 207 Q41 207 41 195 L51 150 L59 110 Z" />
+        <path d="M54 84 Q40 86 38 104 L31 168 Q29 182 27 192 Q25 205 33 207 Q41 207 41 195 L51 150 L59 110 Z" transform="translate(200 0) scale(-1 1)" />
+        <path d="M62 230 Q60 280 70 310 Q72 350 74 392 Q66 398 62 408 Q64 414 76 414 L92 414 Q98 410 96 396 Q98 350 98 310 L99 230 Z" />
+        <path d="M62 230 Q60 280 70 310 Q72 350 74 392 Q66 398 62 408 Q64 414 76 414 L92 414 Q98 410 96 396 Q98 350 98 310 L99 230 Z" transform="translate(200 0) scale(-1 1)" />
+        <path d="M62 80 Q100 66 138 80 Q147 85 145 100 L139 150 Q137 175 135 200 Q133 218 139 234 L61 234 Q67 218 65 200 Q63 175 61 150 L55 100 Q53 85 62 80 Z" />
+        <ellipse cx="100" cy="30" rx="21" ry="25" />
       </g>
       <g>
         {ORGANS.map((o) => {
           const on = o.key === selected;
+          const fill = on ? 'rgb(var(--ht-accent) / 0.6)' : 'rgb(var(--ht-accent) / 0.22)';
+          const stroke = { fill, stroke: 'rgb(var(--ht-accent))', strokeWidth: on ? 2.2 : 1.1, strokeLinejoin: 'round' };
           return (
             <g key={o.key} aria-hidden="true" onClick={() => onSelect(o.key)} style={{ cursor: 'pointer' }} filter={on ? 'url(#organ-glow)' : undefined}>
-              {o.shapes.map((s, i) => (
-                <ellipse key={i} cx={s.cx} cy={s.cy} rx={s.rx} ry={s.ry}
-                  fill={on ? 'rgb(var(--ht-accent) / 0.55)' : 'rgb(var(--ht-accent) / 0.14)'} stroke="rgb(var(--ht-accent))" strokeWidth={on ? 2.5 : 1.2} />
-              ))}
+              {o.shapes.map((sh, i) => {
+                const d = ORGAN_PATH[o.key];
+                if (!d) return <ellipse key={i} cx={sh.cx} cy={sh.cy} rx={sh.rx} ry={sh.ry} {...stroke} />;
+                const flip = (o.key === 'lungs' || o.key === 'kidneys') && sh.cx > 100 ? -1 : 1;
+                return <path key={i} d={d} transform={`translate(${sh.cx} ${sh.cy - (o.key === 'brain' ? 7 : 0)}) scale(${sh.rx * flip} ${sh.ry})`} vectorEffect="non-scaling-stroke" {...stroke} />;
+              })}
             </g>
           );
         })}
