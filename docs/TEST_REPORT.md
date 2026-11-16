@@ -138,3 +138,39 @@ A1 since `main` was merged (3 commits `fdf955f`, `ed3b56b`, `5a347a7`, 2 events 
 Hospital portal checks, Backend checks (pull_request run): success. CI pull_request run: success (24/24 browser files, 530 checks; accessibility audit PASS). CI push run: **failure, A1 again** (23/24 files; only `GET /admin/users` still pending). No backend run was listed for the push event on this sha.
 
 A1 since `main` was first merged into Puneet (5 commits, 2 events each = 10 CI runs): 8 passed, 2 failed (both on push events, the other failure was on `5a347a7`). A1 also failed on `main` itself (`ad0a311`). It is a real, repeating flake whose root cause is still unknown; it is not caused by Puneet's changes.
+
+## Review fixes (16 Nov 2026, local commits, NOT pushed yet)
+
+Six findings from the detailed review of the Puneet branch. `origin/main` (3 new commits) was merged first, no conflicts. Labels: SANDBOX = run in the working sandbox; CI = only a CI run can show it (the sandbox has no network, so `fastapi`, `ruff`, `playwright` and the patient-app `node_modules` are not installed and the backend pytest suite, the patient-app vitest and the browser tests could **not** be run here).
+
+| # | Finding | Commit | What changed | Test added | Result |
+|---|---|---|---|---|---|
+| 1 | Portal reconnected about every 2 s on a dead login | `585172d` | New `hospital-portal/src/services/socketLink.js` (portal) and `patient-app/src/utils/reconnect.js` (patient app): no retry after close code 1008 (portal status "Signed out"), back off 2 s to 30 s, the wait starts again from 2 s only after a socket stayed open 10 s | `socketLink.test.js` (5), `patient-app/tests/unit/reconnect.test.js` (6, fake WebSocket and timers) | Portal: SANDBOX 519 of 519 pass (the whole portal unit suite). Patient app: SANDBOX pure functions checked by hand (2000, 4000, 8000, 16000, 30000, 30000); the vitest file itself runs in CI only |
+| 2 | A1 flake root cause | `ad150e5` | **Not fixed.** Read-only evidence from 5 failing browser-test runs plus test-only diagnostics (request timeline, direct server probes) printed only when A1 fails | none (diagnostics) | CI only. See "A1 evidence" below |
+| 3 | Chunked bodies not limited | `9fad839` | `SecurityMiddleware` counts body bytes as they are read and answers 413 over `MAX_BODY_BYTES` (CORS headers kept) | 3 in `test_hardening.py` | SANDBOX: the middleware was driven directly with a fake app: 180 B chunked gives 413, 100 B and 40 B pass. The pytest tests run in CI only |
+| 4 | Limiter singleton had no lock | `2ff844b` | `emergency_limiter()` creates the limiter under a lock (checked twice) | `test_sixteen_threads_share_one_limiter` | SANDBOX: 16 threads gave 1 shared object and 1 construction (same logic as the test, run without fastapi). pytest run in CI only |
+| 5 | Duplicate authorization in `extract_report` | `aa55475` | The first block never allowed anyone (it only raised for non-owners); the real check was the second call. Now one call, same 403 and the same audit row (`resource_id` "none") | one assertion added to `test_staff_and_admin_are_403_and_audited` | SANDBOX: compiles. pytest runs in CI only |
+| 6 | No CSP or HSTS | `0cbc845` | `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` on API replies; `Strict-Transport-Security` only over HTTPS (scheme or `X-Forwarded-Proto`). `/docs`, `/redoc` and stored PDF or image files are exempt from the CSP so they keep working | 6 in `test_hardening.py` | SANDBOX: helper functions and the middleware driven directly (CSP on `/health`, absent on `/docs` and a PDF; HSTS only when forwarded as https). pytest runs in CI only |
+
+Other SANDBOX results: `dashboard/test.mjs` 16 passed; `python -m compileall` on `backend/app` and `backend/tests` succeeded. ruff and eslint are not installed here, so lint is CI only.
+
+**Still open after these fixes**
+- A1 is **not fixed**. It stays open until 10 green runs in a row of the patient-app browser tests, with the new diagnostics there to read if it fails again.
+- No CSP on the static portal or the patient app (the hosts that serve them are outside this repo's backend): open.
+- Hindi and Gujarati text for the new "Signed out" badge is unreviewed.
+
+### A1 evidence (read-only, 16 Nov 2026)
+
+Source: logs of 5 failing "Browser tests" jobs (runs on `main`, `Puneet`, `dashboard` and `multicity-apps`), read through the REST API. SEEN in all 5:
+- The `/admin` page had loaded: the heading, the "Emergency numbers" editor and the access log table (with the volunteer's `responder.register` row) were on screen. The **Accounts list was empty**.
+- The still-pending requests were, each time, the earliest ones the page sends: `GET /admin/users` (5 of 5), sometimes also `GET /content/emergency_numbers` and `GET /content/first_aid_basics`. The access-log request had finished.
+- The list of failed or 4xx/5xx requests was empty in every run: nothing was refused, aborted or timed out (the app itself aborts after 10 s, which would show as a failed request).
+- Jehal's keep-alive fix (`6ad7baa`, 15 Nov 12:48) is older than all five failures, so stale keep-alive sockets are not the only cause. The retry loop (`15a91bc`) is also older, and still the failure is reached.
+- The failure also occurs on `main`, so it is not caused by this branch.
+
+Competing explanations (GUESS, not proven):
+1. **The browser never really sent the first requests** (a stalled or queued connection in Chrome after the long audit step). Would show: the direct probe from the test process answers quickly, the server never logs the request, `resources` has no entry for `/admin/users`.
+2. **The mock server received them but did not answer** (event loop busy with the simulator and the one-second vitals broadcast). Would show: the direct probes are slow or time out as well, including `/health`.
+3. **The page's own timing** (headless timers or the reload loop). Would show: `attemptsUsed` and `attemptLog` differ from the expected three attempts about 20 s apart, or `fail` entries in the timeline.
+
+The new `diag=` text on the A1 failure line holds `attemptsUsed`, `attemptLog`, `timeline` (start, response, finish, fail times in ms for admin, content and ws requests), the page's resource timings and three probes (`/health`, `/admin/users`, `/content/emergency_numbers`, with status and milliseconds). Step 3 (a fix) is **not done**: the evidence does not point to one cause yet.

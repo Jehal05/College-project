@@ -149,3 +149,5 @@ CONTRACT.md     the API contract (source of truth for this backend)
 - A field the patient did not agree to share is **left out**, never sent as `null`.
 - Only the rules engine decides severity. Nothing here diagnoses; every severity word is guidance, labelled simulated.
 - Nothing is claimed as doctor-approved until a named, registered doctor has signed it off.
+
+**Response headers.** Every reply carries `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Cache-Control: no-store` and a `Content-Security-Policy` of `default-src 'none'; frame-ancestors 'none'` (not on `/docs`, `/redoc` or stored PDF and image files). `Strict-Transport-Security` is added only when the request came over HTTPS (or `X-Forwarded-Proto: https`). The static portal and patient app have no CSP yet (open).
