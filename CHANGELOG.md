@@ -1,5 +1,12 @@
 # Changelog
 
+## Two cities (Ahmedabad and Pune) in the apps
+- API: `GET /cities`, `city_id` / `city_name` / `state` on hospitals, ambulances and emergencies, `?city_id=` filters, patient `home_city_id`. Mock server and backend answer the same shapes; contract script and `docs/API_CONTRACT.md` updated together. Pune sample data (5 hospitals, 5 ambulances) added. Existing ids (HSP-AMD-001 and so on) unchanged.
+- Patient app: city chooser, Hospitals screen, SOS start point from the chosen city, "Simulated location in <city>" note, new text in en/hi/gu.
+- Hospital portal: city switcher (staff locked to their hospital's city, admin can switch or choose "All cities"), "Showing: <city>" label, Dashboard, Map, Fleet, Analytics and Handover follow the choice.
+- New checks: `npm run cities` (mock scenarios), `scripts/joint-cities.mjs` (two-city rehearsal on the mock), patient-app and portal tests. Mock server gained a Pune desk login (`staff@pune`).
+- Limits: see the README section "Two cities".
+
 ## 2D body map
 - The no-WebGL fallback is now a soft, friendly figure (no ribs or spine lines, which looked eerie) with organs drawn as recognisable shapes (heart, lungs, kidneys, liver, brain). Organ positions unchanged. Still a simple drawing, not the 3D model.
 

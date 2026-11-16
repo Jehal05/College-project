@@ -6,6 +6,7 @@ import hospitalsSeed from '../data/hospitals.json';
 import ambulancesSeed from '../data/ambulances.json';
 import rankingConfig from '../data/ranking-config.json';
 import { rankHospitals } from './ranking.js';
+import { DEMO_LOCATION } from './geo.js';
 import { canEscalate, lastAlertTime, nextHospital } from './escalation.js';
 import { emitMock } from './socket.js';
 import { canTransition, canCancel, isFinal, isEarly } from './stateMachine.js';
@@ -337,8 +338,8 @@ export function createEmergency(type, early = false) {
     type: chosen,
     ...SAMPLES[chosen],
     location: {
-      lat: +(23.0225 + (random() - 0.5) * 0.06).toFixed(4),
-      lng: +(72.5714 + (random() - 0.5) * 0.06).toFixed(4),
+      lat: +(DEMO_LOCATION.lat + (random() - 0.5) * 0.06).toFixed(4),
+      lng: +(DEMO_LOCATION.lng + (random() - 0.5) * 0.06).toFixed(4),
       accuracy_m: 20,
     },
   };

@@ -150,6 +150,29 @@ The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from
 |---|---|---|
 | <img src="docs/images/ui/phase4-body-2d-desktop.png" width="260" alt="2D body map"> | <img src="docs/images/ui/phase4-portal-login.png" width="260" alt="Portal login"> | <img src="docs/images/portal-dashboard.png" width="260" alt="Portal dashboard"> |
 
+## Two cities: Ahmedabad and Pune
+
+The prototype now runs a two-city network. The city list comes from one file (`backend/app/seed/data/cities.json`, copied into the mock server and the portal); nothing in the apps types a city name or coordinates by hand.
+
+- **Patient app:** a "City" chooser on the Hospitals screen and Profile (saved as the home city). The hospital list, map and the start point of a practice emergency follow the chosen city. If the phone is far from the chosen city, the app says "Simulated location in <city>".
+- **Hospital portal:** a "Showing: <city>" label on every page. Staff see their own hospital's city; an admin can switch city or choose "All cities". Dashboard, Map, Fleet, Analytics and Handover follow the choice.
+- **API:** `GET /cities`, `city_id` on hospitals, ambulances and emergencies, `?city_id=` filters, `home_city_id` on the patient. The mock server and the backend answer the same shapes.
+- **Ranking:** hospitals in the patient's own city come first. Another city is used only when the own city has no suitable open hospital, and the answer then says so in plain words.
+
+| Patient Hospitals, Ahmedabad | Patient Hospitals, Pune | Portal map, Pune |
+|---|---|---|
+| <img src="docs/images/cities/patient-hospitals-ahmedabad-360.png" width="220" alt="Patient app Hospitals screen showing Ahmedabad at 360 px"> | <img src="docs/images/cities/patient-hospitals-pune-360.png" width="220" alt="Patient app Hospitals screen showing Pune at 360 px"> | <img src="docs/images/cities/portal-map-pune-1440.png" width="400" alt="Hospital portal map showing Pune at 1440 px"> |
+
+More shots (360 and 1440 px, both cities) are in [`docs/images/cities/`](docs/images/cities/). Re-create them with `node scripts/city-screenshots.mjs`.
+
+**Honest limits**
+
+- All hospitals, ambulances, patients and addresses are invented. The Pune hospital names are made up and have not been checked against real places.
+- Only two cities. Routes, ETAs and ambulance positions are simulated straight-line figures, not road routing.
+- On the real backend an SOS picks hospitals by distance. It does not return `city_id` or `other_city` on the emergency yet, so the "other city" note appears only on the mock server.
+- The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
+- Hindi and Gujarati text for the new screens is an unreviewed draft.
+
 ## Status and honest limits
 
 | Item | State |
