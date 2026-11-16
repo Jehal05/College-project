@@ -1,5 +1,10 @@
 # Changelog
 
+## UI phase 4: hospital look and a real human body model
+- Patient app: light hospital-website look by default (dark kept), utility bar, breadcrumb, hero banner, quick actions, footer, About/credits screen. Hospital portal: matching background, login header, simulated-demo footer. New text in en/hi/gu (hi/gu unreviewed drafts).
+- 3D twin: real anatomy model (BodyParts3D, CC BY 4.0, `tools/body-model`, ~2.6 MB, meshopt-compressed) with layers, organ selection, front/back, camera focus and rule-based status words; 2D fallback and text alternative kept. CSP gained `'wasm-unsafe-eval'` for the mesh decoder.
+- Tests: 186 patient-app unit tests, 457 portal unit tests, 22 portal e2e, browser test file phase19-hospital. Known flake: admin test A1 on CI.
+
 ## UI phases 0-3: digital-twin dashboard (patient app, hospital portal styling)
 - New design system (`--ht-*` dark and light tokens), 12-item sidebar, themed screens: Overview, Twin (2D and 3D), Diseases and detail, Monitor, Emergency Center, Report Intelligence (lab values you enter), Simulator, Care Circle, Copilot (rule-based).
 - Safety: every value is labelled simulated or entered; no diagnosis wording; "Ambulance dispatched" only from the exact event; clinician review shown as not reviewed.
