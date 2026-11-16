@@ -7,7 +7,7 @@ What each user hears is decided in app/services/ws_hub.py.
 
 The login is checked again while the socket stays open (WS_RECHECK_SECONDS, default 30) and before every event
 is sent. If the token has expired, or the account was disabled, deleted or given another role, the socket is
-closed with 1008 and nothing more is sent. The token is never logged.
+closed with 1008 and nothing more is sent. The token is kept only in memory; uvicorn's log lines have it replaced (app/security/log_redact.py).
 """
 import asyncio
 import json

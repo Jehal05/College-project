@@ -174,3 +174,11 @@ Competing explanations (GUESS, not proven):
 3. **The page's own timing** (headless timers or the reload loop). Would show: `attemptsUsed` and `attemptLog` differ from the expected three attempts about 20 s apart, or `fail` entries in the timeline.
 
 The new `diag=` text on the A1 failure line holds `attemptsUsed`, `attemptLog`, `timeline` (start, response, finish, fail times in ms for admin, content and ws requests), the page's resource timings and three probes (`/health`, `/admin/users`, `/content/emergency_numbers`, with status and milliseconds). Step 3 (a fix) is **not done**: the evidence does not point to one cause yet.
+
+### Review follow-ups (16 Nov 2026, local, not pushed)
+
+| Finding | Commit | What changed | Test | Result |
+|---|---|---|---|---|
+| SOS answered 429 showed a bare error | `4529d11` | `beginEmergency` keeps the alert as "not sent yet" on a 429 (the screen says call 112 / 108 and has Try again), as it already did for no connection; other errors still show the error | `patient-app/tests/unit/beginEmergency.test.js` (3) | CI only (no patient-app `node_modules` in the sandbox) |
+| Download address revoked at once | `4529d11` | `downloadText` revokes its address after 10 s | none (browser behaviour) | SANDBOX: portal unit tests 519 of 519 |
+| Login token in the WebSocket address could be written to uvicorn's log | next commit | `app/security/log_redact.py` replaces `token=` and `access_token=` values with `[hidden]` in the `uvicorn.access` and `uvicorn.error` loggers; installed by `create_app`; `CONTRACT.md` now says so and warns that a proxy in front must do the same | `backend/tests/test_log_redact.py` (3) | SANDBOX: the same checks run without pytest (token gone, 2 lines redacted). pytest runs in CI only. A real uvicorn run was not done here, so the claim that uvicorn logs the address is from knowledge of uvicorn, not seen here |

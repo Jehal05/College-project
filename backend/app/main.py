@@ -21,6 +21,7 @@ from app.config import demo_mode, parse_cors_origins
 from app.db import get_session_factory, init_db
 from app.errors import install_error_handlers
 from app.hardening import SecurityMiddleware
+from app.security import log_redact
 from app.models.accounts import User
 from app.security import crypto, passport_token
 from app.services import escalation
@@ -77,6 +78,7 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
         lifespan=lifespan,
     )
     install_error_handlers(application)
+    log_redact.install()                              # the socket's login token is in its address: keep it out of the logs
     application.add_middleware(SecurityMiddleware)   # added first, so CORS (added next) wraps it and 413 keeps CORS headers
     if origins:
         application.add_middleware(
