@@ -14,6 +14,15 @@ A patient app watches (simulated) wearable data, and when the patient sends an S
 ![Hospital portal dashboard](docs/images/portal-dashboard.png)
 <p align="center"><em>Hospital portal: alert queue, bed and ICU availability, acknowledge and dispatch</em></p>
 
+## Run everything at one address
+
+```
+npm install
+npm run one
+```
+
+Then open **http://localhost:4000/start**: patient app at `/`, hospital portal at `/portal/`, simulated API at `/api`, all on one port. Details: [`docs/ONE_ADDRESS.md`](docs/ONE_ADDRESS.md).
+
 ## What it does
 
 | Area | What you get |

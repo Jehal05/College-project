@@ -5,7 +5,9 @@ import { readCopy, saveCopy } from '../utils/offlineCache';
 import { isSimulatedOffline } from '../utils/simulatedOffline';
 import { normalizeEmergency } from '../utils/adapters';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// VITE_API_URL may be a full address (http://localhost:4000) or a path on the same site (/api, used by the one-address build).
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+export const API_URL = rawApiUrl.startsWith('/') ? window.location.origin + rawApiUrl : rawApiUrl;
 
 // Calls that start or follow an emergency never get a time limit or an automatic sign-out:
 // the offline "Not sent yet" logic (usePendingEmergency.js) owns them.

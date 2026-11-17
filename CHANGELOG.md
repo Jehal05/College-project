@@ -1,5 +1,8 @@
 # Changelog
 
+## One address for the whole project
+- `npm run one` builds and serves the patient app (`/`), hospital portal (`/portal/`), a start page (`/start`) and the simulated API (`/api`, WebSocket `/ws`) from one port. Apps accept a relative API address; the portal can be built under a base path; the service worker no longer answers `/portal` or `/api` pages. Development on separate ports is unchanged.
+
 ## Two cities (Ahmedabad and Pune)
 - Backend: cities table, `GET /cities`, `city_id` on hospitals and ambulances, `?city_id=` filter, `home_city_id` on patients, five fictional Pune hospitals/ambulances and five patients, additive migration.
 - Mock server: same shapes; SOS uses the patient's city and falls back to another city only when needed.

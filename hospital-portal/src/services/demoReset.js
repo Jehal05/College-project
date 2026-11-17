@@ -14,5 +14,5 @@ export function clearDemoData() {
 
 export function resetDemo() {
   clearDemoData();
-  window.location.assign('/dashboard');
+  window.location.assign(import.meta.env.BASE_URL + 'dashboard');
 }
