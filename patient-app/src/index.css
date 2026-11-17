@@ -106,3 +106,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .print-area, .print-area * { visibility: visible; }
   .print-area { position: absolute; left: 0; top: 0; border: 0; }
 }
+
+/* Pins on the real street map (components/themed/StreetMap.jsx) */
+.leaflet-marker-icon.ht-pin { display: flex; align-items: center; justify-content: center; box-sizing: border-box; border-radius: 9999px; font: 700 14px/1 system-ui, sans-serif; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.leaflet-marker-icon.ht-pin-h { background: #0b5f8a; color: #fff; }
+.leaflet-marker-icon.ht-pin-s { background: #b45309; border-radius: 4px; }

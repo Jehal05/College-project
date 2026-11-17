@@ -1,13 +1,28 @@
 // A small simulated map of one city: numbered hospital pins and the simulated start point. Drawn as SVG from the city's own
 // centre and zoom (GET /cities), so it needs no map server and works offline. It is a picture of the list below it, which
 // carries the same information as text, so the SVG is hidden from screen readers except for one summary.
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mapPins } from '../../utils/cities';
 
+const StreetMap = lazy(() => import('./StreetMap')); // the map library is only downloaded here
 const W = 600; const H = 360;
 
 export default function CityMap({ city, hospitals, start, label }) {
   const { t } = useTranslation();
+  const [streetFailed, setStreetFailed] = useState(false); // offline or tiles blocked: draw the simple map instead
+  const fail = useCallback(() => setStreetFailed(true), []);
+  const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+  if (online && !streetFailed) {
+    return (
+      <figure className="m-0">
+        <Suspense fallback={<div className="grid h-[360px] place-items-center rounded-xl border border-ht-line bg-ht-bg2 text-ht-muted" role="status">{t('hosp.mapLoading')}</div>}>
+          <StreetMap city={city} hospitals={hospitals} start={start} label={label} onFail={fail} />
+        </Suspense>
+        <figcaption className="mt-1 text-sm text-ht-muted">{t('hosp.mapReal')}</figcaption>
+      </figure>
+    );
+  }
   const { pins, start: startPin, centre } = mapPins(city, hospitals, start, { width: W, height: H });
   return (
     <figure className="m-0">
