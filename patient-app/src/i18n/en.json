@@ -1004,5 +1004,7 @@
   "hosp.cap.stroke_unit": "Stroke unit",
   "emc.hospitalIn": "Hospital chosen: {{name}} ({{city}})",
   "emc.otherCity": "No suitable hospital was open in {{own}}, so this simulated alert went to {{name}} in {{city}}.",
-  "emc.simLocation": "Simulated location in {{name}}"
+  "emc.simLocation": "Simulated location in {{name}}",
+  "hosp.mapLoading": "Loading the map…",
+  "hosp.mapReal": "Real street map. The hospitals and ambulances on it are fictional."
 }

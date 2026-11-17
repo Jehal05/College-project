@@ -1,5 +1,8 @@
 # Changelog
 
+## Real street map on the patient Hospitals screen
+- The Hospitals screen now shows a real OpenStreetMap street map (Leaflet, loaded on demand) with numbered pins for the fictional hospitals and the simulated start point. When offline or when tiles are blocked it falls back to the drawn map. CSP allows images from tile.openstreetmap.org only.
+
 ## Fix: demo panel showed the patient home in the one-address build
 - `npm run one` now builds into its own `dist-one` folders, so an older ordinary build (without the demo panel) is never served.
 - After signing in, the patient app returns to the page that was asked for (for example `/demo` or `/twin`) instead of always the home screen.

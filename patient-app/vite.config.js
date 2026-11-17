@@ -11,7 +11,7 @@ function contentSecurityPolicy(env) {
   const api = new URL(sameSite ? 'http://localhost:4000' : env.VITE_API_URL || 'http://localhost:4000');
   const ws = new URL(env.VITE_WS_URL || api.origin.replace(/^http/, 'ws') + '/ws');
   const connect = sameSite ? ["'self'", 'ws:', 'wss:'].join(' ') : ["'self'", api.origin, ws.origin].join(' ');
-  const policy = ["default-src 'self'", "script-src 'self' 'wasm-unsafe-eval'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data: blob:",
+  const policy = ["default-src 'self'", "script-src 'self' 'wasm-unsafe-eval'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.org",
     'connect-src ' + connect, "font-src 'self' data:", "worker-src 'self'", "manifest-src 'self'", "object-src 'none'",
     "base-uri 'self'", "form-action 'self'"].join('; ');
   return {
@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/portal(\/|$)/, /^\/api(\/|$)/, /^\/start(\/|$)/],
         // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
         // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
-        globIgnores: ['**/assets/{three,Twin3D,browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family,Responder,Volunteer,Admin,useLazyStrings}-*.js', '**/assets/{family,responder,admin}.*-*.js'],
+        globIgnores: ['**/assets/{three,Twin3D,browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family,Responder,Volunteer,Admin,useLazyStrings,StreetMap}-*.{js,css}', '**/assets/{family,responder,admin}.*-*.js'],
         runtimeCaching: [{
           urlPattern: ({ url }) => /\/assets\/(three|Twin3D|browser|Passport|PassportView|Reminders|Reports|Consent|Summary|VoiceSymptoms|DemoTools|Family|Responder|Volunteer|Admin|useLazyStrings|(family|responder|admin)\.(en|hi|gu))-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',

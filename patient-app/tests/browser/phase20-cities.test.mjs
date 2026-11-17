@@ -16,8 +16,8 @@ await p.waitForSelector('text=Showing: Ahmedabad, Gujarat'); await p.waitForSele
 let body = await p.innerText('body');
 check('20.1 a patient whose home city is Ahmedabad sees the Ahmedabad hospitals', amd.every((n) => body.includes(n)) && (await p.locator('ol[aria-label=Hospitals] > li').count()) === 5);
 check('20.2 no Pune hospital is shown there', pnq.every((n) => !body.includes(n)));
-check('20.3 it says the data is simulated and where the simulated start is', body.includes('Simulated location in Ahmedabad') && body.includes('SIMULATED MAP'));
-check('20.4 the map is one labelled picture and nothing overflows at 360 px', (await p.locator('svg[role=img]').count()) === 1 && (await noOverflow(p)) && (await unnamedControls(p)).length === 0);
+check('20.3 it says the data is simulated and where the simulated start is', body.includes('Simulated location in Ahmedabad') && (body.includes('SIMULATED MAP') || body.includes('Real street map')));
+check('20.4 the map is one labelled picture and nothing overflows at 360 px', ((await p.locator('svg[role=img]').count()) + (await p.locator('.leaflet-container[role=group]').count())) === 1 && (await noOverflow(p)) && (await unnamedControls(p)).length === 0);
 
 // switch to Pune on the same screen
 await p.locator('label', { hasText: 'Pune' }).click();
