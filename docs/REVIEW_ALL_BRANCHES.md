@@ -7,6 +7,7 @@ Method: `git fetch --all`, ahead/behind counts for every branch, the diffs of to
 - **Puneet**: 50 commits that main does not have (portal redesign, command view, analytics, map notices, backend hardening, 2D organ drawings) and 21 commits behind main. Draft PR #15.
 - **Daksh**: 2 commits main does not have (the operations dashboard, `dashboard/`). 98 behind.
 - **Jehal**: 249 commits behind main. It is Jehal's old mock server.
+- **real-street-map** (new, 17 Nov): 1 commit, a real OpenStreetMap street map on the patient Hospitals screen. Not merged, no pull request yet.
 - Every other branch (ui-*, multicity*, one-place*, docs-*, dashboard, integration, cleanup) is fully inside main. They can be deleted when the team agrees.
 
 ## Why things look wrong
