@@ -32,3 +32,13 @@ Method: `git fetch --all`, ahead/behind counts for every branch, the diffs of to
 
 ## Not reviewed yet
 Line-by-line of the 95 files main changed since 16 Nov apart from the ones above (cities code, mock server stores and simulator, new browser tests), the dashboard code, backend ML, CI workflow files.
+
+## Status after the fix pass (18 Nov, later the same night)
+| # | Done | How it was checked |
+|---|---|---|
+| 1 | Main merged into Puneet (commit ee810da), 7 conflicts resolved by keeping both sides | Portal unit tests 536 of 536 pass; the merged JSX and i18n files compile; Python compiles; the backend phase list still matches the test files. Backend tests, patient-app tests and browser tests were **not** run here (no dependencies): CI must run them |
+| 2 | `test_ws_api` ack test now waits for `hospital.acknowledged` and skips background `vitals.update` | Syntax only; real run is CI |
+| 3 | A1 not fixed. Diagnostics stay | Needs a CI failure to read the `diag=` line |
+| 4 | Accessibility audit starts Chrome up to 3 times | Compiles; real run is CI |
+| 5 | Demo-build warning added to `docs/ONE_ADDRESS.md` | Read |
+| 6, 7, 8 | Not done in code: delete the `jehal-mock` folder, the two `laptop-start-*.bat` files and the merged branches by hand once the team agrees | Listed for the team |

@@ -24,6 +24,16 @@ def hear(ws):
     return ws.receive_json()
 
 
+def hear_event(ws, name, limit=6):
+    """The first event called `name`. A patient's socket also gets background `vitals.update` news (ws_hub), and its time
+    relative to the event under test is not fixed, so the test waits for the event it wants instead of assuming it is first."""
+    for _ in range(limit):
+        event = ws.receive_json()
+        if event.get("event") == name:
+            return event
+    raise AssertionError(f"no {name} event within {limit} messages")
+
+
 def closed_with(demo, url):
     with pytest.raises(WebSocketDisconnect) as info:
         with demo.websocket_connect(url) as ws:
@@ -76,8 +86,8 @@ def test_the_desk_hears_its_own_acknowledge_and_the_patient_hears_it_too(demo, e
             demo.websocket_connect("/ws?token=" + patient_token) as patient:
         assert demo.post(f"/emergencies/{eid}/ack", json={}, headers=demo.headers(*STAFF)).status_code == 200
         for ws in (desk, patient):
-            event = hear(ws)
-            assert event["event"] == "hospital.acknowledged" and event["emergency_id"] == eid
+            event = hear_event(ws, "hospital.acknowledged")
+            assert event["emergency_id"] == eid
             assert event["state"] == "HOSPITAL_ACKNOWLEDGED"
 
 
