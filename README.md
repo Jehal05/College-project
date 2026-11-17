@@ -164,6 +164,16 @@ The simulation covers two fictional city networks, Ahmedabad (AMD) and Pune (PNQ
 
 (The grey map area is because the screenshots were taken without internet access for map tiles.)
 
+Screenshots of both cities at 360 and 1440 px (patient Hospitals screen and portal map) are in [`docs/images/cities/`](docs/images/cities/); re-create them with `node scripts/city-screenshots.mjs`. The two-city rehearsal on the mock server is `node scripts/joint-cities.mjs`.
+
+**Honest limits**
+
+- All hospitals, ambulances, patients and addresses are invented. The Pune hospital names are made up and have not been checked against real places.
+- Only two cities. Routes, ETAs and ambulance positions are simulated straight-line figures, not road routing.
+- On the real backend an SOS picks hospitals by distance. It does not return `city_id` or `other_city` on the emergency yet, so the "other city" note appears only on the mock server.
+- The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
+- Hindi and Gujarati text for the new screens is an unreviewed draft.
+
 ## Status and honest limits
 
 | Item | State |

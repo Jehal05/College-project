@@ -5,6 +5,7 @@
 - Mock server: same shapes; SOS uses the patient's city and falls back to another city only when needed.
 - Patient app: My city chooser, Hospitals screen, city-aware SOS start point. Portal: city switcher (admin), city-scoped queue, map, fleet, analytics and handover.
 - Known: real-backend cross-city SOS ranking is not done; admin test A1 still flakes on CI.
+- Rehearsal and tooling: `scripts/joint-cities.mjs` (two-city joint rehearsal on the mock, 13 checks), `scripts/city-screenshots.mjs`, a Pune desk login in the mock (`staff@pune`); no hard-coded start coordinates outside seed and tests (portal and backend default now read the cities file).
 
 ## 2D body map
 - The no-WebGL fallback is now a soft, friendly figure (no ribs or spine lines, which looked eerie) with organs drawn as recognisable shapes (heart, lungs, kidneys, liver, brain). Organ positions unchanged. Still a simple drawing, not the 3D model.
