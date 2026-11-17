@@ -5,7 +5,7 @@ Method: `git fetch --all`, ahead/behind counts for every branch, the diffs of to
 ## What the branches are
 - **main** (752f062, 18 Nov 01:13): has the two-city feature, the one-address build (`npm run one`, port 4000) and the older portal and backend.
 - **Puneet**: 50 commits that main does not have (portal redesign, command view, analytics, map notices, backend hardening, 2D organ drawings) and 21 commits behind main. Draft PR #15.
-- **Daksh**: 2 commits main does not have (the operations dashboard, `dashboard/`). 98 behind.
+- **Daksh**: 2 commits with ids main does not have, but the same `dashboard/` files are already in main (merged through the `dashboard` branch, PR #24), so nothing is missing. 98 behind. (An earlier version of this review wrongly said the dashboard was unmerged.)
 - **Jehal**: 249 commits behind main. It is Jehal's old mock server.
 - **real-street-map** (new, 17 Nov): 1 commit, a real OpenStreetMap street map on the patient Hospitals screen. Not merged, no pull request yet.
 - Every other branch (ui-*, multicity*, one-place*, docs-*, dashboard, integration, cleanup) is fully inside main. They can be deleted when the team agrees.
