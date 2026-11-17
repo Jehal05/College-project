@@ -14,3 +14,5 @@ globalThis.sessionStorage = store();
 globalThis.document = { documentElement: {}, hidden: false };
 globalThis.window = globalThis;
 globalThis.window.location = { pathname: '/', origin: 'http://localhost:5173' };
+// Node has no window events; the app code registers listeners at import time (services/auth.js), so give it harmless ones.
+for (const name of ['addEventListener', 'removeEventListener', 'dispatchEvent']) if (typeof globalThis[name] !== 'function') globalThis[name] = () => true;

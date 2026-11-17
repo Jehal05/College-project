@@ -54,8 +54,9 @@ def max_body_bytes() -> int:
     return value if value > 0 else DEFAULT_MAX_BODY_BYTES
 
 
-class _BodyTooLarge(Exception):
-    pass
+class _BodyTooLarge(BaseException):
+    """Raised from the receive wrapper. It is a BaseException on purpose: FastAPI turns any Exception raised while it reads
+    the body into a 400, which would hide the real answer (413)."""
 
 
 class SecurityMiddleware:
@@ -80,9 +81,12 @@ class SecurityMiddleware:
                 break
 
         started = False
+        over = False   # the body went past the limit: whatever the app answers after that is dropped and 413 is sent instead
 
         async def send_with_headers(message: Dict[str, Any]) -> None:
             nonlocal started
+            if over and not started:
+                return
             if message["type"] == "http.response.start":
                 started = True
                 present = {name.lower() for name, _ in message.get("headers", [])}
@@ -98,11 +102,12 @@ class SecurityMiddleware:
         limit = max_body_bytes()
 
         async def counting_receive() -> Dict[str, Any]:
-            nonlocal seen
+            nonlocal seen, over
             message = await receive()
             if message["type"] == "http.request":
                 seen += len(message.get("body", b""))
                 if seen > limit:
+                    over = True
                     raise _BodyTooLarge()
             return message
 
@@ -111,6 +116,9 @@ class SecurityMiddleware:
         except _BodyTooLarge:
             if started:
                 raise  # the answer is already on its way; nothing honest can be added
+            await self._refuse(send, https)
+            return
+        if over and not started:   # the app swallowed the error and answered something else; that answer was dropped
             await self._refuse(send, https)
 
     @staticmethod
