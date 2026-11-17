@@ -1,6 +1,6 @@
 // All pages. Everything except /login needs a login; unknown addresses show "not found".
 import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { homeFor } from './utils/roles';
 import useAuth from './hooks/useAuth';
@@ -58,7 +58,9 @@ import NotFound from './screens/NotFound';
 // Patient screens. Anyone else who signs in goes to their own screen and cannot open patient screens.
 function Protected({ children }) {
   const { isLoggedIn, session } = useAuth();
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  const location = useLocation();
+  // Remember the page that was asked for, so signing in brings the person back to it (for example /demo or /twin).
+  if (!isLoggedIn) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   return session && session.role !== 'PATIENT' ? <Navigate to={homeFor(session.role)} replace /> : children;
 }
 

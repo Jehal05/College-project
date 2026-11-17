@@ -28,7 +28,12 @@ await fail('off');
 await p.goto(BASE + '/'); await sleep(800); await fail('expired'); await p.goto(BASE + '/profile'); await p.waitForURL('**/login', { timeout: 8000 });
 check('R5 401 signs out and the login screen says the session ended', (await p.innerText('body')).includes('Your session ended. Please sign in again.'));
 check('R6 saved copies were cleared on the forced sign-out', (await p.evaluate("Object.keys(sessionStorage).filter(k=>k.startsWith('ht.cache')||k==='ht.pending').length")) === 0);
-await fail('off'); await login(p); await p.waitForSelector('text=Hello, Rahul'); check('R7 signing in again works', true);
+await fail('off');
+// The login screen remembers the page that was asked for (/profile), so signing in brings the person back to it.
+await p.fill('input[type=email]', 'patient@demo.test'); await p.fill('input[type=password]', 'demo1234'); await p.click('button[type=submit]');
+await p.waitForURL('**/profile', { timeout: 8000 });
+check('R7 signing in again works and returns to the page that was asked for', new URL(p.url()).pathname === '/profile', p.url());
+await p.goto(BASE + '/'); await p.waitForSelector('text=Hello, Rahul');
 
 // Slow server: give up after 10 s and say so
 await fail('slow'); const t0 = Date.now(); await p.goto(BASE + '/profile'); await p.waitForSelector('text=Could not load your profile.', { timeout: 20000 });

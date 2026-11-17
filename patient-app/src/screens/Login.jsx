@@ -1,6 +1,6 @@
 // Login screen. Fake login against the mock API; returns a token and a role.
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { login } from '../services/api';
 import { takeNotice } from '../services/auth';
@@ -19,13 +19,18 @@ export default function Login() {
   const { t } = useTranslation();
   const { isLoggedIn, session, signIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // The page the person tried to open before being sent here. Only a path on this site is accepted, and only for patients.
+  const wanted = location.state && typeof location.state.from === 'string' ? location.state.from : '';
+  const safeWanted = /^\/(?!\/)/.test(wanted) && !wanted.startsWith('/login') ? wanted : '';
+  const landing = (role) => (role === 'PATIENT' && safeWanted ? safeWanted : homeFor(role));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [notice] = useState(takeNotice); // 'expired' when the server ended the session
 
-  if (isLoggedIn) return <Navigate to={session ? homeFor(session.role) : '/'} replace />;
+  if (isLoggedIn) return <Navigate to={session ? landing(session.role) : '/'} replace />;
 
   async function submit(e) {
     e.preventDefault();
@@ -36,7 +41,7 @@ export default function Login() {
       if (!allowedHere(result.role)) setError(t('login.wrongRole'));
       else {
         signIn(result);
-        navigate(homeFor(result.role), { replace: true });
+        navigate(landing(result.role), { replace: true });
       }
     } catch (err) {
       setError(err.code === 'NETWORK' || err.code === 'TIMEOUT' ? t('login.networkError') : t('login.error'));
