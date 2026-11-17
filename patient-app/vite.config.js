@@ -7,9 +7,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 // 'wasm-unsafe-eval' lets the 3D model decoder (WebAssembly) run; it does not allow eval() of text as JavaScript.
 // Not applied in `npm run dev` (the dev server needs inline scripts).
 function contentSecurityPolicy(env) {
-  const api = new URL(env.VITE_API_URL || 'http://localhost:4000');
+  const sameSite = (env.VITE_API_URL || '').startsWith('/'); // one-address build: the API and live events are on the same site
+  const api = new URL(sameSite ? 'http://localhost:4000' : env.VITE_API_URL || 'http://localhost:4000');
   const ws = new URL(env.VITE_WS_URL || api.origin.replace(/^http/, 'ws') + '/ws');
-  const connect = ["'self'", api.origin, ws.origin].join(' ');
+  const connect = sameSite ? ["'self'", 'ws:', 'wss:'].join(' ') : ["'self'", api.origin, ws.origin].join(' ');
   const policy = ["default-src 'self'", "script-src 'self' 'wasm-unsafe-eval'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data: blob:",
     'connect-src ' + connect, "font-src 'self' data:", "worker-src 'self'", "manifest-src 'self'", "object-src 'none'",
     "base-uri 'self'", "form-action 'self'"].join('; ');
@@ -33,6 +34,8 @@ export default defineConfig(({ mode }) => ({
         // The app files are cached so a visited page opens offline. API calls are never cached here
         // (health data stays out of browser caches; see utils/offlineCache.js for the in-tab saved copies).
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        // In the one-address build the hospital portal and the API live on the same site: never answer them with this app's page.
+        navigateFallbackDenylist: [/^\/portal(\/|$)/, /^\/api(\/|$)/, /^\/start(\/|$)/],
         // Screens that only work with the server (passport, reminders, summary, demo panel) and the QR library are loaded the
         // first time they are opened and then kept by the runtime rule below. This keeps the offline install small.
         globIgnores: ['**/assets/{three,Twin3D,browser,Passport,PassportView,Reminders,Reports,Consent,Summary,VoiceSymptoms,DemoTools,Family,Responder,Volunteer,Admin,useLazyStrings}-*.js', '**/assets/{family,responder,admin}.*-*.js'],

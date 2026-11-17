@@ -16,7 +16,9 @@
     "integration": "node scripts/integration.mjs",
     "cities": "node scripts/cities-scenarios.mjs",
     "test": "npm test -w patient-app",
-    "audit": "npm run audit -w patient-app"
+    "audit": "npm run audit -w patient-app",
+    "one": "node scripts/one.mjs",
+    "one:rebuild": "node scripts/one.mjs --rebuild"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"
