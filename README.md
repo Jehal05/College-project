@@ -14,6 +14,15 @@ A patient app watches (simulated) wearable data, and when the patient sends an S
 ![Hospital portal dashboard](docs/images/portal-dashboard.png)
 <p align="center"><em>Hospital portal: alert queue, bed and ICU availability, acknowledge and dispatch</em></p>
 
+## Run everything at one address
+
+```
+npm install
+npm run one
+```
+
+Then open **http://localhost:4000/start**: patient app at `/`, hospital portal at `/portal/`, simulated API at `/api`, all on one port. Details: [`docs/ONE_ADDRESS.md`](docs/ONE_ADDRESS.md).
+
 ## What it does
 
 | Area | What you get |
@@ -197,6 +206,30 @@ The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from
 | `TRANSLATION_REVIEW.md` | Hindi and Gujarati review status (portal strings) |
 | `demo/`, `i18n/` | Demo screenshots and video, language glyph checks |
 
+### Two cities: Ahmedabad and Pune
+
+The simulation covers two fictional city networks, Ahmedabad (AMD) and Pune (PNQ), five simulated hospitals and ambulances each. The list of cities (name, map centre, zoom, simulated start point) lives in one file, `backend/app/seed/data/cities.json`, and reaches the apps through `GET /cities`.
+
+- **Patient app:** "My city" on the new Hospitals screen (saved as the patient's home city). Hospitals, the map and the simulated SOS start point follow the chosen city, and a notice says "Simulated location in <city>. No real address is used."
+- **Hospital portal:** staff see the city of their own hospital. An admin can switch city or choose "All cities"; by default an admin sees their own hospital's city, and the choice is remembered in the browser. Queue, map, fleet, analytics and handover are scoped to the chosen city, with a "Showing: <city>" label.
+- **SOS routing:** the simulated SOS picks a hospital in the patient's current city and only falls back to another city when its own has no suitable hospital (and says so). Existing ids (for example HSP-AMD-001) did not change.
+
+| Patient app, Pune | Patient app, Pune (360 px) | Portal map, admin on Pune |
+|---|---|---|
+| <img src="docs/images/ui/phase5-cities-hospitals-pune-desktop.png" width="260" alt="Hospitals screen showing Pune"> | <img src="docs/images/ui/phase5-cities-hospitals-pune-mobile.png" width="120" alt="Hospitals screen on a phone"> | <img src="docs/images/ui/phase5-cities-portal-map-pune.png" width="260" alt="Portal map for Pune"> |
+
+(The grey map area is because the screenshots were taken without internet access for map tiles.)
+
+Screenshots of both cities at 360 and 1440 px (patient Hospitals screen and portal map) are in [`docs/images/cities/`](docs/images/cities/); re-create them with `node scripts/city-screenshots.mjs`. The two-city rehearsal on the mock server is `node scripts/joint-cities.mjs`.
+
+**Honest limits**
+
+- All hospitals, ambulances, patients and addresses are invented. The Pune hospital names are made up and have not been checked against real places.
+- Only two cities. Routes, ETAs and ambulance positions are simulated straight-line figures, not road routing.
+- On the real backend an SOS picks hospitals by distance. It does not return `city_id` or `other_city` on the emergency yet, so the "other city" note appears only on the mock server.
+- The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
+- Hindi and Gujarati text for the new screens is an unreviewed draft.
+
 ## Status and honest limits
 
 | Item | State |
@@ -215,6 +248,7 @@ The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from
 | Hospital portal | Restyled but light theme only |
 | Body model contents | No muscles, nerves or reproductive organs; the lungs are a generic outline shape built around the airways (source has none); organ shapes are not personal |
 | 3D model file | About 2.6 MB, not cached offline; offline or without WebGL a hand-drawn 2D body map is shown (a soft figure with organ shapes, simpler than the 3D model) |
+| Cities | Only two, both fictional; Pune hospitals, ambulances and patients are made-up data. The real backend does not yet rank hospitals across cities for the SOS (the mock server does); Hindi and Gujarati city text is an unreviewed draft |
 | Model licence | CC BY 4.0 (attribution required, no share-alike); licence page re-check advised before public release |
 | One admin browser test (A1) | Occasionally fails on CI and passes on rerun; cause not found |
 

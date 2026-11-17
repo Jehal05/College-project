@@ -195,6 +195,7 @@ export function normaliseEmergency(src = {}) {
     symptom_ids,
     symptoms: symptomLabels(symptom_ids),
     patient_id: src.patient_id ?? patient?.id ?? null,
+    ...(src.city_id ? { city_id: String(src.city_id) } : {}),
     alerted_hospital_id: src.alerted_hospital_id ?? (src.hospital?.id != null ? String(src.hospital.id) : null) ?? undefined,
     ambulance_id: src.ambulance_id ?? src.ambulance?.id ?? undefined,
     patient,

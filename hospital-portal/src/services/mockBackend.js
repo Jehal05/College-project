@@ -6,6 +6,7 @@ import hospitalsSeed from '../data/hospitals.json';
 import ambulancesSeed from '../data/ambulances.json';
 import rankingConfig from '../data/ranking-config.json';
 import { rankHospitals } from './ranking.js';
+import { DEMO_LOCATION } from './geo.js';
 import { canEscalate, lastAlertTime, nextHospital } from './escalation.js';
 import { emitMock } from './socket.js';
 import { canTransition, canCancel, isFinal, isEarly } from './stateMachine.js';
@@ -48,8 +49,8 @@ const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
 function seed() {
   if (seeded) return;
   seeded = true;
-  // Make the sample alerts look recent: 20, 12 and 5 seconds old.
-  const ages = [20, 12, 5];
+  // Make the sample alerts look recent: a few seconds old (three in Ahmedabad, two in Pune).
+  const ages = [20, 12, 5, 9, 3];
   mockAlerts.forEach((a, i) => {
     const created_at = new Date(Date.now() - (ages[i] ?? 5) * 1000).toISOString();
     records.set(a.emergency_id, {
@@ -337,8 +338,8 @@ export function createEmergency(type, early = false) {
     type: chosen,
     ...SAMPLES[chosen],
     location: {
-      lat: +(23.0225 + (random() - 0.5) * 0.06).toFixed(4),
-      lng: +(72.5714 + (random() - 0.5) * 0.06).toFixed(4),
+      lat: +(DEMO_LOCATION.lat + (random() - 0.5) * 0.06).toFixed(4),
+      lng: +(DEMO_LOCATION.lng + (random() - 0.5) * 0.06).toFixed(4),
       accuracy_m: 20,
     },
   };

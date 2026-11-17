@@ -169,12 +169,13 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | POST /emergencies/{id}/dispatch | Ambulance dispatched | HOSPITAL_STAFF | Puneet |
 | POST /emergencies/{id}/status | Move to EN_ROUTE, ARRIVED or HANDOVER_DONE | HOSPITAL_STAFF | Puneet |
 | GET /emergencies?status=active or finished | The desk's lists: emergencies the hospital was alerted for (admin: all sent ones), only after the SOS, audited | HOSPITAL_STAFF, ADMIN | Puneet |
-| GET /hospitals?lat&lng&type | Candidate hospitals with capabilities | HOSPITAL_STAFF, PATIENT, ADMIN | Puneet |
+| GET /cities | The cities the apps offer (AMD Ahmedabad, PNQ Pune), read from the cities table; no personal data | any logged-in role | Daksh |
+| GET /hospitals?lat&lng&type&city_id | Candidate hospitals with capabilities; optional `city_id` keeps one city (an unknown id is 400) | HOSPITAL_STAFF, PATIENT, ADMIN | Puneet |
 | PATCH /hospitals/{id}/availability | Update beds, ICU, cath lab, stroke unit | HOSPITAL_STAFF (own hospital), ADMIN | Puneet |
 | POST /hospitals | Add a hospital (starts unverified, never alerted until verified). PROPOSED by the portal, not agreed | ADMIN | Puneet |
 | PUT /hospitals/{id} | Edit a hospital; never changes `verified`. PROPOSED, not agreed | ADMIN | Puneet |
 | PATCH /hospitals/{id}/verify | Verify or unverify a hospital. PROPOSED, not agreed | ADMIN | Puneet |
-| GET /ambulances | List ambulances with position and status | HOSPITAL_STAFF, ADMIN | Puneet |
+| GET /ambulances?city_id | List ambulances with position and status; optional `city_id` filter | HOSPITAL_STAFF, ADMIN | Puneet |
 | PATCH /emergencies/{id}/checklist | Tick or untick a checklist item `{ item_id, done }`; reply `{ checklist }`. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
 | POST /emergencies/{id}/notes | A timeline note `{ kind, note, fields }`; kinds handover, desk, pickup, corridor, assignment, responder. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
 | POST /emergencies/{id}/chat | A chat line `{ text, sender_role: desk or crew, sender_name }`. PROPOSED, not agreed | HOSPITAL_STAFF (alerted hospital) | Puneet |
@@ -296,10 +297,25 @@ Response 201:
     "availability": { "beds_free": 12, "icu_free": 3, "cath_lab_ready": true, "stroke_unit_ready": false },
     "verified": true,
     "distance_km": 1.8,
+    "city_id": "AMD", "city_name": "Ahmedabad", "state": "Gujarat",
     "simulated": true
   }
 ]
 ```
+
+**GET /cities** (any logged-in role)
+```json
+[
+  {
+    "city_id": "AMD", "city_name": "Ahmedabad", "state": "Gujarat",
+    "lat": 23.0225, "lng": 72.5714, "timezone": "Asia/Kolkata", "zoom": 12,
+    "simulation_start": { "lat": 23.0225, "lng": 72.5714, "label": "Ashram Road area" },
+    "simulated": true
+  }
+]
+```
+Hospitals and ambulances also carry `city_id`, `city_name` and `state`. The patient's own record carries `home_city_id`
+(owner only; left out when unset; changed with `PATCH /patients/{id}` to a known city id, otherwise 400).
 
 **POST /ambulances/{id}/location**
 ```json

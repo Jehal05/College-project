@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy.orm import Session
 
 from app.config import truthy
+from app.models.cities import City
 from app.models.enums import EmergencyType
 from app.models.hospitals import Ambulance, Hospital
 from app.services import hospital_match
@@ -70,16 +71,29 @@ def hospital_view(hospital: Hospital, where: Optional[Dict[str, float]] = None, 
         "capabilities": hospital.capabilities,
         "availability": {**hospital.availability, "icu_beds": hospital.availability["icu_free"]},   # icu_beds: the old name
         "distance_km": round(hospital_match.distance_km(point["lat"], point["lng"], hospital.lat, hospital.lng), 2),
+        "city_id": hospital.city_id, "city_name": hospital.city_name, "state": hospital.state,
         "simulated": True}
     if emergency_type:
         body["suitable"] = hospital_match.is_suitable(hospital, emergency_type)
     return body
 
 
+def clean_city(session: Session, raw: Optional[str]) -> Optional[str]:
+    """An optional city_id filter. Unknown ids are an error, never a silently empty list."""
+    if raw is None:
+        return None
+    if session.get(City, raw) is None:
+        raise HospitalInputError("city_id must be one of: " + ", ".join(c.city_id for c in session.query(City).order_by(City.city_id)))
+    return raw
+
+
 def list_hospitals(session: Session, *, verified_only: bool, where: Optional[Dict[str, float]],
-                   emergency_type: Optional[str]) -> List[dict]:
+                   emergency_type: Optional[str], city_id: Optional[str] = None) -> List[dict]:
     """Nearest first. With a type, the hospitals that can handle it and are ready come first."""
-    rows = session.query(Hospital).all()
+    query = session.query(Hospital)
+    if city_id:
+        query = query.filter(Hospital.city_id == city_id)
+    rows = query.all()
     if verified_only:
         rows = [h for h in rows if h.verified]
     views = [hospital_view(h, where, emergency_type) for h in rows]
@@ -98,7 +112,7 @@ def ambulance_view(amb: Ambulance) -> dict:
     return {"id": amb.id, "portal_id": amb.portal_id, "call_sign": amb.call_sign,
             "crew": {"driver": amb.crew_driver, "paramedic": amb.crew_paramedic},
             "base_hospital_id": amb.base_hospital_id, "lat": amb.lat, "lng": amb.lng, "status": amb.status,
-            "simulated": True}
+            "city_id": amb.city_id, "city_name": amb.city_name, "state": amb.state, "simulated": True}
 
 
 # ------------------------------------------------------------------ availability

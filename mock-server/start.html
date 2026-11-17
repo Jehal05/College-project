@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HealthTwin AI: start page</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; background: linear-gradient(#f4f8fc, #e3edf6); color: #0f2233; }
+  header { background: #0d1b2a; color: #fff; padding: 14px 24px; border-bottom: 4px solid #20c7e8; font-weight: 700; font-size: 18px; }
+  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 48px; }
+  .note { background: #fff7e0; border: 1px solid #d9a400; border-radius: 10px; padding: 10px 14px; margin-bottom: 20px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  a.card { display: block; background: #fff; border: 1px solid #c5d3e0; border-radius: 14px; padding: 18px; text-decoration: none; color: inherit; }
+  a.card:hover, a.card:focus-visible { border-color: #0b5f8a; outline: 3px solid #0b5f8a33; }
+  a.card b { display: block; font-size: 18px; color: #0b5f8a; margin-bottom: 4px; }
+  table { border-collapse: collapse; width: 100%; background: #fff; border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e1e8ef; }
+  th { background: #eef3f8; }
+  code { background: #eef3f8; padding: 1px 6px; border-radius: 4px; }
+  #health { font-weight: 600; }
+  h2 { margin-top: 28px; }
+</style>
+</head>
+<body>
+<header>HealthTwin AI: one address for the whole project</header>
+<main>
+  <p class="note"><b>Simulated prototype.</b> No real hospital, ambulance, SMS or emergency number is contacted. Nothing here is medical advice or a medical device.</p>
+  <p>Server: <span id="health">checking…</span></p>
+  <div class="grid">
+    <a class="card" href="/"><b>Patient app</b>Overview, 3D digital twin, emergency help, consent, passport.</a>
+    <a class="card" href="/portal/"><b>Hospital portal</b>Alert queue, map, fleet, acknowledge and dispatch.</a>
+    <a class="card" href="/demo"><b>Demo panel</b>Reset the demo, pick a vitals profile, run scenarios.</a>
+    <a class="card" href="/api/health"><b>API health</b>Plain JSON answer from the simulated server.</a>
+  </div>
+  <h2>Demo logins</h2>
+  <table>
+    <tr><th>Where</th><th>Login</th><th>Password</th></tr>
+    <tr><td>Patient app</td><td><code>patient@demo.test</code></td><td><code>demo1234</code></td></tr>
+    <tr><td>Portal staff, Ahmedabad</td><td><code>staff@demo</code></td><td><code>demo123</code></td></tr>
+    <tr><td>Portal staff, Pune</td><td><code>staff.pune@demo.test</code></td><td><code>demo1234</code></td></tr>
+    <tr><td>Portal admin (can switch city)</td><td><code>admin@demo</code></td><td><code>demo123</code></td></tr>
+  </table>
+  <p>Tip: put the patient app and the hospital portal in two windows side by side. Both talk to this one server.</p>
+</main>
+<script>
+  fetch('/api/health').then((r) => r.json()).then(() => { document.getElementById('health').textContent = 'running (simulated data)'; })
+    .catch(() => { document.getElementById('health').textContent = 'not reachable'; });
+</script>
+</body>
+</html>

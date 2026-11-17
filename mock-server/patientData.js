@@ -143,7 +143,7 @@ router.delete('/patients/:id/reports/:reportId', requireAuth, (req, res) => {
 
 // ---- Baseline used by the digital twin bar ----
 router.get('/patients/:id/baseline', requireAuth, (req, res) => {
-  if (patientOf(req, res)) res.json(store.baseline);
+  if (patientOf(req, res)) res.json(store.baselines[req.params.id] || store.baseline);
 });
 
 // Turn body-size and other parser errors into JSON answers (413 when a report is over 2 MB).

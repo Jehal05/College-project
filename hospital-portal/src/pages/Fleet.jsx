@@ -4,6 +4,8 @@ import { USE_MOCK } from '../services/config.js';
 import { useAmbulances, SAMPLE_FLEET_NOTE } from '../components/AmbulanceProvider.jsx';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
+import { CityLabel } from '../components/CityBar.jsx';
+import { useCityScope } from '../components/useCityScope.js';
 import TrackingMap, { formatEta } from '../components/TrackingMap.jsx';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { typeText } from '../i18n/phrases.js';
@@ -19,8 +21,11 @@ const STATUS = {
 
 export default function Fleet() {
   const t = useT();
-  const { ambulances, error, movementMode } = useAmbulances();
-  const { emergencies } = useEmergencies();
+  const { ambulances: allAmbulances, error, movementMode } = useAmbulances();
+  const { emergencies: allEmergencies } = useEmergencies();
+  const cityScope = useCityScope();
+  const ambulances = cityScope.byCity(allAmbulances);
+  const emergencies = cityScope.alerts(allEmergencies);
   const { hospitals } = useHospitals();
   const hospitalName = (id) => hospitals.find((h) => h.id === id)?.name || id;
   const free = ambulances.filter((a) => a.status === 'available').length;
@@ -30,6 +35,7 @@ export default function Fleet() {
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold">{t('fleet.title')}</h1>
+        <CityLabel />
         <SimulatedBadge text={t('fleet.badge')} />
         <span data-testid="fleet-summary" className="ml-auto text-xl font-semibold">
           {t('fleet.summary', { free, total: ambulances.length })}

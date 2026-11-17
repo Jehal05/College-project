@@ -764,4 +764,9 @@ export default {
   'an.spread.p90': 'P90',
   'an.spread.notEnough': 'પૂરતો ડેટા નથી',
   'an.spread.total': 'આખો કેસ, એલર્ટથી અંત સુધી',
+
+  'city.label': 'શહેર',
+  'city.all': 'બધાં શહેરો',
+  'city.showing': 'બતાવી રહ્યા છીએ: {name}',
+  'city.yours': 'શહેર: {name}',
 };

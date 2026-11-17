@@ -4,6 +4,9 @@ import L from 'leaflet';
 import { USE_MOCK } from '../services/config.js';
 import { originFor } from '../services/adapters.js';
 import { DEMO_LOCATION, ASSUMED_SPEED_KMH, withDistance } from '../services/geo.js';
+import { CityLabel } from '../components/CityBar.jsx';
+import { useCity } from '../components/CityProvider.jsx';
+import { useCityScope } from '../components/useCityScope.js';
 import { useHospitals } from '../components/HospitalProvider.jsx';
 import { useRanking } from '../components/useRanking.js';
 import RankingTable from '../components/RankingTable.jsx';
@@ -48,7 +51,10 @@ function hospitalIcon(h, selected, isTop, t) {
 
 export default function MapPage() {
   const t = useT();
-  const { hospitals: stored, loading, error } = useHospitals();
+  const { hospitals: allStored, loading, error } = useHospitals();
+  const cityScope = useCityScope();
+  const { city, start } = useCity();
+  const stored = useMemo(() => cityScope.byCity(allStored), [cityScope, allStored]);
   const { session } = useAuth();
   const [type, setType] = useState('');
   const [selectedId, setSelectedId] = useState(null);
@@ -56,7 +62,8 @@ export default function MapPage() {
   const [showAed, setShowAed] = useState(false);
   const [showResponders, setShowResponders] = useState(false);
   // Mock mode keeps the sample patient. With a real backend the map starts from the middle of the hospitals, not a fixed city.
-  const origin = useMemo(() => (USE_MOCK ? DEMO_LOCATION : { ...(originFor(null, stored) || DEMO_LOCATION), label: MIDDLE_LABEL }), [stored]);
+  // The start point and zoom come from the chosen city (GET /cities). "All cities" has no single start: the map opens on the middle of the hospitals.
+  const origin = useMemo(() => (USE_MOCK && start ? { ...start, label: DEMO_LOCATION.label } : { ...(originFor(null, stored) || start || DEMO_LOCATION), label: MIDDLE_LABEL }), [stored, start]);
 
   // Distance and capability match are worked out here, so colours and details change at once.
   const hospitals = useMemo(
@@ -76,6 +83,7 @@ export default function MapPage() {
       <section className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">{t('map.title')}</h1>
+          <CityLabel />
           <SimulatedBadge text={t('map.badge', { kmh: ASSUMED_SPEED_KMH })} />
           <label className="ml-auto flex items-center gap-2 text-lg">
             <input data-testid="toggle-aed" type="checkbox" className="h-6 w-6" checked={showAed} onChange={(e) => setShowAed(e.target.checked)} />
@@ -108,7 +116,7 @@ export default function MapPage() {
               {t('map.loading')}
             </div>
           )}
-          <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={12} zoomControl={false} className="h-full w-full">
+          <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={city ? city.zoom : 12} zoomControl={false} className="h-full w-full">
             <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

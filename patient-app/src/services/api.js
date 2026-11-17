@@ -5,7 +5,9 @@ import { readCopy, saveCopy } from '../utils/offlineCache';
 import { isSimulatedOffline } from '../utils/simulatedOffline';
 import { normalizeEmergency } from '../utils/adapters';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// VITE_API_URL may be a full address (http://localhost:4000) or a path on the same site (/api, used by the one-address build).
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+export const API_URL = rawApiUrl.startsWith('/') ? window.location.origin + rawApiUrl : rawApiUrl;
 
 // Calls that start or follow an emergency never get a time limit or an automatic sign-out:
 // the offline "Not sent yet" logic (usePendingEmergency.js) owns them.
@@ -77,7 +79,17 @@ export const cancelEmergency = (id) => request('/emergencies/' + id + '/cancel',
 export const getEmergency = (id) => request('/emergencies/' + id).then(normalizeEmergency);
 
 // ---- Demo helpers ----
-export const runDemoScenario = (type) => request('/demo/scenario', { method: 'POST', body: { type } });
+export const runDemoScenario = (type, cityId) => request('/demo/scenario', { method: 'POST', body: cityId ? { type, city_id: cityId } : { type } });
+
+// ---- Cities (two-city network). The list is saved like the other GET answers, so the last one works offline. ----
+export const getCities = () => request('/cities');
+export const getHospitals = ({ cityId, lat, lng } = {}) => {
+  const q = new URLSearchParams();
+  if (cityId) q.set('city_id', cityId);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) { q.set('lat', lat); q.set('lng', lng); }
+  const text = q.toString();
+  return request('/hospitals' + (text ? '?' + text : ''));
+};
 export const resetDemo = () => request('/demo/reset', { method: 'POST' });
 
 // ---- Consent, contacts, reports and baseline (Phase 3) ----

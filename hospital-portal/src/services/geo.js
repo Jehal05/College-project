@@ -1,8 +1,12 @@
 // Geography helpers. Travel time is SIMULATED (straight-line distance ÷ assumed speed);
 // always show it with the "Simulated ETA" label.
 
-// Fixed demo location (patient position used when GPS is off). Ahmedabad city centre.
-export const DEMO_LOCATION = { lat: 23.0225, lng: 72.5714, label: 'Demo patient location' };
+import cities from '../data/cities.json' with { type: 'json' };
+
+// Fixed demo location (patient position used when GPS is off): the first city's simulated start, from data/cities.json.
+const FIRST = cities[0] || { lat: 0, lng: 0 };
+const START = FIRST.simulation_start || FIRST;
+export const DEMO_LOCATION = { lat: START.lat, lng: START.lng, label: 'Demo patient location' };
 
 // Assumed average ambulance speed in city traffic.
 export const ASSUMED_SPEED_KMH = 40;

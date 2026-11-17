@@ -765,4 +765,9 @@ export default {
   'an.spread.p90': 'P90',
   'an.spread.notEnough': 'Not enough data',
   'an.spread.total': 'Whole case, alert to the end',
+
+  'city.label': 'City',
+  'city.all': 'All cities',
+  'city.showing': 'Showing: {name}',
+  'city.yours': 'City: {name}',
 };

@@ -3,7 +3,7 @@ const express = require('express');
 const crypto = require('crypto');
 const store = require('./store');
 const simulator = require('./simulator');
-const { requireAuth, distanceKm, DEMO_LOCATION } = require('./helpers');
+const { requireAuth, distanceKm, DEMO_LOCATION, cityById, cityStart } = require('./helpers');
 const { hospitalView } = require('./hospitalAdmin');
 const vitals = require('./vitals');
 const demoState = require('./demoState');
@@ -11,7 +11,7 @@ const demoState = require('./demoState');
 const router = express.Router();
 // Contacts and consents have their own endpoints now (patientData.js), so the profile PATCH ignores contacts.
 const EDITABLE = ['name', 'age', 'sex', 'blood_group', 'allergies', 'conditions',
-  'medications', 'language', 'consents'];
+  'medications', 'language', 'consents', 'home_city_id'];
 
 // Health check (no login needed) so teammates can test the connection.
 router.get('/health', (req, res) => res.json({ status: 'ok', mock: true }));
@@ -35,6 +35,9 @@ router.get('/patients/:id', requireAuth, (req, res) => {
 router.patch('/patients/:id', requireAuth, (req, res) => {
   const patient = store.patients[req.params.id];
   if (!patient) return res.status(404).json({ error: 'Patient not found' });
+  if ('home_city_id' in req.body && !(typeof req.body.home_city_id === 'string' && cityById(req.body.home_city_id))) {
+    return res.status(400).json({ error: 'home_city_id must be one of ' + store.cities.map((c) => c.city_id).join(', ') });
+  }
   for (const key of EDITABLE) {
     if (key in req.body) patient[key] = req.body[key];
   }
@@ -129,11 +132,19 @@ router.post('/demo/reset', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// Hospitals sorted by distance from lat/lng (defaults to the Ahmedabad demo point).
+// The cities the apps offer (same answer as the backend's GET /cities).
+router.get('/cities', requireAuth, (req, res) => res.json(store.cities));
+
+// Hospitals sorted by distance from lat/lng. Without a point: the start of the chosen city, else the default city's start.
+// ?city_id= keeps one city; an unknown id is a 400, never an empty list.
 router.get('/hospitals', requireAuth, (req, res) => {
-  const lat = parseFloat(req.query.lat) || DEMO_LOCATION.lat;
-  const lng = parseFloat(req.query.lng) || DEMO_LOCATION.lng;
+  const cityId = req.query.city_id;
+  if (cityId !== undefined && !cityById(cityId)) return res.status(400).json({ error: 'city_id must be one of ' + store.cities.map((c) => c.city_id).join(', ') });
+  const start = cityId ? cityStart(cityId) : DEMO_LOCATION;
+  const lat = parseFloat(req.query.lat) || start.lat;
+  const lng = parseFloat(req.query.lng) || start.lng;
   const list = store.hospitals
+    .filter((h) => !cityId || h.city_id === cityId)
     .map((h) => hospitalView(h, lat, lng))
     .sort((a, b) => a.distance_km - b.distance_km);
   res.json(list);

@@ -31,6 +31,8 @@ jobs:
         run: npm run contract -- http://localhost:4000
       - name: Integration check
         run: npm run integration
+      - name: Two-city scenarios (mock server)
+        run: npm run cities
       - name: Accessibility audit (axe-core, 3 languages)
         run: npm run audit
       - name: Browser tests

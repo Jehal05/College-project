@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { useEmergencies } from '../components/EmergencyProvider.jsx';
 import { useHospitals } from '../components/HospitalProvider.jsx';
+import { CityLabel } from '../components/CityBar.jsx';
+import { useCityScope } from '../components/useCityScope.js';
 import SimulatedBadge from '../components/SimulatedBadge.jsx';
 import { useT } from '../i18n/index.js';
 import { stateText, severityText, typeText } from '../i18n/phrases.js';
@@ -13,7 +15,9 @@ const time = (iso) => new Date(iso).toLocaleString([], { day: '2-digit', month: 
 
 export default function Handover() {
   const t = useT();
-  const { visibleEmergencies, refresh } = useEmergencies();
+  const { visibleEmergencies: allVisible, refresh } = useEmergencies();
+  const cityScope = useCityScope();
+  const visibleEmergencies = useMemo(() => cityScope.alerts(allVisible), [cityScope, allVisible]);
   const { hospitals } = useHospitals();
   const scope = useSyncExternalStore(subscribeUi, getScope);
   const sheet = useMemo(() => handoverSheet(visibleEmergencies, (id) => hospitals.find((h) => h.id === id)?.name || id), [visibleEmergencies, hospitals]);
@@ -33,6 +37,7 @@ export default function Handover() {
     <div className="space-y-5 p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold">{t('handover.title')}</h1>
+        <CityLabel />
         <SimulatedBadge text={t('handover.badge')} />
         <button data-testid="handover-print" onClick={() => window.print()} className="no-print ml-auto rounded-lg bg-sky-600 px-5 py-2.5 text-lg font-bold text-white hover:bg-sky-700">{t('handover.print')}</button>
       </div>

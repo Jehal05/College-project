@@ -1,7 +1,7 @@
 // Emergency simulator: broadcasts WebSocket events and plays the fake hospital response.
 // Timing is divided by DEMO_SPEED (default 1) so demos can run faster, e.g. DEMO_SPEED=5.
 const store = require('./store');
-const { rankHospitals, DEMO_LOCATION } = require('./helpers');
+const { rankHospitals, DEMO_LOCATION, DEFAULT_CITY, cityById, cityStart, nearestCity } = require('./helpers');
 const { buildCreatedPayload } = require('./alertPayload');
 const { getSpeed } = require('./demoState');
 const { evaluate } = require('./rules');
@@ -85,14 +85,23 @@ function createEmergency({ patient_id, type, symptoms, consents, source }) {
 }
 
 // Send the SOS: rank the hospitals, alert the best one and (auto mode) play the response timeline (ms after the SOS).
-function sendSos(emergency, location) {
-  const ranked = rankHospitals(emergency.type, location);
+function sendSos(emergency, sent) {
+  // The patient's current city: the nearest city to the location, else the person's home city. A location that is far from every
+  // city is replaced by that city's simulation start (source "simulated"), so the response always happens inside a known city.
+  const patient = store.patients[emergency.patient_id] || {};
+  const near = nearestCity(sent);
+  const cityId = near ? near.city_id : (cityById(patient.home_city_id) ? patient.home_city_id : DEFAULT_CITY);
+  const location = near ? sent : { ...cityStart(cityId), source: 'simulated' };   // used to rank and to route
+  const shared = sent ? location : null; // what is stored and announced: nothing when the person shares no location
+  emergency.city_id = cityId; emergency.city_name = cityById(cityId).city_name;
+  const ranked = rankHospitals(emergency.type, location, undefined, cityId);
   const top = ranked[0] || null;
-  const h = top && { id: top.id, name: top.name, distance_km: top.distance_km, lat: top.lat, lng: top.lng };
+  const h = top && { id: top.id, name: top.name, distance_km: top.distance_km, lat: top.lat, lng: top.lng, city_id: top.city_id };
   const where = location || DEMO_LOCATION;
-  const hospital = h && { id: h.id, name: h.name, distance_km: h.distance_km };
+  const hospital = h && { id: h.id, name: h.name, distance_km: h.distance_km, city_id: top.city_id, city_name: top.city_name,
+    ...(top.other_city ? { other_city: true } : {}), ...(top.note ? { note: top.note } : {}) };
   const first = emergency.state === 'EMERGENCY_DETECTED';
-  emergency.location = location || null;
+  emergency.location = shared;
   emergency.hospital = hospital || null;
   if (alertAt() === 'sos') {
     // The created event now carries the state SOS_SENT, the location and the hospital. Same state change as below.
@@ -101,7 +110,7 @@ function sendSos(emergency, location) {
     announceCreated(emergency, hospital, top && top.rank);
     broadcast({ type: 'emergency.sos_sent', emergency_id: emergency.id, state: 'SOS_SENT', timestamp: new Date().toISOString(), payload: {} });
   } else {
-    emit(emergency, 'emergency.sos_sent', 'SOS_SENT', {}, { location, hospital });
+    emit(emergency, 'emergency.sos_sent', 'SOS_SENT', {}, { location: shared, hospital });
   }
   if (!first) return emergency;
 
@@ -117,7 +126,7 @@ function sendSos(emergency, location) {
   escalation.start(emergency, ranked, { emit, later }); // nobody acknowledges in time: next hospital (escalation.js)
   if (hospitalMode() === 'manual' || escalation.noAck()) return emergency; // the portal acknowledges, dispatches and moves the ambulance
 
-  const amb = store.ambulances.find((a) => a.base_hospital_id === h.id) || store.ambulances[0];
+  const amb = store.ambulances.find((a) => a.base_hospital_id === h.id) || store.ambulances.find((a) => a.city_id === h.city_id) || store.ambulances[0];
   later(emergency, 4000, () => emit(emergency, 'hospital.acknowledged', 'HOSPITAL_ACKNOWLEDGED',
     { hospital_id: (emergency.hospital || h).id, acknowledged_by: 'ER desk (simulated)' }));
   later(emergency, 8000, () => emit(emergency, 'ambulance.dispatched', 'AMBULANCE_DISPATCHED',

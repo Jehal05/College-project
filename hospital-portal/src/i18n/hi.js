@@ -764,4 +764,9 @@ export default {
   'an.spread.p90': 'P90',
   'an.spread.notEnough': 'पर्याप्त डेटा नहीं',
   'an.spread.total': 'पूरा केस, अलर्ट से अंत तक',
+
+  'city.label': 'शहर',
+  'city.all': 'सभी शहर',
+  'city.showing': 'दिखा रहे हैं: {name}',
+  'city.yours': 'शहर: {name}',
 };

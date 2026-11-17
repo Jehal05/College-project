@@ -63,21 +63,38 @@ describe('allowed state changes', () => {
 });
 
 describe('hospital data and ranking', () => {
-  it('has five verified hospitals in the portal shape', () => {
-    expect(store.hospitals).toHaveLength(5);
+  it('has ten verified hospitals (five per city) in the portal shape', () => {
+    expect(store.hospitals).toHaveLength(10);
     for (const h of store.hospitals) {
-      expect(h.id).toMatch(/^HSP-AMD-\d{3}$/);
+      expect(h.id).toMatch(/^HSP-(AMD|PNQ)-\d{3}$/);
+      expect(h.city_id).toBe(h.id.split('-')[1]);
       expect(Object.keys(h.capabilities)).toEqual(['cath_lab', 'stroke_unit', 'icu', 'emergency']);
       expect(Object.keys(h.availability)).toEqual(['beds_free', 'icu_free', 'cath_lab_ready', 'stroke_unit_ready']);
     }
-    expect(store.ambulances.map((a) => a.id)).toEqual(['AMB-AMD-01', 'AMB-AMD-02', 'AMB-AMD-03', 'AMB-AMD-04', 'AMB-AMD-05']);
+    expect(store.ambulances.map((a) => a.id)).toEqual([1, 2, 3, 4, 5].map((n) => 'AMB-AMD-0' + n).concat([1, 2, 3, 4, 5].map((n) => 'AMB-PNQ-0' + n)));
   });
   it('ranks a hospital with a ready unit first and numbers the list from 1', () => {
     const heart = helpers.rankHospitals('HEART', helpers.DEMO_LOCATION);
-    expect(heart.map((h) => h.rank)).toEqual([1, 2, 3, 4, 5]);
+    expect(heart.map((h) => h.rank)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(heart[0].capabilities.cath_lab && heart[0].availability.cath_lab_ready).toBe(true);
     const stroke = helpers.rankHospitals('STROKE', helpers.DEMO_LOCATION)[0];
     expect(stroke.availability.stroke_unit_ready).toBe(true);
+  });
+  it('puts the patient\'s own city first, and the other city only after it', () => {
+    const pune = store.cities.find((c) => c.city_id === 'PNQ').simulation_start;
+    const list = helpers.rankHospitals('HEART', pune, undefined, 'PNQ');
+    const firstOther = list.findIndex((h) => h.city_id !== 'PNQ');
+    expect(list.slice(0, firstOther).every((h) => h.city_id === 'PNQ')).toBe(true);
+    expect(list.slice(firstOther).every((h) => h.city_id === 'AMD')).toBe(true);
+    expect(list[0].other_city).toBe(false);
+  });
+  it('uses another city only when the own city has no suitable hospital, and says so', () => {
+    const pune = store.cities.find((c) => c.city_id === 'PNQ').simulation_start;
+    const list = store.hospitals.map((h) => (h.city_id === 'PNQ' ? { ...h, availability: { ...h.availability, cath_lab_ready: false } } : h));
+    const top = helpers.rankHospitals('HEART', pune, list, 'PNQ')[0];
+    expect(top.city_id).toBe('AMD');
+    expect(top.other_city).toBe(true);
+    expect(top.note).toMatch(/Pune/);
   });
   it('never ranks a not-ready unit above a ready one even if it is nearer', () => {
     const list = [

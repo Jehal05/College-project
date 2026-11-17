@@ -1,6 +1,7 @@
 // HealthTwin AI mock server: REST API + WebSocket that sends fake vitals every second.
 // Everything is simulated. Start it with: npm start (port 4000).
 const http = require('http');
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { WebSocketServer } = require('ws');
@@ -17,21 +18,39 @@ const PORT = process.env.PORT || 4000;
 const ORIGINS = (process.env.CORS_ORIGINS ||
   'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://localhost:3000').split(',');
 
+// ONE-ADDRESS MODE (SERVE_APPS=true, used by `npm run one`): this server also serves the built patient app at /, the hospital portal at
+// /portal/ and a small start page at /start, and the API moves to /api (the apps have routes such as /hospitals that would clash with it).
+// WebSocket stays at /ws. Without SERVE_APPS nothing changes: the API is at the root and the apps run on their own dev ports.
+const SERVE_APPS = /^(1|true|yes)$/i.test(process.env.SERVE_APPS || '');
+const PATIENT_DIST = path.resolve(__dirname, '../patient-app/dist-one');
+const PORTAL_DIST = path.resolve(__dirname, '../hospital-portal/dist-one');
+
 const app = express();
 app.use(cors({ origin: ORIGINS }));
-app.use(express.json());
-app.use(delay);
-app.use(compat.middleware); // Daksh's contract names, added next to ours (compat.js)
-app.use('/', failMode.router);
-app.use(failMode.middleware);
-app.use('/', compat.router);
-app.use('/', routes);
+const api = express.Router();
+api.use(express.json());
+api.use(delay);
+api.use(compat.middleware); // Daksh's contract names, added next to ours (compat.js)
+api.use('/', failMode.router);
+api.use(failMode.middleware);
+api.use('/', compat.router);
+api.use('/', routes);
+app.use(SERVE_APPS ? '/api' : '/', api);
+
+if (SERVE_APPS) {
+  const page = (dir) => (req, res) => res.sendFile(path.join(dir, 'index.html'));
+  app.get(['/start', '/start/'], (req, res) => res.sendFile(path.join(__dirname, 'start.html')));
+  app.use('/portal', express.static(PORTAL_DIST, { index: false }));
+  app.get('/portal/*', page(PORTAL_DIST)); // the portal's own pages (/portal/map, /portal/fleet ...)
+  app.use(express.static(PATIENT_DIST, { index: false }));
+  app.get('*', (req, res, next) => (/^\/(api|ws)(\/|$)/.test(req.path) ? next() : page(PATIENT_DIST)(req, res)));
+}
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true });
 // /ws is ours; /ws/emergencies/:id and /ws/hospitals/:id are Daksh's paths. The mock sends every event on all of them.
 server.on('upgrade', (req, socket, head) => {
-  if (!/^\/ws(\/(emergencies|hospitals)\/[^/?]+)?(\?|$)/.test(req.url)) return socket.destroy();
+  if (!/^(\/api)?\/ws(\/(emergencies|hospitals)\/[^/?]+)?(\?|$)/.test(req.url)) return socket.destroy();
   wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
 });
 wsAuth.attach(wss); // wrong or missing token: closed with 1008 (wsAuth.js)
@@ -56,5 +75,6 @@ server.headersTimeout = 66000;
 
 server.listen(PORT, () => {
   console.log('Mock server (simulated data) running on http://localhost:' + PORT);
+  if (SERVE_APPS) console.log('ONE ADDRESS: http://localhost:' + PORT + '/start  (patient app /, hospital portal /portal/, API /api)');
   console.log('WebSocket on ws://localhost:' + PORT + '/ws');
 });

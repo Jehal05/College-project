@@ -14,7 +14,7 @@ const LANGS = ['en', 'hi', 'gu'];
 const GET_HELP = LANGS.map((l) => JSON.parse(fs.readFileSync(new URL('../src/i18n/' + l + '.json', import.meta.url), 'utf8'))['symptoms.getHelp']);
 // Redesigned screens: each is checked at 360 px and at desktop width, in the dark theme (all three languages) and the light theme (English).
 const THEMED = [['overview', '/overview', 5000], ['twin', '/twin', 5000], ['disease hub', '/diseases'], ['disease detail', '/diseases/cardiac', 5000], ['monitor', '/monitor', 5000],
-  ['emergency center', '/emergency-center'], ['report intelligence', '/report-intelligence'], ['simulator', '/simulator', 5000], ['care circle', '/care-circle'], ['copilot', '/copilot'], ['about', '/about'], ['design system', '/design']];
+  ['emergency center', '/emergency-center'], ['report intelligence', '/report-intelligence'], ['simulator', '/simulator', 5000], ['care circle', '/care-circle'], ['copilot', '/copilot'], ['about', '/about'], ['hospitals', '/hospitals'], ['design system', '/design']];
 const ONLY = process.env.AUDIT_ONLY; // 'themed' or 'legacy' to run half of the screens
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'];
 

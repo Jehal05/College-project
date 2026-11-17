@@ -28,8 +28,9 @@ for (const code of ['hi', 'gu']) {
     await p.goto(BASE + path); await sleep(1500);
     if (name === 'symptoms') await p.locator('[role=radio]').first().click();
     const body = await p.innerText('body');
+    // City names and states come from the server's city list (data, not app text): marked data-source=data and left out too.
     // A medicine reminder that is due shows the name and dose note written by the server (data, not app text), so it depends on the time of day: leave it out.
-    const left = latinWords(await p.evaluate("(() => { document.querySelectorAll('[aria-label][role=status]').forEach((e) => { e.style.display = 'none'; }); return document.body.innerText; })()"));
+    const left = latinWords(await p.evaluate("(() => { document.querySelectorAll('[aria-label][role=status], [data-source=data]').forEach((e) => { e.style.display = 'none'; }); return document.body.innerText; })()"));
     const raw = body.match(RAW_KEY) || [];
     check(`L4 [${code}] ${name}: translated, banner, lang attr`, !left.length && !raw.length && body.includes(BANNERS[code]) && (await lang()) === code, [left.slice(0, 8), raw.slice(0, 3)]);
   }

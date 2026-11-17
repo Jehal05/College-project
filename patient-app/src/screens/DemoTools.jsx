@@ -12,6 +12,7 @@ import { setSimulatedOffline } from '../utils/simulatedOffline';
 import { endCheckIn } from '../utils/checkIn';
 import { clearPending } from '../hooks/usePendingEmergency';
 import useDemoState from '../hooks/useDemoState';
+import useCity from '../hooks/useCity';
 import DemoLocationToggle from '../components/DemoLocationToggle';
 import DemoSpeedVitals from '../components/DemoSpeedVitals';
 import DemoSimulate from '../components/DemoSimulate';
@@ -22,6 +23,7 @@ export default function DemoTools() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { state, error: stateError, refresh } = useDemoState();
+  const { city } = useCity();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -30,7 +32,7 @@ export default function DemoTools() {
   async function run(type) {
     setBusy(true); setError(''); setMessage('');
     try {
-      const e = await runDemoScenario(type);
+      const e = await runDemoScenario(type, city && city.city_id);
       setActive(e.id);
       navigate('/emergency/' + e.id);
     } catch {

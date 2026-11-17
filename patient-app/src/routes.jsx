@@ -1,6 +1,6 @@
 // All pages. Everything except /login needs a login; unknown addresses show "not found".
 import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { homeFor } from './utils/roles';
 import useAuth from './hooks/useAuth';
@@ -28,6 +28,7 @@ const EmergencyCenter = screen(() => import('./screens/EmergencyCenter'));
 const ReportIntelligence = screen(() => import('./screens/ReportIntelligence'));
 const Simulator = screen(() => import('./screens/Simulator'));
 const About = screen(() => import('./screens/About'));
+const Hospitals = screen(() => import('./screens/Hospitals'));
 const CareCircle = screen(() => import('./screens/CareCircle'));
 const Copilot = screen(() => import('./screens/Copilot'));
 const Passport = screen(() => import('./screens/Passport'));
@@ -53,12 +54,13 @@ function Waiting() {
   );
 }
 import NotFound from './screens/NotFound';
-import ComingSoon from './screens/ComingSoon';
 
 // Patient screens. Anyone else who signs in goes to their own screen and cannot open patient screens.
 function Protected({ children }) {
   const { isLoggedIn, session } = useAuth();
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  const location = useLocation();
+  // Remember the page that was asked for, so signing in brings the person back to it (for example /demo or /twin).
+  if (!isLoggedIn) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   return session && session.role !== 'PATIENT' ? <Navigate to={homeFor(session.role)} replace /> : children;
 }
 
@@ -98,9 +100,7 @@ export default function AppRoutes() {
       <Route path="/reminders" element={<Protected><Reminders /></Protected>} />
       <Route path="/summary/:id" element={<Protected><Summary /></Protected>} />
       <Route path="/twin" element={<Protected><Twin /></Protected>} />
-      {[['hospitals', '/hospitals']].map(([page, path]) => (
-        <Route key={path} path={path} element={<Protected><ComingSoon page={page} /></Protected>} />
-      ))}
+      <Route path="/hospitals" element={<Protected><Hospitals /></Protected>} />
       <Route path="/diseases" element={<Protected><DiseaseHub /></Protected>} />
       <Route path="/diseases/:key" element={<Protected><DiseaseDetail /></Protected>} />
       <Route path="/monitor" element={<Protected><Monitor /></Protected>} />
