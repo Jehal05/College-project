@@ -16,7 +16,14 @@ REQUIRED: Dict[str, Tuple[str, Optional[str]]] = {
     "ASTHMA": ("icu", None),
     "DIABETIC": ("emergency", None),
 }
-DEMO_LOCATION = {"lat": 23.0225, "lng": 72.5714}     # Ahmedabad, used when the patient shared no location
+def _default_location() -> dict:
+    """The first city's simulated start from the cities file (the truth), used when the patient shared no location."""
+    from app.services.cities import load_city_config
+    start = load_city_config()[0]["simulation_start"]
+    return {"lat": start["lat"], "lng": start["lng"]}
+
+
+DEMO_LOCATION = _default_location()
 
 
 def distance_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
