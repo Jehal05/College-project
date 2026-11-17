@@ -12,3 +12,5 @@ dist-audit/
 phase1-results.txt
 backend/healthtwin.db-shm
 backend/healthtwin.db-wal
+
+dist-one/

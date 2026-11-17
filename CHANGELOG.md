@@ -1,5 +1,9 @@
 # Changelog
 
+## Fix: demo panel showed the patient home in the one-address build
+- `npm run one` now builds into its own `dist-one` folders, so an older ordinary build (without the demo panel) is never served.
+- After signing in, the patient app returns to the page that was asked for (for example `/demo` or `/twin`) instead of always the home screen.
+
 ## One address for the whole project
 - `npm run one` builds and serves the patient app (`/`), hospital portal (`/portal/`), a start page (`/start`) and the simulated API (`/api`, WebSocket `/ws`) from one port. Apps accept a relative API address; the portal can be built under a base path; the service worker no longer answers `/portal` or `/api` pages. Development on separate ports is unchanged.
 

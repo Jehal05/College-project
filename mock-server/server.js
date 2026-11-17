@@ -22,8 +22,8 @@ const ORIGINS = (process.env.CORS_ORIGINS ||
 // /portal/ and a small start page at /start, and the API moves to /api (the apps have routes such as /hospitals that would clash with it).
 // WebSocket stays at /ws. Without SERVE_APPS nothing changes: the API is at the root and the apps run on their own dev ports.
 const SERVE_APPS = /^(1|true|yes)$/i.test(process.env.SERVE_APPS || '');
-const PATIENT_DIST = path.resolve(__dirname, '../patient-app/dist');
-const PORTAL_DIST = path.resolve(__dirname, '../hospital-portal/dist');
+const PATIENT_DIST = path.resolve(__dirname, '../patient-app/dist-one');
+const PORTAL_DIST = path.resolve(__dirname, '../hospital-portal/dist-one');
 
 const app = express();
 app.use(cors({ origin: ORIGINS }));

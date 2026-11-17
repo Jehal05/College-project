@@ -32,6 +32,8 @@ Logins: patient `patient@demo.test` / `demo1234`; portal staff `staff@demo` / `d
 
 `mock-server/server.js` has a `SERVE_APPS` mode (set by `scripts/one.mjs`). It serves the built patient app at `/`, the built portal at `/portal/` and moves the API to `/api`, because the apps have pages such as `/hospitals` that would clash with API routes of the same name. The apps are built with a relative API address (`/api`), the portal with base `/portal/`. Without `SERVE_APPS` nothing changes: `npm run mock` plus `npm run dev` still work on ports 4000 and 5173 for development.
 
+- The one-address builds go into `patient-app/dist-one` and `hospital-portal/dist-one`, separate from the normal `dist`, so a normal build (without the demo panel and with the wrong paths) is never served by mistake.
+
 ## Limits
 
 - This is the simulated mock server, not the real backend (`backend/`, FastAPI). The real backend and Daksh's operations dashboard (`dashboard/`) still run separately (see `docs/DEMO_RUN_REAL_BACKEND.md`).
