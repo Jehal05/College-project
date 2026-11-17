@@ -29,6 +29,12 @@
   --ht-text: 244 248 252;    /* #F4F8FC */
   --ht-muted: 169 188 207;   /* secondary text */
   --ht-onaccent: 8 19 33;    /* text on an accent-coloured button */
+  --ht-organ-heart: 255 107 122;     /* organ drawing tints (2D body map): each edge is at least 5:1 on the card and page tints */
+  --ht-organ-lungs: 255 157 184;
+  --ht-organ-brain: 236 200 178;
+  --ht-organ-liver: 222 140 100;
+  --ht-organ-kidneys: 255 138 112;
+  --ht-organ-pancreas: 246 203 102;
 }
 :root:not([data-theme='dark']), [data-theme='light'] {
   --ht-bg: 242 246 251;
@@ -45,6 +51,12 @@
   --ht-text: 15 23 42;
   --ht-muted: 71 85 105;
   --ht-onaccent: 255 255 255;
+  --ht-organ-heart: 176 24 50;       /* organ drawing tints (2D body map): each edge is at least 4.5:1 on white and the pale page tint */
+  --ht-organ-lungs: 184 58 104;
+  --ht-organ-brain: 122 88 76;
+  --ht-organ-liver: 140 66 32;
+  --ht-organ-kidneys: 158 62 42;
+  --ht-organ-pancreas: 138 86 0;
 }
 html { -webkit-text-size-adjust: 100%; color-scheme: light; }
 html[data-theme='dark'] { color-scheme: dark; }

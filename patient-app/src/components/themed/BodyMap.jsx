@@ -1,19 +1,12 @@
-// 2D body map, drawn by hand in SVG (no image file, no licence issue). Organs are shapes you can click; the same organs are
+// 2D body map, drawn by hand in SVG (no image file, no licence issue). Organs are organ-shaped drawings (config/organArt.js) you can click; the same organs are
 // always available in the list next to it, which is the accessible way to choose one (keyboard and screen reader).
 // "Focus" zooms the map to the chosen organ by changing the visible box.
 import { useTranslation } from 'react-i18next';
 import { ORGANS } from '../../config/organs';
+import { ORGAN_ORDER } from '../../config/organArt';
+import { OrganShape, Windpipe } from './organShapes';
 
 const WHOLE = [0, 0, 200, 420];
-// Organ outlines in a unit box (-1..1); each is scaled to the organ's size from config/organs.js.
-const ORGAN_PATH = {
-  brain: 'M-1 .55 C-1.15 -.5 -.45 -1.1 0 -.95 C.45 -1.1 1.15 -.5 1 .55 C.75 1 .3 .75 0 .95 C-.3 .75 -.75 1 -1 .55 Z',
-  heart: 'M0 .9 C-1.1 .1 -1 -.9 -.4 -.8 C-.15 -.75 0 -.5 0 -.4 C0 -.5 .15 -.75 .4 -.8 C1 -.9 1.1 .1 0 .9 Z',
-  lungs: 'M.2 -1 C.9 -.9 1 .2 .8 .9 C.5 1 -.7 1 -.9 .8 C-1 0 -.6 -.9 .2 -1 Z',
-  kidneys: 'M.5 -1 C1 -.6 .8 .3 .4 .9 C0 1.1 -.8 .8 -.6 .2 C-.6 -.5 -.1 -1.1 .5 -1 Z',
-  liver: 'M-1 -.3 C-.6 -1 .6 -1 1 -.4 C1 .3 .2 1 -.5 .9 C-.9 .8 -1.1 .3 -1 -.3 Z',
-};
-
 export default function BodyMap({ selected, onSelect, focus }) {
   const { t } = useTranslation();
   const chosen = ORGANS.find((o) => o.key === selected);
@@ -36,18 +29,15 @@ export default function BodyMap({ selected, onSelect, focus }) {
         <ellipse cx="100" cy="30" rx="21" ry="25" />
       </g>
       <g>
-        {ORGANS.map((o) => {
+        {[...ORGANS].sort((x, y) => ORGAN_ORDER.indexOf(x.key) - ORGAN_ORDER.indexOf(y.key)).map((o) => {
           const on = o.key === selected;
-          const fill = on ? 'rgb(var(--ht-accent) / 0.6)' : 'rgb(var(--ht-accent) / 0.22)';
-          const stroke = { fill, stroke: 'rgb(var(--ht-accent))', strokeWidth: on ? 2.2 : 1.1, strokeLinejoin: 'round' };
           return (
-            <g key={o.key} aria-hidden="true" onClick={() => onSelect(o.key)} style={{ cursor: 'pointer' }} filter={on ? 'url(#organ-glow)' : undefined}>
-              {o.shapes.map((sh, i) => {
-                const d = ORGAN_PATH[o.key];
-                if (!d) return <ellipse key={i} cx={sh.cx} cy={sh.cy} rx={sh.rx} ry={sh.ry} {...stroke} />;
-                const flip = (o.key === 'lungs' || o.key === 'kidneys') && sh.cx > 100 ? -1 : 1;
-                return <path key={i} d={d} transform={`translate(${sh.cx} ${sh.cy - (o.key === 'brain' ? 7 : 0)}) scale(${sh.rx * flip} ${sh.ry})`} vectorEffect="non-scaling-stroke" {...stroke} />;
-              })}
+            <g key={o.key} data-organ={o.key} aria-hidden="true" onClick={() => onSelect(o.key)} style={{ cursor: 'pointer' }} filter={on ? 'url(#organ-glow)' : undefined}>
+              <title>{t('dtwin.organ.' + o.key + '.name')}</title>
+              {o.key === 'lungs' && <Windpipe selected={on} />}
+              {o.shapes.map((sh, i) => (
+                <OrganShape key={i} organKey={o.key} index={i} shape={sh} selected={on} flip={o.key === 'kidneys' && sh.cx > 100 ? -1 : 1} />
+              ))}
             </g>
           );
         })}

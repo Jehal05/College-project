@@ -71,3 +71,12 @@ Login and landing: ward gradient with a faint ECG line. Dashboard and queue: cli
 4. Contrast of text directly over each background motif (lightest and darkest points).
 5. A preview sheet of the palette and motifs for approval before anything is applied.
 6. Decide the branch (suggested: a new branch from the latest `main`, for example `puneet-design`) and agree with Jehal who does which screens.
+
+## 2D body map: organ-shaped drawings (17 Nov 2026)
+
+The 2D "My Digital Twin" map no longer draws organs as plain ovals. Each organ is an original, hand-drawn SVG shape (heart with vessels, lungs with lobes and a windpipe with bronchi, a folded brain with a cerebellum, liver with a gallbladder, kidneys, pancreas), kept as plain data in `patient-app/src/config/organArt.js` and drawn by `components/themed/organShapes.jsx`. No copied anatomy pictures and no new dependency. The 3D model (BodyParts3D) is unchanged.
+- Colours: one tint per organ in both themes (`--ht-organ-*` in `index.css`). Every edge is at least 4.5:1 against the card and the page tint (checked by a unit test, minimum 3:1 enforced).
+- Selected organ: thicker outline, a halo and the glow, so colour is not the only signal. No animation, so reduced motion needs no change.
+- The shapes stay `aria-hidden`: the organ list beside the map is the keyboard and screen-reader way to choose an organ (unchanged). Each shape has a `<title>` for mouse tooltips.
+- The heart is drawn last (never hidden); sizes of the heart, kidneys, liver and pancreas in `config/organs.js` were raised slightly so the shapes are readable.
+- Before and after (SANDBOX renders of the real `BodyMap` component with Chrome): `docs/images/ui/phase8-organs-before-after-dark.png` and `...-light.png`.

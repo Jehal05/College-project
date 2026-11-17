@@ -182,3 +182,13 @@ The new `diag=` text on the A1 failure line holds `attemptsUsed`, `attemptLog`, 
 | SOS answered 429 showed a bare error | `4529d11` | `beginEmergency` keeps the alert as "not sent yet" on a 429 (the screen says call 112 / 108 and has Try again), as it already did for no connection; other errors still show the error | `patient-app/tests/unit/beginEmergency.test.js` (3) | CI only (no patient-app `node_modules` in the sandbox) |
 | Download address revoked at once | `4529d11` | `downloadText` revokes its address after 10 s | none (browser behaviour) | SANDBOX: portal unit tests 519 of 519 |
 | Login token in the WebSocket address could be written to uvicorn's log | `9a35550` | `app/security/log_redact.py` replaces `token=` and `access_token=` values with `[hidden]` in the `uvicorn.access` and `uvicorn.error` loggers; installed by `create_app`; `CONTRACT.md` now says so and warns that a proxy in front must do the same | `backend/tests/test_log_redact.py` (3) | SANDBOX: the same checks run without pytest (token gone, 2 lines redacted). pytest runs in CI only. A real uvicorn run was not done here, so the claim that uvicorn logs the address is from knowledge of uvicorn, not seen here |
+
+### 2D body map organ drawings (17 Nov 2026, local, not pushed)
+
+| Check | Where | Result |
+|---|---|---|
+| New unit tests `patient-app/tests/unit/organArt.test.js` (7: every organ has a drawing, lungs differ left and right, draw order with the heart last, paths hold only path commands and numbers, closed shapes end with Z, colours exist in both themes with at least 3:1 contrast, shapes stay inside the body outline) | SANDBOX, run with a small stand-in for vitest (the real vitest is not installed: no network) | 7 passed, 0 failed. The real vitest run is CI only |
+| `BodyMap.jsx` and `organShapes.jsx` compile; the real component renders 6 organ groups and 6 titles with `react-dom/server` | SANDBOX | ok |
+| Visual check, dark and light, whole body and zoomed per organ | SANDBOX, Chrome headless screenshots | looked at by eye; before and after images are in `docs/images/ui/` |
+| Existing `svg[role=img]` label tests (phase11 browser test), the accessibility audit and the browser tests | CI only (no `playwright` browser run for the app here) | not run |
+| Not checked | A real phone, the Hindi and Gujarati text (no new strings were added; the tooltips reuse the existing organ names), 3D view | |
