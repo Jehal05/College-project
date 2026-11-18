@@ -271,5 +271,19 @@ export async function getAudit({ page = 1, pageSize = 50 } = {}) {
   return request('GET', `/audit?page=${page}&page_size=${pageSize}`);
 }
 
+/**
+ * POST /passport/resolve  body: { token, purpose }. Staff or admin login; the QR token is turned into a patient on the server.
+ * 410 = link unavailable (old, revoked or unknown, all the same answer). Mock mode has no passports: it says so.
+ */
+export async function resolvePassport(token, purpose) {
+  if (USE_MOCK) {
+    const err = new Error('The built-in mock has no passports.');
+    err.status = 404;
+    err.missing = true;
+    throw err;
+  }
+  return request('POST', '/passport/resolve', { token, purpose });
+}
+
 export const mockCrewReply = (id) => mock.crewReply(id);
 export const CANNED_CREW_REPLIES = mock.CANNED_CREW_REPLIES;

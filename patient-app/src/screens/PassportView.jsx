@@ -1,7 +1,7 @@
 // The page a responder sees after scanning the QR. Public (no login), read-only, big text, three languages.
 // It shows only what the patient allowed. It states facts entered by the patient and never interprets them.
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getPublicPassport } from '../services/api';
 import { formatDateTime } from '../utils/time';
@@ -71,7 +71,7 @@ export default function PassportView() {
           <p className="text-sm text-slate-700">{t('view.source')}</p>
           <p className="text-sm text-slate-700">{t('view.updated', { time: formatDateTime(data.last_updated) })}</p>
           <p className="text-sm font-semibold text-slate-800">{t('view.linkValid')} · {t('view.expires', { time: formatDateTime(data.expires_at) })}</p>
-          <Link to="/login" className="mt-4 inline-flex min-h-[44px] items-center rounded-xl border-2 border-brand-800 px-4 font-semibold text-brand-800">{t('view.staffSignIn')}</Link>
+          <a href={'/portal/passport?t=' + encodeURIComponent(token)} className="mt-4 inline-flex min-h-[44px] items-center rounded-xl border-2 border-brand-800 px-4 font-semibold text-brand-800">{t('view.staffSignIn')}</a>
         </div>
       )}
     </div>

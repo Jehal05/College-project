@@ -10,6 +10,7 @@ export const NAV_GROUPS = [
     { to: '/history', label: 'nav.history' },
     { to: '/activity', label: 'nav.activity' },
     { to: '/handover', label: 'nav.handover' },
+    { to: '/passport', label: 'nav.passport' },
   ] },
   { id: 'insights', label: 'nav.g.insights', links: [
     { to: '/analytics', label: 'nav.analytics' },

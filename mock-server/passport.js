@@ -91,18 +91,39 @@ function passportBody(patient, extra = {}) {
 }
 const sharedFields = (patient) => ['history', 'reports'].filter((k) => patient.consents[k]);
 
-// Staff read by patient id (Phase 9): GET /passport/PT-2026-0417 with a staff or admin token. Logged every time.
-function staffRead(req, res, id) {
-  const { role, email } = req.user;
+// Staff read (protected clinical view). Order of checks: role, patient exists, purpose, hospital scope. Every outcome is audited.
+// There is no anonymous override and no "emergency access" here; that needs a clinical and legal review first.
+const PURPOSES = ['emergency_treatment', 'admission_check', 'ambulance_handover', 'follow_up'];
+const hospitalCity = (id) => { const h = store.hospitals.find((x) => x.id === id); return h ? h.city_id : null; };
+
+function clinicalRead(req, res, id, purpose) {
+  const { role, email, hospital_id } = req.user;
   const patient = store.patients[id];
-  if (!['HOSPITAL_STAFF', 'ADMIN'].includes(role)) {
-    audit.record({ user: email, role, action: 'passport.staff_view', patient_id: id, outcome: 'denied', reason: 'role' });
-    return res.status(403).json({ error: 'Hospital staff only' });
-  }
+  const deny = (code, reason, message) => {
+    audit.record({ user: email, role, action: 'passport.staff_view', patient_id: patient ? id : null, outcome: 'denied', reason, purpose: PURPOSES.includes(purpose) ? purpose : null });
+    return res.status(code).json({ error: message });
+  };
+  if (!['HOSPITAL_STAFF', 'ADMIN'].includes(role)) return deny(403, 'role', 'Hospital staff only');
   if (!patient) return res.status(404).json({ error: 'No passport found for this patient' });
-  audit.record({ user: email, role, action: 'passport.staff_view', patient_id: id, fields: sharedFields(patient) });
-  res.json(passportBody(patient, { patient_id: id }));
+  if (!PURPOSES.includes(purpose)) return deny(400, 'purpose_required', 'purpose is required: ' + PURPOSES.join(', '));
+  // Scope: hospital staff may open patients whose home city is the city of their own hospital. Admins are not limited.
+  if (role === 'HOSPITAL_STAFF' && !(hospital_id && hospitalCity(hospital_id) === patient.home_city_id)) return deny(403, 'other_hospital', 'This patient is outside your hospital');
+  const row = audit.record({ user: email, role, action: 'passport.staff_view', patient_id: id, purpose, fields: sharedFields(patient) });
+  const live = current(id);
+  res.json(passportBody(patient, { patient_id: id, purpose, audit_ref: row.ref, passport_expires_at: isLive(live) ? live.expires_at : null, demo: true }));
 }
+const staffRead = (req, res, id) => clinicalRead(req, res, id, String(req.query.purpose || ''));
+
+// Staff scan: the QR token (pasted or scanned) is turned into a patient on the server; the person must be signed in. Neutral 410 for any bad token.
+router.post('/passport/resolve', limit, requireAuth, (req, res) => {
+  const p = findByToken((req.body && req.body.token) || '');
+  if (!isLive(p)) {
+    audit.record({ user: req.user.email, role: req.user.role, action: 'passport.staff_view', outcome: 'denied', reason: 'expired_or_revoked' });
+    return res.status(410).json(GONE);
+  }
+  clinicalRead(req, res, p.patient_id, String((req.body && req.body.purpose) || ''));
+});
+router.get('/passport/purposes', (req, res) => res.json({ purposes: PURPOSES }));
 
 // What an anonymous scan may see. Default-safe list only; the consent switches are the upper limit.
 // Conditions, medicines, reports, vitals, location, login id and the token are never returned here.

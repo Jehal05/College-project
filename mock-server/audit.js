@@ -2,9 +2,11 @@
 const store = require('./store');
 
 // action examples: passport.view (QR link), passport.staff_view, hospital.availability_update. outcome: allowed | denied.
-function record({ user = 'unknown', role = 'unknown', action, patient_id = null, outcome = 'allowed', reason = null, fields = [] }) {
-  const row = { at: new Date().toISOString(), user, role, action, patient_id, outcome, reason, fields };
+function record({ user = 'unknown', role = 'unknown', action, patient_id = null, outcome = 'allowed', reason = null, fields = [], purpose = null }) {
+  const row = { at: new Date().toISOString(), user, role, action, patient_id, outcome, reason, fields, ...(purpose ? { purpose } : {}) };
   store.accessLog.push(row);
+  row.ref = 'AUD-' + String(store.accessLog.length).padStart(5, '0'); // shown to staff so a view can be found later
+  return row;
   if (patient_id && role !== 'PATIENT' && WHAT[action]) { // tell the patient's open screen (no ids, no values)
     try { require('./simulator').broadcast({ type: 'data.accessed', emergency_id: null, state: null, timestamp: row.at, payload: { entry: entryFor(row, store.accessLog.length) } }); } catch { /* telling the patient must never break a request */ }
   }

@@ -20,6 +20,7 @@ const Analytics = lazy(() => import('./pages/Analytics.jsx'));
 const Admin = lazy(() => import('./pages/Admin.jsx'));
 const Crew = lazy(() => import('./pages/Crew.jsx'));
 const History = lazy(() => import('./pages/History.jsx'));
+const PassportScan = lazy(() => import('./pages/PassportScan.jsx'));
 const Activity = lazy(() => import('./pages/Activity.jsx'));
 const Report = lazy(() => import('./pages/Report.jsx'));
 const Handover = lazy(() => import('./pages/Handover.jsx'));
@@ -97,6 +98,10 @@ export default function App() {
       <Route
         path="/report/:emergencyId"
         element={<ProtectedRoute roles={staff}><Shell><Report /></Shell></ProtectedRoute>}
+      />
+      <Route
+        path="/passport"
+        element={<ProtectedRoute roles={staff}><Shell><PassportScan /></Shell></ProtectedRoute>}
       />
       <Route
         path="/activity"

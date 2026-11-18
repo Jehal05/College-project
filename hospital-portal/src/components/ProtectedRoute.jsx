@@ -13,7 +13,7 @@ export default function ProtectedRoute({ roles, children }) {
   const t = useT();
 
   if (!isLoggedIn) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
   if (roles && !roles.includes(role)) {
     return (

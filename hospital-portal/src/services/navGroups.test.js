@@ -6,7 +6,7 @@ const routes = (groups) => groups.flatMap((g) => g.links.map((l) => l.to));
 
 test('every route the portal had before is still in the menu, once', () => {
   const all = routes(NAV_GROUPS);
-  assert.deepEqual([...all].sort(), ['/activity', '/admin', '/analytics', '/dashboard', '/fleet', '/handover', '/history', '/map']);
+  assert.deepEqual([...all].sort(), ['/activity', '/admin', '/analytics', '/dashboard', '/fleet', '/handover', '/history', '/map', '/passport']);
   assert.equal(new Set(all).size, all.length);
 });
 test('staff do not see Admin or an empty Administration group; admin does', () => {
