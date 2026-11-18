@@ -1,5 +1,6 @@
 // All REST endpoints of the mock API. Shapes match the shared API contract.
 const demoAccounts = require('./demoAccounts');
+const guards = require('./guards');
 const express = require('express');
 const crypto = require('crypto');
 const store = require('./store');
@@ -10,6 +11,7 @@ const vitals = require('./vitals');
 const demoState = require('./demoState');
 
 const router = express.Router();
+router.use('/patients/:id', guards.ownRecordOnly); // a patient login only reaches its own record (same 404 as a missing patient)
 // Contacts and consents have their own endpoints now (patientData.js), so the profile PATCH ignores contacts.
 const EDITABLE = ['name', 'age', 'sex', 'blood_group', 'allergies', 'conditions',
   'medications', 'language', 'consents', 'home_city_id'];
@@ -26,8 +28,9 @@ router.get('/demo/accounts', (req, res) => {
 
 router.post('/auth/login', (req, res) => {
   const { email, password } = req.body || {};
+  if (!guards.loginAllowed(req)) return res.status(429).json({ error: 'Too many tries. Wait a minute and try again.' });
   const user = store.users.find((u) => u.email === email && demoAccounts.passwordMatches(u, password));
-  if (!user) return res.status(401).json({ error: 'Invalid email or password' });
+  if (!user) { guards.loginFailed(req); return res.status(401).json({ error: 'Invalid email or password' }); }
   if (user.disabled) return res.status(403).json({ error: 'This account is disabled' });
   const token = crypto.randomBytes(16).toString('hex');
   store.tokens.set(token, user);
