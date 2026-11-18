@@ -112,11 +112,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   }
 }
 
-/* Print: only the passport QR code is printed. */
+/* Print: only the passport card (QR, name, expiry, demo notice) is printed. */
 @media print {
   body * { visibility: hidden; }
   .print-area, .print-area * { visibility: visible; }
-  .print-area { position: absolute; left: 0; top: 0; border: 0; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; max-width: 420px; }
 }
 
 /* Pins on the real street map (components/themed/StreetMap.jsx) */

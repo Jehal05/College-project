@@ -115,7 +115,10 @@ export const getReportFileUrl = (id, reportId) => send(patientPath(id, '/reports
   .then((r) => r.blob()).then((blob) => URL.createObjectURL(blob));
 
 // ---- Health passport (Phase 5) ----
-export const createPassport = (id, hours) => request(patientPath(id, '/passport'), { method: 'POST', body: { hours } });
+export const createPassport = (id, hours, fields) => request(patientPath(id, '/passport'), { method: 'POST', body: { hours, ...(fields ? { fields } : {}) } });
+export const getPassportPreview = (id, fields) => request(patientPath(id, '/passport/preview?fields=' + encodeURIComponent((fields || []).join(','))));
+export const getPassportHistory = (id) => request(patientPath(id, '/passport/history'));
+export const getPublicConfig = () => send('/public-config', { publicCall: true }).then((r) => r.json());
 export const getPassport = (id) => request(patientPath(id, '/passport'));
 export const revokePassport = (id) => request(patientPath(id, '/passport'), { method: 'DELETE' });
 export const getPassportLog = (id) => request(patientPath(id, '/passport/log'));

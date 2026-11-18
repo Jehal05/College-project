@@ -121,7 +121,7 @@ Files: `passport.js` (passport routes) and `failMode.js` (the failure switch). T
 
 ## Phase 7 notes (hospital portal)
 
-Settings (environment variables of the mock): `HOSPITAL_MODE=auto|manual` (default auto: the mock plays the fake hospital; manual: the portal's buttons drive the emergency), `ALERT_AT=sos|detected` (default sos: `emergency.created` is sent at SOS), `DEMO_SPEED`, `CORS_ORIGINS`, `PORT`.
+Settings (environment variables of the mock): `HOSPITAL_MODE=auto|manual` (default auto: the mock plays the fake hospital; manual: the portal's buttons drive the emergency), `ALERT_AT=sos|detected` (default sos: `emergency.created` is sent at SOS), `DEMO_SPEED`, `CORS_ORIGINS`, `PORT`, and `PUBLIC_URL` (the address a phone can open, for example `PUBLIC_URL=http://192.168.1.20:4000`, the laptop's network address; the passport QR points there. Without it the QR uses the page's own address and the patient app warns when that is localhost).
 
 - Data files with their source recorded in `_comment`: `data/hospitals.json` and `data/ambulances.json` (copied from the portal's seed; Ahmedabad; fictional realistic names). The ID style lives only in these files and in `store.nextEmergencyId()`.
 - `alertPayload.js` builds the `emergency.created` payload (pure, unit tested). `hospitalMode.js` holds the staff endpoints, the transition table and `GET /emergencies?status=`, `GET /ambulances`. `demoScenario.js` holds `POST /demo/scenario`.

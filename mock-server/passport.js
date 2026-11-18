@@ -62,7 +62,7 @@ router.post('/patients/:id/passport', requireAuth, owner, (req, res) => {
 router.get('/patients/:id/passport', requireAuth, owner, (req, res) => {
   const p = current(req.params.id);
   if (!isLive(p)) return res.status(404).json({ error: 'No active passport' });
-  res.json({ token: p.token, expires_at: p.expires_at });
+  res.json({ token: p.token, expires_at: p.expires_at, fields: p.scope || QR_FIELDS });
 });
 
 router.delete('/patients/:id/passport', requireAuth, owner, (req, res) => {
@@ -90,6 +90,24 @@ function passportBody(patient, extra = {}) {
   };
 }
 const sharedFields = (patient) => ['history', 'reports'].filter((k) => patient.consents[k]);
+
+// Where the QR should point. A phone cannot open localhost, so the patient app warns when this is empty or local.
+router.get('/public-config', (req, res) => res.json({ public_url: (process.env.PUBLIC_URL || '').replace(/\/$/, '') || null }));
+
+// Exactly what an anonymous scan would show for the chosen fields, without making a link (owner only).
+router.get('/patients/:id/passport/preview', requireAuth, owner, (req, res) => {
+  const raw = req.query.fields === undefined ? QR_FIELDS : String(req.query.fields).split(',').filter(Boolean);
+  if (!raw.every((f) => QR_FIELDS.includes(f))) return res.status(400).json({ error: 'fields must be a list of: ' + QR_FIELDS.join(', ') });
+  const now = new Date();
+  res.json(publicBody(store.patients[req.params.id], { scope: raw, created_at: now.toISOString(), expires_at: new Date(now.getTime() + 24 * 3600e3).toISOString() }));
+});
+
+// Who looked, when, and whether it worked. Kinds only: no names, IP addresses or devices.
+router.get('/patients/:id/passport/history', requireAuth, owner, (req, res) => {
+  const rows = store.accessLog.filter((r) => r.patient_id === req.params.id && ['passport.view', 'passport.staff_view'].includes(r.action))
+    .map((r) => ({ at: r.at, who: r.role === 'public' ? 'anonymous' : 'staff', purpose: r.purpose || null, outcome: r.outcome }));
+  res.json(rows.reverse().slice(0, 50));
+});
 
 // Staff read (protected clinical view). Order of checks: role, patient exists, purpose, hospital scope. Every outcome is audited.
 // There is no anonymous override and no "emergency access" here; that needs a clinical and legal review first.

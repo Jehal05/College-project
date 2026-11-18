@@ -161,3 +161,31 @@ test('clinical view still respects the consent switches', () => {
   const o = view(staffA, 'PT-2026-0417', 'emergency_treatment'); c.history = before;
   assert.ok(!('allergies' in o.body) && !('medications' in o.body));
 });
+
+// ---- Step 5: patient controls ----
+const me = (id) => ({ role: 'PATIENT', email: 'm', patient_id: id });
+test('preview shows what a scan would show, creates no link and is owner-only', () => {
+  const o = run(find('get', '/patients/:id/passport/preview'), { params: { id: 'PT-2026-0421' }, query: { fields: 'blood_group' }, user: me('PT-2026-0421'), socket: {} });
+  assert.strictEqual(o.code, 200); assert.ok(o.body.blood_group && !('allergies' in o.body) && !('contact' in o.body));
+  assert.strictEqual(run(find('get', '/patients/:id/passport/preview'), { params: { id: 'PT-2026-0421' }, query: { fields: 'conditions' }, user: me('PT-2026-0421'), socket: {} }).code, 400);
+  assert.strictEqual(run(find('get', '/patients/:id/passport/preview'), { params: { id: 'PT-2026-0421' }, query: {}, user: me('PT-2026-0418'), socket: {} }).code, 403);
+});
+
+test('history lists anonymous scans and staff views with outcome and purpose, no names', () => {
+  const t = tokenFor('PT-2026-0418'); open(t);
+  view({ role: 'ADMIN', email: 'admin@demo.test' }, 'PT-2026-0418', 'follow_up');
+  view({ role: 'FAMILY', email: 'f@x' }, 'PT-2026-0418', 'follow_up');
+  const h = run(find('get', '/patients/:id/passport/history'), { params: { id: 'PT-2026-0418' }, user: me('PT-2026-0418'), socket: {} }).body;
+  assert.ok(h.some((r) => r.who === 'anonymous' && r.outcome === 'allowed'));
+  assert.ok(h.some((r) => r.who === 'staff' && r.purpose === 'follow_up' && r.outcome === 'allowed'));
+  assert.ok(h.some((r) => r.who === 'staff' && r.outcome === 'denied'));
+  for (const r of h) assert.deepStrictEqual(Object.keys(r).sort(), ['at', 'outcome', 'purpose', 'who']);
+  assert.ok(!JSON.stringify(h).includes('admin@demo.test'));
+});
+
+test('public-config returns the address from PUBLIC_URL, or null', () => {
+  const call = () => run(find('get', '/public-config'), { socket: {} }).body.public_url;
+  delete process.env.PUBLIC_URL; assert.strictEqual(call(), null);
+  process.env.PUBLIC_URL = 'http://192.168.1.20:4000/'; assert.strictEqual(call(), 'http://192.168.1.20:4000');
+  delete process.env.PUBLIC_URL;
+});
