@@ -47,7 +47,7 @@ npm run test:mock      simulated server tests
 npm run smoke          quick check of a running `npm run one`
 ```
 
-Four browser tests remain in `patient-app/tests/browser` (passport, created alert, cancel, resilience). They need Chrome (`npm run test:browser -w patient-app`). Older browser tests that drove removed screens were deleted. None of the patient-app tests have been run on this branch yet.
+Four browser tests remain in `patient-app/tests/browser` (passport, created alert, cancel, resilience). They need Chrome (`npm run test:browser -w patient-app`). Older browser tests that drove removed screens were deleted. None of the patient-app tests have been run on this branch yet. The portal's Playwright specs in `hospital-portal/e2e` still mention the removed Analytics and Admin pages and have not been updated or run.
 
 ## Honest limits
 
