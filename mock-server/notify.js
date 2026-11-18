@@ -72,8 +72,9 @@ async function send({ title, text, priority, emergencyId, link }) {
   const jobs = [];
   const c = channels();
   if (c.ntfy) {
-    const headers = { Title: title, Priority: String(priority || 4), Tags: 'rotating_light' };
-    if (link) headers.Click = link;
+    const ascii = (v) => String(v).replace(/[^\x20-\x7e]/g, '?'); // HTTP header values must be plain ASCII
+    const headers = { Title: ascii(title), Priority: String(priority || 4), Tags: 'rotating_light' };
+    if (link) headers.Click = ascii(link);
     jobs.push(post(config.ntfy.server.replace(/\/$/, '') + '/' + encodeURIComponent(config.ntfy.topic), { method: 'POST', headers, body }).then((r) => ({ channel: 'ntfy', ...r })));
   }
   if (c.telegram) {

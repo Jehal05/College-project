@@ -21,8 +21,7 @@ router.get('/health', (req, res) => res.json({ status: 'ok', mock: true }));
 
 // Local presenter panel only: the five demo logins for this run. Refused for any non-loopback caller.
 router.get('/demo/accounts', (req, res) => {
-  const ip = req.socket.remoteAddress || '';
-  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  if (!guards.isLocal(req)) return res.status(403).json({ error: 'Local only' });
   res.json({ accounts: demoAccounts.accounts(), sandbox: true });
 });
 
@@ -148,15 +147,13 @@ function resetDemo(req, res) {
 router.post('/demo/reset', requireAuth, resetDemo);
 // The Reset button on the /start page: no login, but only from the computer that runs the demo.
 router.post('/demo/reset-local', (req, res) => {
-  const ip = req.socket.remoteAddress || '';
-  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  if (!guards.isLocal(req)) return res.status(403).json({ error: 'Local only' });
   resetDemo(req, res);
 });
 
 // The vitals buttons on the /start page: switch the simulated wearable between Resting and Heart emergency. Local computer only.
 router.post('/demo/vitals-local', (req, res) => {
-  const ip = req.socket.remoteAddress || '';
-  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  if (!guards.isLocal(req)) return res.status(403).json({ error: 'Local only' });
   const profile = req.body && req.body.profile;
   const patientId = req.body && req.body.patient_id;
   if (!vitals.PROFILES[profile]) return res.status(400).json({ error: 'profile must be one of ' + Object.keys(vitals.PROFILES).join(', ') });
@@ -165,7 +162,7 @@ router.post('/demo/vitals-local', (req, res) => {
 });
 
 // Real phone alerts: which channels are set up (no secrets), and a test message. Local computer only, like the other /start buttons.
-const loopback = (req) => /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress || '');
+const loopback = guards.isLocal;
 router.get('/demo/live-status', (req, res) => {
   if (!loopback(req)) return res.status(403).json({ error: 'Local only' });
   res.json({ phone_alerts: require('./notify').channels(), storage: require('./persist').summary() });
@@ -178,7 +175,7 @@ router.post('/demo/notify-test-local', async (req, res) => {
 
 // Which profile each patient has now (the /start page shows it). Local computer only.
 router.get('/demo/vitals-profiles', (req, res) => {
-  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress || '')) return res.status(403).json({ error: 'Local only' });
+  if (!guards.isLocal(req)) return res.status(403).json({ error: 'Local only' });
   res.json({ patients: Object.values(store.patients).map((p) => ({ id: p.id, name: p.name, profile: vitals.profileOf(p.id) })), profiles: Object.keys(vitals.PROFILES) });
 });
 

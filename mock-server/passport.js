@@ -29,7 +29,7 @@ function owner(req, res, next) {
 // Public link rate limit: 30 opens per minute per address. Kept in memory.
 const hits = new Map();
 function limit(req, res, next) {
-  const k = req.socket.remoteAddress || 'x', now = Date.now();
+  const k = require('./guards').clientKey(req), now = Date.now();
   const list = (hits.get(k) || []).filter((t) => now - t < 60000);
   if (list.length >= 30) { hits.set(k, list); return res.status(429).json({ error: 'Too many requests. Try again in a minute.' }); }
   list.push(now); hits.set(k, list);

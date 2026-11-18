@@ -13,6 +13,7 @@ const failMode = require('./failMode');
 const compat = require('./compat');
 const wsAuth = require('./wsAuth');
 const store = require('./store');
+const guards = require('./guards');
 const persist = require('./persist');
 const notify = require('./notify');
 
@@ -33,6 +34,8 @@ app.use(cors({ origin: ORIGINS }));
 const api = express.Router();
 api.use(express.json());
 api.use(delay);
+api.use('/emergencies', guards.emergencyScope); // a patient reaches only its own alerts
+api.use('/ambulances', guards.staffWrites);
 api.use(compat.middleware); // Daksh's contract names, added next to ours (compat.js)
 api.use('/', failMode.router);
 api.use(failMode.middleware);

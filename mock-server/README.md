@@ -1,6 +1,6 @@
 # Mock server (simulated data)
 
-Stands in for the real FastAPI backend during week 1. All data is fake and lives in memory:
+Stands in for the real FastAPI backend during week 1. All data is fake. It lives in memory and is saved to a local SQLite file every few seconds (`persist.js`; `PERSIST=off` for memory only):
 restart the server to reset it.
 
 ```
@@ -102,7 +102,7 @@ Also: `simulator.js` holds the broadcast helper and the timers.
 | POST /demo/passport/expire | Makes the current passport expire now (for tests) |
 | POST /demo/fail | Body `{ mode: "off" \| "server" \| "expired" \| "slow" }`: every request (except health, login and `/demo/*`) answers 500, answers 401, or waits 12 s. `POST /demo/reset` switches it off. For testing the app's error handling |
 
-New event: `passport.opened` (`emergency_id: null`, payload `{ patient_id }`, no IP or device data). Passports live in memory only and are forgotten by `POST /demo/reset`.
+New event: `passport.opened` (`emergency_id: null`, payload `{ patient_id }`, no IP or device data). Passports are saved with the other data and forgotten by `POST /demo/reset`.
 Files: `passport.js` (passport routes) and `failMode.js` (the failure switch). The full contract for the real backend is `docs/API_CONTRACT.md`; check any server with `npm run contract -- <url>`.
 
 ## Phase 6 notes
@@ -146,3 +146,15 @@ Portal (`hospital-portal/.env`): `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http:
 
 ## Phase 10: family, responder and admin endpoints
 `otherApps.js` holds them (table in `docs/API_CONTRACT.md`, "Phase 10"). Demo logins, password `demo1234`: `family@demo.test` (link with the invite code `FAM-0417`), `responder@demo.test` (verified volunteer). A new volunteer who signs up is **not verified** until an admin sets `verified:true` with `PATCH /admin/users`. `POST /demo/reset` forgets links, invites, check-ins, feedback, privacy requests, content edits and new volunteers.
+
+## Real parts (see `docs/GO_LIVE.md`)
+
+| Endpoint or file | What |
+|---|---|
+| `persist.js` | SQLite saving and the event and notification logs |
+| `notify.js` | Push, Telegram and optional SMS to the two team phones only; config in `live.config.json` (git-ignored) |
+| POST, DELETE `/emergencies/:id/live` | The patient's own live GPS and strap heart rate during an open alert; consent-gated; event `live.update` / `live.stopped` |
+| POST `/demo/vitals-local` `{patient_id, profile}` | Simulated wearable of ONE patient (normal, heart_attack, stroke, low_glucose, asthma). Local computer only |
+| GET `/demo/vitals-profiles`, `/demo/live-status`, POST `/demo/notify-test-local` | Start-page helpers. Local computer only: refused through a tunnel or from another computer (`guards.isLocal`) |
+
+A patient login reaches only its own alerts (`guards.emergencyScope`) and cannot move ambulances.

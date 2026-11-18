@@ -21,12 +21,15 @@ export function buildUpdate({ position, bpm, locationOn, heartOn, now = Date.now
  * status: idle | sharing | waiting | denied | ended | error
  */
 export function createLiveShare({ post, geolocation, getBpm = () => null, locationOn, heartOn, onStatus = () => {}, every = SEND_EVERY_MS, now = Date.now, setTimer = setInterval, clearTimer = clearInterval }) {
-  let position = null, watchId = null, timer = null, running = false, denied = false;
+  let position = null, watchId = null, timer = null, running = false, denied = false, busy = false; // busy: one request at a time, never a pile-up on a slow network
 
   const tick = () => {
     const body = buildUpdate({ position, bpm: getBpm(), locationOn, heartOn, now: now() });
     if (!body) { onStatus(denied ? 'denied' : 'waiting'); return; }
-    post(body).then(() => { if (running) onStatus('sharing'); }).catch((err) => {
+    if (busy) return;
+    busy = true;
+    post(body).then(() => { busy = false; if (running) onStatus('sharing'); }).catch((err) => {
+      busy = false;
       if (err && err.status === 409) { stop(); onStatus('ended'); } else if (running) onStatus('error'); // 409: the alert is closed
     });
   };

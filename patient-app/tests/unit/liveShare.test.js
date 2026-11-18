@@ -52,6 +52,14 @@ describe('createLiveShare', () => {
     expect(s.statuses[s.statuses.length - 1]).toBe('ended');
     expect(s.geolocation.clearWatch).toHaveBeenCalledWith(7);
   });
+  it('sends one request at a time while the last one is still waiting', async () => {
+    let release; const post = vi.fn(() => new Promise((r) => { release = r; }));
+    const s = setup({ post }); s.share.start(); s.give(1, 2); s.tick(); s.tick(); s.tick();
+    expect(post).toHaveBeenCalledTimes(1);
+    release({}); await Promise.resolve(); await Promise.resolve();
+    s.tick();
+    expect(post).toHaveBeenCalledTimes(2);
+  });
   it('never watches the position when location is not allowed', () => {
     const s = setup({ locationOn: false }); s.share.start();
     expect(s.geolocation.watchPosition).not.toHaveBeenCalled();

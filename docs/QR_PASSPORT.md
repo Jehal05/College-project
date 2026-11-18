@@ -48,11 +48,11 @@ The patient app asks the server for this address (`GET /api/public-config`). If 
 | Token | The QR image, the patient's screen, and the link. Hash only on the server's lookup table |
 | Quick-view fields | Whoever opens the link, only while it is live |
 | Clinical fields | Signed-in staff or admin, for a chosen purpose, audited |
-| Audit rows | The server's in-memory log (reset by Reset demo) |
+| Audit rows | The server's log, saved in the SQLite file (wiped by Reset demo) |
 
 ## Limits (be honest about these)
 
-- The mock keeps everything in memory. A server restart forgets all passports.
+- The server saves passports to its SQLite file, so a restart keeps them (with `PERSIST=off` a restart forgets all passports).
 - Age band and "last updated" are rough; the seed has no per-field dates.
 - "Other hospital" is decided by city.
 - Hindi and Gujarati text has not been reviewed by a native reader.

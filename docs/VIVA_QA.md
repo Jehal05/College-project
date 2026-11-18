@@ -5,7 +5,7 @@ Read these together and say each answer in your own words. Both of you should be
 1. **What does it do?**
    A patient presses Emergency help, picks symptoms and, after a 10 second countdown to cancel a false alarm, an alert goes to the hospital desk. The desk acknowledges and dispatches an ambulance; the patient watches the timeline. Everything is simulated.
 2. **Why a simulated server?**
-   There are no real hospitals or ambulances to connect to, so the server plays them. It keeps data in memory and every screen says it is simulated. It means the whole demo runs from one command.
+   There are no real hospitals or ambulances to connect to, so the server plays them. It saves its data to a local SQLite file and every screen says it is simulated. It means the whole demo runs from one command.
 3. **How does the portal choose which hospital gets an alert?**
    It rules out hospitals that are not verified or lack the unit the emergency needs, then scores the rest by capability, travel time and free beds. Distances are straight-line; only the tracking map uses road routes.
 4. **What if nobody answers the alert?**
