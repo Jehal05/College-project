@@ -525,6 +525,7 @@ export default {
   'tk.onBoard': 'Patient on board · heading to the hospital · {km} km left',
   'tk.simRoute': 'Simulated ambulance and route',
   'tk.notRoad': 'Not a road route · runs {n}× faster than real time',
+  'tk.roadRoute': 'Real road route (OpenStreetMap data) · {km} km · about {min} min before traffic · ambulance and trip speed are still simulated, {n}× faster than real time',
   'tk.patientTip': 'Patient (simulated)',
   'tk.unitTip': '{name} (simulated)',
   'tk.driven': 'Driven',

@@ -524,6 +524,7 @@ export default {
   'tk.onBoard': 'मरीज़ सवार है · अस्पताल की ओर · {km} किमी बाकी',
   'tk.simRoute': 'Simulated एम्बुलेंस और रास्ता',
   'tk.notRoad': 'असली सड़क का रास्ता नहीं · असली समय से {n}× तेज़ चलता है',
+  'tk.roadRoute': 'असली सड़क का रास्ता (OpenStreetMap डेटा) · {km} किमी · ट्रैफ़िक से पहले लगभग {min} मिनट · एम्बुलेंस और यात्रा की गति अभी भी नकली है, असली समय से {n}× तेज़',
   'tk.patientTip': 'मरीज़ (simulated)',
   'tk.unitTip': '{name} (simulated)',
   'tk.driven': 'तय किया',

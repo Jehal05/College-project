@@ -1,7 +1,8 @@
 // Live ambulance tracking (feature #25) with simulated traffic and green corridor (feature #45).
 // Reads the position from the emergency (kept up to date by ambulance.location events),
 // so it shows the same thing on every screen that is watching.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { cachedRoad, loadRoad } from '../services/roadRoute.js';
 import { TILE_URL, TILE_ATTRIBUTION } from '../config/external.js';
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, ZoomControl } from 'react-leaflet';
 import trafficConfig from '../data/traffic-config.json';
@@ -43,10 +44,20 @@ export default function TrackingMap({ emergency, compact = false }) {
   const lat = where?.lat;
   const lng = where?.lng;
   const ownHospitalId = session?.hospital_id;
-  const route = useMemo(
+  const plainRoute = useMemo(
     () => routeForEmergency({ ambulance_id: ambulanceId, alerted_hospital_id: alertedId, location: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined }, units, hospitals, ownHospitalId),
     [ambulanceId, alertedId, lat, lng, units, hospitals, ownHospitalId],
   );
+  // Real road geometry from the routing server when it answers in time; otherwise the simulated path stays (and says so).
+  const [road, setRoad] = useState(() => cachedRoad(plainRoute) || null);
+  useEffect(() => {
+    let live = true;
+    setRoad(cachedRoad(plainRoute) || null);
+    if (plainRoute) loadRoad(plainRoute).then((v) => { if (live && v && !trips[id]) setRoad(v); }).catch(() => {}); // not while a trip runs: it already follows its own path
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plainRoute]);
+  const route = road || plainRoute;
   if (!route) return <p className="rounded-xl bg-slate-100 p-4 text-slate-500">{t('tk.waiting')}</p>;
 
   const arrived = e.state === 'ARRIVED' || e.state === 'HANDOVER_DONE';
@@ -90,7 +101,9 @@ export default function TrackingMap({ emergency, compact = false }) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <SimulatedBadge text={t('tk.simRoute')} />
-          <SimulatedBadge text={t('tk.notRoad', { n: simConfig.time_scale })} />
+          {route.source === 'road'
+            ? <span data-testid="road-route" className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-900 ring-1 ring-emerald-300">{t('tk.roadRoute', { km: route.road_km, min: Math.max(1, Math.round(route.road_seconds / 60)), n: simConfig.time_scale })}</span>
+            : <SimulatedBadge text={t('tk.notRoad', { n: simConfig.time_scale })} />}
         </div>
       </div>
 

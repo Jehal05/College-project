@@ -8,3 +8,5 @@ export const TILE_URL = env('VITE_TILE_URL', 'https://tile.openstreetmap.org/{z}
 export const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 export const ROUTING_URL = env('VITE_ROUTING_URL', 'https://router.project-osrm.org');
 export const ROUTING_TIMEOUT_MS = 4000; // after this the straight-line estimate is used instead
+// Set VITE_ROAD_ROUTES=false to never call the routing server (tests and offline demos): routes stay simulated straight-ish lines.
+export const ROAD_ROUTES = env('VITE_ROAD_ROUTES', 'true') !== 'false';

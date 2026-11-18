@@ -524,6 +524,7 @@ export default {
   'tk.onBoard': 'દર્દી અંદર છે · હોસ્પિટલ તરફ · {km} કિમી બાકી',
   'tk.simRoute': 'Simulated એમ્બ્યુલન્સ અને રસ્તો',
   'tk.notRoad': 'વાસ્તવિક રસ્તો નથી · વાસ્તવિક સમય કરતાં {n}× ઝડપી ચાલે છે',
+  'tk.roadRoute': 'વાસ્તવિક રસ્તાનો માર્ગ (OpenStreetMap ડેટા) · {km} કિમી · ટ્રાફિક પહેલાં લગભગ {min} મિનિટ · એમ્બ્યુલન્સ અને મુસાફરીની ઝડપ હજી નકલી છે, વાસ્તવિક સમય કરતાં {n}× ઝડપી',
   'tk.patientTip': 'દર્દી (simulated)',
   'tk.unitTip': '{name} (simulated)',
   'tk.driven': 'કાપેલો',

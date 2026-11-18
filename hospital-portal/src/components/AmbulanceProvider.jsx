@@ -9,6 +9,8 @@ import * as api from '../services/api.js';
 import simConfig from '../data/sim-config.json';
 import trafficConfig from '../data/traffic-config.json';
 import { createRouteSimulator } from '../sim/ambulance-route.js';
+import { cachedRoad, loadRoad } from '../services/roadRoute.js';
+import { ROAD_ROUTES } from '../config/external.js';
 import { totalFactor } from '../services/traffic.js';
 import { isFinal } from '../services/stateMachine.js';
 import { haversineKm, DEMO_LOCATION } from '../services/geo.js';
@@ -114,8 +116,9 @@ export function AmbulanceProvider({ children }) {
       if (sims.current.has(id)) return true;
       const find = () => latest.current.emergencies.find((e) => e.emergency_id === id);
       const e = find();
-      const route = e && routeForEmergency(e, latest.current.units, latest.current.hospitals, latest.current.hospitalId);
-      if (!route) return false;
+      const plain = e && routeForEmergency(e, latest.current.units, latest.current.hospitals, latest.current.hospitalId);
+      if (!plain) return false;
+      const route = cachedRoad(plain) || plain; // real road geometry when the routing server answered, else the simulated path
 
       // Network steps run one after another, so EN_ROUTE is always sent before ARRIVED.
       let queue = Promise.resolve();
@@ -184,9 +187,17 @@ export function AmbulanceProvider({ children }) {
   const requestTrip = useCallback(
     (id) => {
       const decide = (elapsedMs) => decideTrip({ mode, useMock: USE_MOCK, backendSeen: backendSeen.current.has(id), elapsedMs });
+      // With road routes on, ask the routing server first (at most ROUTING_TIMEOUT_MS), then start; with them off, start at once.
+      const begin = () => {
+        if (!ROAD_ROUTES) return startTrip(id);
+        const e = latest.current.emergencies.find((x) => x.emergency_id === id);
+        const plain = e && routeForEmergency(e, latest.current.units, latest.current.hospitals, latest.current.hospitalId);
+        loadRoad(plain).catch(() => null).then(() => startTrip(id));
+        return true;
+      };
       const first = decide(0);
-      if (first === 'start') return startTrip(id);
-      if (first === 'wait') setTimeout(() => decide(BACKEND_WAIT_MS) === 'start' && startTrip(id), BACKEND_WAIT_MS);
+      if (first === 'start') return begin();
+      if (first === 'wait') setTimeout(() => decide(BACKEND_WAIT_MS) === 'start' && begin(), BACKEND_WAIT_MS);
       return false;
     },
     [mode, startTrip],

@@ -23,12 +23,6 @@
       "reason": "Name saved with a message or note (data), not screen text."
     }
   ],
-  "components/PatientMiniMap.jsx": [
-    {
-      "text": "OpenStreetMap",
-      "reason": "Brand name in the map credit line."
-    }
-  ],
   "components/RankingTable.jsx": [
     {
       "text": "Capability",
@@ -125,10 +119,6 @@
   ],
   "components/TrackingMap.jsx": [
     {
-      "text": "OpenStreetMap",
-      "reason": "Brand name in the map credit line."
-    },
-    {
       "text": "Corridor request logged (simulated)",
       "reason": "Event text written to the case timeline (data), English in every language."
     }
@@ -150,10 +140,6 @@
     }
   ],
   "pages/Map.jsx": [
-    {
-      "text": "OpenStreetMap",
-      "reason": "Brand name in the map credit line."
-    },
     {
       "text": "Middle of the hospitals (no patient selected)",
       "reason": "Marker value in code; the screen shows t(\"map.middle\")."
