@@ -44,6 +44,9 @@
   <table id="accounts"><tr><th>Login</th><th>Password</th></tr></table>
   <p>These logins exist only in this run. The passwords are never put in a QR code.</p>
   <p><button id="reset" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Reset demo</button> <span id="reset-msg" role="status"></span><br>Clears alerts and passports and restores the five patients. Do this before each run.</p>
+  <p>Simulated wearable: <button id="v-normal" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Resting vitals</button>
+    <button id="v-heart" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #b91c1c;background:#fff;cursor:pointer">Heart emergency vitals</button> <span id="v-msg" role="status"></span><br>
+    Switch before sending the alert so the patient's Home shows a fast heart rate and low oxygen. Simulated data only. Reset demo sets it back to resting.</p>
   <p>Tip: put the patient app and the hospital portal in two windows side by side. Both talk to this one server.</p>
 </main>
 <script>
@@ -60,6 +63,11 @@
     fetch('/api/demo/reset-local', { method: 'POST' }).then((r) => { document.getElementById('reset-msg').textContent = r.ok ? 'Demo reset.' : 'Reset only works on the laptop that runs the demo.'; })
       .catch(() => { document.getElementById('reset-msg').textContent = 'Server not reachable.'; });
   });
+  const setVitals = (profile, label) => fetch('/api/demo/vitals-local', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ profile }) })
+    .then((r) => { document.getElementById('v-msg').textContent = r.ok ? label : 'Only works on the laptop that runs the demo.'; })
+    .catch(() => { document.getElementById('v-msg').textContent = 'Server not reachable.'; });
+  document.getElementById('v-normal').addEventListener('click', () => setVitals('normal', 'Resting vitals on.'));
+  document.getElementById('v-heart').addEventListener('click', () => setVitals('heart_attack', 'Heart emergency vitals on (simulated).'));
 </script>
 </body>
 </html>

@@ -15,6 +15,7 @@ Everything is simulated. Say so at the start: the banner on every screen says "S
 |---|---|---|
 | 0:00 | Window A: sign in as `amit.verma@demo.test` | Home shows his name and simulated heart rate and SpO2 changing |
 | 0:30 | Language selector: हिन्दी, ગુજરાતી, English | The whole app changes at once |
+| 0:50 | `/start` page: press **Heart emergency vitals** | Window A's Home heart rate jumps (simulated wearable) |
 | 1:00 | **Emergency help**, choose a symptom group, tick a symptom, **Get help now** | Red screen, "Call 112 / 108" first, countdown from 10 |
 | 1:30 | Press **Send now** | "Alert sent". Window B: the alert appears in the queue with a map |
 | 2:00 | Window B: **Acknowledge**, then **Dispatch** an ambulance | Window A's timeline updates: hospital acknowledged, ambulance dispatched, ETA, arrived. The portal map follows the ambulance on road routes (a labelled simulated route if the routing server cannot be reached) |

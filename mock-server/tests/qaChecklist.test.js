@@ -96,3 +96,11 @@ test('QA15 form controls on the new screens have labels (static check: every inp
   const labelled = (src.match(/<label[^>]*>\s*<input /g) || []).length;
   assert.strictEqual(inputs, labelled);
 });
+
+test('vitals profile can be switched to the heart emergency profile and back (simulated wearable)', () => {
+  const vitals = require('../vitals');
+  assert.strictEqual(vitals.applyChange({ profile: 'heart_attack' }).status, 200);
+  const hot = vitals.currentVitals(); assert.ok(hot.heart_rate >= 135 && hot.spo2 <= 95);
+  assert.strictEqual(vitals.applyChange({ profile: 'normal' }).status, 200);
+  const calm = vitals.currentVitals(); assert.ok(calm.heart_rate <= 76 && calm.spo2 >= 97);
+});

@@ -150,6 +150,16 @@ router.post('/demo/reset-local', (req, res) => {
   resetDemo(req, res);
 });
 
+// The vitals buttons on the /start page: switch the simulated wearable between Resting and Heart emergency. Local computer only.
+router.post('/demo/vitals-local', (req, res) => {
+  const ip = req.socket.remoteAddress || '';
+  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  const profile = req.body && req.body.profile;
+  if (!['normal', 'heart_attack'].includes(profile)) return res.status(400).json({ error: 'profile must be normal or heart_attack' });
+  const { status, body } = vitals.applyChange({ profile });
+  res.status(status).json(body);
+});
+
 // The cities the apps offer (same answer as the backend's GET /cities).
 router.get('/cities', requireAuth, (req, res) => res.json(store.cities));
 
