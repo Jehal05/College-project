@@ -1006,5 +1006,15 @@
   "emc.otherCity": "No suitable hospital was open in {{own}}, so this simulated alert went to {{name}} in {{city}}.",
   "emc.simLocation": "Simulated location in {{name}}",
   "hosp.mapLoading": "Loading the map…",
-  "hosp.mapReal": "Real street map. The hospitals and ambulances on it are fictional."
+  "hosp.mapReal": "Real street map. The hospitals and ambulances on it are fictional.",
+  "loc.title": "Location sharing",
+  "loc.consentOff": "Location sharing is off in your consent settings. No location will be sent.",
+  "loc.stopped": "Sharing stopped. The alert will be sent without your location.",
+  "loc.willGps": "Your phone's GPS location will be sent to the hospital with this alert (only to this app's own server).",
+  "loc.willSimulated": "A simulated practice location will be sent, not your real position.",
+  "loc.denied": "Your browser blocked location, so a simulated practice location will be sent.",
+  "loc.stop": "Stop sharing my location",
+  "loc.resume": "Share my location again",
+  "loc.gpsLabel": "Your GPS location (about {{m}} m)",
+  "loc.simLabel": "Simulated location"
 }
