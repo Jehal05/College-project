@@ -5,7 +5,7 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 ## Hospital portal (Puneet)
 
 1. **How does the portal choose which hospital gets an alert?**
-   It first rules out hospitals that are not verified or that lack the unit the emergency needs (for example a cath lab for a heart attack). Then it scores the rest: 50% capability, 30% travel time, 20% availability (`src/data/ranking-config.json`). Distance never brings back a hospital that was ruled out. The reason is shown on screen.
+   It first rules out hospitals that are not verified or that lack the unit the emergency needs (for example a cath lab for a chest-pain emergency). Then it scores the rest: 50% capability, 30% travel time, 20% availability (`src/data/ranking-config.json`). Distance never brings back a hospital that was ruled out. The reason is shown on screen.
 2. **What happens if nobody answers an alert?**
    After 30 seconds the alert escalates to the next ranked hospital and the card shows it. The 30-second timer now exists in the backend too (tested in CI), but the demo still uses Jehal's mock, where it also runs.
 3. **What if the backend lacks an endpoint?**
@@ -77,3 +77,20 @@ Written from the code and docs on branch `integration` (14 Nov 2026). **Read thi
 | Family, responder, admin | `Shagun` | 0 beyond the initial commit | built by Jehal instead |
 
 Many commits are written with an AI assistant. Be ready to explain your own part in your own words.
+
+## QR passport
+
+1. **What is in the QR?**
+   Only a link with a random 24-character token. No name, number, blood group or diagnosis. The server looks the token up by its hash.
+2. **What does a stranger who scans it see?**
+   A minimal page: name, patient code, age band, blood group, allergies and one masked contact, only what the patient switched on and consented to, with a demo banner. No conditions, medicines, reports, vitals, location or full phone number.
+3. **How do doctors see more?**
+   Only after a hospital staff or admin login, by choosing a purpose. Every view and every refusal is audited with the purpose and an audit reference. There is no emergency override; that would need a clinical and legal review.
+4. **What if the QR is lost or shared?**
+   The patient can make a new QR (the old one stops at once) or revoke it. Links also expire after 1 hour, 24 hours or 7 days. Say honestly that it is a bearer link: anyone holding it can open the quick view until then.
+5. **Is this ABHA or a government ID?**
+   No. It is a HealthTwin demo token with fictional data. It is not identity proof and not a credential.
+6. **Is it in the real backend?**
+   Not yet. It runs on the mock server used for the demo; the FastAPI backend still has its older passport.
+7. **Do you use real maps?**
+   Yes for map tiles (OpenStreetMap) and road routes on the portal tracking map (OSRM, with a labelled simulated fallback). Hospital ranking and list ETAs still use straight-line distance. See `docs/REAL_DATA.md`.

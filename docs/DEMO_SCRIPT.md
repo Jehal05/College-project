@@ -13,19 +13,19 @@ Everything is simulated. Say so at the start: the yellow banner on every screen 
 
 | Time | Do | Say / expect |
 |---|---|---|
-| 0:00 | Sign in: `patient@demo.test` / `demo1234` | Home shows "Hello, Rahul", live heart rate and SpO2 changing, the twin bar "Within your usual range" |
+| 0:00 | Sign in: `patient@demo.test` / `demo1234` | Home shows "Hello, Amit", live heart rate and SpO2 changing, the twin bar "Within your usual range" |
 | 0:30 | Open the language selector (Profile or Login), choose हिन्दी, then ગુજરાતી, then English | Whole app changes at once and is remembered |
 | 1:00 | Press **Emergency help**. Tap **Stroke signs**. Tick "Face drooping" (or use the mic button, say the symptom, press "Tick them") | Voice only suggests: "We heard: ..." and "We may have heard wrong. Please check." Nothing is ticked until confirmed |
 | 1:45 | Press **Get help now** | Red screen, "Call 112 / 108" first, countdown from 10 with a beep |
 | 2:00 | Let it run or press **Send now** | "Alert sent", location line, then the timeline fills: hospital acknowledged, ambulance dispatched, ETA counting down, arrived, handover done. "Time since alert" runs and freezes |
 | 2:45 | Point at "Your contacts were notified (simulated)" | Names only, no phone numbers |
 | 3:00 | Press **Back to Home**, open Profile > Consent settings, switch Location off | "Saved". Next emergency says "Location sharing is off in your consent settings". Switch back on |
-| 3:15 | Open Profile > **Health passport (QR)**, keep 24 hours, press **Create passport** | A QR appears with "Valid for 24 hours". Scan it with a phone (or press "Preview the responder page"): name, blood group, allergies, medicines and contacts, with "Prepared by the patient. Not verified by a doctor." |
-| 3:30 | Turn **Medical history** off in Consent settings, reload the responder page | The allergies, medicines and contacts are gone ("The patient has not shared this section."). Turn it back on. Back on the passport screen it says "Opened 2 times" and the bell on Home lists "Passport opened" |
+| 3:15 | Open Profile > **Health passport (QR)**, keep 24 hours, press **Create passport** | A QR appears with "Valid for 24 hours". Scan it with a phone (or press "Preview the responder page"): name, patient code, blood group, allergies and one masked contact (no medicines or conditions), with "Prepared by the patient. Not verified by a doctor." |
+| 3:30 | Turn **Medical history** off in Consent settings, reload the responder page | The allergies and the contact are gone ("The patient has not shared this section."). Turn it back on. Back on the passport screen it says "Opened 2 times" and the bell on Home lists "Passport opened" |
 | 3:45 | **Offline moment:** in browser dev tools set Network to Offline | Banner "You are offline... Call 112 / 108 works without internet." Profile shows "Saved copy" and edits are off |
 | 4:00 | While offline, start an emergency | Red **Not sent yet** screen, "No alert has reached any hospital. Call 112 / 108 now." Never says sent |
 | 4:20 | Set Network back to Online | App sends by itself and opens the emergency screen |
-| 4:45 | Press **Revoke now** on the passport screen, then reload the responder page: "This passport is no longer available." Close: what is real and what is not | See below |
+| 4:45 | Press **Revoke now** on the passport screen, then reload the responder page: "Passport link unavailable." Close: what is real and what is not | See below |
 
 ## If something goes wrong
 
@@ -37,7 +37,7 @@ Everything is simulated. Say so at the start: the yellow banner on every screen 
 
 ## What to say is NOT real
 
-Simulated hospital and ambulance; the passport page shows data the patient typed (not doctor-verified); mock server with fake data in memory; no real SMS or push to contacts; no doctor-reviewed condition guidance (only 3 general lines); Hindi and Gujarati not yet checked by native speakers.
+Simulated hospital and ambulance; the passport page shows fictional data labelled as simulated (not doctor-verified, not ABHA, not a government credential); mock server with fake data in memory; no real SMS or push to contacts; no doctor-reviewed condition guidance (only 3 general lines); Hindi and Gujarati not yet checked by native speakers.
 
 ## Phase 6: 6-minute rehearsal with the demo panel
 
@@ -62,3 +62,19 @@ If something goes wrong: **Reset demo** (also clears the in-memory trend, notifi
 ## Phase 7: joint demo with the hospital portal (5 minutes)
 
 Two windows: the patient phone view and the hospital desk (Puneet's portal). Start the mock with `HOSPITAL_MODE=manual DEMO_SPEED=5`. The minute-by-minute table, what to say, and what to do if something fails are in `docs/JOINT_REHEARSAL.md`. Say clearly: no real hospital or ambulance is contacted; the patient app says "notification sent" until the desk dispatches.
+
+## QR passport walkthrough with the five patients (about 5 minutes, `npm run one`)
+
+Start with the phone-reachable address: `PUBLIC_URL=http://<laptop-ip>:4000 DEMO_SPEED=5 npm run one`. Open `http://localhost:4000/start`: it shows the five demo logins for this run (new passwords every start) and the portal logins. Full detail: `docs/QR_PASSPORT.md`.
+
+| Time | Do | Say / expect |
+|---|---|---|
+| 0:00 | Sign in as `rahul.sharma@demo.test` (Rahul, 28, no symptoms). Profile > Health passport > Create | QR on a card with "Demo profile". No yellow localhost warning. Scan with a phone: demo banner, name, code, blood group, allergies, one masked contact. No conditions or medicines |
+| 1:15 | Sign in as `amit.verma@demo.test` in a second window, create his passport, scan it | A different QR, a different page. Say: Amit's login cannot see Rahul's record (it answers 404) |
+| 2:00 | Open the scanned page's **Staff sign-in** button while signed out | The portal login first. Not signed in means no clinical details |
+| 2:30 | Sign in as `staff@demo` / `demo123`, choose purpose **Emergency treatment**, open | Conditions, medicines and contacts for Amit appear with an audit reference. Say: staff in the other city's hospital are refused, and every view and refusal is logged |
+| 3:30 | Amit: **Who looked** | Anonymous scan and the staff view with the purpose, no names or devices |
+| 4:00 | Turn Medical history off in Consent settings; rescan | Allergies and contact are gone on the next scan |
+| 4:30 | **Make a new QR**, scan the old one; then **Revoke now**, scan again | "Passport link unavailable" both times |
+
+Say what is real and what is not: demo token, fictional data, simulated phones, not ABHA, in-memory server. Scenario names to use for the patients are "potentially serious scenario" and "emergency-severity test case"; the rule thresholds are draft, pending doctor review.

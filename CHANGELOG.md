@@ -1,5 +1,13 @@
 # Changelog
 
+## QR passport and five demo patients
+- Five fictional patients with their own logins (random passwords per start, salted hash, shown only on the local `/start` page). Existing patients renamed: the main demo patient is now Amit Verma.
+- Minimal anonymous quick view (name, code, age band, blood group, allergies, one masked contact) with a demo banner. Conditions, medicines and full phone numbers are no longer sent to an anonymous scan.
+- Protected clinical view in the portal (`/passport`): staff login, purpose, city scope, audit reference; every view and refusal audited.
+- Patient controls: choose QR fields and expiry, preview, make a new QR, revoke, "Who looked", printable card, `PUBLIC_URL` setting with a localhost warning.
+- Fixed in the mock: passport routes had no ownership check; patients could read other patients' routes; no limit on wrong passwords; the public link had no rate limit.
+- Not done: the FastAPI backend still has the older passport. Patient-app and backend suites were not run in the build sandbox. See `docs/QR_PASSPORT.md` and `docs/QR_PASSPORT_QA.md`.
+
 ## Four parts of the demo can use real data
 - One config file per app for every outside address (map tiles, routing). Real tiles in the portal's three maps and the patient Hospitals map.
 - Real GPS rules: fresh high-accuracy fix, only with the location consent; the countdown screen says what will be sent and has **Stop sharing my location**.

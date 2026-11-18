@@ -225,13 +225,16 @@ Screenshots of both cities at 360 and 1440 px (patient Hospitals screen and port
 **Honest limits**
 
 - All hospitals, ambulances, patients and addresses are invented. The Pune hospital names are made up and have not been checked against real places.
-- Only two cities. Routes, ETAs and ambulance positions are simulated straight-line figures, not road routing.
+- Only two cities. The portal's tracking map can use real road routes (OSRM, simulated fallback when it cannot be reached); hospital ranking and list ETAs are still straight-line figures. See `docs/REAL_DATA.md`.
 - On the real backend an SOS picks hospitals by distance. It does not return `city_id` or `other_city` on the emergency yet, so the "other city" note appears only on the mock server.
 - The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
 - Hindi and Gujarati text for the new screens is an unreviewed draft.
 
 ## Real data in the demo
 Map tiles, device GPS, road routes and a Bluetooth heart-rate strap can be real; everything else stays simulated and labelled. What is sent where, the limits and how to test by hand: [`docs/REAL_DATA.md`](docs/REAL_DATA.md).
+
+## QR health passport
+Five fictional demo patients, each with a login, a unique QR, a minimal public quick view, and a staff-only clinical view that needs a purpose and is audited. A HealthTwin demo token: not ABHA, not identity proof. Works on `npm run one`; set `PUBLIC_URL` so phones can scan it. How it works, limits and manual steps: [`docs/QR_PASSPORT.md`](docs/QR_PASSPORT.md), checks in [`docs/QR_PASSPORT_QA.md`](docs/QR_PASSPORT_QA.md). Not yet in the FastAPI backend.
 
 ## Status and honest limits
 
@@ -243,7 +246,8 @@ Map tiles, device GPS, road routes and a Bluetooth heart-rate strap can be real;
 | Doctor review of symptom rules and guidance | Pending — see [`docs/CLINICAL_REVIEW.md`](docs/CLINICAL_REVIEW.md) |
 | Native-speaker review of Hindi / Gujarati | Pending — see [`docs/TRANSLATION_REVIEW.md`](docs/TRANSLATION_REVIEW.md) |
 | Real-device and accessibility check | Plan in [`docs/review/DEVICE_TEST_PLAN.md`](docs/review/DEVICE_TEST_PLAN.md) |
-| Real SMS, calls, maps and wearables | Simulated on purpose |
+| Real SMS and calls | Simulated on purpose |
+| QR passport | Built on the mock server, patient app and portal; not in the backend; patient-app suites not run in the build sandbox ([`docs/QR_PASSPORT_QA.md`](docs/QR_PASSPORT_QA.md)) |
 | Hindi / Gujarati text on the new dashboard | AI-written drafts, layout checked, wording not reviewed |
 | 3D twin | Tested in headless Chrome only; not on a real GPU or phone |
 | Lab values on the dashboard | Stored on the device only; no backend endpoint yet (see [`docs/BACKEND_GAPS.md`](docs/BACKEND_GAPS.md)) |
