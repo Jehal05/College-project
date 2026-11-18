@@ -3,15 +3,10 @@
 # Put this file at the repo root:  .github/workflows/backend.yml
 name: Backend checks
 
+# Manual only (changed on request: automatic runs were causing problems). Start it from the Actions tab with "Run workflow".
+# To bring automatic runs back, restore the push and pull_request triggers from git history (commit before this change).
 on:
-  push:
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
-  pull_request:
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+  workflow_dispatch:
 
 jobs:
   test:

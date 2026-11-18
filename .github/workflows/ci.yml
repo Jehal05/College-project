@@ -1,8 +1,9 @@
 # Runs on every push and pull request: install, build, unit tests, contract test, accessibility audit, browser tests.
 name: CI
+# Manual only (changed on request: automatic runs were causing problems). Start it from the Actions tab with "Run workflow".
+# To bring automatic runs back, restore the push and pull_request triggers from git history (commit before this change).
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest

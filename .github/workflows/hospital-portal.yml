@@ -2,14 +2,10 @@
 # Runs on every push and pull request that touches hospital-portal: install, unit tests, production build.
 name: Hospital portal checks
 
+# Manual only (changed on request: automatic runs were causing problems). Start it from the Actions tab with "Run workflow".
+# To bring automatic runs back, restore the push and pull_request triggers from git history (commit before this change).
 on:
-  push:
-    paths:
-      - 'hospital-portal/**'
-      - '.github/workflows/hospital-portal.yml'
-  pull_request:
-    paths:
-      - 'hospital-portal/**'
+  workflow_dispatch:
 
 # The jobs only read the code: no write access to the repository is needed.
 permissions:
