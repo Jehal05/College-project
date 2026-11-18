@@ -68,7 +68,7 @@ function createEmergency({ patient_id, type, symptoms, consents, source }) {
   const id = store.nextEmergencyId();
   const patient = store.patients[patient_id] || {};
   const shared = { ...(patient.consents || {}), ...(consents || {}) }; // consent as it was when the alert started
-  const vitals_at_alert = sharedVitals(shared);
+  const vitals_at_alert = sharedVitals(shared, patient_id);
   const reasons = {
     ...evaluate(symptoms, vitals_at_alert || {}),
     inputs: { symptoms, vitals: vitals_at_alert ? Object.fromEntries(VITAL_KEYS.map((k) => [k, vitals_at_alert[k]])) : {},

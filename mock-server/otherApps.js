@@ -67,7 +67,7 @@ function familyView(pid) {
   const p = store.patients[pid];
   const e = latestLive(pid);
   const view = { patient_id: pid, name: p.name, shared_fields: shared(p), simulated: true, active_emergency: null };
-  if (p.consents.vitals) { const { timestamp, ...v } = vitals.currentVitals(); view.vitals = { ...v, timestamp }; }
+  if (p.consents.vitals) { const { timestamp, ...v } = vitals.currentVitals(pid); view.vitals = { ...v, timestamp }; }
   if (e && e.state !== 'EMERGENCY_DETECTED') {
     const sent = bothOn(e.consents || p.consents, p.consents); // what was shared when the SOS was sent AND what is still shared now
     view.active_emergency = { id: e.id, state: e.state, started_at: e.status_events[0].timestamp,
@@ -217,6 +217,7 @@ router.post('/privacy-requests', requireAuth, need('PATIENT', 'ADMIN'), (req, re
 // A verified volunteer gets only responder.alert (no identity). Anyone else gets nothing.
 function filterFor(user, event) {
   if (event.type === 'data.accessed') return user && user.role === 'PATIENT' ? event : null; // only the patient hears who looked
+  if (user && user.role === 'PATIENT' && event.type === 'vitals.update') return event.payload && event.payload.patient_id === user.patient_id ? event : null;
   // A patient's phone hears only its own alerts (live position, heart rate and the alert details of other patients stay private).
   if (user && user.role === 'PATIENT' && event.emergency_id) {
     const own = store.emergencies.get(event.emergency_id);

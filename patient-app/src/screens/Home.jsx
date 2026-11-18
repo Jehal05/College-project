@@ -26,7 +26,7 @@ const QUICK = [['/passport', 'qr', 'home.passport'], ['/hospitals', 'hospital', 
 export default function Home() {
   const { t } = useTranslation();
   const { session, signOut } = useAuth();
-  const { vitals, connected } = useVitals();
+  const { vitals, connected } = useVitals(session.patient_id);
   const { baseline, status: baselineStatus, reload: reloadBaseline } = useBaseline(session.patient_id);
   const { consents } = useConsents(session.patient_id);
   const strap = useHeartStrap(!!consents && consents.vitals === true);

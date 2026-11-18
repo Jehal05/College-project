@@ -44,9 +44,9 @@
   <table id="accounts"><tr><th>Login</th><th>Password</th></tr></table>
   <p>These logins exist only in this run. The passwords are never put in a QR code.</p>
   <p><button id="reset" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Reset demo</button> <span id="reset-msg" role="status"></span><br>Clears alerts and passports and restores the five patients. Do this before each run.</p>
-  <p>Simulated wearable: <button id="v-normal" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Resting vitals</button>
-    <button id="v-heart" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #b91c1c;background:#fff;cursor:pointer">Heart emergency vitals</button> <span id="v-msg" role="status"></span><br>
-    Switch before sending the alert so the patient's Home shows a fast heart rate and low oxygen. Simulated data only. Reset demo sets it back to resting.</p>
+  <h2>Simulated wearable, one per patient</h2>
+  <p>Pick a situation for one patient. Only that patient changes: their Home screen, their live vitals and the vitals in the alert the hospital sees. The others stay resting. Reset demo sets everyone back to resting. <span id="v-msg" role="status"></span></p>
+  <table id="wearables"><tr><th>Patient</th><th>Now</th><th>Set to</th></tr></table>
   <h2>Real parts of this demo</h2>
   <ul id="real">
     <li><strong>Saved data:</strong> <span id="r-store">checking...</span></li>
@@ -72,11 +72,29 @@
     fetch('/api/demo/reset-local', { method: 'POST' }).then((r) => { document.getElementById('reset-msg').textContent = r.ok ? 'Demo reset.' : 'Reset only works on the laptop that runs the demo.'; })
       .catch(() => { document.getElementById('reset-msg').textContent = 'Server not reachable.'; });
   });
-  const setVitals = (profile, label) => fetch('/api/demo/vitals-local', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ profile }) })
-    .then((r) => { document.getElementById('v-msg').textContent = r.ok ? label : 'Only works on the laptop that runs the demo.'; })
-    .catch(() => { document.getElementById('v-msg').textContent = 'Server not reachable.'; });
-  document.getElementById('v-normal').addEventListener('click', () => setVitals('normal', 'Resting vitals on.'));
-  document.getElementById('v-heart').addEventListener('click', () => setVitals('heart_attack', 'Heart emergency vitals on (simulated).'));
+  const LABEL = { normal: 'Resting', heart_attack: 'Heart emergency', stroke: 'Stroke signs', low_glucose: 'Low sugar', asthma: 'Asthma attack' };
+  const msg = (text) => { document.getElementById('v-msg').textContent = text; };
+  function drawWearables() {
+    fetch('/api/demo/vitals-profiles').then((r) => { if (!r.ok) throw new Error('local'); return r.json(); }).then((d) => {
+      const t = document.getElementById('wearables');
+      while (t.rows.length > 1) t.deleteRow(1);
+      d.patients.forEach((p) => {
+        const tr = t.insertRow();
+        tr.insertCell().textContent = p.name;
+        const now = tr.insertCell(); now.textContent = LABEL[p.profile] || p.profile; if (p.profile !== 'normal') now.style.cssText = 'color:#b91c1c;font-weight:700';
+        const set = tr.insertCell();
+        d.profiles.forEach((name) => {
+          const b = document.createElement('button'); b.type = 'button'; b.textContent = LABEL[name] || name;
+          b.style.cssText = 'margin:.15rem;padding:.4rem .7rem;border-radius:.5rem;border:2px solid ' + (name === 'normal' ? '#334155' : '#b91c1c') + ';background:#fff;cursor:pointer';
+          b.addEventListener('click', () => fetch('/api/demo/vitals-local', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patient_id: p.id, profile: name }) })
+            .then((r) => { msg(r.ok ? p.name + ': ' + (LABEL[name] || name) + ' (simulated).' : 'Did not work.'); drawWearables(); }).catch(() => msg('Server not reachable.')));
+          set.appendChild(b);
+        });
+      });
+    }).catch(() => msg('Only works on the laptop that runs the demo.'));
+  }
+  drawWearables();
+  document.getElementById('reset').addEventListener('click', () => setTimeout(drawWearables, 400));
   fetch('/api/demo/live-status').then((r) => r.json()).then((d) => {
     const st = d.storage || {}, ph = d.phone_alerts || {};
     document.getElementById('r-store').textContent = st.enabled ? 'on, in a SQLite file (' + st.emergencies + ' alerts, ' + st.events + ' events saved so far)' : 'off (memory only, needs Node 22.5 or newer)';

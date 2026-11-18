@@ -11,35 +11,42 @@ const ALIASES = { HEART: 'heart_attack', STROKE: 'stroke', DIABETIC: 'low_glucos
 const LIMITS = { heart_rate: [20, 250], spo2: [50, 100], bp_sys: [60, 260], bp_dia: [30, 160], glucose: [20, 600], resp_rate: [4, 60] };
 const VITALS = Object.keys(LIMITS);
 
-const state = { profile: 'normal', overrides: {} };
+const state = { profile: 'normal', overrides: {} }; // the default: every patient without a profile of their own
+const perPatient = new Map();                       // patient id -> { profile, overrides } (Heart emergency for ONE patient)
 let last = null;
+const stateFor = (patientId) => (patientId && perPatient.get(patientId)) || state;
 
 const randomInt = (min, max) => Math.floor(min + Math.random() * (max - min + 1));
 const profileName = (name) => (PROFILES[name] ? name : ALIASES[name] || null);
 
 // One reading "now" for the active profile, with any pinned values applied.
-function currentVitals() {
-  const base = PROFILES[state.profile];
+function currentVitals(patientId) {
+  const st = stateFor(patientId);
+  const base = PROFILES[st.profile];
   const r = {};
-  VITALS.forEach((k) => { r[k] = k in state.overrides ? state.overrides[k] : randomInt(base[k][0], base[k][1]); });
+  VITALS.forEach((k) => { r[k] = k in st.overrides ? st.overrides[k] : randomInt(base[k][0], base[k][1]); });
   r.bp = r.bp_sys + '/' + r.bp_dia;
-  r.profile = state.profile;
+  r.profile = st.profile;
   r.timestamp = new Date().toISOString();
   last = r;
   return r;
 }
 
 // Validates first and changes nothing when anything is wrong. Returns { status, body }.
-function applyChange(body) {
+// With a patient_id the change applies to that patient only (unknown patients are refused); without one it changes the default.
+function applyChange(body, knownPatient = () => true) {
   const known = ['patient_id', 'profile', 'overrides'];
   const extra = Object.keys(body || {}).filter((k) => !known.includes(k));
   if (!body || typeof body !== 'object' || extra.length) return { status: 422, body: { error: 'Unknown field: ' + (extra[0] || 'body') } };
-  let wanted = state.profile;
+  const pid = body && body.patient_id;
+  if (pid !== undefined && (typeof pid !== 'string' || !knownPatient(pid))) return { status: 404, body: { error: 'Patient not found' } };
+  const target = stateFor(pid);
+  let wanted = target.profile;
   if (body.profile !== undefined) {
     wanted = profileName(body.profile);
     if (!wanted) return { status: 400, body: { error: 'Unknown profile. Use: ' + Object.keys(PROFILES).join(', ') } };
   }
-  let next = { ...state.overrides };
+  let next = { ...target.overrides };
   if (body.overrides !== undefined) {
     const o = body.overrides;
     if (!o || typeof o !== 'object' || Array.isArray(o)) return { status: 400, body: { error: 'overrides must be an object' } };
@@ -53,21 +60,23 @@ function applyChange(body) {
       next[k] = v;
     }
   }
-  state.profile = wanted;
-  state.overrides = next;
-  return { status: 200, body: { profile: state.profile, overrides: { ...state.overrides }, reading: currentVitals(), simulated: true } };
+  if (pid !== undefined) perPatient.set(pid, { profile: wanted, overrides: next });
+  else { state.profile = wanted; state.overrides = next; }
+  const now = stateFor(pid);
+  return { status: 200, body: { ...(pid !== undefined ? { patient_id: pid } : {}), profile: now.profile, overrides: { ...now.overrides }, reading: currentVitals(pid), simulated: true } };
 }
 
-const reset = () => { state.profile = 'normal'; state.overrides = {}; last = null; };
-const snapshot = () => ({ profile: state.profile, overrides: { ...state.overrides }, profiles: Object.keys(PROFILES) });
+const reset = () => { state.profile = 'normal'; state.overrides = {}; perPatient.clear(); last = null; };
+const snapshot = () => ({ profile: state.profile, overrides: { ...state.overrides }, profiles: Object.keys(PROFILES), patients: Object.fromEntries([...perPatient].map(([id, s]) => [id, s.profile])) });
+const profileOf = (patientId) => stateFor(patientId).profile;
 
 
 // The readings the rules engine and the summary use. Only when the patient shares vitals.
 const VITAL_KEYS = ['heart_rate', 'spo2', 'bp_sys', 'bp_dia', 'glucose', 'resp_rate'];
-function sharedVitals(consents) {
+function sharedVitals(consents, patientId) {
   if (consents && consents.vitals === false) return null;
-  const reading = currentVitals();
+  const reading = currentVitals(patientId);
   return { ...Object.fromEntries(VITAL_KEYS.map((k) => [k, reading[k]])), timestamp: reading.timestamp };
 }
 
-module.exports = { sharedVitals, VITAL_KEYS, currentVitals, applyChange, reset, snapshot, PROFILES, VITALS, LIMITS };
+module.exports = { profileOf, sharedVitals, VITAL_KEYS, currentVitals, applyChange, reset, snapshot, PROFILES, VITALS, LIMITS };

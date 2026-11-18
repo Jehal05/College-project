@@ -22,7 +22,7 @@ router.post('/demo/no-ack', requireAuth, (req, res) => {
   res.json({ no_ack: escalation.noAck() });
 });
 router.post('/demo/vitals', requireAuth, (req, res) => {
-  const { status, body } = vitals.applyChange(req.body);
+  const { status, body } = vitals.applyChange(req.body, (id) => Boolean(require('./store').patients[id]));
   res.status(status).json(body);
 });
 

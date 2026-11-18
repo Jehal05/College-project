@@ -57,7 +57,7 @@ router.patch('/patients/:id', requireAuth, (req, res) => {
 
 router.get('/patients/:id/vitals', requireAuth, (req, res) => {
   if (!store.patients[req.params.id]) return res.status(404).json({ error: 'Patient not found' });
-  res.json(vitals.currentVitals());
+  res.json(vitals.currentVitals(req.params.id));
 });
 
 // Consents, contacts, reports and baseline (Phase 3) live in their own file.
@@ -158,8 +158,9 @@ router.post('/demo/vitals-local', (req, res) => {
   const ip = req.socket.remoteAddress || '';
   if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
   const profile = req.body && req.body.profile;
-  if (!['normal', 'heart_attack'].includes(profile)) return res.status(400).json({ error: 'profile must be normal or heart_attack' });
-  const { status, body } = vitals.applyChange({ profile });
+  const patientId = req.body && req.body.patient_id;
+  if (!vitals.PROFILES[profile]) return res.status(400).json({ error: 'profile must be one of ' + Object.keys(vitals.PROFILES).join(', ') });
+  const { status, body } = vitals.applyChange({ profile, ...(patientId ? { patient_id: patientId } : {}) }, (id) => Boolean(store.patients[id]));
   res.status(status).json(body);
 });
 
@@ -173,6 +174,12 @@ router.post('/demo/notify-test-local', async (req, res) => {
   if (!loopback(req)) return res.status(403).json({ error: 'Local only' });
   const results = await require('./notify').testMessage();
   res.json({ sent: results.filter((r) => r.ok).length, failed: results.filter((r) => !r.ok).length, channels: [...new Set(results.map((r) => r.channel))] });
+});
+
+// Which profile each patient has now (the /start page shows it). Local computer only.
+router.get('/demo/vitals-profiles', (req, res) => {
+  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress || '')) return res.status(403).json({ error: 'Local only' });
+  res.json({ patients: Object.values(store.patients).map((p) => ({ id: p.id, name: p.name, profile: vitals.profileOf(p.id) })), profiles: Object.keys(vitals.PROFILES) });
 });
 
 // The cities the apps offer (same answer as the backend's GET /cities).

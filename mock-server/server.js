@@ -12,6 +12,7 @@ const simulator = require('./simulator');
 const failMode = require('./failMode');
 const compat = require('./compat');
 const wsAuth = require('./wsAuth');
+const store = require('./store');
 const persist = require('./persist');
 const notify = require('./notify');
 
@@ -60,15 +61,16 @@ simulator.setServer(wss); // the simulator uses it to broadcast emergency events
 
 // Every second, send a vitals.update event to every connected client.
 setInterval(() => {
-  const v = vitals.currentVitals();
-  const event = {
-    type: 'vitals.update',
-    emergency_id: null,
-    state: 'MONITORING',
-    timestamp: v.timestamp,
-    payload: { patient_id: 'PT-2026-0417', heart_rate: v.heart_rate, spo2: v.spo2, bp: v.bp, bp_sys: v.bp_sys, bp_dia: v.bp_dia, glucose: v.glucose, resp_rate: v.resp_rate },
-  };
-  simulator.broadcast(event);
+  for (const patientId of Object.keys(store.patients)) { // each patient has their own simulated wearable
+    const v = vitals.currentVitals(patientId);
+    simulator.broadcast({
+      type: 'vitals.update',
+      emergency_id: null,
+      state: 'MONITORING',
+      timestamp: v.timestamp,
+      payload: { patient_id: patientId, heart_rate: v.heart_rate, spo2: v.spo2, bp: v.bp, bp_sys: v.bp_sys, bp_dia: v.bp_dia, glucose: v.glucose, resp_rate: v.resp_rate },
+    });
+  }
 }, 1000);
 
 // Node closes idle connections after 5 s; a browser that reuses one at that moment can see a request stall. Keep them open longer.
