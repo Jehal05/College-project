@@ -64,7 +64,7 @@ test('summarise: counts, averages, escalations and ambulance use', () => {
   const s = summarise([a, b, c, open], [{ id: 'AMB-1', call_sign: 'Alpha 1' }]);
   assert.equal(s.total, 4);
   assert.deepEqual([s.finished, s.cancelled, s.open], [2, 1, 1]);
-  assert.deepEqual(s.byType, { HEART: 1, STROKE: 1, DIABETIC: 1, ASTHMA: 1 });
+  assert.deepEqual(s.byType, { HEART: 1, STROKE: 1, DIABETIC: 1, ASTHMA: 1, ACCIDENT: 0, SEIZURE: 0, ALLERGIC: 0, POISONING: 0, BURN: 0, PREGNANCY: 0 });
   assert.deepEqual(s.bySeverity, { EMERGENCY: 2, URGENT: 2, WATCH: 0 });
   assert.equal(s.byState.CANCELLED, 1);
   assert.deepEqual(s.averages.alert_to_ack, { count: 2, seconds: 30 }); // (20 + 40) / 2

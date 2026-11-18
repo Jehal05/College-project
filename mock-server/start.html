@@ -72,7 +72,7 @@
     fetch('/api/demo/reset-local', { method: 'POST' }).then((r) => { document.getElementById('reset-msg').textContent = r.ok ? 'Demo reset.' : 'Reset only works on the laptop that runs the demo.'; })
       .catch(() => { document.getElementById('reset-msg').textContent = 'Server not reachable.'; });
   });
-  const LABEL = { normal: 'Resting', heart_attack: 'Heart emergency', stroke: 'Stroke signs', low_glucose: 'Low sugar', asthma: 'Asthma attack' };
+  const LABEL = { normal: 'Resting', heart_attack: 'Heart emergency', stroke: 'Stroke signs', low_glucose: 'Low sugar', asthma: 'Asthma attack', accident: 'Accident', seizure: 'Seizure', allergic: 'Allergic reaction', poisoning: 'Poisoning', burn: 'Burn', pregnancy: 'Pregnancy emergency' };
   const msg = (text) => { document.getElementById('v-msg').textContent = text; };
   function drawWearables() {
     fetch('/api/demo/vitals-profiles').then((r) => { if (!r.ok) throw new Error('local'); return r.json(); }).then((d) => {

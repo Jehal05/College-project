@@ -6,8 +6,14 @@ const PROFILES = {
   stroke:       { heart_rate: [85, 95],   spo2: [96, 97], bp_sys: [192, 198], bp_dia: [108, 112], glucose: [125, 135], resp_rate: [17, 19] },
   low_glucose:  { heart_rate: [105, 115], spo2: [97, 98], bp_sys: [108, 112], bp_dia: [68, 72],   glucose: [48, 56],   resp_rate: [17, 19] },
   asthma:       { heart_rate: [110, 120], spo2: [88, 91], bp_sys: [128, 132], bp_dia: [83, 87],   glucose: [108, 112], resp_rate: [27, 30] },
+  accident:   { heart_rate: [112, 126], spo2: [94, 96], bp_sys: [92, 102], bp_dia: [58, 66], glucose: [100, 110], resp_rate: [20, 24] },
+  seizure:    { heart_rate: [118, 132], spo2: [90, 94], bp_sys: [128, 138], bp_dia: [82, 88], glucose: [105, 115], resp_rate: [22, 26] },
+  allergic:   { heart_rate: [120, 136], spo2: [89, 93], bp_sys: [84, 92], bp_dia: [50, 58], glucose: [100, 110], resp_rate: [24, 28] },
+  poisoning:  { heart_rate: [102, 116], spo2: [93, 96], bp_sys: [100, 110], bp_dia: [62, 70], glucose: [95, 110], resp_rate: [14, 18] },
+  burn:       { heart_rate: [108, 124], spo2: [93, 96], bp_sys: [104, 114], bp_dia: [66, 74], glucose: [105, 120], resp_rate: [20, 24] },
+  pregnancy:  { heart_rate: [98, 110], spo2: [96, 98], bp_sys: [150, 160], bp_dia: [98, 104], glucose: [95, 105], resp_rate: [18, 20] },
 };
-const ALIASES = { HEART: 'heart_attack', STROKE: 'stroke', DIABETIC: 'low_glucose', ASTHMA: 'asthma' };
+const ALIASES = { HEART: 'heart_attack', STROKE: 'stroke', DIABETIC: 'low_glucose', ASTHMA: 'asthma', ACCIDENT: 'accident', SEIZURE: 'seizure', ALLERGIC: 'allergic', POISONING: 'poisoning', BURN: 'burn', PREGNANCY: 'pregnancy' };
 const LIMITS = { heart_rate: [20, 250], spo2: [50, 100], bp_sys: [60, 260], bp_dia: [30, 160], glucose: [20, 600], resp_rate: [4, 60] };
 const VITALS = Object.keys(LIMITS);
 

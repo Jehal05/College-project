@@ -14,7 +14,7 @@ export const EMERGENCY_STATES = [
 ];
 export const EXTRA_STATES = ['CANCELLED', 'ESCALATED'];
 
-export const EMERGENCY_TYPES = ['HEART', 'STROKE', 'DIABETIC', 'ASTHMA'];
+export const EMERGENCY_TYPES = ['HEART', 'STROKE', 'DIABETIC', 'ASTHMA', 'ACCIDENT', 'SEIZURE', 'ALLERGIC', 'POISONING', 'BURN', 'PREGNANCY'];
 // UNKNOWN = the safety check-in started the alert with no symptoms (source FALL_CHECK or INACTIVITY_CHECK).
 // Jehal's app sends it; it is not in the day-1 contract yet (see docs/PROPOSED_ENDPOINTS_FOR_DAKSH.md).
 export const EXTRA_TYPES = ['UNKNOWN'];
@@ -44,6 +44,12 @@ export const REQUIRED_CAPABILITIES = {
   STROKE: ['stroke_unit', 'emergency'],
   DIABETIC: ['emergency'],
   ASTHMA: ['icu', 'emergency'],
+  ACCIDENT: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
+  SEIZURE: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
+  ALLERGIC: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
+  POISONING: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
+  BURN: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
+  PREGNANCY: ['emergency'], // no trauma, burn or maternity capability in the hospital data yet
   UNKNOWN: ['emergency'], // nothing is known yet, so only an emergency department is required
 };
 
@@ -59,6 +65,12 @@ export const TYPE_LABELS = {
   STROKE: 'Stroke',
   DIABETIC: 'Diabetic emergency',
   ASTHMA: 'Severe asthma',
+  ACCIDENT: 'Accident or bleeding',
+  SEIZURE: 'Seizure',
+  ALLERGIC: 'Severe allergic reaction',
+  POISONING: 'Poisoning',
+  BURN: 'Burns',
+  PREGNANCY: 'Pregnancy or childbirth',
   UNKNOWN: 'Safety check-in (no symptoms)',
 };
 
@@ -88,6 +100,12 @@ export const SPECIALTY_FOR_TYPE = {
   STROKE: 'Neurology',
   DIABETIC: 'Emergency Medicine',
   ASTHMA: 'Pulmonology',
+  ACCIDENT: 'Emergency Medicine',
+  SEIZURE: 'Emergency Medicine',
+  ALLERGIC: 'Emergency Medicine',
+  POISONING: 'Emergency Medicine',
+  BURN: 'Emergency Medicine',
+  PREGNANCY: 'Obstetrics',
   UNKNOWN: 'Emergency Medicine',
 };
 

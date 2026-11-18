@@ -1,7 +1,87 @@
 {
-  "GENERAL": ["instructions.general1", "instructions.general2", "instructions.general3"],
-  "HEART":    { "reviewed": false, "lines": [] },
-  "STROKE":   { "reviewed": false, "lines": [] },
-  "DIABETIC": { "reviewed": false, "lines": [] },
-  "ASTHMA":   { "reviewed": false, "lines": [] }
+  "GENERAL": [
+    "instructions.general1",
+    "instructions.general2",
+    "instructions.general3"
+  ],
+  "HEART": {
+    "reviewed": false,
+    "lines": [
+      "tip.HEART.1",
+      "tip.HEART.2",
+      "tip.HEART.3"
+    ]
+  },
+  "STROKE": {
+    "reviewed": false,
+    "lines": [
+      "tip.STROKE.1",
+      "tip.STROKE.2",
+      "tip.STROKE.3"
+    ]
+  },
+  "DIABETIC": {
+    "reviewed": false,
+    "lines": [
+      "tip.DIABETIC.1",
+      "tip.DIABETIC.2",
+      "tip.DIABETIC.3"
+    ]
+  },
+  "ASTHMA": {
+    "reviewed": false,
+    "lines": [
+      "tip.ASTHMA.1",
+      "tip.ASTHMA.2",
+      "tip.ASTHMA.3"
+    ]
+  },
+  "ACCIDENT": {
+    "reviewed": false,
+    "lines": [
+      "tip.ACCIDENT.1",
+      "tip.ACCIDENT.2",
+      "tip.ACCIDENT.3"
+    ]
+  },
+  "SEIZURE": {
+    "reviewed": false,
+    "lines": [
+      "tip.SEIZURE.1",
+      "tip.SEIZURE.2",
+      "tip.SEIZURE.3"
+    ]
+  },
+  "ALLERGIC": {
+    "reviewed": false,
+    "lines": [
+      "tip.ALLERGIC.1",
+      "tip.ALLERGIC.2",
+      "tip.ALLERGIC.3"
+    ]
+  },
+  "POISONING": {
+    "reviewed": false,
+    "lines": [
+      "tip.POISONING.1",
+      "tip.POISONING.2",
+      "tip.POISONING.3"
+    ]
+  },
+  "BURN": {
+    "reviewed": false,
+    "lines": [
+      "tip.BURN.1",
+      "tip.BURN.2",
+      "tip.BURN.3"
+    ]
+  },
+  "PREGNANCY": {
+    "reviewed": false,
+    "lines": [
+      "tip.PREGNANCY.1",
+      "tip.PREGNANCY.2",
+      "tip.PREGNANCY.3"
+    ]
+  }
 }

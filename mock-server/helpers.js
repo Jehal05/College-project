@@ -44,6 +44,7 @@ const DEMO_LOCATION = cityStart(DEFAULT_CITY);
 // What each emergency type needs from a hospital: [capability key, availability key that must also be true].
 const REQUIRED = {
   HEART: ['cath_lab', 'cath_lab_ready'], STROKE: ['stroke_unit', 'stroke_unit_ready'], ASTHMA: ['icu', null], DIABETIC: ['emergency', null],
+  ACCIDENT: ['emergency', null], SEIZURE: ['emergency', null], ALLERGIC: ['emergency', null], POISONING: ['emergency', null], BURN: ['emergency', null], PREGNANCY: ['emergency', null], // no trauma, burn or maternity capability in the hospital data yet
 };
 
 // Ranks the verified hospitals: suitable ones first (capability present and ready), then by distance.

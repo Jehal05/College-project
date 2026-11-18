@@ -52,6 +52,7 @@ Four browser tests remain in `patient-app/tests/browser` (passport, created aler
 ## Honest limits
 
 - The ambulance, the hospitals' replies and the patients' contacts are simulated. No real hospital, ambulance, 112/108 call or patient SMS exists. Real parts: SQLite saving, phone alerts to the team's own phones, live GPS and strap heart rate, pop-ups on a second device (see [`docs/GO_LIVE.md`](docs/GO_LIVE.md); the phone and GPS parts are not tested from the build sandbox).
+- Ten emergency types are built in: Heart, Stroke, Diabetic, Asthma, Accident or bleeding, Seizure, Severe allergic reaction, Poisoning, Burns, Pregnancy or childbirth. Each has its own symptoms, simulated vitals, draft alert rules, a staff checklist and short first-aid suggestions. The suggestions are shown under a clear "Draft, not reviewed by a doctor" label, and the hospital ranking is emergency-department first because the hospital data has no trauma, burn or maternity capability. Not a diagnosis tool.
 - The rules that spot emergencies are a draft, pending doctor review. The Hindi and Gujarati text has not been reviewed by a native reader.
 - Hospital ranking and list ETAs use straight-line distance; the portal's tracking map can use real road routes (OSRM) and falls back to a labelled simulated route.
 - Heart rate from a Bluetooth chest strap is shown on the patient screen and, with the vitals consent, streamed to the hospital screen during an open alert. Without a strap the hospital sees the simulated vitals, labelled.

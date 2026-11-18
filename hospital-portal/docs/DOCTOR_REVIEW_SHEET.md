@@ -18,6 +18,12 @@ The portal ranks only hospitals that have these capabilities, before it looks at
 | Stroke | Stroke Unit, Emergency |  |  |
 | Diabetic emergency | Emergency |  |  |
 | Severe asthma | ICU, Emergency |  |  |
+| Accident or bleeding | Emergency |  |  |
+| Seizure | Emergency |  |  |
+| Severe allergic reaction | Emergency |  |  |
+| Poisoning | Emergency |  |  |
+| Burns | Emergency |  |  |
+| Pregnancy or childbirth | Emergency |  |  |
 | Safety check-in (no symptoms) | Emergency |  |  |
 
 ## 2. Severity used in the sample alerts
@@ -108,6 +114,60 @@ The patient app sends symptom codes; the portal shows these words to the hospita
 | 2 | Try to reach the patient or their contacts for symptoms | ☐ OK    ☐ Remove    Change to: |  |
 | 3 | Emergency bay and basic monitoring ready | ☐ OK    ☐ Remove    Change to: |  |
 | 4 | Read allergies and medicines from the health passport | ☐ OK    ☐ Remove    Change to: |  |
+
+### Accident or bleeding
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Alert the trauma or surgical team on call | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Prepare a blood group and cross-match request | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Keep the neck stabilised until it is cleared | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Check tetanus status in the health passport | ☐ OK    ☐ Remove    Change to: |  |
+
+### Seizure
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Inform the duty physician | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Check blood glucose at the bay | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Protect from injury and keep the airway clear | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Read epilepsy medicines from the health passport | ☐ OK    ☐ Remove    Change to: |  |
+
+### Severe allergic reaction
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Inform the duty physician at once | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Prepare adrenaline and airway equipment per hospital protocol | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Read allergies from the health passport | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Keep the patient under observation after treatment | ☐ OK    ☐ Remove    Change to: |  |
+
+### Poisoning
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Inform the duty physician | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Ask the crew what was taken, how much and when | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Contact the poison information centre | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Read medicines and allergies from the health passport | ☐ OK    ☐ Remove    Change to: |  |
+
+### Burns
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Inform the duty physician | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Prepare burns dressing and fluids per protocol | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Check the airway if smoke was breathed | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Confirm a burns or ICU bed if needed | ☐ OK    ☐ Remove    Change to: |  |
+
+### Pregnancy or childbirth
+
+| No. | Checklist item (as shown in the portal) | OK / change to / remove | Comment |
+| --- | --- | --- | --- |
+| 1 | Inform the duty physician and the obstetrics team | ☐ OK    ☐ Remove    Change to: |  |
+| 2 | Prepare the delivery and newborn care area | ☐ OK    ☐ Remove    Change to: |  |
+| 3 | Check blood pressure on arrival | ☐ OK    ☐ Remove    Change to: |  |
+| 4 | Confirm a maternity bed if needed | ☐ OK    ☐ Remove    Change to: |  |
 
 ## 5. Sign-off
 

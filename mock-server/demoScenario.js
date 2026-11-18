@@ -11,11 +11,17 @@ const DEFAULT_SYMPTOMS = {
   STROKE: ['FACE_DROOP', 'LIMB_WEAKNESS', 'SLURRED_SPEECH'],
   DIABETIC: ['DIA_CONFUSION', 'DIA_SHAKING', 'LOW_GLUCOSE_READING'],
   ASTHMA: ['WHEEZING', 'CANNOT_SPEAK_SENTENCES', 'SEVERE_SHORT_BREATH'],
+  ACCIDENT: ['SEVERE_BLEEDING',  'HEAD_INJURY'],
+  SEIZURE: ['SEIZURE_ONGOING',  'SEIZURE_LONG'],
+  ALLERGIC: ['ALLERGY_SWELLING',  'ALLERGY_BREATH',  'ALLERGY_TRIGGER'],
+  POISONING: ['POISON_SWALLOWED',  'POISON_DROWSY'],
+  BURN: ['BURN_LARGE',  'BURN_FACE'],
+  PREGNANCY: ['PREG_LABOUR',  'PREG_WATER'],
 };
 
 router.post('/demo/scenario', requireAuth, (req, res) => {
   const type = req.body && req.body.type;
-  if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be HEART, STROKE, DIABETIC or ASTHMA' });
+  if (!DEFAULT_SYMPTOMS[type]) return res.status(400).json({ error: 'type must be one of ' + Object.keys(DEFAULT_SYMPTOMS).join(', ') + '' });
   const patient = store.patients[(req.body && req.body.patient_id) || 'PT-2026-0417'];
   if (!patient) return res.status(404).json({ error: 'Patient not found' });
   const asked = req.body && req.body.city_id;

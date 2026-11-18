@@ -19,7 +19,7 @@ import Icon from '../components/icons';
 // Voice input is optional and needs the network, so it loads on demand instead of being part of the offline install.
 const VoiceSymptoms = lazy(() => import('../components/VoiceSymptoms').catch(() => ({ default: () => null })));
 
-const CATEGORY_ICON = { HEART: 'heart', STROKE: 'bolt', DIABETIC: 'drop', ASTHMA: 'wind' };
+const CATEGORY_ICON = { HEART: 'heart', STROKE: 'bolt', DIABETIC: 'drop', ASTHMA: 'wind', ACCIDENT: 'ambulance', SEIZURE: 'activity', ALLERGIC: 'shield', POISONING: 'pill', BURN: 'alert', PREGNANCY: 'users' };
 
 export default function Symptoms() {
   const { t } = useTranslation();

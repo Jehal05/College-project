@@ -103,4 +103,69 @@ export const VOICE_KEYWORDS = {
     hi: ['होंठ नीले', 'होंठ नीला', 'नीले होंठ'],
     gu: ['હોઠ ભૂરા', 'હોઠ વાદળી', 'ભૂરા હોઠ'],
   },
+  SEVERE_BLEEDING: {
+    en: ['heavy bleeding', 'bleeding a lot', 'blood everywhere'],
+    hi: [],
+    gu: [],
+  },
+  HEAD_INJURY: {
+    en: ['head injury', 'hit my head', 'hit his head', 'hit her head'],
+    hi: [],
+    gu: [],
+  },
+  BROKEN_BONE: {
+    en: ['broken bone', 'broke my leg', 'broke my arm'],
+    hi: [],
+    gu: [],
+  },
+  SEIZURE_ONGOING: {
+    en: ['having a seizure', 'having a fit', 'seizure'],
+    hi: [],
+    gu: [],
+  },
+  ALLERGY_SWELLING: {
+    en: ['face is swelling', 'lips are swelling', 'swollen face', 'swollen tongue'],
+    hi: [],
+    gu: [],
+  },
+  ALLERGY_HIVES: {
+    en: ['hives', 'rash all over'],
+    hi: [],
+    gu: [],
+  },
+  POISON_SWALLOWED: {
+    en: ['swallowed poison', 'drank poison', 'overdose', 'swallowed pills', 'swallowed bleach'],
+    hi: [],
+    gu: [],
+  },
+  POISON_FUMES: {
+    en: ['breathed smoke', 'gas leak', 'inhaled fumes'],
+    hi: [],
+    gu: [],
+  },
+  BURN_LARGE: {
+    en: ['big burn', 'burnt badly', 'burned badly'],
+    hi: [],
+    gu: [],
+  },
+  BURN_ELECTRIC_CHEM: {
+    en: ['electric shock', 'chemical burn'],
+    hi: [],
+    gu: [],
+  },
+  PREG_LABOUR: {
+    en: ['labour pain', 'labor pain', 'contractions', 'in labour'],
+    hi: [],
+    gu: [],
+  },
+  PREG_WATER: {
+    en: ['water broke', 'water has broken'],
+    hi: [],
+    gu: [],
+  },
+  PREG_BLEEDING: {
+    en: ['bleeding in pregnancy', 'pregnant and bleeding'],
+    hi: [],
+    gu: [],
+  },
 };

@@ -6,6 +6,12 @@
     "STROKE": ["stroke_unit", "emergency"],
     "DIABETIC": ["emergency"],
     "ASTHMA": ["icu", "emergency"],
+    "ACCIDENT": ["emergency"],
+    "SEIZURE": ["emergency"],
+    "ALLERGIC": ["emergency"],
+    "POISONING": ["emergency"],
+    "BURN": ["emergency"],
+    "PREGNANCY": ["emergency"],
     "UNKNOWN": ["emergency"]
   },
   "scoring": {

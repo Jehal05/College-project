@@ -20,6 +20,7 @@ Everything is simulated. Say so at the start: the banner on every screen says "S
 | 1:30 | Press **Send now** | "Alert sent". Window B: the alert appears in the queue with a map |
 | 2:00 | Window B: **Acknowledge**, then **Dispatch** an ambulance | Window A's timeline updates: hospital acknowledged, ambulance dispatched, ETA, arrived. The portal map follows the ambulance on road routes (a labelled simulated route if the routing server cannot be reached) |
 | 2:30 | Window A: on the red screen, look at **Live sharing with the hospital** (optionally connect a strap). Window B: open the alert | A green **Live from patient phone** card with the real position and heart rate. Your two phones buzzed with DEMO messages (if set up) |
+| 2:45 | Window A: start another alert, this time pick **Severe allergic reaction** or **Burns** (set that patient's wearable on `/start` first) | The red screen shows "Draft suggestions, not reviewed by a doctor" with short first-aid lines under "Call 112 / 108". The portal shows the type name and its staff checklist |
 | 3:00 | Window A: **Profile > Consent**, switch Location off | Saved. The next emergency says location sharing is off. Switch it back on |
 | 3:20 | **Hospitals** | Real street map with the fictional hospitals |
 | 3:40 | **Health passport**: keep all fields, 24 hours, **Create** | QR on a card with "Demo profile" |

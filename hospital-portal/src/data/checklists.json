@@ -192,5 +192,185 @@
       "reviewed_on": null
     }
   ],
-  "_review": "Each item carries status ('draft' or 'reviewed'), reviewed_by and reviewed_on. A real doctor or medical teacher fills these in after reading docs/DOCTOR_REVIEW_SHEET.md. They stay null until then: nobody is named as a reviewer by default. The label 'Sample checklist. Pending medical review.' is switched off only by reviewedBy and reviewedOn in src/data/reviewStatus.js, not by these fields."
+  "_review": "Each item carries status ('draft' or 'reviewed'), reviewed_by and reviewed_on. A real doctor or medical teacher fills these in after reading docs/DOCTOR_REVIEW_SHEET.md. They stay null until then: nobody is named as a reviewer by default. The label 'Sample checklist. Pending medical review.' is switched off only by reviewedBy and reviewedOn in src/data/reviewStatus.js, not by these fields.",
+  "ACCIDENT": [
+    {
+      "id": "accident-1",
+      "text": "Alert the trauma or surgical team on call",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "accident-2",
+      "text": "Prepare a blood group and cross-match request",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "accident-3",
+      "text": "Keep the neck stabilised until it is cleared",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "accident-4",
+      "text": "Check tetanus status in the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ],
+  "SEIZURE": [
+    {
+      "id": "seizure-1",
+      "text": "Inform the duty physician",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "seizure-2",
+      "text": "Check blood glucose at the bay",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "seizure-3",
+      "text": "Protect from injury and keep the airway clear",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "seizure-4",
+      "text": "Read epilepsy medicines from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ],
+  "ALLERGIC": [
+    {
+      "id": "allergic-1",
+      "text": "Inform the duty physician at once",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "allergic-2",
+      "text": "Prepare adrenaline and airway equipment per hospital protocol",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "allergic-3",
+      "text": "Read allergies from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "allergic-4",
+      "text": "Keep the patient under observation after treatment",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ],
+  "POISONING": [
+    {
+      "id": "poisoning-1",
+      "text": "Inform the duty physician",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "poisoning-2",
+      "text": "Ask the crew what was taken, how much and when",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "poisoning-3",
+      "text": "Contact the poison information centre",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "poisoning-4",
+      "text": "Read medicines and allergies from the health passport",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ],
+  "BURN": [
+    {
+      "id": "burn-1",
+      "text": "Inform the duty physician",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "burn-2",
+      "text": "Prepare burns dressing and fluids per protocol",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "burn-3",
+      "text": "Check the airway if smoke was breathed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "burn-4",
+      "text": "Confirm a burns or ICU bed if needed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ],
+  "PREGNANCY": [
+    {
+      "id": "pregnancy-1",
+      "text": "Inform the duty physician and the obstetrics team",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "pregnancy-2",
+      "text": "Prepare the delivery and newborn care area",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "pregnancy-3",
+      "text": "Check blood pressure on arrival",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "pregnancy-4",
+      "text": "Confirm a maternity bed if needed",
+      "status": "draft",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ]
 }

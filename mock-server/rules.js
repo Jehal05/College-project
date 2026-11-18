@@ -5,7 +5,7 @@ const table = require('./data/rules.json');
 const { toEngineSymptoms } = require('./adapters');
 
 const RANK = { NONE: 0, WATCH: 1, URGENT: 2, EMERGENCY: 3 };
-const TYPE_PRIORITY = ['HEART', 'STROKE', 'DIABETIC', 'ASTHMA'];
+const TYPE_PRIORITY = ['HEART', 'STROKE', 'DIABETIC', 'ASTHMA', 'ACCIDENT', 'SEIZURE', 'ALLERGIC', 'POISONING', 'BURN', 'PREGNANCY'];
 const OPS = {
   lt: (v, n) => v < n, lte: (v, n) => v <= n, gt: (v, n) => v > n, gte: (v, n) => v >= n,
 };

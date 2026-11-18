@@ -97,7 +97,7 @@ async function send({ title, text, priority, emergencyId, link }) {
   return results;
 }
 
-const TYPE_LABEL = { HEART: 'Heart or chest', STROKE: 'Stroke signs', DIABETIC: 'Diabetic emergency', ASTHMA: 'Asthma or breathing' };
+const TYPE_LABEL = { HEART: 'Heart or chest', STROKE: 'Stroke signs', DIABETIC: 'Diabetic emergency', ASTHMA: 'Asthma or breathing', ACCIDENT: 'Accident or bleeding', SEIZURE: 'Seizure', ALLERGIC: 'Severe allergic reaction', POISONING: 'Poisoning', BURN: 'Burns', PREGNANCY: 'Pregnancy or childbirth' };
 
 // What each step says. Names are the fictional demo patient only; no phone numbers, no address, no medical history.
 function messageFor(event) {

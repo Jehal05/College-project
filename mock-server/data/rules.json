@@ -384,6 +384,337 @@
      }
     }
    }
+  },
+  {
+   "id": "ACCIDENT_SEVERE_BLEEDING",
+   "type": "ACCIDENT",
+   "severity": "EMERGENCY",
+   "reason": "Heavy bleeding that will not stop",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "severe_bleeding"
+    ]
+   }
+  },
+  {
+   "id": "ACCIDENT_CANNOT_MOVE_LIMBS",
+   "type": "ACCIDENT",
+   "severity": "EMERGENCY",
+   "reason": "Cannot move or feel arms or legs after an accident",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "cannot_move_limbs"
+    ]
+   }
+  },
+  {
+   "id": "ACCIDENT_HEAD_INJURY_UNCONSCIOUS",
+   "type": "ACCIDENT",
+   "severity": "EMERGENCY",
+   "reason": "Head injury with loss of consciousness",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "head_injury",
+     "unconscious_injury"
+    ]
+   }
+  },
+  {
+   "id": "ACCIDENT_HEAD_INJURY",
+   "type": "ACCIDENT",
+   "severity": "URGENT",
+   "reason": "Injury to the head",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "head_injury"
+    ]
+   }
+  },
+  {
+   "id": "ACCIDENT_BROKEN_BONE",
+   "type": "ACCIDENT",
+   "severity": "URGENT",
+   "reason": "Possible broken bone",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "broken_bone"
+    ]
+   }
+  },
+  {
+   "id": "SEIZURE_LONG",
+   "type": "SEIZURE",
+   "severity": "EMERGENCY",
+   "reason": "A fit lasting more than 5 minutes",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "seizure_long"
+    ]
+   }
+  },
+  {
+   "id": "SEIZURE_REPEAT",
+   "type": "SEIZURE",
+   "severity": "EMERGENCY",
+   "reason": "More than one fit in a row",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "seizure_repeat"
+    ]
+   }
+  },
+  {
+   "id": "SEIZURE_NOT_WAKING",
+   "type": "SEIZURE",
+   "severity": "EMERGENCY",
+   "reason": "Not waking up after a fit",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "seizure_not_waking"
+    ]
+   }
+  },
+  {
+   "id": "SEIZURE_ONGOING",
+   "type": "SEIZURE",
+   "severity": "URGENT",
+   "reason": "A fit is happening now",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "seizure_ongoing"
+    ]
+   }
+  },
+  {
+   "id": "ALLERGY_BREATHING",
+   "type": "ALLERGIC",
+   "severity": "EMERGENCY",
+   "reason": "Hard or noisy breathing with an allergic reaction",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "allergy_breath"
+    ]
+   }
+  },
+  {
+   "id": "ALLERGY_SWELLING_WITH_SIGNS",
+   "type": "ALLERGIC",
+   "severity": "EMERGENCY",
+   "reason": "Swelling of face, lips or tongue with breathing trouble, dizziness or a known trigger",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "allergy_swelling"
+    ],
+    "any_symptoms": [
+     "allergy_breath",
+     "allergy_dizzy",
+     "allergy_trigger"
+    ]
+   }
+  },
+  {
+   "id": "ALLERGY_LOW_BP",
+   "type": "ALLERGIC",
+   "severity": "EMERGENCY",
+   "reason": "Low blood pressure after a known trigger",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "allergy_trigger"
+    ],
+    "vitals": {
+     "bp_sys": {
+      "lt": 90
+     }
+    }
+   }
+  },
+  {
+   "id": "ALLERGY_HIVES_TRIGGER",
+   "type": "ALLERGIC",
+   "severity": "URGENT",
+   "reason": "Hives or rash after a known trigger",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "allergy_hives",
+     "allergy_trigger"
+    ]
+   }
+  },
+  {
+   "id": "POISON_SWALLOWED_DROWSY",
+   "type": "POISONING",
+   "severity": "EMERGENCY",
+   "reason": "Swallowed something harmful and very sleepy or breathing badly",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "poison_swallowed"
+    ],
+    "any_symptoms": [
+     "poison_drowsy",
+     "poison_breath"
+    ]
+   }
+  },
+  {
+   "id": "POISON_FUMES_BREATHING",
+   "type": "POISONING",
+   "severity": "EMERGENCY",
+   "reason": "Breathed in smoke or fumes with breathing trouble",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "poison_fumes",
+     "poison_breath"
+    ]
+   }
+  },
+  {
+   "id": "POISON_SWALLOWED",
+   "type": "POISONING",
+   "severity": "URGENT",
+   "reason": "Swallowed something harmful",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "poison_swallowed"
+    ]
+   }
+  },
+  {
+   "id": "BURN_BREATHING",
+   "type": "BURN",
+   "severity": "EMERGENCY",
+   "reason": "Breathed smoke or has trouble breathing after a burn",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "burn_breath"
+    ]
+   }
+  },
+  {
+   "id": "BURN_DEEP",
+   "type": "BURN",
+   "severity": "EMERGENCY",
+   "reason": "Deep burn (white, black or leathery skin)",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "burn_deep"
+    ]
+   }
+  },
+  {
+   "id": "BURN_LARGE_SENSITIVE_AREA",
+   "type": "BURN",
+   "severity": "EMERGENCY",
+   "reason": "Large burn on the face, hands, groin or joints",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "burn_large",
+     "burn_face"
+    ]
+   }
+  },
+  {
+   "id": "BURN_ELECTRIC_CHEM",
+   "type": "BURN",
+   "severity": "URGENT",
+   "reason": "Electric or chemical burn",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "burn_electric_chem"
+    ]
+   }
+  },
+  {
+   "id": "BURN_LARGE",
+   "type": "BURN",
+   "severity": "URGENT",
+   "reason": "Burn bigger than the palm",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "burn_large"
+    ]
+   }
+  },
+  {
+   "id": "PREG_FIT_HEADACHE",
+   "type": "PREGNANCY",
+   "severity": "EMERGENCY",
+   "reason": "Severe headache, blurred vision or fits in pregnancy",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "preg_fit_headache"
+    ]
+   }
+  },
+  {
+   "id": "PREG_BLEEDING",
+   "type": "PREGNANCY",
+   "severity": "EMERGENCY",
+   "reason": "Bleeding in pregnancy",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "preg_bleeding"
+    ]
+   }
+  },
+  {
+   "id": "PREG_LABOUR_WATER",
+   "type": "PREGNANCY",
+   "severity": "URGENT",
+   "reason": "Labour with the water broken",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "preg_labour",
+     "preg_water"
+    ]
+   }
+  },
+  {
+   "id": "PREG_NO_MOVEMENT",
+   "type": "PREGNANCY",
+   "severity": "URGENT",
+   "reason": "Baby is not moving as usual",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "preg_no_movement"
+    ]
+   }
+  },
+  {
+   "id": "PREG_LABOUR",
+   "type": "PREGNANCY",
+   "severity": "URGENT",
+   "reason": "Labour pains",
+   "review_status": "pending doctor review",
+   "when": {
+    "all_symptoms": [
+     "preg_labour"
+    ]
+   }
   }
  ]
 }
