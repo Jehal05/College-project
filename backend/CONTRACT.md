@@ -444,7 +444,7 @@ Response 200:
 
 `GET /patients/{id}` answers (owner):
 ```json
-{ "id": "PT-2026-0417", "name": "Rahul Mehta", "age": 54, "sex": "M", "blood_group": "B+", "blood_group_verified": false,
+{ "id": "PT-2026-0417", "name": "Amit Verma", "age": 52, "sex": "M", "blood_group": "B+", "blood_group_verified": false,
   "language": "en", "allergies": ["Penicillin"], "conditions": ["Hypertension"], "medications": ["Amlodipine"],
   "contacts": [ { "id": "C-1", "name": "Sunita Mehta", "relation": "Mother", "phone": "+91 00000 00001", "is_primary": true, "simulated": true } ],
   "consents": { "location": true, "history": true, "vitals": true, "reports": true }, "simulated": true }

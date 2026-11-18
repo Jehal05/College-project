@@ -300,7 +300,7 @@ def test_a_patient_reads_their_own_insights(demo):
 
 def test_a_hospital_desk_user_opens_the_staff_passport_and_it_is_audited(demo):
     r = demo.get("/passport/PT-2026-0417", headers=demo.headers("staff@demo", "demo123"))
-    assert r.status_code == 200 and r.json()["name"] == "Rahul Mehta"
+    assert r.status_code == 200 and r.json()["name"] == "Amit Verma"
     with Session(demo.engine) as s:
         row = s.query(AuditLog).order_by(AuditLog.id.desc()).first()
         assert (row.user_id, row.role, row.outcome) == ("usr_004", "HOSPITAL_STAFF", "allowed")

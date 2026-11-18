@@ -28,8 +28,8 @@ DEMO_HOSPITAL_ID = "HSP-AMD-002"   # the heart and stroke institute: the staff l
 
 # (id, login, display name, demo password, role, patient id, hospital id, label shown in the login answer)
 DEMO_ACCOUNTS = [
-    ("usr_001", "patient@demo.test", "Rahul Mehta", "demo1234", "PATIENT", DEMO_PATIENT_ID, None, None),
-    ("usr_002", "patient1", "Rahul Mehta", "demo-password", "PATIENT", DEMO_PATIENT_ID, None, None),
+    ("usr_001", "patient@demo.test", "Amit Verma", "demo1234", "PATIENT", DEMO_PATIENT_ID, None, None),
+    ("usr_002", "patient1", "Amit Verma", "demo-password", "PATIENT", DEMO_PATIENT_ID, None, None),
     ("usr_003", "staff@demo.test", "Desk Staff (Demo)", "demo1234", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, None),
     ("usr_004", "staff@demo", "Desk Staff (Demo)", "demo123", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, "staff"),
     ("usr_005", "staff1", "Desk Staff (Demo)", "demo-password", "HOSPITAL_STAFF", None, DEMO_HOSPITAL_ID, None),

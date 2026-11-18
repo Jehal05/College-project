@@ -124,7 +124,7 @@ def test_another_patient_cannot_invite_for_me_and_an_unknown_patient_is_404(demo
 def test_linking_with_a_real_code_answers_200_and_the_code_is_single_use(demo, engine):
     code = demo.post(f"/patients/{PID}/family-invites", headers=H(demo)).json()["code"]
     r = link(demo, FAM, code)
-    assert r.status_code == 200 and r.json() == {"patient_id": PID, "name": "Rahul Mehta", "linked": True, "simulated": True}
+    assert r.status_code == 200 and r.json() == {"patient_id": PID, "name": "Amit Verma", "linked": True, "simulated": True}
     again = link(demo, FAM, code)                                     # the same relative again: fine, nothing used up
     assert again.status_code == 200
     stranger = link(demo, FAM1, code)
@@ -182,7 +182,7 @@ def test_an_unlinked_relative_sees_nothing(demo):
 def test_a_linked_relative_sees_the_name_and_what_is_shared_and_nothing_private(demo):
     link(demo, FAM)
     [view] = demo.get("/family/patients", headers=H(demo, FAM)).json()
-    assert view["patient_id"] == PID and view["name"] == "Rahul Mehta" and view["simulated"] is True
+    assert view["patient_id"] == PID and view["name"] == "Amit Verma" and view["simulated"] is True
     assert view["shared_fields"] == ["location", "history", "vitals", "reports"]
     assert view["active_emergency"] is None and view["vitals"]["heart_rate"] and "patient_id" not in view["vitals"]
     assert has_none(view) == []
@@ -483,7 +483,7 @@ def test_accepting_releases_name_age_allergies_and_location_as_shared(demo, engi
     assert r.status_code == 200
     b = r.json()
     assert b["id"] == eid and b["accepted"] is True and b["simulated"] is True
-    assert b["patient"]["name"] == "Rahul Mehta" and isinstance(b["patient"]["age"], int) and b["patient"]["allergies"] is not None
+    assert b["patient"]["name"] == "Amit Verma" and isinstance(b["patient"]["age"], int) and b["patient"]["allergies"] is not None
     assert b["location"] == {"lat": 23.03, "lng": 72.55}
     assert has_none(b, ("phone", "password", "token", "medication", "condition", "severity", "symptom")) == []
     [ev] = seen
@@ -508,7 +508,7 @@ def test_history_consent_withdrawn_removes_the_allergies_from_accept(demo, engin
     eid = sos(demo)
     set_consent(engine, history=False)
     b = demo.post(f"/responders/{eid}/accept", headers=H(demo, RESP)).json()
-    assert "allergies" not in b["patient"] and b["patient"]["name"] == "Rahul Mehta"
+    assert "allergies" not in b["patient"] and b["patient"]["name"] == "Amit Verma"
     assert "allergies" not in audit_rows(engine, "responder.accept")[-1]["fields_released"]
 
 

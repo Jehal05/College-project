@@ -103,7 +103,7 @@ def test_the_ambulances_belong_to_real_hospitals(seeded):
 
 def test_the_demo_patient_and_contacts(seeded):
     p = seeded.get(Patient, "PT-2026-0417")
-    assert (p.name, p.age, p.sex, p.blood_group, p.language) == ("Rahul Mehta", 54, "M", "B+", "en")
+    assert (p.name, p.age, p.sex, p.blood_group, p.language) == ("Amit Verma", 52, "M", "B+", "en")
     assert "Penicillin" in p.allergies and p.baseline["heart_rate"] == {"min": 60, "max": 85}
     contacts = seeded.query(Contact).filter(Contact.patient_id == "PT-2026-0417").order_by(Contact.position).all()
     assert [(c.id, c.relation, c.is_primary, c.position) for c in contacts] == [("C-1", "Mother", True, 1), ("C-2", "Friend", False, 2)]

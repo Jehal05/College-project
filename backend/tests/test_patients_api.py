@@ -58,7 +58,7 @@ def test_the_owner_gets_the_full_record(demo):
     assert r.status_code == 200
     body = r.json()
     assert set(body) == OWNER_KEYS and body["id"] == "PT-2026-0417"
-    assert (body["name"], body["age"], body["sex"], body["blood_group"], body["language"]) == ("Rahul Mehta", 54, "M", "B+", "en")
+    assert (body["name"], body["age"], body["sex"], body["blood_group"], body["language"]) == ("Amit Verma", 52, "M", "B+", "en")
     assert body["consents"] == {"location": True, "history": True, "vitals": True, "reports": True} and body["simulated"] is True
     assert [(c["id"], c["is_primary"]) for c in body["contacts"]] == [("C-1", True), ("C-2", False)]
     assert body["contacts"][0]["phone"] == "+91 00000 00001"
@@ -127,7 +127,7 @@ def test_when_history_is_not_shared_the_admin_gets_the_basics_only(demo):
     body = demo.get(ME, headers=demo.headers(*ADMIN)).json()
     for left_out in ("allergies", "conditions", "medications", "contacts"):
         assert left_out not in body
-    assert body["name"] == "Rahul Mehta" and body["blood_group"] == "B+" and body["sex"] == "M"
+    assert body["name"] == "Amit Verma" and body["blood_group"] == "B+" and body["sex"] == "M"
 
 
 def test_revoking_history_takes_effect_on_the_admins_very_next_read(demo):
@@ -163,7 +163,7 @@ def test_the_language_can_be_changed_and_changed_back(demo):
 
 def test_the_profile_form_the_patient_app_sends_is_accepted(demo):
     h = demo.headers()
-    body = {"name": "Rahul Mehta", "age": 55, "blood_group": "O-", "allergies": ["Penicillin", "Dust"], "conditions": ["Asthma"], "medications": []}
+    body = {"name": "Amit Verma", "age": 55, "blood_group": "O-", "allergies": ["Penicillin", "Dust"], "conditions": ["Asthma"], "medications": []}
     r = demo.patch(ME, json=body, headers=h)
     assert r.status_code == 200
     got = demo.get(ME, headers=h).json()
@@ -205,7 +205,7 @@ def test_a_body_that_is_not_an_object_is_400(demo, raw):
 def test_a_valid_field_next_to_a_bad_one_changes_nothing(demo):
     h = demo.headers()
     assert demo.patch(ME, json={"age": 70, "blood_group": "nope"}, headers=h).status_code == 400
-    assert demo.get(ME, headers=h).json()["age"] == 54
+    assert demo.get(ME, headers=h).json()["age"] == 52
 
 
 def test_patch_never_touches_consents_or_contacts(demo):
@@ -220,7 +220,7 @@ def test_patch_never_touches_consents_or_contacts(demo):
 def test_only_the_owner_may_patch(demo, who, status):
     headers = demo.headers(*who) if who else {}
     assert demo.patch(ME, json={"age": 99}, headers=headers).status_code == status
-    assert demo.get(ME, headers=demo.headers()).json()["age"] == 54
+    assert demo.get(ME, headers=demo.headers()).json()["age"] == 52
 
 
 def test_another_patient_cannot_patch(demo):

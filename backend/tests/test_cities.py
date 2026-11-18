@@ -180,7 +180,7 @@ def by_city_p(rows, city_id):
 
 def test_the_original_patient_is_unchanged_and_lives_in_ahmedabad(seeded):
     p = seeded.get(Patient, "PT-2026-0417")
-    assert (p.name, p.age, p.home_city_id) == ("Rahul Mehta", 54, "AMD")
+    assert (p.name, p.age, p.home_city_id) == ("Amit Verma", 52, "AMD")
 
 
 def test_every_patient_has_a_baseline_contacts_and_consents(seeded):

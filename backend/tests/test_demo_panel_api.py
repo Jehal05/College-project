@@ -116,7 +116,7 @@ def test_reset_restores_the_seed_data_and_removes_everything_else(demo, engine):
     reset(demo)
     with Session(engine) as s:
         assert s.get(Patient, "PT-X") is None and s.query(User).filter(User.login == "x@demo.test").count() == 0
-        assert s.get(Patient, PID).name == "Rahul Mehta"
+        assert s.get(Patient, PID).name == "Amit Verma"
         assert s.get(Hospital, "HSP-AMD-002").beds_free > 0
         assert [c.name for c in s.query(Contact).filter(Contact.patient_id == PID).order_by(Contact.position)] == [
             "Sunita Mehta", "Karan Mehta"]

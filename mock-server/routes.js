@@ -1,4 +1,5 @@
 // All REST endpoints of the mock API. Shapes match the shared API contract.
+const demoAccounts = require('./demoAccounts');
 const express = require('express');
 const crypto = require('crypto');
 const store = require('./store');
@@ -16,9 +17,16 @@ const EDITABLE = ['name', 'age', 'sex', 'blood_group', 'allergies', 'conditions'
 // Health check (no login needed) so teammates can test the connection.
 router.get('/health', (req, res) => res.json({ status: 'ok', mock: true }));
 
+// Local presenter panel only: the five demo logins for this run. Refused for any non-loopback caller.
+router.get('/demo/accounts', (req, res) => {
+  const ip = req.socket.remoteAddress || '';
+  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  res.json({ accounts: demoAccounts.accounts(), sandbox: true });
+});
+
 router.post('/auth/login', (req, res) => {
   const { email, password } = req.body || {};
-  const user = store.users.find((u) => u.email === email && u.password === password);
+  const user = store.users.find((u) => u.email === email && demoAccounts.passwordMatches(u, password));
   if (!user) return res.status(401).json({ error: 'Invalid email or password' });
   if (user.disabled) return res.status(403).json({ error: 'This account is disabled' });
   const token = crypto.randomBytes(16).toString('hex');

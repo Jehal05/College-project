@@ -126,7 +126,7 @@ Settings (environment variables of the mock): `HOSPITAL_MODE=auto|manual` (defau
 - Data files with their source recorded in `_comment`: `data/hospitals.json` and `data/ambulances.json` (copied from the portal's seed; Ahmedabad; fictional realistic names). The ID style lives only in these files and in `store.nextEmergencyId()`.
 - `alertPayload.js` builds the `emergency.created` payload (pure, unit tested). `hospitalMode.js` holds the staff endpoints, the transition table and `GET /emergencies?status=`, `GET /ambulances`. `demoScenario.js` holds `POST /demo/scenario`.
 - Ranking (`helpers.js` `rankHospitals`): needed unit present **and ready** first, then nearest. Unverified hospitals are skipped.
-- Seed data is fictional but realistic-looking: patient `PT-2026-0417` Rahul Mehta, contacts Sunita Mehta and Karan Mehta (`+91 00000 00001`/`00002`), medicines Metformin 500 mg and Amlodipine 5 mg. No real people, hospitals or phone numbers.
+- Seed data is fictional but realistic-looking: patient `PT-2026-0417` Amit Verma, contacts Sunita Mehta and Karan Mehta (`+91 00000 00001`/`00002`), medicines Metformin 500 mg and Amlodipine 5 mg. No real people, hospitals or phone numbers.
 - Full description of the calls and events: `docs/API_CONTRACT.md` section "Phase 7". Rehearsal with the real portal: `docs/JOINT_REHEARSAL.md`.
 
 ## Phase 9 settings

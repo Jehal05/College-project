@@ -1,6 +1,7 @@
 // In-memory data for the mock server. Everything resets when the server restarts
 // (or when POST /demo/reset is called). All data here is FAKE.
-const users = require('./data/users.json');
+const demoAccounts = require('./demoAccounts');
+const users = [...require('./data/users.json'), ...demoAccounts.createUsers()]; // fixed logins + five demo patients with random passwords
 const hospitals = require('./data/hospitals.json').hospitals;
 const ambulances = require('./data/ambulances.json').ambulances.map((a) => ({ ...a }));
 const emergencyTypes = require('./data/emergencyTypes.json');

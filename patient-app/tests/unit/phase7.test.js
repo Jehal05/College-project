@@ -6,7 +6,7 @@ import helpers from '../../../mock-server/helpers.js';
 import store from '../../../mock-server/store.js';
 
 const { buildCreatedPayload } = alertPayload;
-const patient = { id: 'PT-2026-0417', name: 'Rahul Mehta', age: 54, sex: 'M', blood_group: 'B+', allergies: ['Penicillin'], conditions: ['Hypertension'], medications: ['Metformin'] };
+const patient = { id: 'PT-2026-0417', name: 'Amit Verma', age: 52, sex: 'M', blood_group: 'B+', allergies: ['Penicillin'], conditions: ['Hypertension'], medications: ['Metformin'] };
 const base = (consents, location) => ({
   emergency: { type: 'HEART', severity: 'EMERGENCY', symptoms: ['CHEST_PAIN'], source: 'MANUAL', patient_id: patient.id, consents, location,
     status_events: [{ state: 'EMERGENCY_DETECTED', timestamp: '2026-11-13T10:00:00.000Z' }], reasons: { matched_rules: [] } },
@@ -19,7 +19,7 @@ describe('emergency.created payload', () => {
     const p = buildCreatedPayload(base({ location: true, history: true, vitals: true, reports: true }, loc));
     expect(p.location).toEqual(loc); expect(p.vitals.heart_rate).toBe(110); expect(p.vitals.bp).toBe('150/95'); expect('timestamp' in p.vitals).toBe(false);
     expect(p.symptoms).toEqual(['Chest pain']); expect(p.symptom_ids).toEqual(['CHEST_PAIN']);
-    expect(p.patient_summary).toEqual({ name: 'Rahul Mehta', age: 54, blood_group: 'B+' });
+    expect(p.patient_summary).toEqual({ name: 'Amit Verma', age: 52, blood_group: 'B+' });
     expect(p.patient.allergies).toEqual(['Penicillin']); expect(p.hospital.rank).toBe(1); expect(p.simulated).toBe(true);
   });
   it('leaves out (never null) what the patient did not share', () => {
@@ -27,7 +27,7 @@ describe('emergency.created payload', () => {
     for (const k of ['location', 'vitals']) expect(k in p).toBe(false);
     for (const k of ['allergies', 'conditions', 'medications']) expect(k in p.patient).toBe(false);
     for (const k of ['name', 'age', 'sex', 'blood_group']) expect(k in p.patient).toBe(true); // always shown
-    expect(p.patient.name).toBe('Rahul Mehta');
+    expect(p.patient.name).toBe('Amit Verma');
     expect(JSON.stringify(p)).not.toContain('null');
   });
   it('each consent off in turn removes only its own fields', () => {

@@ -41,11 +41,21 @@
     <tr><td>Portal staff, Pune</td><td><code>staff.pune@demo.test</code></td><td><code>demo1234</code></td></tr>
     <tr><td>Portal admin (can switch city)</td><td><code>admin@demo</code></td><td><code>demo123</code></td></tr>
   </table>
+  <h2>Five demo patients (sandbox, new passwords every start)</h2>
+  <table id="accounts"><tr><th>Login</th><th>Password</th></tr></table>
+  <p>These logins exist only in this run. The passwords are never put in a QR code.</p>
   <p>Tip: put the patient app and the hospital portal in two windows side by side. Both talk to this one server.</p>
 </main>
 <script>
   fetch('/api/health').then((r) => r.json()).then(() => { document.getElementById('health').textContent = 'running (simulated data)'; })
     .catch(() => { document.getElementById('health').textContent = 'not reachable'; });
+  fetch('/api/demo/accounts').then((r) => r.json()).then((d) => {
+    const t = document.getElementById('accounts');
+    d.accounts.forEach((a) => {
+      const tr = t.insertRow();
+      [a.email, a.password].forEach((v) => { const c = tr.insertCell(); const k = document.createElement('code'); k.textContent = v; c.appendChild(k); });
+    });
+  }).catch(() => {});
 </script>
 </body>
 </html>

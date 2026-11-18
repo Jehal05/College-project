@@ -33,7 +33,7 @@ check('P6 download, print and revoke controls', (await p.getByRole('link', { nam
 const rctx = await phone(browser); const r = await newPage(rctx);
 await r.goto(target); await r.waitForSelector("[data-testid='passport-content']");
 const content = await r.innerText("[data-testid='passport-content']"); const top = await r.innerText('main');
-check('P7 responder page needs no login and shows the shared details', ['Rahul Mehta', 'B+', 'Penicillin', 'Hypertension', 'Metformin', 'Sunita Mehta', 'Karan Mehta', 'Prepared by the patient. Not verified by a doctor.'].every((s) => content.includes(s)));
+check('P7 responder page needs no login and shows the shared details', ['Amit Verma', 'B+', 'Penicillin', 'Hypertension', 'Metformin', 'Sunita Mehta', 'Karan Mehta', 'Prepared by the patient. Not verified by a doctor.'].every((s) => content.includes(s)));
 check('P8 responder page starts with Call 112 / 108 (tel:112)', (await r.locator("main a").first().getAttribute('href')) === 'tel:112' && top.trimStart().startsWith('Call 112 / 108'));
 check('P9 phone numbers are tel: links', (await r.locator("[data-testid='passport-content'] a[href^='tel:']").count()) === 2);
 check('P10 responder content has none of the forbidden words', !FORBIDDEN.test(content), content.match(FORBIDDEN));
@@ -45,7 +45,7 @@ await r.reload(); await r.waitForSelector("[data-testid='passport-content']"); c
 await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: true, history: false, vitals: true, reports: true });
 await r.reload(); await r.waitForSelector("[data-testid='passport-content']");
 const limited = await r.innerText("[data-testid='passport-content']");
-check('P13 history consent off removes allergies, conditions, medicines and contacts', limited.includes('Rahul Mehta') && !limited.includes('Penicillin') && !limited.includes('Metformin') && !limited.includes('Sunita Mehta') && limited.includes('The patient has not shared this section.'));
+check('P13 history consent off removes allergies, conditions, medicines and contacts', limited.includes('Amit Verma') && !limited.includes('Penicillin') && !limited.includes('Metformin') && !limited.includes('Sunita Mehta') && limited.includes('The patient has not shared this section.'));
 const raw = await (await fetch(API + '/passport/' + token)).json();
 check('P14 the server response itself omits the data', !('allergies' in raw) && !('contacts' in raw) && raw.shared.history === false);
 await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: true, history: true, vitals: true, reports: true });

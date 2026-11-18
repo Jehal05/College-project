@@ -157,7 +157,7 @@ def test_a_live_link_opens_without_a_login_and_shows_only_what_is_shared(demo):
     r = public(demo, token)
     assert r.status_code == 200
     b = r.json()
-    assert b["name"] == "Rahul Mehta" and isinstance(b["age"], int) and b["blood_group"] and b["expires_at"].endswith("Z")
+    assert b["name"] == "Amit Verma" and isinstance(b["age"], int) and b["blood_group"] and b["expires_at"].endswith("Z")
     assert b["shared"] == {"history": True, "reports": True} and b["simulated"] is True
     assert b["allergies"] is not None and b["contacts"][0]["relation"] and b["contacts"][0]["phone"]
 
@@ -277,7 +277,7 @@ def test_a_link_for_one_patient_never_opens_another(demo, engine):
     other = second_patient(engine)
     other_token = demo.post("/patients/PT-2026-0002/passport", json={"hours": 1}, headers=H(demo, other)).json()["token"]
     assert public(demo, other_token).json()["name"] == "Other"
-    assert public(demo, token).json()["name"] == "Rahul Mehta"
+    assert public(demo, token).json()["name"] == "Amit Verma"
     assert demo.get(f"/passport/PT-2026-0002?token={token}").status_code == 403
     demo.delete(P, headers=H(demo))
     assert public(demo, other_token).status_code == 200                       # revoking mine leaves theirs alone

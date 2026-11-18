@@ -18,8 +18,8 @@ check('F1 relative lands on /family with the heading and the simulated banner', 
 check('F2 nothing linked yet: empty message and a link form', (await p.locator('[data-testid=family-empty]').count()) === 1 && (await p.getByLabel('Invite code').count()) === 1);
 await p.getByLabel('Invite code').fill('FAM-0000-NOPE'); await p.getByRole('button', { name: 'Link' }).click(); body = await waitText(p, (b) => b.includes('was not found'));
 check('F3 a wrong code says so in plain words', body.includes('This code was not found'), body.slice(-200));
-await p.getByLabel('Invite code').fill('fam-0417'); await p.getByRole('button', { name: 'Link' }).click(); body = await waitText(p, (b) => b.includes('Rahul Mehta'));
-check('F4 the right code links the patient (code is not case sensitive)', body.includes('Rahul Mehta'));
+await p.getByLabel('Invite code').fill('fam-0417'); await p.getByRole('button', { name: 'Link' }).click(); body = await waitText(p, (b) => b.includes('Amit Verma'));
+check('F4 the right code links the patient (code is not case sensitive)', body.includes('Amit Verma'));
 check('F5 shared chips and simulated vitals are shown', body.includes('Shared with you') && body.includes('Vitals') && (await p.locator('[data-testid=family-vitals]').count()) === 1);
 check('F6 no allergies, conditions, medicines, phone numbers, or "help is on the way"', !/penicillin|amlodipine|metformin|hypertension|diabetes|\+91|help is on the way/i.test(body));
 check('F7 no active emergency message before an SOS', body.includes('No active emergency'));
@@ -48,7 +48,7 @@ check('L6 the server kept the check-in', JSON.stringify(view).includes('ON_MY_WA
 
 // --- consent off: vitals disappear on the next load ---
 await api('PUT', '/patients/PT-2026-0417/consents', tok, { vitals: false });
-await p.reload(); body = await waitText(p, (b) => b.includes('Rahul Mehta'));
+await p.reload(); body = await waitText(p, (b) => b.includes('Amit Verma'));
 check('C1 vitals consent off: no readings for the relative', (await p.locator('[data-testid=family-vitals]').count()) === 0);
 await api('PUT', '/patients/PT-2026-0417/consents', tok, { vitals: true });
 await api('POST', '/emergencies/' + made.id + '/cancel', tok);
@@ -64,8 +64,8 @@ check('I1 the patient gets a code like FAM-1234 valid for 24 hours', /^FAM-\d{4}
 await ctx.close();
 ctx = await phone(browser); p = await newPage(ctx);
 await signIn(p, 'family@demo.test'); await p.waitForURL(BASE + '/family');
-await p.getByLabel('Invite code').fill(code); await p.getByRole('button', { name: 'Link' }).click(); body = await waitText(p, (b) => b.includes('Rahul Mehta'));
-check('I2 the new code links the relative', body.includes('Rahul Mehta'));
+await p.getByLabel('Invite code').fill(code); await p.getByRole('button', { name: 'Link' }).click(); body = await waitText(p, (b) => b.includes('Amit Verma'));
+check('I2 the new code links the relative', body.includes('Amit Verma'));
 await p.getByRole('button', { name: 'Sign out' }).click(); await p.waitForURL(BASE + '/login');
 check('I3 sign out returns to the login page', p.url() === BASE + '/login');
 await ctx.close();
@@ -83,7 +83,7 @@ for (const [lang, title, shared] of [['hi', 'परिवार', 'आपके 
   ctx = await phone(browser); p = await newPage(ctx);
   await p.goto(BASE + '/login'); await p.evaluate(`localStorage.setItem('ht.lang','${lang}')`); await p.reload();
   await p.fill('input[type=email]', 'family@demo.test'); await p.fill('input[type=password]', 'demo1234'); await p.click('button[type=submit]'); await p.waitForURL(BASE + '/family');
-  await p.locator('input').first().fill('FAM-0417'); await p.locator('form button[type=submit]').click(); body = await waitText(p, (b) => b.includes('Rahul Mehta'));
+  await p.locator('input').first().fill('FAM-0417'); await p.locator('form button[type=submit]').click(); body = await waitText(p, (b) => b.includes('Amit Verma'));
   check('H1 [' + lang + '] the family screen is translated', body.includes(title) && body.includes(shared), body.slice(0, 160));
   const latin = (body.match(/[A-Za-z][A-Za-z0-9_]*/g) || []).filter((w) => !/^(english|rahul|mehta|sos|fam|healthtwin|ai|spo2|qr|km|min)$/i.test(w) && !/^\d/.test(w));
   check('H2 [' + lang + '] no English words left on the family screen', latin.length === 0, latin.slice(0, 8));

@@ -84,7 +84,7 @@ await p.addScriptTag({ path: axePath });
 check('R4 axe: no serious or critical problems on the responder screen', (await serious(p)).length === 0, await serious(p));
 await p.getByRole('button', { name: 'Accept' }).click(); body = await waitText(p, (b) => b.includes('You accepted'));
 const patient = await p.innerText('[data-testid=responder-patient]');
-check('R5 accepting shows the name and age the patient allowed', patient.includes('Rahul Mehta') && /Age \d+/.test(patient), patient);
+check('R5 accepting shows the name and age the patient allowed', patient.includes('Amit Verma') && /Age \d+/.test(patient), patient);
 check('R6 the place appears only because the location consent is on', patient.includes('Location: 23.0225, 72.5714'), patient);
 check('R7 no phone number and no medical history other than allergies', !/\+91|amlodipine|metformin|hypertension|diabetes/i.test(patient));
 await api('PUT', '/patients/PT-2026-0417/consents', tok, { location: false, history: false });
