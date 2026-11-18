@@ -43,17 +43,19 @@ router.post('/patients/:id/passport', requireAuth, owner, (req, res) => {
   if (!store.patients[req.params.id]) return res.status(404).json({ error: 'Patient not found' });
   const hours = Number((req.body && req.body.hours) || 24);
   if (!HOURS.includes(hours)) return res.status(400).json({ error: 'hours must be 1, 24 or 168' });
+  const fields = req.body && req.body.fields;
+  if (fields !== undefined && !(Array.isArray(fields) && fields.every((f) => QR_FIELDS.includes(f)))) return res.status(400).json({ error: 'fields must be a list of: ' + QR_FIELDS.join(', ') });
   const old = current(req.params.id);
   if (old) { old.revoked = true; audit.record({ user: req.user.email, role: req.user.role, action: 'passport.rotate', patient_id: req.params.id }); } // only one live link at a time
   const passport = {
     token: crypto.randomBytes(18).toString('base64url'), // 24 URL-safe characters
     patient_id: req.params.id, created_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + hours * 3600 * 1000).toISOString(), revoked: false, log: [],
+    expires_at: new Date(Date.now() + hours * 3600 * 1000).toISOString(), revoked: false, log: [], scope: fields || QR_FIELDS,
   };
   store.passports[req.params.id] = passport;
   store.passportTokens.set(hashToken(passport.token), passport);
   audit.record({ user: req.user.email, role: req.user.role, action: 'passport.create', patient_id: req.params.id });
-  res.status(201).json({ token: passport.token, expires_at: passport.expires_at });
+  res.status(201).json({ token: passport.token, expires_at: passport.expires_at, fields: passport.scope });
 });
 
 // The patient's current passport (or 404), so the screen can show it again after a reload.
@@ -102,6 +104,26 @@ function staffRead(req, res, id) {
   res.json(passportBody(patient, { patient_id: id }));
 }
 
+// What an anonymous scan may see. Default-safe list only; the consent switches are the upper limit.
+// Conditions, medicines, reports, vitals, location, login id and the token are never returned here.
+const maskPhone = (phone) => { const d = String(phone || '').replace(/\D/g, ''); return d.length >= 4 ? '+91 XXXXX XXX' + d.slice(-2) : 'XXXXX'; };
+const ageBand = (age) => { const a = Number(age); if (!Number.isFinite(a)) return null; const lo = Math.floor(a / 10) * 10; return lo + '-' + (lo + 9); };
+const QR_FIELDS = ['blood_group', 'allergies', 'contact']; // what the patient can switch on for the QR (all on by default)
+function publicBody(patient, p) {
+  const scope = p.scope || QR_FIELDS;
+  const history = Boolean(patient.consents.history);
+  const on = (k) => scope.includes(k);
+  const first = (patient.contacts || [])[0];
+  return {
+    demo: true, name: patient.name, patient_code: 'HT-' + String(patient.id).slice(-4), age_band: ageBand(patient.age),
+    ...(on('blood_group') ? { blood_group: patient.blood_group } : {}),
+    ...(on('allergies') && history ? { allergies: patient.allergies } : {}),
+    ...(on('contact') && history && first ? { contact: { name: first.name, relation: first.relation, phone_masked: maskPhone(first.phone) } } : {}),
+    ...(patient.medical_alert ? { medical_alert: patient.medical_alert } : {}),
+    source: 'simulated', last_updated: p.created_at, link_valid: true, expires_at: p.expires_at,
+  };
+}
+
 // Two kinds of address: a random QR token (public, no login) or a patient id (staff login needed). A token always wins.
 router.get('/passport/:token', limit, (req, res) => {
   const p = findByToken(req.params.token);
@@ -112,7 +134,7 @@ router.get('/passport/:token', limit, (req, res) => {
     p.log.push(opened_at);
     audit.record({ user: 'qr_link', role: 'public', action: 'passport.view', patient_id: p.patient_id, fields: sharedFields(patient) });
     simulator.broadcast({ type: 'passport.opened', emergency_id: null, state: 'MONITORING', timestamp: opened_at, payload: { patient_id: p.patient_id } });
-    return res.json(passportBody(patient, { expires_at: p.expires_at }));
+    return res.json(publicBody(patient, p));
   }
   if (!PATIENT_ID.test(req.params.token)) return res.status(410).json(GONE); // an unknown token
   requireAuth(req, res, () => {

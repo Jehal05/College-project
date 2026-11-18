@@ -71,3 +71,32 @@ test('public link is rate limited per address', () => {
   for (let i = 0; i < 31; i++) last = run(find('get', '/passport/:token'), { params: { token: t }, socket: { remoteAddress: 'one-ip' } });
   assert.strictEqual(last.code, 429);
 });
+
+test('anonymous quick view: only default-safe fields, masked phone, no clinical data', () => {
+  const t = tokenFor('PT-2026-0417');
+  const body = open(t).body;
+  assert.strictEqual(body.demo, true);
+  assert.match(body.patient_code, /^HT-\d{4}$/);
+  assert.match(body.age_band, /^\d0-\d9$/);
+  assert.ok(Array.isArray(body.allergies));
+  assert.match(body.contact.phone_masked, /^\+91 XXXXX XXX\d\d$/);
+  for (const k of ['conditions', 'medications', 'reports', 'contacts', 'vitals', 'location', 'email', 'token', 'age', 'patient_id']) assert.ok(!(k in body), k);
+  assert.ok(!JSON.stringify(body).includes(t));
+});
+
+test('consent history off removes allergies and the contact on the next scan', () => {
+  const t = tokenFor('PT-2026-0419'); const c = store.patients['PT-2026-0419'].consents; const before = c.history;
+  c.history = false;
+  const body = open(t).body;
+  c.history = before;
+  assert.ok(!('allergies' in body) && !('contact' in body));
+  assert.ok(body.name);
+});
+
+test('the patient can switch QR fields off; unknown field names are refused', () => {
+  const mk = (fields) => run(find('post', '/patients/:id/passport'), { params: { id: 'PT-2026-0420' }, body: { fields }, user: { role: 'PATIENT', email: 'r', patient_id: 'PT-2026-0420' }, socket: {} });
+  assert.strictEqual(mk(['conditions']).code, 400);
+  const ok = mk(['blood_group']);
+  const body = open(ok.body.token).body;
+  assert.ok(body.blood_group && !('allergies' in body) && !('contact' in body));
+});

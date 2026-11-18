@@ -321,7 +321,7 @@
   "view.notShared": "The patient has not shared this section.",
   "view.loading": "Loading passport...",
   "view.error": "Could not load the passport. Check the internet connection.",
-  "view.gone": "This passport is no longer available.",
+  "view.gone": "Passport link unavailable",
   "view.goneHelp": "Ask the patient for a new QR code, or call 112 / 108.",
   "view.expires": "Link valid until {{time}}",
   "notif.bell": "Notifications, {{count}} new",
@@ -1031,5 +1031,14 @@
   "strap.error": "Could not connect to the strap. Check that it is on and not used by another app, then try again.",
   "strap.cancelled": "No strap chosen.",
   "strap.connect": "Connect heart-rate strap",
-  "strap.disconnect": "Disconnect strap"
+  "strap.disconnect": "Disconnect strap",
+  "view.banner": "HealthTwin Demo Passport: fictional data, not a real medical record. Not ABHA.",
+  "view.code": "Patient code",
+  "view.ageBand": "Age band: {{band}} years",
+  "view.alert": "Medical alert (entered by the patient)",
+  "view.callOff": "(demo number, calling is off)",
+  "view.source": "Source: simulated demo data entered for this prototype.",
+  "view.updated": "Last updated: {{time}}",
+  "view.linkValid": "Passport link valid",
+  "view.staffSignIn": "Staff sign-in for authorized clinical details"
 }

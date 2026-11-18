@@ -1,7 +1,7 @@
 // The page a responder sees after scanning the QR. Public (no login), read-only, big text, three languages.
 // It shows only what the patient allowed. It states facts entered by the patient and never interprets them.
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getPublicPassport } from '../services/api';
 import { formatDateTime } from '../utils/time';
@@ -35,6 +35,7 @@ export default function PassportView() {
   const { status, data } = state;
   return (
     <div className="text-lg">
+      <div role="note" className="-mx-1 mb-2 rounded-xl bg-amber-100 px-3 py-2 text-base font-bold text-amber-950">{t('view.banner')}</div>
       <CallButton />
       <h1 className="mb-3 mt-4 flex items-center gap-2 text-2xl font-bold text-slate-900"><LogoMark size={28} />{t('view.title')}</h1>
       <LanguageSelect saveToRecord={false} />
@@ -54,19 +55,23 @@ export default function PassportView() {
               <Avatar name={data.name} size={56} />
               <div className="min-w-0">
                 <h2 className="break-words text-2xl font-bold text-slate-900">{data.name}</h2>
-                <p className="text-slate-700">{t('view.age', { age: data.age })}</p>
+                <p className="text-slate-700">{t('view.code')}: {data.patient_code}</p>
+                {data.age_band && <p className="text-slate-700">{t('view.ageBand', { band: data.age_band })}</p>}
               </div>
             </div>
-            <p className="mt-3 flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2">{t('view.bloodGroup')}: <strong className="text-2xl text-slate-900">{data.blood_group || t('view.none')}</strong></p>
+            {data.blood_group && <p className="mt-3 flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2">{t('view.bloodGroup')}: <strong className="text-2xl text-slate-900">{data.blood_group}</strong></p>}
           </section>
-          <PassportSection title={t('view.allergies')} items={data.allergies} shared={data.shared.history} />
-          <PassportSection title={t('view.conditions')} items={data.conditions} shared={data.shared.history} />
-          <PassportSection title={t('view.medicines')} items={data.medications} shared={data.shared.history} />
-          <PassportSection title={t('view.contacts')} shared={data.shared.history}
-            items={(data.contacts || []).map((c) => (
-              <span key={c.phone}>{c.name} ({t('relation.' + c.relation, { defaultValue: c.relation })}) <a href={'tel:' + c.phone.replace(/[\s-]/g, '')} className="inline-flex min-h-[44px] items-center font-semibold text-brand-800 underline">{c.phone}</a></span>
-            ))} />
-          <p className="text-sm text-slate-700">{t('view.expires', { time: formatDateTime(data.expires_at) })}</p>
+          {data.medical_alert && <PassportSection title={t('view.alert')} items={[data.medical_alert]} />}
+          {'allergies' in data
+            ? <PassportSection title={t('view.allergies')} items={data.allergies} />
+            : <PassportSection title={t('view.allergies')} items={[]} shared={false} />}
+          {'contact' in data
+            ? <PassportSection title={t('view.contacts')} items={[<span key="c">{data.contact.name} ({t('relation.' + data.contact.relation, { defaultValue: data.contact.relation })}) <span className="font-semibold">{data.contact.phone_masked}</span> <span className="text-base text-slate-700">{t('view.callOff')}</span></span>]} />
+            : <PassportSection title={t('view.contacts')} items={[]} shared={false} />}
+          <p className="text-sm text-slate-700">{t('view.source')}</p>
+          <p className="text-sm text-slate-700">{t('view.updated', { time: formatDateTime(data.last_updated) })}</p>
+          <p className="text-sm font-semibold text-slate-800">{t('view.linkValid')} · {t('view.expires', { time: formatDateTime(data.expires_at) })}</p>
+          <Link to="/login" className="mt-4 inline-flex min-h-[44px] items-center rounded-xl border-2 border-brand-800 px-4 font-semibold text-brand-800">{t('view.staffSignIn')}</Link>
         </div>
       )}
     </div>
