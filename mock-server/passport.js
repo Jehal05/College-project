@@ -12,40 +12,65 @@ const HOURS = [1, 24, 168]; // allowed validity: 1 hour, 24 hours, 7 days
 const PATIENT_ID = /^PT-\d{4}-\d{4}$/;
 const GONE = { error: 'This passport is no longer available.' };
 
+// Lookup is by SHA-256 of the token (like the backend). The raw token is kept only as the owner's copy so the patient can see the QR again.
+const hashToken = (t) => crypto.createHash('sha256').update(String(t)).digest('hex');
+const findByToken = (t) => store.passportTokens.get(hashToken(t)) || null;
+
+// Only the patient who owns the record may manage its passport. Staff and admins read through GET /passport/:id, which is audited.
+function owner(req, res, next) {
+  const { role, patient_id, email } = req.user;
+  if (role !== 'PATIENT' || patient_id !== req.params.id) {
+    audit.record({ user: email, role, action: 'passport.manage', patient_id: req.params.id, outcome: 'denied', reason: 'not_owner' });
+    return res.status(403).json({ error: 'Not your passport' });
+  }
+  next();
+}
+
+// Public link rate limit: 30 opens per minute per address. Kept in memory.
+const hits = new Map();
+function limit(req, res, next) {
+  const k = req.socket.remoteAddress || 'x', now = Date.now();
+  const list = (hits.get(k) || []).filter((t) => now - t < 60000);
+  if (list.length >= 30) { hits.set(k, list); return res.status(429).json({ error: 'Too many requests. Try again in a minute.' }); }
+  list.push(now); hits.set(k, list);
+  next();
+}
+
 const current = (patientId) => store.passports[patientId] || null;
 const isLive = (p) => p && !p.revoked && Date.parse(p.expires_at) > Date.now();
 
-router.post('/patients/:id/passport', requireAuth, (req, res) => {
+router.post('/patients/:id/passport', requireAuth, owner, (req, res) => {
   if (!store.patients[req.params.id]) return res.status(404).json({ error: 'Patient not found' });
   const hours = Number((req.body && req.body.hours) || 24);
   if (!HOURS.includes(hours)) return res.status(400).json({ error: 'hours must be 1, 24 or 168' });
   const old = current(req.params.id);
-  if (old) old.revoked = true; // only one passport at a time
+  if (old) { old.revoked = true; audit.record({ user: req.user.email, role: req.user.role, action: 'passport.rotate', patient_id: req.params.id }); } // only one live link at a time
   const passport = {
     token: crypto.randomBytes(18).toString('base64url'), // 24 URL-safe characters
     patient_id: req.params.id, created_at: new Date().toISOString(),
     expires_at: new Date(Date.now() + hours * 3600 * 1000).toISOString(), revoked: false, log: [],
   };
   store.passports[req.params.id] = passport;
-  store.passportTokens.set(passport.token, passport);
+  store.passportTokens.set(hashToken(passport.token), passport);
+  audit.record({ user: req.user.email, role: req.user.role, action: 'passport.create', patient_id: req.params.id });
   res.status(201).json({ token: passport.token, expires_at: passport.expires_at });
 });
 
 // The patient's current passport (or 404), so the screen can show it again after a reload.
-router.get('/patients/:id/passport', requireAuth, (req, res) => {
+router.get('/patients/:id/passport', requireAuth, owner, (req, res) => {
   const p = current(req.params.id);
   if (!isLive(p)) return res.status(404).json({ error: 'No active passport' });
   res.json({ token: p.token, expires_at: p.expires_at });
 });
 
-router.delete('/patients/:id/passport', requireAuth, (req, res) => {
+router.delete('/patients/:id/passport', requireAuth, owner, (req, res) => {
   const p = current(req.params.id);
-  if (p) p.revoked = true; // the token stays known so the link answers 410, not 404
+  if (p) { p.revoked = true; audit.record({ user: req.user.email, role: req.user.role, action: 'passport.revoke', patient_id: req.params.id }); } // the token stays known so the link answers 410, not 404
   res.json({ ok: true });
 });
 
 // Only times. No IP address, no device information.
-router.get('/patients/:id/passport/log', requireAuth, (req, res) => {
+router.get('/patients/:id/passport/log', requireAuth, owner, (req, res) => {
   const p = current(req.params.id);
   res.json(p ? p.log.map((opened_at) => ({ opened_at })) : []);
 });
@@ -78,8 +103,8 @@ function staffRead(req, res, id) {
 }
 
 // Two kinds of address: a random QR token (public, no login) or a patient id (staff login needed). A token always wins.
-router.get('/passport/:token', (req, res) => {
-  const p = store.passportTokens.get(req.params.token);
+router.get('/passport/:token', limit, (req, res) => {
+  const p = findByToken(req.params.token);
   if (p) {
     if (!isLive(p)) { audit.record({ user: 'qr_link', role: 'public', action: 'passport.view', patient_id: p.patient_id, outcome: 'denied', reason: 'expired_or_revoked' }); return res.status(410).json(GONE); }
     const patient = store.patients[p.patient_id];
@@ -99,9 +124,11 @@ router.get('/passport/:token', (req, res) => {
 
 // Demo helper: make the current passport expire now (used by tests and the demo).
 router.post('/demo/passport/expire', requireAuth, (req, res) => {
-  const p = current('PT-2026-0417');
+  const p = current(req.user.patient_id || 'PT-2026-0417');
   if (p) p.expires_at = new Date(Date.now() - 1000).toISOString();
   res.json({ ok: true });
 });
 
 module.exports = router;
+module.exports.findByToken = findByToken;
+module.exports.hashToken = hashToken;

@@ -76,7 +76,7 @@ function middleware(req, res, next) {
   // Daksh's passport call: GET /passport/{patient_id}?token=...  (401 expired or unknown, 403 other patient)
   const passport = /^\/passport\/([^/]+)$/.exec(req.path);
   if (req.method === 'GET' && passport && req.query.token) {
-    const p = store.passportTokens.get(String(req.query.token));
+    const p = require('./passport').findByToken(String(req.query.token));
     if (!p || p.revoked || Date.parse(p.expires_at) <= Date.now()) return res.status(401).json({ error: 'Token expired or invalid' });
     if (p.patient_id !== passport[1]) return res.status(403).json({ error: 'Token belongs to another patient' });
     req.url = '/passport/' + p.token;
