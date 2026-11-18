@@ -2,6 +2,7 @@
 // Reads the position from the emergency (kept up to date by ambulance.location events),
 // so it shows the same thing on every screen that is watching.
 import { useMemo, useState } from 'react';
+import { TILE_URL, TILE_ATTRIBUTION } from '../config/external.js';
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, ZoomControl } from 'react-leaflet';
 import trafficConfig from '../data/traffic-config.json';
 import simConfig from '../data/sim-config.json';
@@ -97,8 +98,8 @@ export default function TrackingMap({ emergency, compact = false }) {
         <MapContainer key={`${id}-${route.ambulance.id}`} bounds={route.points.map(toLatLng)} boundsOptions={{ padding: [40, 40] }} scrollWheelZoom={false} zoomControl={false} className="h-full w-full">
           <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution={TILE_ATTRIBUTION}
+            url={TILE_URL}
             eventHandlers={tiles.handlers}
           />
           <Polyline positions={done.map(toLatLng)} pathOptions={{ color: '#94a3b8', weight: 6 }} />

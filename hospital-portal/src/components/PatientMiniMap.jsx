@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Tooltip, Circle, ZoomControl } from 'react-leaflet';
+import { TILE_URL, TILE_ATTRIBUTION } from '../config/external.js';
 import { useT } from '../i18n/index.js';
 import { patientIcon } from './mapIcons.js';
 import TileNotice from './TileNotice.jsx';
@@ -19,8 +20,8 @@ export default function PatientMiniMap({ location }) {
       <MapContainer key={position.join(',')} center={position} zoom={14} scrollWheelZoom={false} zoomControl={false} className="h-full w-full">
         <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={TILE_ATTRIBUTION}
+          url={TILE_URL}
           eventHandlers={tiles.handlers}
         />
         <Marker position={position} icon={patientIcon}>

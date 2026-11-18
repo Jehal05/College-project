@@ -4,6 +4,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { TILE_URL, TILE_ATTRIBUTION } from '../../config/external';
 
 const pin = (html, cls) => L.divIcon({ className: 'ht-pin ' + cls, html, iconSize: [28, 28], iconAnchor: [14, 14] });
 
@@ -19,9 +20,7 @@ export default function StreetMap({ city, hospitals, start, label, onFail }) {
     const { hospitals, start, onFail } = latest.current;
     const map = L.map(box.current, { zoomControl: true, attributionControl: true, keyboard: false, scrollWheelZoom: false }).setView([city.lat, city.lng], city.zoom || 12);
     let loaded = 0; let errors = 0;
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    const tiles = L.tileLayer(TILE_URL, { maxZoom: 19, attribution: TILE_ATTRIBUTION }).addTo(map);
     tiles.on('tileload', () => { loaded += 1; });
     tiles.on('tileerror', () => { errors += 1; if (loaded === 0 && errors >= 3 && onFail) onFail(); });
     const points = [];

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { TILE_URL, TILE_ATTRIBUTION } from '../config/external.js';
 import { MapContainer, TileLayer, Marker, Tooltip, Circle, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import { USE_MOCK } from '../services/config.js';
@@ -119,8 +120,8 @@ export default function MapPage() {
           <MapContainer key={`${origin.lat},${origin.lng}`} center={[origin.lat, origin.lng]} zoom={city ? city.zoom : 12} zoomControl={false} className="h-full w-full">
             <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution={TILE_ATTRIBUTION}
+              url={TILE_URL}
               eventHandlers={tiles.handlers}
             />
             <Marker position={[origin.lat, origin.lng]} icon={patientIcon}>
