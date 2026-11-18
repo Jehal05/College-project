@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { stepDurations, summarise, escalationCount } from './analytics.js';
+import { stepDurations, summarise, escalationCount, percentile, spread, stepSpreads, filterByDate, MIN_SPREAD_N } from './analytics.js';
+import { analyticsToCsv } from './csv.js';
 
 const T0 = Date.parse('2026-11-12T10:00:00Z');
 const at = (s) => new Date(T0 + s * 1000).toISOString();
@@ -79,4 +80,56 @@ test('summarise: no data gives zero counts and null averages, never NaN', () => 
   assert.equal(s.averages.alert_to_ack.seconds, null);
   assert.equal(s.averageTotal.seconds, null);
   assert.deepEqual(s.ambulance.units, []);
+});
+
+
+test('percentile: interpolates, ignores bad values, empty gives null', () => {
+  assert.equal(percentile([10, 20, 30, 40, 50], 50), 30);
+  assert.equal(percentile([10, 20, 30, 40, 50], 90), 46);
+  assert.equal(percentile([5], 90), 5);
+  assert.equal(percentile([], 50), null);
+  assert.equal(percentile([NaN, 10, null, undefined], 50), 10);
+  assert.equal(percentile([1, 2, 3], 500), 3);
+});
+
+test('spread: a few slow cases pull the average above the median; p90 shows the slow tail', () => {
+  const s = spread([10, 10, 10, 10, 10, 10, 10, 10, 10, 100]);
+  assert.equal(s.n, 10);
+  assert.equal(s.average, 19);
+  assert.equal(s.median, 10);
+  assert.equal(s.p90, 19);
+  assert.equal(s.enough, true);
+});
+
+test('spread: under the minimum number of cases there is an average but no median or p90', () => {
+  const s = spread([30, 50]);
+  assert.equal(MIN_SPREAD_N, 5);
+  assert.deepEqual([s.n, s.average, s.median, s.p90, s.enough], [2, 40, null, null, false]);
+  assert.deepEqual(spread([]), { n: 0, average: null, median: null, p90: null, enough: false });
+});
+
+test('stepSpreads: built from status_events, one entry per step plus the total', () => {
+  const s = stepSpreads([full(), full({ emergency_id: 'E-9' })]);
+  assert.equal(s.alert_to_ack.n, 2);
+  assert.equal(s.alert_to_ack.average, 20);
+  assert.equal(s.alert_to_ack.median, null); // only 2 cases
+  assert.ok('total' in s);
+});
+
+test('filterByDate: inclusive local days, open ends, and a case with no valid date is dropped only when filtering', () => {
+  const day = (d) => ({ emergency_id: d, created_at: `2026-11-${d}T12:00:00` });
+  const list = [day('10'), day('11'), day('12'), { emergency_id: 'x', created_at: 'nonsense' }];
+  assert.equal(filterByDate(list, {}).length, 4);
+  assert.deepEqual(filterByDate(list, { from: '2026-11-11', to: '2026-11-11' }).map((c) => c.emergency_id), ['11']);
+  assert.deepEqual(filterByDate(list, { from: '2026-11-11' }).map((c) => c.emergency_id), ['11', '12']);
+  assert.deepEqual(filterByDate(list, { to: '2026-11-10' }).map((c) => c.emergency_id), ['10']);
+});
+
+test('analytics CSV: says Simulated, has numbers only, and no case or patient ids', () => {
+  const cases = [full({ emergency_id: 'E-SECRET', patient_id: 'P-SECRET' })];
+  const text = analyticsToCsv(summarise(cases), stepSpreads(cases), { from: '2026-11-01', to: '', generated: '2026-11-15T00:00:00Z', stepLabel: (k) => k });
+  assert.match(text, /Simulated data/);
+  assert.match(text, /2026-11-01/);
+  assert.doesNotMatch(text, /SECRET/);
+  assert.match(text, /alert_to_ack,1,20,,/);
 });

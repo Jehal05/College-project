@@ -80,7 +80,15 @@ async function audit(browser, session, lang, screen, { theme = 'dark', width = 3
 }
 
 const session = { ...(await call('/auth/login', null, { email: 'patient@demo.test', password: 'demo1234' })) };
-const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+// Chrome sometimes fails to start in CI ("Timed out ... waiting for the WS endpoint URL", seen on main 17 Nov). Try three times, then fail with the last error.
+async function launchChrome() {
+  let last;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try { return await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }); } catch (e) { last = e; console.error('Chrome did not start (attempt ' + attempt + ' of 3): ' + e.message); }
+  }
+  throw last;
+}
+const browser = await launchChrome();
 const rows = [];
 const all = (await screens(session.token)).filter((x) => !ONLY || (ONLY === 'themed') === !!x.themed);
 for (const screen of all) {

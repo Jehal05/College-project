@@ -19,6 +19,7 @@ from app.models.emergencies import Emergency
 from app.models.enums import EmergencyState, InvalidTransition
 from app.models.patient_data import Patient
 from app.security.actor import Actor
+from app.security.write_limiter import emergency_limiter
 from app.services import audit, events
 from app.services import emergencies as svc
 
@@ -116,6 +117,10 @@ def create_emergency(body: Dict[str, Any], actor: Actor = Depends(get_current_ac
     patient = db.get(Patient, actor.patient_id)
     if patient is None:
         raise HTTPException(status_code=404, detail="Patient not found")
+    wait = emergency_limiter().take(str(actor.user_id))
+    if wait is not None:        # a stuck button or a script, not a person: stop it before it reaches the hospital
+        raise HTTPException(status_code=429, detail="Too many emergency requests. Please wait and try again.",
+                            headers={"Retry-After": str(wait)})
     try:
         emergency = svc.create_emergency(db, actor, patient, clean)
     except svc.EmergencyInputError as exc:

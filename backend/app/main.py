@@ -14,12 +14,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
     access_log, admin_users, audit, auth, cities, consents, contacts, content, demo_panel, demo_vitals, emergencies, family, feedback,
-    hospital_desk, hospitals, insights, location_shares, passport, passport_links, patients, reminders, reports,
-    responders, ws,
+    hospital_desk, hospitals, insights, lab_values, location_shares, organs, passport, passport_links, patients, predictions,
+    reminders, report_extract, reports, responders, ws,
 )
 from app.config import demo_mode, parse_cors_origins
 from app.db import get_session_factory, init_db
 from app.errors import install_error_handlers
+from app.hardening import SecurityMiddleware
+from app.security import log_redact
 from app.models.accounts import User
 from app.security import crypto, passport_token
 from app.services import escalation
@@ -76,6 +78,8 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
         lifespan=lifespan,
     )
     install_error_handlers(application)
+    log_redact.install()                              # the socket's login token is in its address: keep it out of the logs
+    application.add_middleware(SecurityMiddleware)   # added first, so CORS (added next) wraps it and 413 keeps CORS headers
     if origins:
         application.add_middleware(
             CORSMiddleware,
@@ -110,6 +114,10 @@ def create_app(environ: Optional[Mapping[str, str]] = None) -> FastAPI:
     application.include_router(feedback.router)
     application.include_router(location_shares.router)
     application.include_router(access_log.router)
+    application.include_router(predictions.router)
+    application.include_router(lab_values.router)
+    application.include_router(organs.router)
+    application.include_router(report_extract.router)
 
     @application.get("/health", tags=["system"])
     def health() -> dict:

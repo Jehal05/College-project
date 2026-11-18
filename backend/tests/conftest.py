@@ -12,6 +12,7 @@ from app.main import app
 from app.models.patient_data import Contact, Patient, Report
 from app.security import crypto, passport_token
 from app.security.login_limiter import reset_limiter
+from app.security.write_limiter import reset_write_limiters
 from app.sim.wearable import registry as wearable_registry
 
 
@@ -25,16 +26,18 @@ def fresh_key(monkeypatch):
     monkeypatch.setenv("BCRYPT_ROUNDS", "4")          # fast hashing in tests
     monkeypatch.delenv("CORS_ALLOW_ORIGINS", raising=False)
     monkeypatch.delenv("ACCESS_TOKEN_EXPIRE_MINUTES", raising=False)
-    for name in ("LOGIN_MAX_FAILURES", "LOGIN_IP_MAX_FAILURES", "LOGIN_WINDOW_SECONDS"):
+    for name in ("LOGIN_MAX_FAILURES", "LOGIN_IP_MAX_FAILURES", "LOGIN_WINDOW_SECONDS", "EMERGENCY_MAX_PER_WINDOW", "WRITE_WINDOW_SECONDS"):
         monkeypatch.delenv(name, raising=False)
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
     reset_limiter()
+    reset_write_limiters()
     wearable_registry.reset_all()          # no test may inherit another test's demo vitals profile
     yield
     crypto.reset_cipher()
     passport_token.reset_demo_secret()
     reset_limiter()
+    reset_write_limiters()
     wearable_registry.reset_all()
 
 

@@ -1,8 +1,9 @@
 import { setPresenting } from '../services/presentation.js';
 import { usePresenting } from './usePresenting.js';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider.jsx';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { visibleGroups } from '../services/navGroups.js';
 import SimulatedBadge from './SimulatedBadge.jsx';
 import { USE_MOCK } from '../services/config.js';
 import { resetDemo } from '../services/demoReset.js';
@@ -13,17 +14,6 @@ import LanguageSwitcher from './LanguageSwitcher.jsx';
 import SoundControl from './SoundControl.jsx';
 import { CitySwitcher } from './CityBar.jsx';
 
-const links = [
-  { to: '/dashboard', label: 'nav.dashboard' },
-  { to: '/map', label: 'nav.map' },
-  { to: '/fleet', label: 'nav.fleet' },
-  { to: '/history', label: 'nav.history' },
-  { to: '/activity', label: 'nav.activity' },
-  { to: '/handover', label: 'nav.handover' },
-  { to: '/analytics', label: 'nav.analytics' },
-  { to: '/admin', label: 'nav.admin', adminOnly: true },
-];
-
 export default function NavBar() {
   const t = useT();
   const presenting = usePresenting();
@@ -31,6 +21,18 @@ export default function NavBar() {
   const { hospitals } = useHospitals();
   const navigate = useNavigate();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // small screens only: the menu is folded behind a button
+  const menuButton = useRef(null);
+  const { pathname } = useLocation();
+  useEffect(() => setMenuOpen(false), [pathname]); // choosing a page closes the menu
+
+  // Escape closes the small-screen menu and puts focus back on its button.
+  function onMenuKeyDown(e) {
+    if (e.key === 'Escape' && menuOpen) {
+      setMenuOpen(false);
+      menuButton.current?.focus();
+    }
+  }
 
   return (
     <header className="border-b-4 border-ht-accent bg-ht-sidebar text-white">
@@ -42,22 +44,45 @@ export default function NavBar() {
           {t('app.title')}
         </span>
         <SimulatedBadge text={t('app.simulated')} />
-        <nav className="flex gap-1 ml-4">
-          {links
-            .filter((l) => !l.adminOnly || role === 'admin')
-            .map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-1.5 font-medium ${isActive ? 'bg-ht-accent text-ht-sidebar' : 'hover:bg-ht-card'}`
-                }
-              >
-                {t(l.label)}
-              </NavLink>
+        <nav aria-label={t('nav.aria')} onKeyDown={onMenuKeyDown} className="ml-4">
+          <button
+            ref={menuButton}
+            type="button"
+            data-testid="menu-toggle"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="min-h-11 rounded-lg border border-slate-400 px-4 py-1.5 font-semibold lg:hidden"
+          >
+            {menuOpen ? t('nav.menuClose') : t('nav.menu')}
+          </button>
+          <div id="site-menu" className={`${menuOpen ? 'mt-2 flex' : 'hidden'} flex-col gap-3 lg:mt-0 lg:flex lg:flex-row lg:items-start lg:gap-5`}>
+            {visibleGroups(role).map((g) => (
+              <div key={g.id} role="group" aria-labelledby={`nav-g-${g.id}`}>
+                <div id={`nav-g-${g.id}`} className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-300">{t(g.label)}</div>
+                <div className="flex flex-col gap-1 lg:flex-row">
+                  {g.links.map((l) => (
+                    <NavLink
+                      key={l.to}
+                      to={l.to}
+                      className={({ isActive }) =>
+                        `inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 ${isActive ? 'bg-ht-accent font-bold text-ht-sidebar underline decoration-2 underline-offset-4' : 'font-medium hover:bg-ht-card'}`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          {isActive && <span aria-hidden="true" className="mr-1">▸</span>}
+                          {t(l.label)}
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
             ))}
+          </div>
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex flex-wrap items-center gap-3">
           {USE_MOCK && !presenting && !confirmReset && (
             <button data-testid="reset-demo" onClick={() => setConfirmReset(true)} className="rounded-lg border border-amber-400 px-3 py-1.5 text-amber-200 hover:bg-slate-700">
               {t('nav.resetDemo')}

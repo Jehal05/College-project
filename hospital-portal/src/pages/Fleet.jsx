@@ -99,7 +99,7 @@ export default function Fleet() {
       <div>
         <h2 className="mb-3 text-2xl font-bold">{t('fleet.trips', { n: active.length })}</h2>
         {active.length === 0 && <p className="rounded-2xl bg-white p-6 text-slate-500 shadow">{t('fleet.noTrips')}</p>}
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {active.map((e) => (
             <div key={e.emergency_id} className="rounded-2xl bg-white p-4 shadow">
               <h3 className="mb-2 text-xl font-bold">{e.emergency_id} · {typeText(t, e.type)}</h3>

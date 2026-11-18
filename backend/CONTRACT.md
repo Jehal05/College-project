@@ -1,6 +1,6 @@
 # HealthTwin AI: API and Event Contract
 
-**Version 0.7 (in progress) | Owner: Daksh (backend) | Date: 13 November 2026**
+**Version 0.7 (in progress) | Owner: Puneet (backend, from 16 Nov 2026; Daksh before) | Date: 13 November 2026**
 
 > Simulated prototype. Not a medical device. The system supports emergency escalation. It does not diagnose.
 > Anyone with possible heart attack symptoms should call 112 (or 108) immediately.
@@ -96,7 +96,7 @@ Rules:
 
 Emergency records start at `EMERGENCY_DETECTED`. `MONITORING` and `SYMPTOMS_REPORTED` describe the patient state and feed the digital twin bar.
 
-**Decision (0.7, Jehal; pending confirmation by Daksh and Puneet): who moves `EMERGENCY_DETECTED → SOS_SENT`?** The patient app does, with `POST /emergencies/{id}/sos`, when its own cancel countdown ends (as the mock server already works). The backend has no timer for it. The call is idempotent: a second call, or a call after the hospital answered, returns `200` with the current state and changes nothing. A cancelled emergency answers `409` with `from` and `to`. The earlier proposal (a backend countdown, `COUNTDOWN_SECONDS`) is dropped unless the team decides otherwise.
+**Decision (0.7, Jehal; pending confirmation by Puneet (backend)): who moves `EMERGENCY_DETECTED → SOS_SENT`?** The patient app does, with `POST /emergencies/{id}/sos`, when its own cancel countdown ends (as the mock server already works). The backend has no timer for it. The call is idempotent: a second call, or a call after the hospital answered, returns `200` with the current state and changes nothing. A cancelled emergency answers `409` with `from` and `to`. The earlier proposal (a backend countdown, `COUNTDOWN_SECONDS`) is dropped unless the team decides otherwise.
 
 ---
 
@@ -188,6 +188,11 @@ For any other endpoint: `401` means no login or a login that is bad, expired or 
 | GET, POST /patients/{id}/reports | List the reports (no file bytes) / upload one: raw PDF, JPG or PNG body, file name in `?name=` | PATIENT (own) | Jehal |
 | GET /patients/{id}/reports/{rid}/file | Download one report | PATIENT (own) | Jehal |
 | DELETE /patients/{id}/reports/{rid} | Delete one report | PATIENT (own) | Jehal |
+| POST /predictions/{model} | Educational risk estimate for `heart` or `diabetes`; optional `scenario` for a what-if. PROPOSED, not agreed (see docs/API_CONTRACT.md) | PATIENT (own) | Puneet |
+| GET /patients/{id}/organs/{organ} | The readings that belong to one organ (a fixed table); no data gives `has_data: false`. PROPOSED, not agreed | PATIENT (own) | Puneet |
+| POST /reports/extract | Propose lab values from a text PDF; saves nothing. PROPOSED, not agreed | PATIENT | Puneet |
+| GET, POST /patients/{id}/lab-values | List / save lab values the patient confirmed (max 20 per save). PROPOSED, not agreed | PATIENT (own) | Puneet |
+| DELETE /patients/{id}/lab-values/{lab_id} | Delete one stored lab value. PROPOSED, not agreed | PATIENT (own) | Puneet |
 | GET, POST /patients/{id}/reminders | List / add a medication reminder | PATIENT (own) | Jehal |
 | PUT, DELETE /patients/{id}/reminders/{rid} | Change / delete a reminder | PATIENT (own) | Jehal |
 | POST /patients/{id}/reminders/{rid}/shown, /taken | Log that a dose reminder was shown / marked taken | PATIENT (own) | Jehal |
@@ -606,6 +611,8 @@ Connect to `ws://localhost:8000/ws/hospitals/{hospital_id}?token=<jwt>` for hosp
 
 **As built (14 Nov 2026, Puneet; the path is proposed, not agreed with Daksh and Jehal):** ONE path, `ws://localhost:8000/ws?token=<login token>`, as the mock server and the portal already use. The server filters by role instead of by room: hospital staff hear the emergencies their hospital was alerted for (and hospital-wide news such as `hospital.availability_updated`), an admin hears every sent emergency, a patient hears their own, and family and responders hear nothing yet (the family link and responder alerts are not built). A bad token is accepted and closed at once with code 1008. With no token in the address, send `{"type":"auth","token":"..."}` within 5 seconds and wait for `auth.ok`. `replay_since` is read and ignored (replay is not built). The older two-path design above stays in this contract until the three of us decide.
 
+**Dead logins (as built, 16 Nov 2026):** an open socket proves its login again every `WS_RECHECK_SECONDS` (default 30) and before every event it sends. If the token has expired, or the account was disabled or deleted or has another role, the server closes the socket with code `1008` and sends nothing more. The token is kept only in memory. Because it travels in the address, the server replaces `token=` values with `[hidden]` in uvicorn's log lines (`app/security/log_redact.py`); any other proxy or log in front of the server must do the same, or the client should use the message login instead. The client must log in again; the URL and the event shapes did not change.
+
 **Escalation (as built):** an emergency in `SOS_SENT` that nobody acknowledges for `ESCALATION_TIMEOUT_SECONDS` (default 30) goes `SOS_SENT` to `ESCALATED` to `SOS_SENT` and the next verified hospital in the SOS ranking that can treat that emergency type (for a heart attack, one with a cath lab ready) is alerted; when none is left, nothing more happens (`hospital.escalated`, `emergency.created`, `hospital.alerted`). The app checks once a second (`ESCALATION_SWEEP_SECONDS`).
 
 ### 5.1 Event envelope (every event uses it)
@@ -655,6 +662,8 @@ Added in 0.7.3 (J3): `passport_secrets` (the QR link, encrypted), `passport_open
 Added in 0.7.5 (P2, proposed): `desk_entries` (desk notes, chat lines and checklist ticks, text encrypted).
 
 Added in 0.7.5: `location_shares` (location encrypted).
+
+Added in Phase 3 (P5, proposed): `lab_values` (the value and the printed range are encrypted).
 
 Added in 0.7.4 (J4): `family_invites`, `family_links`, `family_checkins`, `responder_profiles`, `responder_acceptances`, `content_items`, `feedback` (comment encrypted), `privacy_requests`.
 

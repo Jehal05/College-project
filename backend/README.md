@@ -46,6 +46,7 @@ Open `.env` in a text editor and replace the two placeholders. Generate the valu
 
 The app **refuses to start** with a placeholder or empty key (unless `DEMO_MODE=true`, which uses throw-away keys
 and prints a warning). Never commit `.env`.
+`.env.example` ships with `DEMO_MODE=false` on purpose: demo accounts and weak demo passwords load only when you set it to `true` yourself.
 
 Start the server:
 
@@ -67,6 +68,7 @@ Then open <http://localhost:8000/docs> for the interactive API page, and <http:/
 | `BCRYPT_ROUNDS` | Password hashing cost. Keep 12 or more for anything real | 12 |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login lasts | 480 |
 | `LOGIN_MAX_FAILURES`, `LOGIN_IP_MAX_FAILURES`, `LOGIN_WINDOW_SECONDS` | Login rate limit (wrong attempts per login, per address, and the window in seconds) | 5, 30, 60 |
+| `MAX_BODY_BYTES` | Largest request body accepted; bigger ones get 413 (from the Content-Length header, or, for a chunked body, counted as it is read). Report uploads keep their own 2 MB limit | 8388608 |
 | `PASSPORT_TOKEN_EXPIRE_MINUTES` | How long a passport link lasts | 30 |
 | `DISPATCH_OWN_AMBULANCE_ONLY` | PROPOSED, not agreed: `true` lets a desk dispatch only ambulances based at its own hospital (403 otherwise). Off means any available ambulance, the old behaviour | off |
 | `ESCALATION_TIMEOUT_SECONDS`, `ESCALATION_SWEEP_SECONDS` | How long an alert may wait for a hospital to acknowledge before it goes to the next hospital, and how often the server checks | 30, 1 |
@@ -111,12 +113,17 @@ contract is wrong, tell Jehal and Puneet first, change the contract text, then t
 `docker compose up` is set up (it reads `.env`), but it has **not yet been built and run on a real machine**.
 Treat it as untested until someone has done it.
 
+## Database and migrations
+
+The tables are created with `Base.metadata.create_all` on a local SQLite file (`healthtwin.db`). There are **no migrations**. If a model changes, an existing database file is not updated: delete the local `.db` file and let the app create it again (the demo data is seeded again when `DEMO_MODE=true`), or add Alembic before keeping real data. This is acceptable for a simulated prototype only.
+
 ## Blocks built by Puneet (P1 to P4)
 
 - **Hospitals** (`app/api/hospitals.py`, `app/services/hospitals.py`): list with distance and a `type` filter, availability updates (staff of that hospital or an admin), and add, edit and verify (admin only; a new hospital starts unverified and is never alerted until verified). The add, edit and verify calls are the portal's proposals, not yet agreed.
 - **Ambulances**: `GET /ambulances` and `POST /ambulances/{id}/location` (staff of the hospital the ambulance belongs to or is working for).
 - **Hospital desk** (`app/api/hospital_desk.py`): acknowledge, dispatch, status and the `GET /emergencies?status=` lists, all through `emergency_state.transition()`. Also the proposed notes, chat and checklist calls and `GET /emergencies/{id}/desk` (new table `desk_entries`).
 - **Live events** (`app/api/ws.py`, `app/services/ws_hub.py`): one WebSocket at `/ws?token=`, filtered by role. **Escalation** (`app/services/escalation.py`): no acknowledgement in time, the next verified hospital is alerted.
+- WebSocket logins are re-checked while a socket is open (`WS_RECHECK_SECONDS`, default 30, and before every event); a dead login is closed with 1008 (16 Nov 2026).
 - Not built: a desk taking over another hospital's alert, a once-a-second `vitals.update` stream, WebSocket replay, a Docker build check. The path of the socket is not agreed with Daksh and Jehal.
 
 ## Where things are
@@ -142,3 +149,5 @@ CONTRACT.md     the API contract (source of truth for this backend)
 - A field the patient did not agree to share is **left out**, never sent as `null`.
 - Only the rules engine decides severity. Nothing here diagnoses; every severity word is guidance, labelled simulated.
 - Nothing is claimed as doctor-approved until a named, registered doctor has signed it off.
+
+**Response headers.** Every reply carries `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Cache-Control: no-store` and a `Content-Security-Policy` of `default-src 'none'; frame-ancestors 'none'` (not on `/docs`, `/redoc` or stored PDF and image files). `Strict-Transport-Security` is added only when the request came over HTTPS (or `X-Forwarded-Proto: https`). The static portal and patient app have no CSP yet (open).

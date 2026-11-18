@@ -30,3 +30,10 @@ The mock server keeps everything in memory and is not for real users. The real b
 ## Demo panel
 
 The `/demo` panel is left out of a normal build. For a rehearsal deployment set `VITE_DEMO_TOOLS=true` at build time; do not set it for anything real people use.
+
+## Backend and portal are not covered here yet
+This page and `netlify.toml` only deploy the **patient app** as a static site. Nothing in the repository yet says how to deploy:
+- the **backend** (FastAPI + SQLite; `backend/Dockerfile` and `docker-compose.yml` exist but have not been built and run on a real machine, see `backend/README.md`), or
+- the **hospital portal** (a separate Vite app in `hospital-portal/`; it has no `netlify.toml` and no deploy steps).
+
+The demo runs on one laptop (`docs/DEMO_RUN_REAL_BACKEND.md`). A hosted deployment of all three parts is not done.

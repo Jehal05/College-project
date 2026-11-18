@@ -12,7 +12,7 @@ import { stateText } from '../../i18n/phrases.js';
 const MOCK_BUTTON = 'mt-3 rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 px-4 py-2 font-semibold text-amber-900 hover:bg-amber-100';
 
 /** Action buttons, escalation countdown, last update and the mock-only helper buttons. `next` is the next hospital on the list (or null). */
-export default function ActionsPanel({ emergency: e, next }) {
+export default function ActionsPanel({ emergency: e, next, noHospital = false }) {
   const [error, setError] = useState('');
   const t = useT();
   const presenting = usePresenting(); // always called, never behind &&
@@ -33,7 +33,7 @@ export default function ActionsPanel({ emergency: e, next }) {
       <h3 className="mb-2 font-semibold">{t('detail.actions')}</h3>
       <ActionButtons emergency={e} />
       <div className="mt-3 empty:hidden">
-        <EscalationCountdown emergency={e} hasNext={Boolean(next)} large />
+        <EscalationCountdown emergency={e} hasNext={Boolean(next)} noHospital={noHospital} large />
       </div>
       {last && (
         <p data-testid="last-action" className="mt-3 text-slate-600">

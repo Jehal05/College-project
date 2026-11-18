@@ -764,3 +764,14 @@ Please review these new strings (generated from `src/i18n/*.js`):
 | `act.nk.note` | Note | नोट | નોંધ | pending | pending |
 | `map.demoLoc` | Demo patient location | डेमो मरीज़ की लोकेशन | ડેમો દર્દીનું લોકેશન | pending | pending |
 | `map.sampleTag` | (sample) | (नमूना) | (નમૂનો) | pending | pending |
+
+## Added 2026-11-15 (no suitable hospital, last hospital, take-over explanation)
+
+Status of every row below: **draft, needs native review** (Hindi and Gujarati). Written with AI help; nobody has reviewed them.
+
+| Key | English | Hindi | Gujarati | Hindi review | Gujarati review |
+|---|---|---|---|---|---|
+| `banner.noHospital` | No suitable hospital is available for this emergency. Call the control room. | इस आपातकाल के लिए कोई उपयुक्त अस्पताल उपलब्ध नहीं है। कंट्रोल रूम को कॉल करें। | આ કટોકટી માટે કોઈ યોગ્ય હોસ્પિટલ ઉપલબ્ધ નથી. કંટ્રોલ રૂમને કૉલ કરો. | pending | pending |
+| `banner.lastHospital` | This is the last hospital on the list. If nobody answers, call the control room. | यह सूची का आखिरी अस्पताल है। कोई जवाब न दे तो कंट्रोल रूम को कॉल करें। | આ યાદીની છેલ્લી હોસ્પિટલ છે. કોઈ જવાબ ન આપે તો કંટ્રોલ રૂમને કૉલ કરો. | pending | pending |
+| `countdown.noHospital` | No suitable hospital · call the control room | कोई उपयुक्त अस्पताल नहीं · कंट्रोल रूम को कॉल करें | કોઈ યોગ્ય હોસ્પિટલ નથી · કંટ્રોલ રૂમને કૉલ કરો | pending | pending |
+| `takeover.why` | Why this step: an alert belongs to the hospital it was sent to. It moves on only when that hospital does not answer in time. A desk must take it over on purpose, so nobody acts on another hospital's alert by accident. | यह कदम क्यों: अलर्ट उसी अस्पताल का होता है जिसे वह भेजा गया। वह तभी आगे जाता है जब वह अस्पताल समय पर जवाब न दे। डेस्क को इसे जानबूझकर अपने हाथ में लेना होता है, ताकि कोई गलती से दूसरे अस्पताल के अलर्ट पर कार्रवाई न करे। | આ પગલું કેમ: એલર્ટ જે હોસ્પિટલને મોકલ્યો હોય તેનો જ ગણાય. તે હોસ્પિટલ સમયસર જવાબ ન આપે ત્યારે જ તે આગળ જાય છે. ડેસ્કે તેને જાણી જોઈને હાથમાં લેવો પડે છે, જેથી કોઈ ભૂલથી બીજી હોસ્પિટલના એલર્ટ પર કાર્યવાહી ન કરે. | pending | pending |

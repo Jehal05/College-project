@@ -19,6 +19,6 @@ export default defineConfig({
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
-    env: { VITE_USE_MOCK: 'true' },
+    env: { VITE_USE_MOCK: 'true', VITE_ROAD_ROUTES: 'false' }, // tests never call the public routing server
   },
 });

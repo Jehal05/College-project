@@ -1,7 +1,9 @@
 // Live ambulance tracking (feature #25) with simulated traffic and green corridor (feature #45).
 // Reads the position from the emergency (kept up to date by ambulance.location events),
 // so it shows the same thing on every screen that is watching.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { cachedRoad, loadRoad } from '../services/roadRoute.js';
+import { TILE_URL, TILE_ATTRIBUTION } from '../config/external.js';
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, ZoomControl } from 'react-leaflet';
 import trafficConfig from '../data/traffic-config.json';
 import simConfig from '../data/sim-config.json';
@@ -17,6 +19,9 @@ import { useEmergencies } from './EmergencyProvider.jsx';
 import { useHospitals } from './HospitalProvider.jsx';
 import { useAuth } from './AuthProvider.jsx';
 import SimulatedBadge from './SimulatedBadge.jsx';
+import TileNotice from './TileNotice.jsx';
+import { useTileHealth } from './useTileHealth.js';
+import { remainingKm } from '../services/mapHealth.js';
 import { useT } from '../i18n/index.js';
 import { formatEta, legText } from '../services/eta.js';
 
@@ -28,6 +33,7 @@ export default function TrackingMap({ emergency, compact = false }) {
   const { hospitals } = useHospitals();
   const { units, traffic, setTraffic, trips, startTrip, pauseTrip, resumeTrip, resetTrip, movementFor } = useAmbulances();
   const { addNote } = useEmergencies();
+  const tiles = useTileHealth();
   const [message, setMessage] = useState('');
   const e = emergency;
   const id = e.emergency_id;
@@ -38,10 +44,20 @@ export default function TrackingMap({ emergency, compact = false }) {
   const lat = where?.lat;
   const lng = where?.lng;
   const ownHospitalId = session?.hospital_id;
-  const route = useMemo(
+  const plainRoute = useMemo(
     () => routeForEmergency({ ambulance_id: ambulanceId, alerted_hospital_id: alertedId, location: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined }, units, hospitals, ownHospitalId),
     [ambulanceId, alertedId, lat, lng, units, hospitals, ownHospitalId],
   );
+  // Real road geometry from the routing server when it answers in time; otherwise the simulated path stays (and says so).
+  const [road, setRoad] = useState(() => cachedRoad(plainRoute) || null);
+  useEffect(() => {
+    let live = true;
+    setRoad(cachedRoad(plainRoute) || null);
+    if (plainRoute) loadRoad(plainRoute).then((v) => { if (live && v && !trips[id]) setRoad(v); }).catch(() => {}); // not while a trip runs: it already follows its own path
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plainRoute]);
+  const route = road || plainRoute;
   if (!route) return <p className="rounded-xl bg-slate-100 p-4 text-slate-500">{t('tk.waiting')}</p>;
 
   const arrived = e.state === 'ARRIVED' || e.state === 'HANDOVER_DONE';
@@ -50,6 +66,7 @@ export default function TrackingMap({ emergency, compact = false }) {
   const progress = arrived ? 1 : live ? e.ambulance.progress || 0 : 0;
   const position = arrived ? route.hospital : live ? e.ambulance : route.points[0];
   const { done, remaining } = splitPath(route.points, route.cumulative, progress);
+  const toGo = remainingKm({ totalKm: route.totalKm, progress, live, arrived }); // along the simulated route; null when no live position
   const toLatLng = (p) => [p.lat, p.lng];
   const trip = trips[id];
   const moving = e.state === 'AMBULANCE_DISPATCHED' || e.state === 'EN_ROUTE';
@@ -75,13 +92,18 @@ export default function TrackingMap({ emergency, compact = false }) {
             {arrived ? t('tk.arrived') : live ? t('tk.eta', { time: formatEta(e.ambulance.eta_seconds, t) }) : t('tk.etaWait')}
           </div>
           <div data-testid="movement-source" data-source={movementFor(id)} className="text-sm text-slate-500">{movementText(movementFor(id), t)}</div>
+          {toGo !== null && !arrived && (
+            <div data-testid="distance-left" data-km={toGo} className="text-slate-700">{t('tk.toGoKm', { km: toGo })}</div>
+          )}
           <div data-testid="trip-leg" className="font-semibold text-slate-700">
             {legText({ arrived, live, ambulance: e.ambulance }, t)}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <SimulatedBadge text={t('tk.simRoute')} />
-          <SimulatedBadge text={t('tk.notRoad', { n: simConfig.time_scale })} />
+          {route.source === 'road'
+            ? <span data-testid="road-route" className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-900 ring-1 ring-emerald-300">{t('tk.roadRoute', { km: route.road_km, min: Math.max(1, Math.round(route.road_seconds / 60)), n: simConfig.time_scale })}</span>
+            : <SimulatedBadge text={t('tk.notRoad', { n: simConfig.time_scale })} />}
         </div>
       </div>
 
@@ -89,8 +111,9 @@ export default function TrackingMap({ emergency, compact = false }) {
         <MapContainer key={`${id}-${route.ambulance.id}`} bounds={route.points.map(toLatLng)} boundsOptions={{ padding: [40, 40] }} scrollWheelZoom={false} zoomControl={false} className="h-full w-full">
           <ZoomControl zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution={TILE_ATTRIBUTION}
+            url={TILE_URL}
+            eventHandlers={tiles.handlers}
           />
           <Polyline positions={done.map(toLatLng)} pathOptions={{ color: '#94a3b8', weight: 6 }} />
           <Polyline positions={remaining.map(toLatLng)} pathOptions={{ color: '#2563eb', weight: 6, dashArray: '2 10' }} />
@@ -105,6 +128,7 @@ export default function TrackingMap({ emergency, compact = false }) {
           </Marker>
         </MapContainer>
       </div>
+      <TileNotice down={tiles.down} />
       <div className="mt-1 flex flex-wrap gap-4 text-sm text-slate-600">
         <span><b className="text-slate-400">━</b> {t('tk.driven')}</span>
         <span><b className="text-blue-600">┅</b> {t('tk.toGo')}</span>

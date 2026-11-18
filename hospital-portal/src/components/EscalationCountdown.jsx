@@ -7,8 +7,9 @@ import { useT } from '../i18n/index.js';
  * "Escalates in 12 s" for an alert nobody has acknowledged yet (feature #43).
  * Shows nothing once the alert is acknowledged, cancelled or finished.
  *   hasNext – false when there is no further hospital to escalate to
+ *   noHospital – true when the list of suitable hospitals is empty (says so, instead of "last hospital")
  */
-export default function EscalationCountdown({ emergency, hasNext = true, large = false }) {
+export default function EscalationCountdown({ emergency, hasNext = true, noHospital = false, large = false }) {
   const [now, setNow] = useState(Date.now());
   const t = useT();
   const left = secondsLeft(emergency, now, ESCALATION_SECONDS);
@@ -25,7 +26,7 @@ export default function EscalationCountdown({ emergency, hasNext = true, large =
   if (!hasNext) {
     return (
       <span data-testid="countdown" data-left="" className={`inline-block rounded-lg bg-slate-200 font-semibold text-slate-700 ${size}`}>
-        {t('countdown.last')}
+        {noHospital ? t('countdown.noHospital') : t('countdown.last')}
       </span>
     );
   }

@@ -46,7 +46,9 @@ export async function beginEmergency(patientId, type, symptoms, { source, online
   try {
     return { emergency: await startEmergency(patientId, type, symptoms, savedConsents, source) };
   } catch (err) {
-    if (err.code === 'NETWORK') { setPending(type, symptoms, source); return { pending: true }; }
+    // No connection, or the server asked us to slow down (429): keep it as "not sent yet" (never shown as sent). The pending screen
+    // says "Call 112 / 108 now" and has a "Try again" button, so a person is never left with a bare error on an SOS.
+    if (err.code === 'NETWORK' || err.status === 429) { setPending(type, symptoms, source); return { pending: true }; }
     throw err;
   }
 }

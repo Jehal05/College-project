@@ -64,3 +64,95 @@ Please confirm or change, one line each:
 **Draft only. Not sent.**
 
 Jehal, two questions: (1) Your `TRANSLATION_REVIEW.md` still says "not reviewed by a native speaker". Who reviewed the Hindi and Gujarati text, and can you write their name in the file? Until then we say it is unreviewed. (2) The backend now has the hospital calls and a WebSocket, so we can try the apps against it. Do you want to try that with me on one laptop? Neither of us has run it yet.
+
+## Phase 1 review request (15 Nov 2026, not sent)
+
+### To Daksh
+
+Daksh, I added a PROPOSED section to `docs/API_CONTRACT.md` ("Proposed: predictions, organs, report extraction"). Nothing is built. Three routes (`POST /predictions/{model}`, `GET /patients/{id}/organs/{organ}`, `POST /reports/extract`) and one new route for saving confirmed lab values. The new code would live in your backend, so please say yes or no and answer the open questions at the end of that section. In particular: where the model files should live. Separately, I will send the WebSocket review findings (the token is checked only when the socket opens).
+
+### To Jehal
+
+Jehal, the same section describes the answers for the model card, the organ panel and the report review screen. Could your mock return one fixed example of each so you can build the screens first? Please tell me if a field you need is missing. The shapes are a proposal, not agreed.
+
+## Phase 3 build notes (15 Nov 2026, drafts, not sent)
+
+Everything below is on branch `Puneet` only (not merged, not pushed until Puneet says so). Nothing is agreed until each person answers in writing.
+
+### To Daksh
+
+Daksh, the routes I proposed are now built on `Puneet` in your `backend/app`, so you can read them as code instead of as a plan:
+
+- `POST /predictions/{model}` (heart, diabetes; now with an optional `scenario` for a what-if)
+- `GET /patients/{id}/organs/{organ}`, `POST /reports/extract`, `POST` and `GET /patients/{id}/lab-values`, `DELETE /patients/{id}/lab-values/{lab_id}`
+- one new table, `lab_values` (the value and the printed range are encrypted; created by `create_all`, no migration)
+- `backend/CONTRACT.md` has PROPOSED rows for all of them, because `test_contract_conformance.py` fails for any served route that is not listed there. (`/predictions/{model}` was missing since Phase 2; I only noticed now.)
+
+Please answer: (1) the six routes and the table: accept, change or drop; (2) `pypdf` for `/reports/extract`: I did **not** add it to `requirements.txt` or the lock. Without it the route answers 503 and nothing else is affected. Add it (pure Python, BSD) or keep extraction off? (3) the model files: kept in the repo under `app/ml/models/`. They are practice models trained on invented data, so every answer says so. Real data is still missing. (4) FYI the WebSocket token is only checked when the socket opens (details in my Phase 1 message). I did not run any of the new endpoint tests on a machine with FastAPI; they run in CI.
+
+### To Jehal
+
+Jehal, the answers for your Twin, Report and Simulator screens exist now, with examples in `docs/examples/phase3/*.json` (the extract and what-if ones are real function output; the others are written from the code, not captured from a server). The shapes to read: `docs/API_CONTRACT.md`, "Phase 3 build notes" under sections 2, 3 and 4 and the what-if note under section 1.
+
+Things that differ from what you may expect: (1) the organ list is your six (heart, lungs, kidneys, liver, pancreas, brain) but brain always answers `has_data: false`; (2) vitals have **no trend** (the simulator keeps no history), only stored labs have one; (3) lab `test` values are your keys (`hba1c`, `fasting_glucose`, ...), units are your app units, and `/reports/extract` already converts mmol/L etc; (4) `unreadable` is a list of objects; (5) the what-if only changes the model's own inputs. Exercise, smoking, sleep and diet cannot be changed (no coefficients exist for them), and your four slider names do not map one to one onto the model inputs (reasons in the contract note). Please show the model inputs themselves on the Simulator. Your screens need to call `POST /patients/{id}/lab-values` after the person has checked the extracted values; the extract call saves nothing.
+
+To try it on one laptop, Puneet has `.\laptop-phase3-check.cmd` (no packages needed; it starts the backend by itself and writes `laptop-phase3-log.txt`). The done-when for you: your Twin, Report and Simulator screens show real answers from the real backend.
+
+## Phase 4 build notes (15 Nov 2026, drafts, not sent)
+
+Branch `Puneet` only. Nothing is agreed until each person answers in writing. The full evidence is in `docs/DECISIONS_PHASE4.md`.
+
+### To Daksh
+
+Daksh, three things for you, none of them changed by me in your code:
+
+1. **Ranking.** Your `rank_hospitals` picks the nearest suitable hospital; the portal's ranking scores capability, travel time and beds. On six test cases the first hospital differs in 4 (HEART at the demo location: portal Maninagar, backend Navrangpura). You can reproduce it with `python3 -I backend/scripts/compare_rankings.py`. My recommendation (option 2 in the note): the backend ranks like the portal, using the shared `ranking-config.json`, after a doctor has looked at the weights. Do you agree, or do you want the portal to follow the backend?
+2. **Ambulance.** The backend has no mover; only the portal (with `VITE_PORTAL_SIMULATES_AMBULANCE=true`) or Jehal's mock moves it. For the recording I suggest the portal does it. Long term: a small backend simulation. Your call.
+3. **Two gaps I only read, not tested.** (a) `GET /emergencies/{id}` sends `status_events` with `state` and `timestamp` only, so after a reload the command view cannot say who acknowledged ("Name not recorded"). Could the event carry a display name (not a user id)? (b) The WebSocket checks the token only when the socket opens (`api/ws.py`), so an expired token or a disabled account keeps hearing alerts. Suggested: close at expiry. I would write the test first.
+
+Also new: `backend/scripts/perf_check.py` (standard library only, single-user local check, not a load test) and `scripts/run-all-tests.ps1`. The full backend test run on a machine with FastAPI has still not happened for the Phase 1 to 3 tests: CI or my laptop is the first place.
+
+### To Jehal
+
+Jehal, for the demo on the real backend: `docs/DEMO_ISSUES_PHASE4.md` lists what I expect to go wrong, and `docs/DEMO_RECORDING_CHECKLIST.md` is the checklist. Your items: (1) the SOS from **Emergency help** in the new design has never been pressed against the real backend (marked "not seen yet" in the run sheet); (2) the six planned screens must not be clicked while recording; (3) the browser test A1 (`phase10-apps.test.mjs`) failed once in CI and is treated as flaky; if you see it fail again the message already lists the pending requests. Ambulance: do you want your mock to keep moving it only in mock mode? That is what happens today. Please run `.\laptop-demo-check.cmd` once the backend is up, or tell me and I will.
+
+
+## Phase 6A build notes (15 Nov 2026, draft, not sent)
+
+### To Jehal
+
+Jehal, I polished the hospital portal (grouped menu, stats strip, clearer alert cards, analytics with median and P90). I did **not** touch `patient-app/` or the mock. Two small questions: (1) does your mock's `hospital.alerted` event carry `hospital.distance_km`? The alert card shows a distance only when it does. (2) `docs/FRONTEND_HANDOFF_PATIENT_APP.md` lists ideas from a frontend review for your app (design consistency, Overview layout, mobile navigation). They are suggestions only; one item I checked in your code: mobile Home goes to `/` and desktop Overview to `/overview`, which looks intentional. Take what helps.
+
+### To Daksh
+
+Daksh, no code of yours was touched. `docs/API_CONTRACT.md` has four PROPOSED rows (section "Phase 6A"): please confirm `hospital.distance_km` is sent on every read of an emergency, and say whether ambulances will ever get `registration` and `speed_kmh`. The portal works without all of them.
+
+## PR #15 review requests (16 Nov 2026, drafts, not sent; updated for the new split)
+
+New split: Puneet owns the backend, Jehal owns the whole frontend, Daksh is off the project. Full table: `docs/PR15_OWNERSHIP.md`. This replaces the "I did not touch patient-app/" line in the Phase 6A draft above: that line was true for Phase 6A only, not for the whole branch.
+
+### To Jehal
+
+Jehal, PR #15 has the hospital portal work (Phase 4 command view, Phase 6A shared UI parts, stats strip, alert cards, grouped navigation, analytics median/p90/n, map tile notice, 12 new e2e tests) and 3 files in `patient-app/`; nothing in `mock-server/`. As you now own the frontend, please review: (1) the portal changes (`hospital-portal/`, commits listed in the ownership table); (2) `patient-app/tests/browser/phase10-apps.test.mjs` (`b2f30ff`, `15a91bc`): A1 reloads up to 3 times when `GET /admin/users` stays pending; (3) `phase15-simulator.test.mjs` (`15a91bc`): S5 and S6 wait for the table; (4) `patient-app/eslint.config.js` (`c5239e9`), new and not run in CI. A1 passed on both CI events at `fdf955f` but failed on the pull_request run twice before; the root cause is unknown. The portal's Hindi and Gujarati strings are unreviewed drafts.
+
+### Backend and Daksh
+
+No message to Daksh while he is off the project. The backend part of PR #15 (about 5,600 lines: hardening, rate limit, PROPOSED lab values, organ answers, report text and what-if routes, practice ML models on invented data) is now Puneet's. It still needs a second reviewer; decide who. Backend CI passed at `fdf955f`.
+
+## Phase 7B: WebSocket token fix (16 Nov 2026, draft, not sent)
+
+### To Jehal
+
+Jehal, I (Puneet, backend) plan to change `backend/app/api/ws.py` so the server re-checks the login while a socket is open (on a timer and before each event) and closes it with code 1008 if the token has expired or the account was disabled. Today it checks only when the socket opens (`docs/DEMO_ISSUES_PHASE4.md` item 5). I will not touch the frontend, the `/ws` URL or the message shapes. Two questions: (1) Does your AI/security work touch `ws.py` or the token checks? If yes, tell me and I will wait. (2) A frontend point I found by reading only: `hospital-portal/src/services/socket.js` reconnects after any close and resets its wait to 2 s as soon as the socket opens, and the server opens (accepts) a socket before it closes it with 1008. So a desk with a dead token would retry about every 2 s forever and never show "log in again". This already happens today for a bad token at connect. The fix would be on your side (for example, after a 1008 close, stop retrying and ask for a new login). I am not changing it.
+
+## Phase 8: design improvement (16 Nov 2026, draft, not sent)
+
+### To Jehal
+
+Jehal, I (Puneet) would like to help improve the look of the whole app, building on your hospital-website work that is now in main (`.ht-page` and the login header in the portal, `.ht-themed` and the light default in the patient app). What I would propose, nothing built yet: (1) no plain white or plain black as a page or card background anywhere, using a tinted medical palette in light and dark (deep navy-teal instead of black); (2) a medical-themed background on every screen group, made only from CSS and inline SVG (faint ECG line, clinical grid, medical cross, soft anatomical outline, pulse rings on emergency screens), drawn on solid tinted cards so text never sits on the pattern; (3) one shared token set and shared Button, Card, StatusPill and empty/error/loading states in both apps; (4) a contrast script that measures WCAG AA for every text and background pair, and keeps `axe` at PASS. In the portal only the login page uses your new `.ht-page` background so far; the other portal screens do not. Questions: which files or screens are you working on right now, so we do not collide? Do you want me to work on a separate branch from the latest `main` (I would suggest `puneet-design`), or would you rather take it yourself and I only send the audit? Please say if any of the ideas above should be dropped.
+
+## Dead-login reconnect fix (16 Nov 2026) - UNSENT DRAFT for Jehal
+Hi Jehal, I touched two small files in your area, in the Puneet branch only:
+- hospital-portal/src/services/socket.js now uses a new socketLink.js. After the server closes with code 1008 (login no longer valid) the portal stops retrying and the badge shows "Signed out". Other drops wait 2 s, 4 s ... 30 s, and the wait starts again from 2 s only after a socket stayed open 10 s. Tests: socketLink.test.js.
+- patient-app/src/services/socket.js had a fixed 2 s retry; it now stops on 1008 and backs off the same way (utils/reconnect.js, tests/unit/reconnect.test.js).
+Please look at the "Signed out" badge text (en, hi, gu; hi and gu are unreviewed) and tell me if you want the desk to go to the login page instead.

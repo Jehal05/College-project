@@ -1,5 +1,12 @@
 # Changelog
 
+## Four parts of the demo can use real data
+- One config file per app for every outside address (map tiles, routing). Real tiles in the portal's three maps and the patient Hospitals map.
+- Real GPS rules: fresh high-accuracy fix, only with the location consent; the countdown screen says what will be sent and has **Stop sharing my location**.
+- Real road routes and times (OSRM public server, 4 s timeout) on the portal tracking map, with the simulated route as a labelled fallback.
+- Heart rate from a Bluetooth chest strap on the patient Home screen, only with the vitals consent, labelled Device vs Simulated.
+- Not done: sending the strap reading or a live GPS stream to the server (needs a backend endpoint). See `docs/REAL_DATA.md`.
+
 ## Real street map on the patient Hospitals screen
 - The Hospitals screen now shows a real OpenStreetMap street map (Leaflet, loaded on demand) with numbered pins for the fictional hospitals and the simulated start point. When offline or when tiles are blocked it falls back to the drawn map. CSP allows images from tile.openstreetmap.org only.
 

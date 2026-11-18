@@ -34,7 +34,7 @@ Then open **http://localhost:4000/start**: patient app at `/`, hospital portal a
 | **Hospital portal** | Alert queue, map, ambulance fleet, acknowledge / dispatch / hand-over, bed and ICU updates, history, activity log, analytics, English / Hindi / Gujarati |
 | **Family, volunteer, admin** | Invite-code family link with check-ins, verified volunteer responders, admin user and content management |
 | **Escalation** | If a hospital does not acknowledge in time, the alert escalates to the next hospital |
-| **Backend** | FastAPI + SQLite, encrypted personal data, append-only audit log, role-based access, 76 contract endpoints, WebSocket live events |
+| **Backend** | FastAPI + SQLite, encrypted personal data, append-only audit log, role-based access, 77 contract endpoints, WebSocket live events |
 
 ## Screens
 
@@ -159,6 +159,53 @@ The 3D twin loads a real human anatomy model (skin, skeleton, organs) built from
 |---|---|---|
 | <img src="docs/images/ui/phase4-body-2d-desktop.png" width="260" alt="2D body map"> | <img src="docs/images/ui/phase4-portal-login.png" width="260" alt="Portal login"> | <img src="docs/images/portal-dashboard.png" width="260" alt="Portal dashboard"> |
 
+## Docs index
+
+**Two files share a name on purpose.** `docs/DEMO_SCRIPT.md` is the full 5-minute demo on the mock server (patient app and portal); `hospital-portal/docs/DEMO_SCRIPT.md` is the 3-minute portal-side script; `docs/DEMO_RUN_REAL_BACKEND.md` is the run-through for the real backend. `TRANSLATION_REVIEW.md` also exists in both folders (patient app and portal strings).
+
+### `docs/`
+| File | What it is |
+|---|---|
+| `ACCESSIBILITY.md` | Accessibility audit of the patient app |
+| `API_CONTRACT.md` | The API the apps and the backend agree on |
+| `BACKEND_GAPS.md` | What the apps call and the backend does not have (draft for Daksh) |
+| `CLINICAL_REVIEW.md` | How a doctor signs off the emergency guidance (nothing reviewed yet) |
+| `DECISIONS_MEETING.md` | Questions for the team meeting |
+| `DEMO_RECORDING_PLAN.md` | Plan for recording the 3-minute demo |
+| `DEMO_RUN_REAL_BACKEND.md` | Demo run-of-show on the real backend |
+| `DEMO_SCRIPT.md` | Full 5-minute demo on the mock server |
+| `DEPLOY.md` | Deploying the patient app on Netlify |
+| `JOINT_REHEARSAL.md` | Joint rehearsal of the patient app and the portal |
+| `LANGUAGE_GAPS_2026-11-15.md` | What stays English in Hindi and Gujarati (portal) |
+| `LAPTOP_RUN_2026-11-14.md` | Notes from running the apps on the Windows laptop |
+| `NPM_AUDIT_2026-11-14.md`, `NPM_AUDIT_2026-11-15.md` | npm audit reports (the 15 Nov one is a placeholder until run) |
+| `PROJECT_STATUS.md` | Honest status of every part |
+| `PR_INTEGRATION_TO_MAIN.md` | Draft text for the pull request into `main` |
+| `RELEASE_CHECKLIST.md` | Release checklist |
+| `SHAGUN_WORK_SPLIT.md` | How Shagun's planned work was shared |
+| `TRANSLATION_REVIEW.md` | Hindi and Gujarati review status (patient app) |
+| `VIVA_QA.md` | Likely jury questions and plain answers |
+| `review/` | Review sheets for the doctor, language and device tests |
+| `images/` | Screenshots used in this README |
+
+### `hospital-portal/docs/`
+| File | What it is |
+|---|---|
+| `COVER_NOTES_DRAFTS.md` | Draft cover notes (not sent) |
+| `DEMO_SCRIPT.md` | 3-minute portal demo script and the "Laptop run" table |
+| `DEPENDENCY_AUDIT.md` | Dependency audit notes for the portal |
+| `DOCTOR_QUESTIONS.md` | Questions to help a doctor review (not a review) |
+| `DOCTOR_REVIEW_SHEET.md` / `.html` | Generated sheet for the doctor |
+| `ENDPOINTS_TO_AGREE.md` | Endpoints to agree with Daksh (notes, chat, checklist, hospital edit) |
+| `MESSAGES_TO_TEAM.md` | Messages to send to the team |
+| `PROPOSED_ENDPOINTS_FOR_DAKSH.md` | Proposed endpoints and events |
+| `QUALITY_TOOLS.md` | Lint and end-to-end test setup |
+| `REVIEW_PACK.md` | Review request messages |
+| `RUN_BOTH_APPS.md` | Run the portal and the patient app together |
+| `RUN_WITH_JEHALS_MOCK.md` | Run the portal against Jehal's mock |
+| `TRANSLATION_REVIEW.md` | Hindi and Gujarati review status (portal strings) |
+| `demo/`, `i18n/` | Demo screenshots and video, language glyph checks |
+
 ### Two cities: Ahmedabad and Pune
 
 The simulation covers two fictional city networks, Ahmedabad (AMD) and Pune (PNQ), five simulated hospitals and ambulances each. The list of cities (name, map centre, zoom, simulated start point) lives in one file, `backend/app/seed/data/cities.json`, and reaches the apps through `GET /cities`.
@@ -182,6 +229,9 @@ Screenshots of both cities at 360 and 1440 px (patient Hospitals screen and port
 - On the real backend an SOS picks hospitals by distance. It does not return `city_id` or `other_city` on the emergency yet, so the "other city" note appears only on the mock server.
 - The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
 - Hindi and Gujarati text for the new screens is an unreviewed draft.
+
+## Real data in the demo
+Map tiles, device GPS, road routes and a Bluetooth heart-rate strap can be real; everything else stays simulated and labelled. What is sent where, the limits and how to test by hand: [`docs/REAL_DATA.md`](docs/REAL_DATA.md).
 
 ## Status and honest limits
 

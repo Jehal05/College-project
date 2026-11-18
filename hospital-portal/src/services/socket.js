@@ -4,15 +4,11 @@
 import { USE_MOCK, WS_URL, WS_AUTH } from './config.js';
 import { WS_EVENTS, PROPOSED_EVENTS } from './contract.js';
 import { normaliseEvent } from './adapters.js';
-import { reconnectDelay } from './backoff.js';
+import { createLink } from './socketLink.js';
 
-let ws = null;
-let reconnectTimer = null;
-let wanted = false; // true between connect() and disconnect()
-let attempt = 0; // failed tries in a row; the wait grows with it and starts again after a good connection
 const handlers = new Map(); // event name -> Set of callbacks
 
-// ---- connection status: 'mock' | 'connecting' | 'live' | 'reconnecting'
+// ---- connection status: 'mock' | 'connecting' | 'live' | 'reconnecting' | 'signed_out'
 let status = USE_MOCK ? 'mock' : 'connecting';
 const statusListeners = new Set();
 function setStatus(next) {
@@ -35,60 +31,41 @@ function deliver(raw) {
   handlers.get('*')?.forEach((cb) => cb(message));
 }
 
-/** Open the connection (call after login). If it drops, it tries again after 2 s, 4 s, 8 s ... up to 30 s (with a little jitter). */
-export function connect(token) {
-  if (USE_MOCK) return setStatus('mock');
-  wanted = true;
-  if (ws) return;
-  // VITE_WS_AUTH=query (default): token in the address. =message: the token is sent as the first message instead.
-  const url = token && WS_AUTH === 'query' ? `${WS_URL}?token=${encodeURIComponent(token)}` : WS_URL;
-  let socket;
-  try {
-    socket = new WebSocket(url);
-  } catch (err) {
-    console.warn('WebSocket could not start', err);
-    return scheduleReconnect(token);
-  }
-  ws = socket;
-  socket.onopen = () => {
-    attempt = 0;
+let token = null;
+const link = createLink({
+  makeSocket: () => {
+    // VITE_WS_AUTH=query (default): token in the address. =message: the token is sent as the first message instead.
+    const url = token && WS_AUTH === 'query' ? `${WS_URL}?token=${encodeURIComponent(token)}` : WS_URL;
+    return new WebSocket(url);
+  },
+  onOpen: (socket) => {
     if (token && WS_AUTH === 'message') socket.send(JSON.stringify({ type: 'auth', token }));
-    setStatus('live');
-  };
-  socket.onmessage = (e) => {
+  },
+  onMessage: (e) => {
     try {
       deliver(JSON.parse(e.data));
     } catch (err) {
       console.warn('Bad WebSocket message', err);
     }
-  };
-  // The browser gives no useful detail here, and the address holds the token, so nothing is logged from it.
-  socket.onerror = () => {
-    if (wanted && ws === socket) setStatus('reconnecting');
-  };
-  socket.onclose = () => {
-    if (ws === socket) ws = null;
-    if (wanted) scheduleReconnect(token);
-  };
-}
+  },
+  onStatus: setStatus,
+});
 
-function scheduleReconnect(token) {
-  setStatus('reconnecting');
-  clearTimeout(reconnectTimer);
-  reconnectTimer = setTimeout(() => wanted && connect(token), reconnectDelay(attempt++));
+/**
+ * Open the connection (call after login). If it drops, it tries again after 2 s, 4 s, 8 s ... up to 30 s (with a little jitter).
+ * If the server closes it with code 1008 (the login is no longer valid) it stops and the status becomes 'signed_out'.
+ */
+export function connect(authToken) {
+  if (USE_MOCK) return setStatus('mock');
+  token = authToken;
+  if (status === 'signed_out') setStatus('connecting');
+  link.start();
 }
 
 /** Close the connection (call on logout). */
 export function disconnect() {
-  wanted = false;
-  attempt = 0;
-  clearTimeout(reconnectTimer);
-  if (ws) {
-    const socket = ws;
-    ws = null;
-    socket.close();
-  }
-  setStatus(USE_MOCK ? 'mock' : 'connecting');
+  token = null;
+  link.stop(USE_MOCK ? 'mock' : 'connecting');
 }
 
 /**

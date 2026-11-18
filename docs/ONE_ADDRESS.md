@@ -36,6 +36,8 @@ Logins: patient `patient@demo.test` / `demo1234`; portal staff `staff@demo` / `d
 
 ## Limits
 
+- **Demo build only.** `npm run one` builds the patient app with the demo panel switched on (`VITE_DEMO_TOOLS=true`) and the portal against the simulated server. Never deploy these builds (`dist-one`); a normal release is built with `npm run build`.
+- **Which branch you are on decides what you see.** The portal at `/portal/` is built from the files in the folder you run it in. After merging, `Puneet` carries both today's city feature and the newer portal pages (dashboard strip, command view, analytics, map notices); `main` carries only what has been merged into it.
 - This is the simulated mock server, not the real backend (`backend/`, FastAPI). The real backend and Daksh's operations dashboard (`dashboard/`) still run separately (see `docs/DEMO_RUN_REAL_BACKEND.md`).
 - The patient app's offline cache (service worker) keeps its own screens only; the portal and API are never answered from it.
 - Tested in Chrome: start page, both logins, portal deep links, and an SOS from the patient app that appears on the portal and is acknowledged back. Not tested on Firefox or Safari.

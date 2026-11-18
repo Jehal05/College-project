@@ -18,6 +18,7 @@ import ContactsNotified from '../components/ContactsNotified';
 import InstructionsCard from '../components/InstructionsCard';
 import WhyThisAlert from '../components/WhyThisAlert';
 import ErrorMessage from '../components/ErrorMessage';
+import LocationSharing from '../components/LocationSharing';
 
 const CAN_CANCEL_AFTER_SOS = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE'];
 
@@ -55,7 +56,7 @@ export default function Emergency() {
     setSending(true);
     setProblem('');
     try {
-      const location = await resolveLocation(!emergency.consents || emergency.consents.location !== false, emergency.patient_id);
+      const location = await resolveLocation(!emergency.consents || emergency.consents.location !== false, emergency.patient_id, id);
       await sendSos(id, location);
       await reload();
     } catch {
@@ -111,6 +112,7 @@ export default function Emergency() {
       {counting && (
         <>
           <Countdown key={id} initial={secondsLeft(emergency, id)} onDone={send} onCancel={cancel} />
+          <LocationSharing emergencyId={id} consent={!emergency.consents || emergency.consents.location !== false} />
           {sending && <p role="status" className="mt-3 font-semibold">{t('emergency.sending')}</p>}
         </>
       )}

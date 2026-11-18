@@ -1,0 +1,32 @@
+{
+  "_how_made": "written by hand from the route code, not captured from a running server (GET /patients/{id}/lab-values?test=hba1c, newest first)",
+  "values": [
+    {
+      "id": "LAB-1A2B3C4D5E6F7A8B",
+      "test": "hba1c",
+      "value": 6.4,
+      "unit": "%",
+      "reference_range": {
+        "low": 4.0,
+        "high": 5.6
+      },
+      "taken_on": "2026-11-01",
+      "status": "confirmed_by_patient",
+      "source": "entered",
+      "report_id": null,
+      "created_at": "2026-11-15T09:30:00Z"
+    },
+    {
+      "id": "LAB-0A0B0C0D0E0F0102",
+      "test": "hba1c",
+      "value": 6.1,
+      "unit": "%",
+      "reference_range": null,
+      "taken_on": "2026-08-02",
+      "status": "confirmed_by_patient",
+      "source": "entered",
+      "report_id": null,
+      "created_at": "2026-08-02T07:00:00Z"
+    }
+  ]
+}
