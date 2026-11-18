@@ -1069,5 +1069,18 @@
   "card.status": "Status: valid",
   "nav.passport": "Health passport",
   "nav.consent": "Consent",
-  "nav.contacts": "Contacts"
+  "nav.contacts": "Contacts",
+  "live.title": "Live sharing with the hospital",
+  "live.waiting": "Waiting for your phone's location. Sharing starts as soon as it is found.",
+  "live.sharingLocation": "Sharing your real location with the hospital screen now.",
+  "live.sharingBoth": "Sharing your real location and heart rate with the hospital screen now.",
+  "live.denied": "Your browser blocked location, so nothing is being shared. Allow location for this site to share it.",
+  "live.error": "Could not reach the server. Trying again.",
+  "live.ended": "The alert is closed, so sharing has ended.",
+  "live.consentOff": "Your consent settings keep location and heart rate private. Nothing is being shared.",
+  "live.stopped": "Sharing stopped. The hospital screen keeps only the last position it received.",
+  "live.practice": "Practice location mode is on, so your real position is not sent.",
+  "live.note": "Real data from this phone, sent only to this app's own server. The ambulance is still simulated.",
+  "live.stop": "Stop sharing",
+  "live.resume": "Share again"
 }

@@ -75,5 +75,9 @@ function resetStore() {
   hospitals.forEach((h, i) => { h.availability = { ...seedAvailability[i] }; });
 }
 
-module.exports = { users, hospitals, ambulances, emergencyTypes, patients, tokens, emergencies, nextEmergencyId, resetStore,
+const emergencyCounterValue = () => emergencyCounter;
+const setEmergencyCounter = (n) => { emergencyCounter = n; };
+const availability = () => hospitals.map((h) => h.availability);
+
+module.exports = { emergencyCounterValue, setEmergencyCounter, availability, users, hospitals, ambulances, emergencyTypes, patients, tokens, emergencies, nextEmergencyId, resetStore,
   baseline, baselines, cities, reports, consentChanges, counters, passports, passportTokens, accessLog, reminders, reminderLog, preferences };

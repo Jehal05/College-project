@@ -18,6 +18,7 @@ import DetailHeader from './detail/DetailHeader.jsx';
 import PatientFacts from './detail/PatientFacts.jsx';
 import SymptomList from './detail/SymptomList.jsx';
 import VitalsGrid from './detail/VitalsGrid.jsx';
+import LiveCard from './detail/LiveCard.jsx';
 import ActionsPanel from './detail/ActionsPanel.jsx';
 import NotesPanel from './NotesPanel.jsx';
 import ReadinessWarning from './detail/ReadinessWarning.jsx';
@@ -48,6 +49,7 @@ export default function EmergencyDetail({ emergency }) {
           <PatientFacts emergency={e} />
           <SymptomList emergency={e} />
           <VitalsGrid emergency={e} />
+          <LiveCard emergency={e} />
 
           {!hasAmbulance && (
             <div>

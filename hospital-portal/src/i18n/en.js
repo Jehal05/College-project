@@ -808,4 +808,13 @@ export default {
   'ps.expires': 'Passport link valid until {time}',
   'ps.noLink': 'No live QR link right now.',
   'ps.source': 'Source: simulated demo data entered for this prototype.',
+  'lv.title': 'Live from patient phone',
+  'lv.live': 'LIVE (real data)',
+  'lv.quiet': 'No update for {s} s',
+  'lv.stopped': 'Patient stopped sharing',
+  'lv.strap': 'chest strap (real)',
+  'lv.here': 'Patient position (live, real GPS)',
+  'lv.noPosition': 'No live position received yet.',
+  'lv.note': 'Real GPS and heart rate sent by the patient phone. The patient chooses what is shared. The ambulance is still simulated.',
+  'popup.allow': 'Allow pop-up alerts on this device',
 };

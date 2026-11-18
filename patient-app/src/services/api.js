@@ -75,6 +75,9 @@ export const getVitals = (id) => request('/patients/' + id + '/vitals');
 // ---- Emergency flow (Phase 2) ----
 export const createEmergency = (body) => request('/emergencies', { method: 'POST', body });
 export const sendSos = (id, location) => request('/emergencies/' + id + '/sos', { method: 'POST', body: { location } });
+// Live GPS and heart rate while the alert is open (the hospital portal shows it as 'Live from patient phone')
+export const postLive = (id, body) => request('/emergencies/' + id + '/live', { method: 'POST', body });
+export const stopLive = (id) => request('/emergencies/' + id + '/live', { method: 'DELETE' });
 export const cancelEmergency = (id) => request('/emergencies/' + id + '/cancel', { method: 'POST' });
 export const getEmergency = (id) => request('/emergencies/' + id).then(normalizeEmergency);
 

@@ -25,8 +25,8 @@ Read these together and say each answer in your own words. Both of you should be
 11. **Does it diagnose?**
     No. It shows what the patient entered and simple draft alert rules, pending doctor review. It never interprets results.
 12. **Is anything real?**
-    Map tiles (OpenStreetMap), road routes (OSRM, with a labelled fallback), the phone's GPS when the patient agrees, and a Bluetooth heart-rate strap on the patient screen (not sent to the server). Everything else is simulated.
+    Map tiles (OpenStreetMap), road routes (OSRM, with a labelled fallback), the phone's GPS and a Bluetooth heart-rate strap streamed live to the hospital screen when the patient agrees, a SQLite file for saved data, and real push or SMS messages to the two team phones. The ambulance, the hospitals' replies, the patients' contacts and 112/108 are simulated.
 13. **What does it not do?**
-    No real SMS, calls, hospitals or database; the Hindi and Gujarati text is unreviewed; the tests for the patient app and the browser flows have not all been run on this final version (see `docs/QR_PASSPORT_QA.md`).
+    No real ambulance, hospital, 112/108 call or message to patients' contacts; the live and phone parts were not run on a real phone from the build environment; the Hindi and Gujarati text is unreviewed; the tests for the patient app and the browser flows have not all been run on this final version (see `docs/QR_PASSPORT_QA.md`).
 14. **Where is the FastAPI backend?**
     It exists on branch `Puneet` with its own tests. The final demo does not use it.

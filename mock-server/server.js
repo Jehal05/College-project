@@ -12,6 +12,8 @@ const simulator = require('./simulator');
 const failMode = require('./failMode');
 const compat = require('./compat');
 const wsAuth = require('./wsAuth');
+const persist = require('./persist');
+const notify = require('./notify');
 
 const PORT = process.env.PORT || 4000;
 // Extra ports are allowed so Puneet's hospital portal can call this server too.
@@ -73,7 +75,12 @@ setInterval(() => {
 server.keepAliveTimeout = 65000;
 server.headersTimeout = 66000;
 
+const saved = persist.start(); // real data saving (persist.js)
+notify.init();
+
 server.listen(PORT, () => {
+  console.log(saved.enabled ? 'Saving to a SQLite file (' + saved.file + '): ' + saved.emergencies + ' earlier alert(s) restored' + (saved.interrupted ? ', ' + saved.interrupted + ' closed because the server had stopped' : '') : 'Data stays in memory only (' + (saved.reason || 'off') + ')');
+  console.log(notify.describe());
   console.log('Mock server (simulated data) running on http://localhost:' + PORT);
   if (SERVE_APPS) console.log('ONE ADDRESS: http://localhost:' + PORT + '/start  (patient app /, hospital portal /portal/, API /api)');
   console.log('WebSocket on ws://localhost:' + PORT + '/ws');

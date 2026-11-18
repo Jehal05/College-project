@@ -217,6 +217,11 @@ router.post('/privacy-requests', requireAuth, need('PATIENT', 'ADMIN'), (req, re
 // A verified volunteer gets only responder.alert (no identity). Anyone else gets nothing.
 function filterFor(user, event) {
   if (event.type === 'data.accessed') return user && user.role === 'PATIENT' ? event : null; // only the patient hears who looked
+  // A patient's phone hears only its own alerts (live position, heart rate and the alert details of other patients stay private).
+  if (user && user.role === 'PATIENT' && event.emergency_id) {
+    const own = store.emergencies.get(event.emergency_id);
+    return own && own.patient_id === user.patient_id ? event : null;
+  }
   if (!user || ['PATIENT', 'HOSPITAL_STAFF', 'ADMIN'].includes(user.role)) return event;
   const e = event.emergency_id && store.emergencies.get(event.emergency_id);
   const stamp = { emergency_id: event.emergency_id, state: event.state, timestamp: event.timestamp };

@@ -19,6 +19,7 @@ import InstructionsCard from '../components/InstructionsCard';
 import WhyThisAlert from '../components/WhyThisAlert';
 import ErrorMessage from '../components/ErrorMessage';
 import LocationSharing from '../components/LocationSharing';
+import LiveShare from '../components/LiveShare';
 
 const CAN_CANCEL_AFTER_SOS = ['SOS_SENT', 'HOSPITAL_ACKNOWLEDGED', 'AMBULANCE_DISPATCHED', 'EN_ROUTE'];
 
@@ -125,6 +126,7 @@ export default function Emergency() {
         <>
           <GoldenHourClock events={events} />
           <ResponseCard emergency={emergency} events={events} />
+          <LiveShare emergencyId={id} state={state} consents={emergency.consents} />
           <ContactsNotified emergency={emergency} />
         </>
       )}

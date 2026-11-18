@@ -47,6 +47,15 @@
   <p>Simulated wearable: <button id="v-normal" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Resting vitals</button>
     <button id="v-heart" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #b91c1c;background:#fff;cursor:pointer">Heart emergency vitals</button> <span id="v-msg" role="status"></span><br>
     Switch before sending the alert so the patient's Home shows a fast heart rate and low oxygen. Simulated data only. Reset demo sets it back to resting.</p>
+  <h2>Real parts of this demo</h2>
+  <ul id="real">
+    <li><strong>Saved data:</strong> <span id="r-store">checking...</span></li>
+    <li><strong>Phone alerts to the team phones:</strong> <span id="r-phone">checking...</span></li>
+    <li><strong>Live location and heart rate:</strong> real GPS and chest strap from the patient phone, shown on the hospital screen while an alert is open.</li>
+    <li><strong>Pop-up on a second device:</strong> open the portal on another phone or laptop and tap "Allow pop-up alerts".</li>
+    <li><strong>Still simulated:</strong> the ambulance, the hospitals' replies, the patients' contacts and 112/108. No real service is ever called.</li>
+  </ul>
+  <p><button id="test-phone" type="button" style="font-size:1.1rem;padding:.6rem 1rem;border-radius:.6rem;border:2px solid #334155;background:#fff;cursor:pointer">Send a test message to the team phones</button> <span id="t-msg" role="status"></span></p>
   <p>Tip: put the patient app and the hospital portal in two windows side by side. Both talk to this one server.</p>
 </main>
 <script>
@@ -68,6 +77,16 @@
     .catch(() => { document.getElementById('v-msg').textContent = 'Server not reachable.'; });
   document.getElementById('v-normal').addEventListener('click', () => setVitals('normal', 'Resting vitals on.'));
   document.getElementById('v-heart').addEventListener('click', () => setVitals('heart_attack', 'Heart emergency vitals on (simulated).'));
+  fetch('/api/demo/live-status').then((r) => r.json()).then((d) => {
+    const st = d.storage || {}, ph = d.phone_alerts || {};
+    document.getElementById('r-store').textContent = st.enabled ? 'on, in a SQLite file (' + st.emergencies + ' alerts, ' + st.events + ' events saved so far)' : 'off (memory only, needs Node 22.5 or newer)';
+    const on = Object.keys(ph).filter((k) => ph[k]).map((k) => ({ ntfy: 'ntfy push', telegram: 'Telegram', sms: 'SMS' }[k]));
+    document.getElementById('r-phone').textContent = on.length ? 'on: ' + on.join(', ') + ' (every message says DEMO)' : 'off. Fill in mock-server/live.config.json (see docs/GO_LIVE.md).';
+  }).catch(() => { document.getElementById('r-store').textContent = 'only visible on the laptop that runs the demo'; document.getElementById('r-phone').textContent = 'only visible on the laptop that runs the demo'; });
+  document.getElementById('test-phone').addEventListener('click', () => {
+    fetch('/api/demo/notify-test-local', { method: 'POST' }).then((r) => r.json()).then((d) => { document.getElementById('t-msg').textContent = d.error ? d.error : (d.sent + ' sent, ' + d.failed + ' failed'); })
+      .catch(() => { document.getElementById('t-msg').textContent = 'Server not reachable.'; });
+  });
 </script>
 </body>
 </html>

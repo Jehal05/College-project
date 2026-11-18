@@ -47,6 +47,14 @@ export function normalise(e) {
  * Apply one WebSocket event { event, emergency_id, state, timestamp, payload }.
  * Returns the same list object when nothing changed.
  */
+/** Merge one live.update payload into the earlier `live` object. Pure. */
+export function applyLive(prev, payload = {}, timestamp) {
+  const next = { ...(prev || {}), sharing: true, updated_at: payload.updated_at || timestamp, stopped_at: undefined };
+  if (Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) Object.assign(next, { lat: payload.lat, lng: payload.lng, accuracy: payload.accuracy, location_at: next.updated_at });
+  if (Number.isFinite(payload.heart_rate)) Object.assign(next, { heart_rate: payload.heart_rate, hr_source: payload.hr_source || 'strap', hr_at: next.updated_at });
+  return next;
+}
+
 export function applyEvent(list, msg) {
   const { event, emergency_id, state, timestamp, payload = {} } = msg || {};
   if (!emergency_id) return list;
@@ -77,6 +85,10 @@ export function applyEvent(list, msg) {
   if (idx < 0) return list; // unknown emergency
   const current = list[idx];
   const replace = (updated) => list.map((e, i) => (i === idx ? updated : e));
+
+  // Real live data from the patient's phone (position, strap heart rate). Merged into one `live` object; a stop keeps the last values.
+  if (event === 'live.update') return replace({ ...current, live: applyLive(current.live, payload, timestamp) });
+  if (event === 'live.stopped') return replace({ ...current, live: { ...(current.live || {}), sharing: false, stopped_at: timestamp } });
 
   // Which hospital has the alert now (no state change).
   if (event === 'hospital.alerted') {

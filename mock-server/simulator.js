@@ -15,6 +15,8 @@ function setServer(server) { wss = server; }
 
 // Send one event to every connected client. Shape: { type, emergency_id, state, timestamp, payload }
 function broadcast(event) {
+  require('./persist').logEvent(event);  // real saved event log (SQLite)
+  require('./notify').onEvent(event);    // real phone alerts to the team phones, if set up
   if (!wss) return;
   const message = JSON.stringify({ event: event.type, ...event }); // `event` is Daksh's name for `type`; both are sent
   const { filterFor } = require('./otherApps'); // family and volunteer sockets get reduced events (Phase 10)

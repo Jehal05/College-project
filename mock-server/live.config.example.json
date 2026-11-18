@@ -1,0 +1,22 @@
+{
+  "public_url": "http://YOUR-LAPTOP-IP:4000",
+  "ntfy": {
+    "topic": "healthtwin-demo-PUT-A-LONG-RANDOM-WORD-HERE"
+  },
+  "telegram": {
+    "bot_token": "",
+    "chat_ids": [
+      "PUNEET_CHAT_ID",
+      "JEHAL_CHAT_ID"
+    ]
+  },
+  "twilio": {
+    "account_sid": "",
+    "auth_token": "",
+    "from": "",
+    "to": [
+      "PUNEET_PHONE_WITH_COUNTRY_CODE",
+      "JEHAL_PHONE_WITH_COUNTRY_CODE"
+    ]
+  }
+}

@@ -74,9 +74,12 @@ test('QA11 account isolation: another patient gets the same 404 as a missing pat
   assert.strictEqual(call(ids[3], ids[4]), 404);
 });
 
-test('QA12 demo phones never trigger SMS or calls: no sender code in the mock, no tel: link on the public page', () => {
+test('QA12 demo phones never trigger SMS or calls: sender code only in notify.js (team phones from the config), no tel: link on the public page', () => {
   const dir = path.join(__dirname, '..');
-  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js'))) assert.ok(!/twilio|sendSms|nodemailer|msg91|vonage/i.test(fs.readFileSync(path.join(dir, f), 'utf8')), f);
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js') && x !== 'notify.js')) assert.ok(!/twilio|sendSms|nodemailer|msg91|vonage/i.test(fs.readFileSync(path.join(dir, f), 'utf8')), f);
+  // notify.js reads its recipients only from the team config, never from patient data
+  const n = fs.readFileSync(path.join(dir, 'notify.js'), 'utf8');
+  assert.ok(!/patients\[[^\]]*\]\.contacts|\.phone/.test(n.replace(/\/\/.*$/gm, '')));
   const view = fs.readFileSync(path.join(dir, '../patient-app/src/components/PassportQuickView.jsx'), 'utf8');
   assert.ok(!/href=\{?['"`]tel:/.test(view));
   const body = scan(make('PT-2026-0420')).body;

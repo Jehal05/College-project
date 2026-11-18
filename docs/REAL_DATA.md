@@ -9,7 +9,7 @@ HealthTwin AI is a **simulated prototype and not a medical device**. This page s
 | Street map | You are online (tiles from OpenStreetMap) | Drawn simple map / a notice on the portal map | `patient-app/src/components/themed/StreetMap.jsx`, portal `Map.jsx`, `TrackingMap.jsx`, `PatientMiniMap.jsx` |
 | GPS location | The location consent is on, the browser permission is granted and the fix is inside the chosen city | A labelled **simulated** start point of the chosen city | `patient-app/src/services/geo.js` |
 | Road route and time | The routing server answers within 4 seconds | The simulated path and the assumed-speed estimate, labelled | `hospital-portal/src/services/roadRoute.js` |
-| Heart rate | A Bluetooth strap is connected and the vitals consent is on | The simulated heart rate, labelled **Simulated** | `patient-app/src/services/heartStrap.js` |
+| Heart rate | A Bluetooth strap is connected and the vitals consent is on (also streamed to the hospital during an open alert) | The simulated heart rate, labelled **Simulated** | `patient-app/src/services/heartStrap.js` |
 
 ## One place for every outside address
 
@@ -21,13 +21,13 @@ Both defaults are free public servers without a key: `tile.openstreetmap.org` (O
 
 - **Map and routing services get coordinates only.** Tiles are asked for by map square numbers. A route request holds four numbers (two points). Never a name, id or health data, no cookies, no referrer.
 - **GPS** is read only after the location consent is on, with a fresh high-accuracy fix (up to 8 seconds). It is sent only to this app's own server, only together with the SOS, and is labelled `gps` with its accuracy. During the countdown the screen says what will be sent and offers **Stop sharing my location**; the alert is then sent without a location.
-- **Heart rate from a strap stays on the phone.** It is shown with the label "Device (chest strap)". The oxygen value and every other number stay labelled "Simulated". The two are never mixed silently.
+- **Heart rate from a strap** is shown with the label "Device (chest strap)". During an open alert, and only with the vitals consent, it is also sent to this app's own server and shown to the hospital as "chest strap (real)". The oxygen value and every other number stay labelled "Simulated". The two are never mixed silently.
 
 ## Honest limits
 
 - A real GPS position outside the chosen city is not used (the demo hospitals are in Ahmedabad and Pune); the simulated start point is used and labelled.
-- GPS is sent once, with the SOS. There is no live location stream yet: that needs a backend endpoint.
-- The strap reading is **not sent to the server**: the hospital still sees the simulated vitals. Sending it needs a backend endpoint that accepts a device reading; it has not been built or tested.
+- GPS is sent with the SOS and then streamed about every 2 seconds while the alert is open (see `docs/GO_LIVE.md`), only with the consent. The ambulance does not follow it.
+- The strap reading is streamed to the hospital screen during an open alert, labelled "chest strap (real)". Without a strap the hospital still sees the simulated vitals, labelled. The streaming code is tested with fakes, not with real hardware.
 - Road routes are used on the portal's ambulance tracking map. Hospital ranking and the list ETAs still use straight-line distance and an assumed speed. OSRM's time is before traffic; the ambulance's movement along the road is still simulated and faster than real time.
 - Web Bluetooth works in Chrome and Edge on Android and computers, not in iPhone browsers or Firefox.
 - Hindi and Gujarati text added for this work has not been reviewed by a native reader.

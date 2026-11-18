@@ -6,7 +6,7 @@ import TileNotice from './TileNotice.jsx';
 import { useTileHealth } from './useTileHealth.js';
 
 /** Small map of the patient's reported location, shown in the detail panel. */
-export default function PatientMiniMap({ location }) {
+export default function PatientMiniMap({ location, label }) {
   const t = useT();
   const tiles = useTileHealth();
   if (!location) {
@@ -25,7 +25,7 @@ export default function PatientMiniMap({ location }) {
           eventHandlers={tiles.handlers}
         />
         <Marker position={position} icon={patientIcon}>
-          <Tooltip direction="top" offset={[0, -12]}>{t('map.patientLoc')}</Tooltip>
+          <Tooltip direction="top" offset={[0, -12]}>{label || t('map.patientLoc')}</Tooltip>
         </Marker>
         {location.accuracy_m ? (
           <Circle center={position} radius={location.accuracy_m} pathOptions={{ color: '#dc2626', weight: 1, fillOpacity: 0.1 }} />

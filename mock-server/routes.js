@@ -111,6 +111,8 @@ router.post('/emergencies/:id/sos', requireAuth, (req, res) => {
   res.json({ id: e.id, state: e.state, hospital: e.hospital });
 });
 
+router.use('/', require('./live').router); // live GPS and heart rate from the patient's phone (live.js)
+
 router.post('/emergencies/:id/cancel', requireAuth, (req, res) => {
   const e = findEmergency(req, res);
   if (!e) return;
@@ -137,6 +139,7 @@ router.get('/emergencies/:id/reasons', requireAuth, (req, res) => {
 function resetDemo(req, res) {
   simulator.stopAll();
   store.resetStore();
+  require('./persist').wipe();
   demoState.reset();
   require('./failMode').reset();
   require('./otherApps').reset();
@@ -158,6 +161,18 @@ router.post('/demo/vitals-local', (req, res) => {
   if (!['normal', 'heart_attack'].includes(profile)) return res.status(400).json({ error: 'profile must be normal or heart_attack' });
   const { status, body } = vitals.applyChange({ profile });
   res.status(status).json(body);
+});
+
+// Real phone alerts: which channels are set up (no secrets), and a test message. Local computer only, like the other /start buttons.
+const loopback = (req) => /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress || '');
+router.get('/demo/live-status', (req, res) => {
+  if (!loopback(req)) return res.status(403).json({ error: 'Local only' });
+  res.json({ phone_alerts: require('./notify').channels(), storage: require('./persist').summary() });
+});
+router.post('/demo/notify-test-local', async (req, res) => {
+  if (!loopback(req)) return res.status(403).json({ error: 'Local only' });
+  const results = await require('./notify').testMessage();
+  res.json({ sent: results.filter((r) => r.ok).length, failed: results.filter((r) => !r.ok).length, channels: [...new Set(results.map((r) => r.channel))] });
 });
 
 // The cities the apps offer (same answer as the backend's GET /cities).

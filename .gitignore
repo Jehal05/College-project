@@ -14,3 +14,9 @@ backend/healthtwin.db-shm
 backend/healthtwin.db-wal
 
 dist-one/
+
+# Real demo parts: saved data and private notification settings (never commit these)
+*.db
+*.db-shm
+*.db-wal
+mock-server/live.config.json

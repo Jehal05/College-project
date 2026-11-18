@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AlertAnnouncer from './components/AlertAnnouncer.jsx';
+import PopupAlerts from './components/PopupAlerts.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import BackendHealthBanner from './components/BackendHealthBanner.jsx';
 import HospitalFallbackBanner from './components/HospitalFallbackBanner.jsx';
@@ -51,6 +52,7 @@ function Shell({ children }) {
         <a href="#alert-queue" onClick={skip} data-testid="skip-link" className={`${skipClass}`}>{t('a11y.skipQueue')}</a>
       )}
       <AlertAnnouncer />
+      <PopupAlerts />
       <NavBar />
       <BackendHealthBanner />
       <OfflineBanner />

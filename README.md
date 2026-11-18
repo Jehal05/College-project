@@ -30,7 +30,7 @@ PUBLIC_URL=http://192.168.1.20:4000 npm run one
 | Patient app (`/`) | Sign in as one of five patients, see simulated vitals, press Emergency help, pick symptoms, cancel in the 10 s countdown or send, watch the timeline (hospital acknowledged, ambulance dispatched, arrived), see nearby hospitals on a real street map, choose what is shared, see who looked at your data. English, Hindi, Gujarati |
 | QR passport | Create a QR, choose the fields, preview, make a new QR, revoke, print a card. A stranger's scan shows a minimal page; hospital staff see clinical details only after login, with a purpose, audited |
 | Hospital portal (`/portal/`) | Sign in as staff, see the alert queue and map, acknowledge, dispatch, follow the ambulance on road routes, open a patient's passport with a purpose |
-| Simulated server | Plays the hospital and ambulance, keeps everything in memory (a restart forgets it all) |
+| Server | Plays the hospital and ambulance (simulated), saves data to a SQLite file, sends real phone alerts to the team phones when set up, and relays the patient's live GPS and heart rate |
 
 What is real and what is simulated: [`docs/REAL_DATA.md`](docs/REAL_DATA.md). The demo walkthrough: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). Likely questions: [`docs/VIVA_QA.md`](docs/VIVA_QA.md).
 
@@ -51,10 +51,10 @@ Four browser tests remain in `patient-app/tests/browser` (passport, created aler
 
 ## Honest limits
 
-- The server is a simulation with in-memory data. There is no real database, SMS, phone call or hospital.
+- The ambulance, the hospitals' replies and the patients' contacts are simulated. No real hospital, ambulance, 112/108 call or patient SMS exists. Real parts: SQLite saving, phone alerts to the team's own phones, live GPS and strap heart rate, pop-ups on a second device (see [`docs/GO_LIVE.md`](docs/GO_LIVE.md); the phone and GPS parts are not tested from the build sandbox).
 - The rules that spot emergencies are a draft, pending doctor review. The Hindi and Gujarati text has not been reviewed by a native reader.
 - Hospital ranking and list ETAs use straight-line distance; the portal's tracking map can use real road routes (OSRM) and falls back to a labelled simulated route.
-- Heart rate from a Bluetooth chest strap works only on the patient screen; it is not sent to the server.
+- Heart rate from a Bluetooth chest strap is shown on the patient screen and, with the vitals consent, streamed to the hospital screen during an open alert. Without a strap the hospital sees the simulated vitals, labelled.
 - This branch (`final`) is the simplified project. The full version, with the FastAPI backend and more screens, is on branch `Puneet`.
 
-More: [`docs/QR_PASSPORT.md`](docs/QR_PASSPORT.md), [`docs/QR_PASSPORT_QA.md`](docs/QR_PASSPORT_QA.md), [`docs/ONE_ADDRESS.md`](docs/ONE_ADDRESS.md), [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md), [`SECURITY.md`](SECURITY.md).
+More: [`docs/GO_LIVE.md`](docs/GO_LIVE.md), [`docs/QR_PASSPORT.md`](docs/QR_PASSPORT.md), [`docs/QR_PASSPORT_QA.md`](docs/QR_PASSPORT_QA.md), [`docs/ONE_ADDRESS.md`](docs/ONE_ADDRESS.md), [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md), [`SECURITY.md`](SECURITY.md).

@@ -19,6 +19,7 @@ Everything is simulated. Say so at the start: the banner on every screen says "S
 | 1:00 | **Emergency help**, choose a symptom group, tick a symptom, **Get help now** | Red screen, "Call 112 / 108" first, countdown from 10 |
 | 1:30 | Press **Send now** | "Alert sent". Window B: the alert appears in the queue with a map |
 | 2:00 | Window B: **Acknowledge**, then **Dispatch** an ambulance | Window A's timeline updates: hospital acknowledged, ambulance dispatched, ETA, arrived. The portal map follows the ambulance on road routes (a labelled simulated route if the routing server cannot be reached) |
+| 2:30 | Window A: on the red screen, look at **Live sharing with the hospital** (optionally connect a strap). Window B: open the alert | A green **Live from patient phone** card with the real position and heart rate. Your two phones buzzed with DEMO messages (if set up) |
 | 3:00 | Window A: **Profile > Consent**, switch Location off | Saved. The next emergency says location sharing is off. Switch it back on |
 | 3:20 | **Hospitals** | Real street map with the fictional hospitals |
 | 3:40 | **Health passport**: keep all fields, 24 hours, **Create** | QR on a card with "Demo profile" |
@@ -31,10 +32,11 @@ Everything is simulated. Say so at the start: the banner on every screen says "S
 ## If something goes wrong
 
 - **Alert does not appear in the portal:** press Reset demo on `/start`, sign in again.
+- **Phones got no message:** check the start page "Phone alerts" line and press the test button; the laptop needs internet. The demo itself never depends on it.
 - **Too slow:** start with `DEMO_SPEED=10`.
 - **Phone cannot open the QR:** the address in `PUBLIC_URL` is wrong or the phone is on another network. The passport screen shows a yellow warning when the address is localhost.
 - **Total failure:** the offline "Not sent yet" screen keeps the Call 112 / 108 button, so safety never depends on the app.
 
 ## What to say is NOT real
 
-Simulated hospital, ambulance and wearable; fictional patients and hospitals; in-memory server; no real SMS or calls; the QR passport is a demo token (not ABHA, not identity proof); the emergency rules are a draft pending doctor review; Hindi and Gujarati not reviewed by a native reader.
+Simulated hospital replies, ambulance and wearable (unless a strap is connected); fictional patients and hospitals; real SMS or push only to the two team phones, never to patients' contacts or any emergency number; saved data is a local SQLite file; the QR passport is a demo token (not ABHA, not identity proof); the emergency rules are a draft pending doctor review; Hindi and Gujarati not reviewed by a native reader.
