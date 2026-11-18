@@ -2,7 +2,7 @@
 
 **This is a HealthTwin demo token. It is not ABHA, not identity proof, not a government credential, and not a medical record.** Everything shown is fictional, simulated data. Anyone who has the link can open the quick view until it expires or is revoked (a bearer link). Phone numbers are masked demo numbers; the demo never sends an SMS or makes a call.
 
-Status: built in the **mock server** (`npm run one`), the patient app and the hospital portal. The FastAPI backend does not have this version yet (see "Not in the backend").
+Status: built in the simulated server (`npm run one`), the patient app and the hospital portal.
 
 ## The five demo patients
 
@@ -61,7 +61,7 @@ The patient app asks the server for this address (`GET /api/public-config`). If 
 
 ## Not in the backend
 
-The FastAPI backend still has its own, older passport (full details for anyone with the link). It has no purpose rule, resolve route, preview, history, `PUBLIC_URL` or field choice. Bringing it in line, with its tests, is a separate piece of work.
+The FastAPI backend is not part of this branch. On branch `Puneet` it still has its own, older passport (full details for anyone with the link) without the purpose rule, resolve route, preview, history or `PUBLIC_URL`.
 
 ## Manual test steps
 

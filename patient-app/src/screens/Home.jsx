@@ -21,7 +21,7 @@ import Button from '../components/ui/Button';
 import { Avatar, SectionHeader } from '../components/ui/Card';
 
 // Quick links under the emergency button: [route, icon, translation key].
-const QUICK = [['/passport', 'qr', 'home.passport'], ['/reminders', 'pill', 'home.reminders'], ['/contacts', 'users', 'contacts.title'], ['/reports', 'file', 'reports.title']];
+const QUICK = [['/passport', 'qr', 'home.passport'], ['/hospitals', 'hospital', 'nav.hospitals'], ['/contacts', 'users', 'contacts.title'], ['/consent', 'shield', 'profile.consent']];
 
 export default function Home() {
   const { t } = useTranslation();

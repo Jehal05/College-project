@@ -2,23 +2,22 @@
   "name": "college-project",
   "version": "1.0.0",
   "private": true,
-  "description": "HealthTwin AI - Patient App (Phase 1) and shared mock API. Simulated prototype, not a medical device.",
+  "description": "HealthTwin AI: patient app, hospital portal and a simulated server. Simulated prototype, not a medical device.",
   "workspaces": [
     "patient-app",
     "mock-server"
   ],
   "scripts": {
-    "dev": "npm run dev -w patient-app",
-    "mock": "npm start -w mock-server",
-    "dev:all": "concurrently -n app,mock -c blue,green \"npm run dev -w patient-app\" \"npm start -w mock-server\"",
-    "build": "npm run build -w patient-app",
-    "contract": "node scripts/contract.mjs",
-    "integration": "node scripts/integration.mjs",
-    "cities": "node scripts/cities-scenarios.mjs",
-    "test": "npm test -w patient-app",
-    "audit": "npm run audit -w patient-app",
     "one": "node scripts/one.mjs",
-    "one:rebuild": "node scripts/one.mjs --rebuild"
+    "one:rebuild": "node scripts/one.mjs --rebuild",
+    "smoke": "node scripts/one-smoke.mjs",
+    "mock": "npm start -w mock-server",
+    "dev": "npm run dev -w patient-app",
+    "build": "npm run build -w patient-app",
+    "test": "npm run test:unit -w patient-app",
+    "test:portal": "npm test --prefix hospital-portal",
+    "test:mock": "node --test mock-server/tests/*.test.js",
+    "dev:all": "concurrently -n app,mock -c blue,green \"npm run dev -w patient-app\" \"npm start -w mock-server\""
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

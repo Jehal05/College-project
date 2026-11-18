@@ -1,8 +1,0 @@
-{
-  "_how_made": "written by hand from the route code, not captured from a running server (GET /patients/{id}/organs/liver before any liver value is saved)",
-  "organ": "liver",
-  "has_data": false,
-  "items": [],
-  "mapping_note": "Which readings belong to which organ is a fixed table, documented in the backend.",
-  "label": "Educational representation, not a medical image."
-}

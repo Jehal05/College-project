@@ -1,96 +1,32 @@
 # Likely jury questions and plain answers
 
-Written from the code and docs on branch `integration` (14 Nov 2026). **Read this together as a team and check each answer against your own part.** Each person should be able to answer for their own part without this page. Where something is not built or not reviewed, the honest answer is written here: use it.
+Read these together and say each answer in your own words. Both of you should be able to answer any of them.
 
-## Hospital portal (Puneet)
-
-1. **How does the portal choose which hospital gets an alert?**
-   It first rules out hospitals that are not verified or that lack the unit the emergency needs (for example a cath lab for a chest-pain emergency). Then it scores the rest: 50% capability, 30% travel time, 20% availability (`src/data/ranking-config.json`). Distance never brings back a hospital that was ruled out. The reason is shown on screen.
-2. **What happens if nobody answers an alert?**
-   After 30 seconds the alert escalates to the next ranked hospital and the card shows it. The 30-second timer now exists in the backend too (tested in CI), but the demo still uses Jehal's mock, where it also runs.
-3. **What if the backend lacks an endpoint?**
-   The portal does not crash. A missing call (404, 405 or 501) limits that one feature and says so: for example notes and checklist ticks are "saved on this screen only", and chat shows "not sent". The list is in `hospital-portal/docs/ENDPOINTS_TO_AGREE.md`.
-4. **How do you know it works?**
-   Unit tests for the logic (ranking, state machine, translations), end-to-end tests in a real browser, lint and build, all run by CI on every push. The numbers are in `docs/PROJECT_STATUS.md`. We have not yet recorded a full run on the demo laptop.
-5. **Who reviewed the medical content?**
-   Nobody yet. The checklists, severity levels and symptom words are sample content. The portal keeps showing "Sample checklist. Pending medical review." until a real doctor signs the review sheet and the name and date are entered in `src/data/reviewStatus.js`.
-6. **How do the Hindi and Gujarati versions work, and are they correct?**
-   All screens read their text from three files with the same keys, checked by a test, and another test fails if English text is hard-coded in a page. The translations are drafts: a review CSV exists for native speakers, and none has reviewed it yet.
-7. **What does the ambulance on the map do?**
-   Everything about the ambulance is simulated. Only one side moves it: with Jehal's mock the mock moves it, otherwise the portal does. The map says which.
-8. **What did you not build?**
-   Real hospital systems, real dispatch, real notifications. Notes, chat, checklist saving and hospital add/edit/verify are built in the backend but are marked PROPOSED, not agreed with Daksh in writing.
-
-## Patient app and mock server (Jehal)
-
-1. **What does the patient do in an emergency?**
-   Choose symptoms, press the emergency button, and a 10-second countdown with an alarm lets them cancel a false alarm. Then the SOS is sent with their location, and the app shows the simulated hospital and ambulance response live over a WebSocket.
-2. **Why a mock server?**
-   The real backend was not ready, so the mock lets the apps be built and tested together. It keeps data in memory and is clearly labelled simulated. `npm run contract` checks that any server (mock or real) keeps to the agreed API.
-3. **How does the app protect privacy?**
-   The patient chooses what is shared (location, history, vitals, reports) on a consent screen; other roles see only what was shared; the health passport can be time-limited and revoked.
-4. **Does it work offline and in three languages?**
-   It saves a read-only copy for offline use, shows a banner, and supports English, Hindi and Gujarati. The Hindi and Gujarati text has not been reviewed by native speakers.
-5. **Does it diagnose?**
-   No. Every screen says "Simulated event. Not a medical diagnosis." Voice input only suggests symptoms.
-6. **How is it tested?**
-   Unit tests, an API contract test against the mock, an accessibility audit in three languages, and browser tests, all in CI. A joint rehearsal script drives the real portal and the patient app together (18 of 18 checks on the mock, last run 13 Nov per `docs/JOINT_REHEARSAL.md`).
-7. **Who built the family, responder and admin screens?**
-   Jehal (Phase 10), because Shagun's branch holds only the initial commit. The backend side of those does not exist yet.
-8. **What is not finished?**
-   The patient app is built for the real backend's contract, but the real backend does not have the emergency flow yet, so the full flow only works on the mock.
-
-## Backend (Daksh)
-
-1. **What is real in the backend today?**
-   Login with hashed passwords and a limit on wrong tries, the patient record, vitals, baseline, contacts, consents with a change history, the health passport, the audit log, wellbeing insights, the wearable simulator, the rules engine, and emergency create, SOS, cancel and read. CI's contract status on `4d1ebae` says 77 endpoints built, FREEZE READY (his older `FREEZE.md` snapshot said 17 of 42).
-2. **What is not built?**
-   Nothing on the endpoint list: `POST /location-shares` is now built (Backend checks on `4d1ebae`: 77 built, FREEZE READY). The hospital-side calls and the WebSocket are built, and the portal and patient app were run against the real backend on a laptop on 14 to 15 Nov.
-3. **How is patient data protected?**
-   Sensitive fields are encrypted in the database, passwords use bcrypt, the status timeline is append-only, every passport view is audited, and tokens are checked on each request.
-4. **How are the medical rules made, and are they approved?**
-   The rule table maps symptoms and vitals to a severity and an action. Every decision carries "pending doctor review". Twelve rules were drafted by an AI assistant from public first-aid guidance and accepted for the prototype; a doctor has not reviewed any of it.
-5. **How do you know it works?**
-   The backend suite has 2042 passing tests (Backend checks on `4d1ebae`, 15 Nov 2026) and the repo has a CI workflow that runs pytest; see `docs/PROJECT_STATUS.md` for what CI showed.
-6. **Why does the demo not use your backend?**
-   The apps were run against the real backend on a laptop on 14 to 15 Nov and it worked, with two open points: the real backend does not move the ambulance (the portal simulates it) and its hospital ranking differs from the portal's. The team still has to decide which one the live demo uses.
-7. **What is the plan to finish?**
-   The five most needed calls are listed in `docs/BACKEND_GAPS.md`. No date has been agreed.
-8. **Is there anything demo-only?**
-   Yes: `/demo/*` exists only in demo mode, and the seed data is fictional.
-
-## Questions we cannot answer yet (say so, do not guess)
-- Has any doctor reviewed the checklists, severity levels, rules or symptom words? **No.**
-- Has a native speaker reviewed the Hindi and Gujarati text? **No.**
-- Does the full flow run end to end on the real backend? **No.** The first half (create, SOS, cancel) exists there now; acknowledge, dispatch, hospitals and the WebSocket do not. The demo runs on the mock.
-- When will the backend's emergency flow be finished? **Not agreed.**
-- Has the whole demo been recorded on the demo laptop? **Not yet.** The table in `hospital-portal/docs/DEMO_SCRIPT.md` ("Laptop run") is empty until it is.
-- Is `main` the final version? **No.** `main` holds only the initial commit; `integration` is the combined version.
-
-## Who built what (from the branch history)
-
-| Part | Branch | Commits | Notes |
-|---|---|---|---|
-| Hospital portal | `Puneet` | 99 | 94 of the commits are authored by Claude sessions |
-| Patient app, mock server, family, responder and admin screens | `Jehal` | 25 | 23 authored by Claude sessions |
-| Backend | `Daksh` | 20 | authored by Daksh |
-| Family, responder, admin | `Shagun` | 0 beyond the initial commit | built by Jehal instead |
-
-Many commits are written with an AI assistant. Be ready to explain your own part in your own words.
-
-## QR passport
-
-1. **What is in the QR?**
-   Only a link with a random 24-character token. No name, number, blood group or diagnosis. The server looks the token up by its hash.
-2. **What does a stranger who scans it see?**
-   A minimal page: name, patient code, age band, blood group, allergies and one masked contact, only what the patient switched on and consented to, with a demo banner. No conditions, medicines, reports, vitals, location or full phone number.
-3. **How do doctors see more?**
-   Only after a hospital staff or admin login, by choosing a purpose. Every view and every refusal is audited with the purpose and an audit reference. There is no emergency override; that would need a clinical and legal review.
-4. **What if the QR is lost or shared?**
-   The patient can make a new QR (the old one stops at once) or revoke it. Links also expire after 1 hour, 24 hours or 7 days. Say honestly that it is a bearer link: anyone holding it can open the quick view until then.
-5. **Is this ABHA or a government ID?**
-   No. It is a HealthTwin demo token with fictional data. It is not identity proof and not a credential.
-6. **Is it in the real backend?**
-   Not yet. It runs on the mock server used for the demo; the FastAPI backend still has its older passport.
-7. **Do you use real maps?**
-   Yes for map tiles (OpenStreetMap) and road routes on the portal tracking map (OSRM, with a labelled simulated fallback). Hospital ranking and list ETAs still use straight-line distance. See `docs/REAL_DATA.md`.
+1. **What does it do?**
+   A patient presses Emergency help, picks symptoms and, after a 10 second countdown to cancel a false alarm, an alert goes to the hospital desk. The desk acknowledges and dispatches an ambulance; the patient watches the timeline. Everything is simulated.
+2. **Why a simulated server?**
+   There are no real hospitals or ambulances to connect to, so the server plays them. It keeps data in memory and every screen says it is simulated. It means the whole demo runs from one command.
+3. **How does the portal choose which hospital gets an alert?**
+   It rules out hospitals that are not verified or lack the unit the emergency needs, then scores the rest by capability, travel time and free beds. Distances are straight-line; only the tracking map uses road routes.
+4. **What if nobody answers the alert?**
+   After 30 seconds (shorter at demo speed) it moves to the next ranked hospital and the card shows it.
+5. **How is privacy handled?**
+   The patient chooses what is shared (location, history, vitals, reports) on a consent screen, and can see who looked at their data. Turning a consent off removes that field from the next view.
+6. **What is in the QR?**
+   Only a link with a random 24-character token. No name, number, blood group or diagnosis. The server finds it by the token's hash.
+7. **What does a stranger who scans it see?**
+   A minimal page: name, patient code, age band, blood group, allergies, one masked contact, and only what the patient switched on and consented to, with a demo banner.
+8. **How do doctors see more?**
+   Only after a hospital staff login, by choosing a purpose. Every view and every refusal is audited. There is no emergency override; that would need a clinical and legal review.
+9. **What if the QR is lost or shared?**
+   The patient can make a new QR (the old one stops at once) or revoke it, and links expire after 1 hour, 24 hours or 7 days. It is a bearer link: anyone holding it can open the quick view until then.
+10. **Is this ABHA or a government ID?**
+    No. It is a HealthTwin demo token with fictional data.
+11. **Does it diagnose?**
+    No. It shows what the patient entered and simple draft alert rules, pending doctor review. It never interprets results.
+12. **Is anything real?**
+    Map tiles (OpenStreetMap), road routes (OSRM, with a labelled fallback), the phone's GPS when the patient agrees, and a Bluetooth heart-rate strap on the patient screen (not sent to the server). Everything else is simulated.
+13. **What does it not do?**
+    No real SMS, calls, hospitals or database; the Hindi and Gujarati text is unreviewed; the tests for the patient app and the browser flows have not all been run on this final version (see `docs/QR_PASSPORT_QA.md`).
+14. **Where is the FastAPI backend?**
+    It exists on branch `Puneet` with its own tests. The final demo does not use it.

@@ -123,16 +123,6 @@
       "reason": "Event text written to the case timeline (data), English in every language."
     }
   ],
-  "pages/Admin.jsx": [
-    {
-      "text": ".env",
-      "reason": "A file name and a command typed by a developer."
-    },
-    {
-      "text": "npm run dev",
-      "reason": "A file name and a command typed by a developer."
-    }
-  ],
   "pages/Crew.jsx": [
     {
       "text": "Ambulance crew (simulated)",

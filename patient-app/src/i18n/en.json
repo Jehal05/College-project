@@ -1066,5 +1066,8 @@
   "card.title": "Passport card",
   "card.badge": "Demo profile",
   "card.scan": "Scan to view the information this patient has chosen to share",
-  "card.status": "Status: valid"
+  "card.status": "Status: valid",
+  "nav.passport": "Health passport",
+  "nav.consent": "Consent",
+  "nav.contacts": "Contacts"
 }

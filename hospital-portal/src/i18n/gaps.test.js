@@ -2,8 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { translate } from './translate.js';
-import { warningText, roleText, activityText } from './phrases.js';
-import { buildActivity } from '../services/activity.js';
+import { warningText, roleText } from './phrases.js';
 import { reviewBadge } from '../services/review.js';
 import { readinessWarnings, cardWarning, cardWarningCode } from '../services/capacity.js';
 import { REQUIRED_CAPABILITIES } from '../services/contract.js';
@@ -73,18 +72,6 @@ test('the new screen texts are translated (not left as English) in hi and gu', (
   for (const k of keys) for (const l of ['hi', 'gu']) assert.notEqual(translate(l, k, { id: 'X', who: 'a', time: 'b', pos: 1, of: 2, total: 3 }), translate('en', k, { id: 'X', who: 'a', time: 'b', pos: 1, of: 2, total: 3 }), `${l} ${k} is still English`);
 });
 
-test('Activity rows: English text is unchanged, hi/gu translate the status and the Ticked word, and case data stays', () => {
-  const cases = [{ emergency_id: 'E1', type: 'HEART', created_at: '2026-11-14T10:00:00Z', checklist: { 'chk-1': { done: true, by: 'Asha', at: '2026-11-14T10:05:00Z' } },
-    status_events: [{ state: 'HOSPITAL_ACKNOWLEDGED', timestamp: '2026-11-14T10:01:00Z' }, { state: 'NOTE', kind: 'desk', note: 'Bay 2 ready', timestamp: '2026-11-14T10:02:00Z', actor: 'Asha' }] }];
-  const rows = buildActivity(cases);
-  const byKind = Object.fromEntries(rows.map((r) => [r.kind, r]));
-  for (const r of rows) assert.equal(activityText(tr('en'), r), r.text, `en ${r.kind}`);
-  assert.notEqual(activityText(tr('hi'), byKind.state), byKind.state.text);
-  assert.notEqual(activityText(tr('gu'), byKind.state), byKind.state.text);
-  assert.ok(activityText(tr('hi'), byKind.note).endsWith(': Bay 2 ready'));
-  assert.ok(!activityText(tr('hi'), byKind.note).startsWith('Desk note'));
-  assert.notEqual(activityText(tr('gu'), byKind.checklist).split(':')[0], 'Ticked');
-});
 test('review badge: English unchanged, hi/gu translated, pending until signed off', () => {
   const none = { reviewedBy: '', reviewedOn: '' };
   const signed = { reviewedBy: 'Dr A', reviewedOn: '2026-11-01' };

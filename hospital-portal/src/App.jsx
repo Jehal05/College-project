@@ -16,14 +16,10 @@ const Login = lazy(() => import('./pages/Login.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const MapPage = lazy(() => import('./pages/Map.jsx'));
 const Fleet = lazy(() => import('./pages/Fleet.jsx'));
-const Analytics = lazy(() => import('./pages/Analytics.jsx'));
-const Admin = lazy(() => import('./pages/Admin.jsx'));
 const Crew = lazy(() => import('./pages/Crew.jsx'));
 const History = lazy(() => import('./pages/History.jsx'));
 const PassportScan = lazy(() => import('./pages/PassportScan.jsx'));
-const Activity = lazy(() => import('./pages/Activity.jsx'));
 const Report = lazy(() => import('./pages/Report.jsx'));
-const Handover = lazy(() => import('./pages/Handover.jsx'));
 
 function PageLoading() {
   const t = useT();
@@ -102,22 +98,6 @@ export default function App() {
       <Route
         path="/passport"
         element={<ProtectedRoute roles={staff}><Shell><PassportScan /></Shell></ProtectedRoute>}
-      />
-      <Route
-        path="/activity"
-        element={<ProtectedRoute roles={staff}><Shell><Activity /></Shell></ProtectedRoute>}
-      />
-      <Route
-        path="/handover"
-        element={<ProtectedRoute roles={staff}><Shell><Handover /></Shell></ProtectedRoute>}
-      />
-      <Route
-        path="/analytics"
-        element={<ProtectedRoute roles={staff}><Shell><Analytics /></Shell></ProtectedRoute>}
-      />
-      <Route
-        path="/admin"
-        element={<ProtectedRoute roles={['admin']}><Shell><Admin /></Shell></ProtectedRoute>}
       />
       {/* Crew side of the chat (feature #49). Open it in a second browser tab. */}
       <Route path="/crew/:emergencyId" element={<ProtectedRoute roles={staff}><Suspense fallback={<PageLoading />}><Crew /></Suspense></ProtectedRoute>} />

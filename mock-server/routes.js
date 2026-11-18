@@ -134,13 +134,20 @@ router.get('/emergencies/:id/reasons', requireAuth, (req, res) => {
   if (e) res.json(e.reasons);
 });
 
-router.post('/demo/reset', requireAuth, (req, res) => {
+function resetDemo(req, res) {
   simulator.stopAll();
   store.resetStore();
   demoState.reset();
   require('./failMode').reset();
   require('./otherApps').reset();
   res.json({ ok: true });
+}
+router.post('/demo/reset', requireAuth, resetDemo);
+// The Reset button on the /start page: no login, but only from the computer that runs the demo.
+router.post('/demo/reset-local', (req, res) => {
+  const ip = req.socket.remoteAddress || '';
+  if (!/^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(ip)) return res.status(403).json({ error: 'Local only' });
+  resetDemo(req, res);
 });
 
 // The cities the apps offer (same answer as the backend's GET /cities).

@@ -7,7 +7,6 @@ import OfflineBanner from './components/OfflineBanner';
 import SkipLink from './components/SkipLink';
 import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
-import ReminderBanner from './components/ReminderBanner';
 import SafetyCheckInHost from './components/SafetyCheckInHost';
 import DesktopShell from './components/shell/DesktopShell';
 import UtilityBar from './components/shell/UtilityBar';
@@ -37,7 +36,7 @@ export default function App() {
   if (desktop && isPatient && !plain) {
     return (
       <>
-        <DesktopShell reminder={<ReminderBanner />}>{content}</DesktopShell>
+        <DesktopShell>{content}</DesktopShell>
         <SafetyCheckInHost />
       </>
     );
@@ -50,7 +49,6 @@ export default function App() {
       {!pathname.startsWith('/emergency') && !pathname.startsWith('/p/') && <AppHeader />}
       <main id="main" tabIndex={-1} className="flex-1 p-4">
         <OfflineBanner />
-        {isPatient && !pathname.startsWith('/p/') && <ReminderBanner />}
         {content}
       </main>
       {isPatient && !plain && <SiteFooter />}

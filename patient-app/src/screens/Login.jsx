@@ -66,7 +66,6 @@ export default function Login() {
       </Card>
       <div className="mt-4"><LanguageSelect /></div>
       {DEMO_ENABLED && <p className="mt-2 text-sm text-slate-600">{t('login.demoHint')}</p>}
-      <Link to="/volunteer" className="mt-2 flex min-h-[44px] items-center justify-center font-semibold text-brand-900 underline">{t('login.volunteer')}</Link>
       <a href="tel:112" className="mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-xl border-2 border-slate-900 bg-white font-bold text-slate-900"><Icon name="phone" />{t('emergency.call')}</a>
     </form>
   );
