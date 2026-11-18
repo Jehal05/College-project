@@ -230,6 +230,9 @@ Screenshots of both cities at 360 and 1440 px (patient Hospitals screen and port
 - The joint rehearsal (`node scripts/joint-cities.mjs`) runs on the mock server only. It has not been run through a browser against the real backend.
 - Hindi and Gujarati text for the new screens is an unreviewed draft.
 
+## Real data in the demo
+Map tiles, device GPS, road routes and a Bluetooth heart-rate strap can be real; everything else stays simulated and labelled. What is sent where, the limits and how to test by hand: [`docs/REAL_DATA.md`](docs/REAL_DATA.md).
+
 ## Status and honest limits
 
 | Item | State |
