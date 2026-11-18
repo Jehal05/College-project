@@ -9,10 +9,10 @@ Status: built in the **mock server** (`npm run one`), the patient app and the ho
 | Patient | Login (patient app) | City |
 |---|---|---|
 | Amit Verma (PT-2026-0417, 52) | `amit.verma@demo.test` | Ahmedabad |
-| Priya Singh (0418, 47) | `priya.singh@demo.test` | see the seed |
-| Rohan Mehta (0419, 35) | `rohan.mehta@demo.test` | see the seed |
-| Rahul Sharma (0420, 28) | `rahul.sharma@demo.test` | see the seed |
-| Neha Kapoor (0421, 24) | `neha.kapoor@demo.test` | see the seed |
+| Priya Singh (0418, 47) | `priya.singh@demo.test` | Ahmedabad |
+| Rohan Mehta (0419, 35) | `rohan.mehta@demo.test` | Ahmedabad |
+| Rahul Sharma (0420, 28) | `rahul.sharma@demo.test` | Pune |
+| Neha Kapoor (0421, 24) | `neha.kapoor@demo.test` | Pune |
 
 Each login has its own random password, new at every server start. Open `http://localhost:4000/start` on the laptop running the demo to read them (the list is refused to any other computer). The server keeps only a salted hash. The old `patient@demo.test` / `demo1234` login still works and opens Amit Verma.
 

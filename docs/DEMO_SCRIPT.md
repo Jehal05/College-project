@@ -72,7 +72,7 @@ Start with the phone-reachable address: `PUBLIC_URL=http://<laptop-ip>:4000 DEMO
 | 0:00 | Sign in as `rahul.sharma@demo.test` (Rahul, 28, no symptoms). Profile > Health passport > Create | QR on a card with "Demo profile". No yellow localhost warning. Scan with a phone: demo banner, name, code, blood group, allergies, one masked contact. No conditions or medicines |
 | 1:15 | Sign in as `amit.verma@demo.test` in a second window, create his passport, scan it | A different QR, a different page. Say: Amit's login cannot see Rahul's record (it answers 404) |
 | 2:00 | Open the scanned page's **Staff sign-in** button while signed out | The portal login first. Not signed in means no clinical details |
-| 2:30 | Sign in as `staff@demo` / `demo123`, choose purpose **Emergency treatment**, open | Conditions, medicines and contacts for Amit appear with an audit reference. Say: staff in the other city's hospital are refused, and every view and refusal is logged |
+| 2:30 | Sign in as `staff@demo` / `demo123`, choose purpose **Emergency treatment**, open | Conditions, medicines and contacts for Amit appear with an audit reference. Say: staff of a hospital in the other city are refused (try `staff.pune@demo.test` / `demo1234` on Amit: refused and logged), and every view and refusal is logged |
 | 3:30 | Amit: **Who looked** | Anonymous scan and the staff view with the purpose, no names or devices |
 | 4:00 | Turn Medical history off in Consent settings; rescan | Allergies and contact are gone on the next scan |
 | 4:30 | **Make a new QR**, scan the old one; then **Revoke now**, scan again | "Passport link unavailable" both times |
