@@ -1016,5 +1016,20 @@
   "loc.stop": "Stop sharing my location",
   "loc.resume": "Share my location again",
   "loc.gpsLabel": "Your GPS location (about {{m}} m)",
-  "loc.simLabel": "Simulated location"
+  "loc.simLabel": "Simulated location",
+  "strap.title": "Heart-rate strap",
+  "strap.source.device": "Device (chest strap)",
+  "strap.source.simulated": "Simulated",
+  "strap.consentOff": "Turn on vitals sharing in your consent settings to use a heart-rate strap.",
+  "strap.unsupported": "This browser cannot connect to a Bluetooth strap. Try Chrome on Android or on a computer.",
+  "strap.idle": "No strap connected. The heart rate shown is simulated.",
+  "strap.connecting": "Choose your strap in the window that opens…",
+  "strap.connected": "Strap connected. The heart rate shown comes from your device. It stays on this phone.",
+  "strap.waiting": "Strap connected, waiting for a reading. Wet the strap and wear it snugly.",
+  "strap.reconnecting": "Connection lost. Trying to reconnect…",
+  "strap.lost": "The strap could not be reconnected. The heart rate shown is simulated again.",
+  "strap.error": "Could not connect to the strap. Check that it is on and not used by another app, then try again.",
+  "strap.cancelled": "No strap chosen.",
+  "strap.connect": "Connect heart-rate strap",
+  "strap.disconnect": "Disconnect strap"
 }

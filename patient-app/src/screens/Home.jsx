@@ -10,6 +10,8 @@ import useBaseline from '../hooks/useBaseline';
 import useConsents from '../hooks/useConsents';
 import useVitalsHistory from '../hooks/useVitalsHistory';
 import VitalsCard from '../components/VitalsCard';
+import StrapConnect from '../components/StrapConnect';
+import useHeartStrap from '../hooks/useHeartStrap';
 import DigitalTwinBar from '../components/DigitalTwinBar';
 import StatusBar from '../components/StatusBar';
 import { usePending } from '../hooks/usePendingEmergency';
@@ -27,6 +29,7 @@ export default function Home() {
   const { vitals, connected } = useVitals();
   const { baseline, status: baselineStatus, reload: reloadBaseline } = useBaseline(session.patient_id);
   const { consents } = useConsents(session.patient_id);
+  const strap = useHeartStrap(!!consents && consents.vitals === true);
   const sharing = !!consents && consents.vitals === true; // live vitals sharing on: the trend keeps the last minute in memory
   const history = useVitalsHistory(vitals, sharing);
   const [name, setName] = useState('');
@@ -86,7 +89,8 @@ export default function Home() {
           </Link>
         ))}
       </nav>
-      <VitalsCard vitals={vitals} connected={connected} />
+      <VitalsCard vitals={vitals} connected={connected} strapBpm={strap.bpm} />
+      <StrapConnect strap={strap} consentOn={!!consents && consents.vitals === true} />
       <DigitalTwinBar vitals={vitals} baseline={baseline} status={baselineStatus} onRetry={reloadBaseline}
         history={history} sharing={sharing} sharingOff={!!consents && consents.vitals === false} />
       <SectionHeader>{t('home.state')}</SectionHeader>
